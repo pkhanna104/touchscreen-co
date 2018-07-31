@@ -27,6 +27,7 @@ class Data(tables.IsDescription):
     cursor = tables.Float32Col(shape=(10, 2))
     cursor_ids = tables.Float32Col(shape = (10, ))
     target_pos = tables.Float32Col(shape=(2, ))
+    cap_touch = tables.Float32Col()
     time = tables.Float32Col()
 
 class COGame(Widget):
@@ -89,7 +90,13 @@ class COGame(Widget):
         self.cursor_ids.remove(touch.uid)
         _ = self.cursor.pop(touch.uid)
 
-    def init(self, animal_names_dict, rew_in, task_in, rew_del, test, cap_on):
+    def init(self, animal_names_dict, rew_in, task_in, rew_del, test, cap_on, hold):
+
+        holdz = [.25, .5, .625, .75]
+        for i, val in enumerate(hold['hold']):
+            if val:
+                self.cht = holdz[i]
+                self.tht = holdz[i]
 
         cap = [1, 0]
         for i, val in enumerate(cap_on['cap']):
@@ -97,7 +104,7 @@ class COGame(Widget):
                 self.use_cap_sensor = cap[i]
 
         if self.use_cap_sensor:
-            self.serial_port_cap = serial.Serial(port='COM5')
+            self.serial_port_cap = serial.Serial(port='COM3')
         self.rhtouch_sensor = 0.
 
         small_rew_opts = [.1, .3, .5]
@@ -121,6 +128,11 @@ class COGame(Widget):
         else:
             self.reward_for_targtouch = [False, 0]
 
+        if rew_in['snd_only']:
+            self.reward_for_targtouch = [True, 0.]
+            self.skip_juice = True
+        else:
+            self.skip_juice = False
 
         target_rad_opts = [.5, 1.0, 1.5, 2.0, 3.0]
         for i, val in enumerate(task_in['targ_rad']):
@@ -209,7 +221,9 @@ class COGame(Widget):
             target_distance = self.target_distance,
             start_time = datetime.datetime.now().strftime('%Y%m%d_%H%M'),
             testing=self.testing,
-            rew_delay = self.reward_delay_time)
+            rew_delay = self.reward_delay_time,
+            use_cap_sensor = self.use_cap_sensor,
+            )
 
         try:
             if self.testing:
@@ -231,7 +245,9 @@ class COGame(Widget):
 
     def close_app(self):
         # Save Data Eventually
-
+        if self.use_cap_sensor:
+            self.serial_port_cap.close()
+            
         App.get_running_app().stop()
         Window.close()
 
@@ -264,14 +280,16 @@ class COGame(Widget):
                     start_state_fn()
         
         if self.use_cap_sensor:
-            self.serial_port_cap.flushInput()
-            port_read = self.serial_port_cap.read(4)
-            if str(port_read[:2]) == "b'N1'":
-                self.rhtouch_sensor = False
-            elif str(port_read[:2]) == "b'C1'":
-                self.rhtouch_sensor = True
-            
-        print(self.state)
+            try:
+                self.serial_port_cap.flushInput()
+                port_read = self.serial_port_cap.read(4)
+                if str(port_read[:2]) == "b'N1'":
+                    self.rhtouch_sensor = False
+                elif str(port_read[:2]) == "b'C1'":
+                    self.rhtouch_sensor = True
+            except:
+                print('passing state! ')
+                pass     
         if self.testing:
             pass
         else:
@@ -294,6 +312,7 @@ class COGame(Widget):
 
         self.h5_table_row['target_pos'] = self.periph_target_position
         self.h5_table_row['time'] = time.time()
+        self.h5_table_row['cap_touch'] = self.rhtouch_sensor
         self.h5_table_row.append()
 
     def stop(self, **kwargs):
@@ -400,13 +419,15 @@ class COGame(Widget):
         try:
             if self.reward_for_targtouch[0]:
                 winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                self.reward_port.open()
-                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
-                self.reward_port.write(rew_str)
-                time.sleep(.5 + self.reward_delay_time)
-                run_str = [ord(r) for r in 'run\n']
-                self.reward_port.write(run_str)
-                self.reward_port.close()
+
+                if not self.skip_juice:
+                    self.reward_port.open()
+                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                    self.reward_port.write(rew_str)
+                    time.sleep(.5 + self.reward_delay_time)
+                    run_str = [ord(r) for r in 'run\n']
+                    self.reward_port.write(run_str)
+                    self.reward_port.close()
         except:
             pass
         

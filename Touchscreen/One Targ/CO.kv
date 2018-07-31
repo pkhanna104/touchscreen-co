@@ -345,6 +345,48 @@
                     fontsize: 50
 
             BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Target Hold Time'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0.25 sec'
+
+                CheckBox:
+                    id: quarter_sec
+                    group: 'hold_time'
+
+                Label: 
+                    text: '0.5 sec'
+
+                CheckBox:
+                    id: half_sec
+                    group: 'hold_time'
+
+                Label:
+                    text: '0.75 sec'
+                    fontsize: 50
+
+                CheckBox:
+                    id: three_quart_sec
+                    group: 'hold_time'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+            BoxLayout:
                 id: test
                 orientation: 'horizontal'
                 Label:
@@ -382,7 +424,7 @@
                 on_release: 
                     root.current = 'game_screen'
                     game.init(dict(haun=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=rew_noauto_chk.active, rew_anytouch=rew_anytouch_chk.active, rew_any_pls_targ=rew_anytouch_pls_targ_chk.active, rew_targ=rew_targ_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
-                    dict(targ_rad=[targ_rad_5.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), dict(test=[testing.active, monk_time.active]), dict(cap=[yes_cap.active, no_cap.active]))
+                    dict(targ_rad=[targ_rad_5.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), dict(test=[testing.active, monk_time.active]), dict(cap=[yes_cap.active, no_cap.active]), dict(hold=[quarter_sec.active, half_sec.active, three_quart_sec.active]))
                     Clock.schedule_interval(game.update, 1.0 / 60.0)
             Label:
                 text: ''
