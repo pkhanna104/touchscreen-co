@@ -67,6 +67,14 @@
                     group: 'rew'
                     id: rew_targ_chk
 
+                Label: 
+                    text: 'SOUND for target touch'
+
+                CheckBox:
+                    group: 'rew'
+                    id: sound_only_chk
+
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -373,6 +381,13 @@
                     id: half_sec
                     group: 'hold_time'
 
+                Label: 
+                    text: '0.625 sec'
+
+                CheckBox:
+                    id: five_eighth_sec
+                    group: 'hold_time'
+
                 Label:
                     text: '0.75 sec'
                     fontsize: 50
@@ -385,6 +400,41 @@
                     text: ''
                     fontsize: 50
 
+            BoxLayout:
+                id: test
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+                
+                Label: 
+                    text: 'Target Structure'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: 'Random'
+                CheckBox:
+                    id: rand_targ
+                    group: 'targ_struct'
+
+                Label:
+                    text: '4 Targs'
+                CheckBox:
+                    id: four_targ
+                    group: 'targ_struct'
+
+                Label:
+                    text: '2 step CO'
+                CheckBox:
+                    id: co_targ
+                    group: 'targ_struct'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
 
             BoxLayout:
                 id: test
@@ -423,8 +473,8 @@
                 text_size: self.size
                 on_release: 
                     root.current = 'game_screen'
-                    game.init(dict(haun=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=rew_noauto_chk.active, rew_anytouch=rew_anytouch_chk.active, rew_any_pls_targ=rew_anytouch_pls_targ_chk.active, rew_targ=rew_targ_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
-                    dict(targ_rad=[targ_rad_5.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), dict(test=[testing.active, monk_time.active]), dict(cap=[yes_cap.active, no_cap.active]), dict(hold=[quarter_sec.active, half_sec.active, three_quart_sec.active]))
+                    game.init(dict(haun=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=rew_noauto_chk.active, rew_anytouch=rew_anytouch_chk.active, rew_any_pls_targ=rew_anytouch_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
+                    dict(targ_rad=[targ_rad_5.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), dict(test=[testing.active, monk_time.active]), dict(cap=[yes_cap.active, no_cap.active]), dict(hold=[quarter_sec.active, half_sec.active, five_eighth_sec.active, three_quart_sec.active]), dict(get_targets_rand=rand_targ.active, get_4targets=four_targ.active, get_targets_co=co_targ.active))
                     Clock.schedule_interval(game.update, 1.0 / 60.0)
             Label:
                 text: ''
@@ -437,7 +487,7 @@
         name: 'game_screen'
         COGame:
             id: game
-            
+
 <COGame>:
     center_target: target_c
     periph_target: target_p

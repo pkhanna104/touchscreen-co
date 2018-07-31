@@ -90,7 +90,7 @@ class COGame(Widget):
         self.cursor_ids.remove(touch.uid)
         _ = self.cursor.pop(touch.uid)
 
-    def init(self, animal_names_dict, rew_in, task_in, rew_del, test, cap_on, hold):
+    def init(self, animal_names_dict, rew_in, task_in, rew_del, test, cap_on, hold, targ_structure):
 
         holdz = [.25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
@@ -138,11 +138,18 @@ class COGame(Widget):
         for i, val in enumerate(task_in['targ_rad']):
             if val:
                 self.periph_target_rad = target_rad_opts[i]
+                self.center_target_rad = target_rad_opts[i]
 
         for i, (nm, val) in enumerate(animal_names_dict.items()):
             if val:
                 animal_name = nm
 
+        self.use_center = False
+        for i, (nm, val) in enumerate(targ_structure.items()):
+            if val:
+                generatorz = getattr(self, nm)
+                if 'co' in nm:
+                    self.use_center = True
         try:
             pygame.mixer.init()    
         except:
@@ -175,27 +182,38 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
 
-        self.target_list = self.get_targets_rand(self.target_distance)
+        self.target_list = generatorz()
         self.target_index = 0
         self.repeat = False
         self.center_target_position = np.array([0., 0.])
         self.periph_target_position = self.target_list[self.target_index, :]
 
+
+
         self.FSM = dict()
         self.FSM['ITI'] = dict(end_ITI='RH_touch', stop=None)
         self.FSM['RH_touch'] = dict(rhtouch='target', stop=None)
-        # self.FSM['center'] = dict(touch_center='center_hold', center_timeout='timeout_error', stop=None) #touch_not_center='touch_error')
-        # self.FSM['center_hold'] = dict(finish_center_hold='target', early_leave_center_hold='hold_error', 
-        #     center_drag_out = 'drag_error', stop=None)
+        
+        if self.use_center:
+            self.FSM['RH_touch'] = dict(rhtouch='center', stop=None)
+            self.FSM['center'] = dict(touch_center='center_hold', center_timeout='timeout_error', stop=None)
+            self.FSM['center_hold'] = dict(finish_center_hold='target', early_leave_center_hold='hold_error',stop=None)
+
         self.FSM['target'] = dict(touch_target = 'targ_hold', target_timeout='timeout_error', stop=None,
             anytouch='rew_anytouch', non_rhtouch='RH_touch')#,touch_not_target='touch_error')
         self.FSM['targ_hold'] = dict(finish_targ_hold='reward', early_leave_target_hold = 'hold_error',
          targ_drag_out = 'drag_error', stop=None, non_rhtouch='RH_touch')
         self.FSM['reward'] = dict(end_reward = 'ITI', stop=None, non_rhtouch='RH_touch')
-        self.FSM['touch_error'] = dict(end_touch_error='target', stop=None, non_rhtouch='RH_touch')
-        self.FSM['timeout_error'] = dict(end_timeout_error='target', stop=None, non_rhtouch='RH_touch')
-        self.FSM['hold_error'] = dict(end_hold_error='target', stop=None, non_rhtouch='RH_touch')
-        self.FSM['drag_error'] = dict(end_drag_error='target', stop=None, non_rhtouch='RH_touch')
+
+        if self.use_center:
+            return_ = 'center'
+        else:
+            return_ = 'target'
+
+        self.FSM['touch_error'] = dict(end_touch_error=return_, stop=None, non_rhtouch='RH_touch')
+        self.FSM['timeout_error'] = dict(end_timeout_error=return_, stop=None, non_rhtouch='RH_touch')
+        self.FSM['hold_error'] = dict(end_hold_error=return_, stop=None, non_rhtouch='RH_touch')
+        self.FSM['drag_error'] = dict(end_drag_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['rew_anytouch'] = dict(end_rewanytouch='target', stop=None, non_rhtouch='RH_touch')
 
         try:
@@ -207,7 +225,8 @@ class COGame(Widget):
 
         # save parameters: 
         d = dict(animal_name=animal_name, center_target_rad=self.center_target_rad,
-            periph_target_rad=self.periph_target_rad, target_list = self.target_list, 
+            periph_target_rad=self.periph_target_rad, target_structure = generatorz.__name__, 
+            target_list = self.target_list, 
             ITI_mean=self.ITI_mean, ITI_std = self.ITI_std, ch_timeout=self.ch_timeout, 
             cht=self.cht, reward_time_small=self.reward_for_anytouch[1],
             reward_time_big=self.reward_for_targtouch[1],
@@ -294,7 +313,6 @@ class COGame(Widget):
             pass
         else:
             self.write_to_h5file()
-
 
     def write_to_h5file(self):
         self.h5_table_row['state']= self.state; 
@@ -516,7 +534,10 @@ class COGame(Widget):
         else:
             return False
 
-    def get_targets_co(self, ntargets, target_distance):
+    def get_4targets(self):
+        return self.get_targets_co()
+
+    def get_targets_co(self, ntargets=4, target_distance=4):
         # Targets in CM: 
         angle = np.linspace(0, 2*np.pi, ntargets+1)[:-1]
         x = np.cos(angle)*target_distance
@@ -529,7 +550,7 @@ class COGame(Widget):
             tgs.append(tmp[ix, :])
         return np.vstack((tgs))
 
-    def get_targets_rand(self, target_distance):
+    def get_targets_rand(self, target_distance=8):
         # Targets in CM: 
         angle = np.linspace(0, 2*np.pi, 1000)
         target_distance = np.linspace(target_distance/4., target_distance, 1000)
