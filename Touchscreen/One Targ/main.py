@@ -164,7 +164,7 @@ class COGame(Widget):
         for i, val in enumerate(test['test']):
             if val:
                 self.testing = test_vals[i]
-
+        
         self.state = 'ITI'
         self.state_start = time.time()
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
@@ -249,7 +249,20 @@ class COGame(Widget):
                 pass
 
             else:
-                self.filename = 'C:/Users/Ganguly/Documents/Preeya/data/'+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+                import os
+                path = os.getcwd()
+                path = path.split('\\')
+                path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
+                p = ''
+                for ip in path_data:
+                    p += ip+'/'
+                p += 'data/'
+                print ('')
+                print ('')
+                print('Data saving PATH: ', p)
+                print ('')
+                print ('')
+                self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
                 pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
                 self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
                 self.h5_table = self.h5file.create_table('/', 'task', Data, '')
