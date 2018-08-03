@@ -69,7 +69,7 @@ class COGame(Widget):
     prev_exit_ts = np.array([0,0])
 
     # Number of trials: 
-    trial_counter =  NumericProperty(0)
+    trial_counter = NumericProperty(0)
 
 
     def on_touch_down(self, touch):
@@ -93,7 +93,7 @@ class COGame(Widget):
         self.cursor_ids.remove(touch.uid)
         _ = self.cursor.pop(touch.uid)
 
-    def init(self, animal_names_dict, rew_in, task_in, rew_del, test, cap_on, hold, targ_structure):
+    def init(self, animal_names_dict, rew_in, task_in, rew_del, test, cap_on, hold, targ_structure, autoquit):
 
         holdz = [.25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
@@ -168,6 +168,11 @@ class COGame(Widget):
             if val:
                 self.testing = test_vals[i]
         
+        autoquit_trls = [25, 50, 10**10]
+        for i, val in enumerate(autoquit['autoquit']):
+            if val: 
+                self.max_trials = autoquit_trls[i]
+
         self.state = 'ITI'
         self.state_start = time.time()
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
@@ -348,20 +353,26 @@ class COGame(Widget):
         self.h5_table_row.append()
 
     def stop(self, **kwargs):
-        e = [0, 0]
-        e[0] = self.check_if_cursors_in_targ(self.exit_pos, self.exit_rad)
-        e[1] = self.check_if_cursors_in_targ(self.exit_pos2, self.exit_rad)
-        t = [0, 0]
-        for i in range(2):
-            if np.logical_and(self.prev_exit_ts[i] !=0, e[i] == True):
-                t[i] = time.time() - self.prev_exit_ts[i]
-            elif np.logical_and(self.prev_exit_ts[i] == 0, e[i]==True):
-                self.prev_exit_ts[i] = time.time()
-            else:
-                self.prev_exit_ts[i] = 0
-                
-        if t[0] > self.exit_hold and t[1] > self.exit_hold:
+        # If past number of max trials then auto-quit: 
+        if np.logical_and(self.trial_counter >= self.max_trials, self.state == 'ITI'):
             return True
+        else:
+            e = [0, 0]
+            e[0] = self.check_if_cursors_in_targ(self.exit_pos, self.exit_rad)
+            e[1] = self.check_if_cursors_in_targ(self.exit_pos2, self.exit_rad)
+            t = [0, 0]
+            for i in range(2):
+                if np.logical_and(self.prev_exit_ts[i] !=0, e[i] == True):
+                    t[i] = time.time() - self.prev_exit_ts[i]
+                elif np.logical_and(self.prev_exit_ts[i] == 0, e[i]==True):
+                    self.prev_exit_ts[i] = time.time()
+                else:
+                    self.prev_exit_ts[i] = 0
+                    
+            if t[0] > self.exit_hold and t[1] > self.exit_hold:
+                return True
+            else:
+                return False
 
     def _start_ITI(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
