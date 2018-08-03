@@ -66,8 +66,11 @@ class COGame(Widget):
     periph_target = ObjectProperty(None)
 
     done_init = False
-
     prev_exit_ts = np.array([0,0])
+
+    # Number of trials: 
+    trial_counter =  NumericProperty(0)
+
 
     def on_touch_down(self, touch):
         #handle many touchs:
@@ -187,8 +190,6 @@ class COGame(Widget):
         self.repeat = False
         self.center_target_position = np.array([0., 0.])
         self.periph_target_position = self.target_list[self.target_index, :]
-
-
 
         self.FSM = dict()
         self.FSM['ITI'] = dict(end_ITI='RH_touch', stop=None)
@@ -442,6 +443,7 @@ class COGame(Widget):
         self.repeat = False
 
     def _start_reward(self, **kwargs):
+        self.trial_counter += 1
         Window.clearcolor = (1., 1., 1., 1.)
         self.periph_target.color = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
