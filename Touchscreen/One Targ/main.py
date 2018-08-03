@@ -163,10 +163,12 @@ class COGame(Widget):
             if val:
                 self.reward_delay_time = reward_delay_opts[i]
 
-        test_vals = [True, False]
+        test_vals = [True, False, False]
+        in_cage_vals = [False, False, True]
         for i, val in enumerate(test['test']):
             if val:
                 self.testing = test_vals[i]
+                self.in_cage = in_cage_vals[i]
         
         autoquit_trls = [25, 50, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
@@ -269,6 +271,9 @@ class COGame(Widget):
                 print ('')
                 print ('')
                 self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+                if self.in_cage:
+                    self.filename = self.filename+'_cage'
+                    
                 pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
                 self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
                 self.h5_table = self.h5file.create_table('/', 'task', Data, '')
