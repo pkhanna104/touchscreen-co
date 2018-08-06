@@ -491,6 +491,36 @@
                     fontsize: 50
                 
                 Label: 
+                    text: 'Allow Drag Finger Into Targ: '
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: 'Yes'
+                CheckBox:
+                    id: drag
+                    group: 'drag'
+                    active: True
+
+                Label:
+                    text: 'No'
+                CheckBox:
+                    id: no_drag
+                    group: 'drag'
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            BoxLayout:
+                id: test
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+                
+                Label: 
                     text: 'Testing or Monkey Time?'
                     color: 1, 1, 0, 1
 
@@ -530,13 +560,23 @@
                 on_release: 
                     root.current = 'game_screen'
                     game.init(dict(haun=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=rew_noauto_chk.active, rew_anytouch=rew_anytouch_chk.active, rew_any_pls_targ=rew_anytouch_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
-                    dict(targ_rad=[targ_rad_5.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), dict(test=[testing.active, monk_time.active, monk_time_in_cage.active]), dict(cap=[yes_cap.active, no_cap.active]), dict(hold=[quarter_sec.active, half_sec.active, five_eighth_sec.active, three_quart_sec.active]), dict(get_targets_rand=rand_targ.active, get_4targets=four_targ.active, get_targets_co=co_targ.active), dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]))
+                    dict(targ_rad=[targ_rad_5.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), dict(test=[testing.active, monk_time.active, monk_time_in_cage.active]), dict(cap=[yes_cap.active, no_cap.active]), dict(hold=[quarter_sec.active, half_sec.active, five_eighth_sec.active, three_quart_sec.active]), dict(get_targets_rand=rand_targ.active, get_4targets=four_targ.active, get_targets_co=co_targ.active), dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), dict(drag=[drag.active, no_drag.active]))
                     Clock.schedule_interval(game.update, 1.0 / 60.0)
             Label:
                 text: ''
                 fontsize: 50
             Label:
                 text: ''
+                fontsize: 50
+
+    Screen: 
+        name: 'splash_start'
+        BoxLayout
+            id: splash
+            orientation: 'vertical'
+    
+            Label:
+                text: 'Parameters Noted! \n Prepare the Monkey! Pausing Until Start Buttons Pressed. '
                 fontsize: 50
 
     Screen:

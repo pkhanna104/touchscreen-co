@@ -50,6 +50,7 @@ class COGame(Widget):
     tht = .001
 
     cursor = {}
+    cursor_start = {}
     cursor_ids = []
 
     anytouch_prev = False
@@ -80,7 +81,9 @@ class COGame(Widget):
         self.cursor_ids.append(touch.uid)
 
         # Add cursor
-        self.cursor[touch.uid] =  pix2cm(np.array([touch.x, touch.y]))
+        curs = pix2cm(np.array([touch.x, touch.y]))
+        self.cursor[touch.uid] =  curs.copy()
+        self.cursor_start[touch.uid] = curs.copy()
 
         # set self.touch to True
         self.touch = True
@@ -93,7 +96,8 @@ class COGame(Widget):
         self.cursor_ids.remove(touch.uid)
         _ = self.cursor.pop(touch.uid)
 
-    def init(self, animal_names_dict, rew_in, task_in, rew_del, test, cap_on, hold, targ_structure, autoquit):
+    def init(self, animal_names_dict, rew_in, task_in, rew_del, test, cap_on, hold, targ_structure,
+        autoquit, drag):
 
         holdz = [.25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
@@ -174,6 +178,11 @@ class COGame(Widget):
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
+
+        drag_ok = [True, False]
+        for i, val in enumerate(drag['drag']):
+            if val:
+                self.drag_ok = drag_ok[i]
 
         self.state = 'ITI'
         self.state_start = time.time()
@@ -273,7 +282,7 @@ class COGame(Widget):
                 self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
                 if self.in_cage:
                     self.filename = self.filename+'_cage'
-                    
+
                 pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
                 self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
                 self.h5_table = self.h5file.create_table('/', 'task', Data, '')
@@ -516,7 +525,11 @@ class COGame(Widget):
         return kwargs['ts'] >= self.drag_error_timeout
 
     def touch_center(self, **kwargs):
-        return self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad)
+        if self.drag_ok:
+            return self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad)
+        else:
+            return np.logical_and(self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad),
+                self.check_if_started_in_targ(self.center_target_position, self.center_target_rad))
 
     def center_timeout(self, **kwargs):
         return kwargs['ts'] > self.ch_timeout
@@ -535,7 +548,11 @@ class COGame(Widget):
         return not stay_in
 
     def touch_target(self, **kwargs):
-        return self.check_if_cursors_in_targ(self.periph_target_position, self.periph_target_rad)
+        if self.drag_ok:
+            return self.check_if_cursors_in_targ(self.periph_target_position, self.periph_target_rad)
+        else:
+            return np.logical_and(self.check_if_cursors_in_targ(self.periph_target_position, self.periph_target_rad),
+                self.check_if_started_in_targ(self.periph_target_position, self.periph_target_rad))
 
     def target_timeout(self, **kwargs):
         return kwargs['ts'] > self.target_timeout_time
@@ -547,7 +564,6 @@ class COGame(Widget):
         return not self.check_if_cursors_in_targ(self.periph_target_position, self.periph_target_rad)
 
     def targ_drag_out(self, **kwargs):
-
         touch = self.touch
         self.touch = True
         stay_in = self.check_if_cursors_in_targ(self.periph_target_position, self.periph_target_rad)
@@ -593,12 +609,23 @@ class COGame(Widget):
         y = np.sin(angle[ix_ang])*target_distance[ix_dist]
         return np.hstack((x[:, np.newaxis], y[:, np.newaxis]))
 
+    def check_if_started_in_targ(self, targ_center, targ_rad):
+        startedInTarg = False
+        if self.touch:
+            for id_ in self.cursor_ids:
+                # If in target: 
+                if np.linalg.norm(np.array(self.cursor[id_]) - targ_center) < targ_rad:
+                    if np.linalg.norm(np.array(self.cursor_start[id_]) - targ_center) < targ_rad:
+                        startedInTarg = True
+        return startedInTarg
+
     def check_if_cursors_in_targ(self, targ_center, targ_rad):
         if self.touch:
             inTarg = False
             for id_ in self.cursor_ids:
                 if np.linalg.norm(np.array(self.cursor[id_]) - targ_center) < targ_rad:
                     inTarg = True
+
             return inTarg
         else:
             return False
