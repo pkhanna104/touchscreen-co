@@ -96,8 +96,9 @@ class COGame(Widget):
         self.cursor_ids.remove(touch.uid)
         _ = self.cursor.pop(touch.uid)
 
-    def init(self, animal_names_dict, rew_in, task_in, rew_del, test, cap_on, hold, targ_structure,
-        autoquit, drag):
+    def init(self, animal_names_dict=None, rew_in=None, task_in=None, rew_del=None,
+        test=None, cap_on=None, hold=None, targ_structure=None,
+        autoquit=None, drag=None):
 
         holdz = [.25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
@@ -232,6 +233,7 @@ class COGame(Widget):
         self.FSM['hold_error'] = dict(end_hold_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['drag_error'] = dict(end_drag_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['rew_anytouch'] = dict(end_rewanytouch='target', stop=None, non_rhtouch='RH_touch')
+        self.FSM['idle_exit'] = dict(stop=None)
 
         try:
             self.reward_port = serial.Serial(port='COM6',
@@ -259,6 +261,7 @@ class COGame(Widget):
             testing=self.testing,
             rew_delay = self.reward_delay_time,
             use_cap_sensor = self.use_cap_sensor,
+            drag_ok = self.drag_ok,
             )
 
         try:
@@ -299,9 +302,12 @@ class COGame(Widget):
         # Save Data Eventually
         if self.use_cap_sensor:
             self.serial_port_cap.close()
-            
-        App.get_running_app().stop()
-        Window.close()
+        if self.idle:
+            self.state = 'idle_exit'
+            self.trial_counter = -1
+        else:
+            App.get_running_app().stop()
+            Window.close()
 
     def update(self, ts):
         self.state_length = time.time() - self.state_start
@@ -316,21 +322,22 @@ class COGame(Widget):
                 if fcn_test_name == 'stop':
                     self.close_app()
 
-                # Run any 'end' fcns from prevoius state: 
-                end_state_fn_name = "_end_%s" % self.state
-                if hasattr(self, end_state_fn_name):
-                    end_state_fn = getattr(self, end_state_fn_name)
-                    end_state_fn()
-                self.prev_state = self.state
-                self.state = next_state
-                self.state_start = time.time()
+                else:
+                    # Run any 'end' fcns from prevoius state: 
+                    end_state_fn_name = "_end_%s" % self.state
+                    if hasattr(self, end_state_fn_name):
+                        end_state_fn = getattr(self, end_state_fn_name)
+                        end_state_fn()
+                    self.prev_state = self.state
+                    self.state = next_state
+                    self.state_start = time.time()
 
-                # Run any starting functions: 
-                start_state_fn_name = "_start_%s" % self.state
-                if hasattr(self, start_state_fn_name):
-                    start_state_fn = getattr(self, start_state_fn_name)
-                    start_state_fn()
-        
+                    # Run any starting functions: 
+                    start_state_fn_name = "_start_%s" % self.state
+                    if hasattr(self, start_state_fn_name):
+                        start_state_fn = getattr(self, start_state_fn_name)
+                        start_state_fn()
+            
         if self.use_cap_sensor:
             try:
                 self.serial_port_cap.flushInput()
@@ -345,7 +352,10 @@ class COGame(Widget):
         if self.testing:
             pass
         else:
-            self.write_to_h5file()
+            if self.state == 'idle_exit':
+                pass
+            else:
+                self.write_to_h5file()
 
     def write_to_h5file(self):
         self.h5_table_row['state']= self.state; 
@@ -369,6 +379,7 @@ class COGame(Widget):
     def stop(self, **kwargs):
         # If past number of max trials then auto-quit: 
         if np.logical_and(self.trial_counter >= self.max_trials, self.state == 'ITI'):
+            self.idle = True
             return True
         else:
             e = [0, 0]
@@ -384,7 +395,9 @@ class COGame(Widget):
                     self.prev_exit_ts[i] = 0
                     
             if t[0] > self.exit_hold and t[1] > self.exit_hold:
+                self.idle = False
                 return True
+
             else:
                 return False
 
@@ -630,6 +643,10 @@ class COGame(Widget):
         else:
             return False
 
+class Splash(Widget):
+    def init(self, *args):
+        self.args = args
+
 class Target(Widget):
     
     color = ListProperty([0., 0., 0., 1.])
@@ -655,7 +672,6 @@ class COApp(App):
         Window.left = (screenx - 1800)/2
         Window.top = (screeny - 1000)/2
         return Manager()
-
 
 def cm2pix(pos_cm, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):
     # Convert from CM to pixels: 
