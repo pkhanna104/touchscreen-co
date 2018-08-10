@@ -93,9 +93,12 @@ class COGame(Widget):
         self.touch = True
 
     def on_touch_up(self, touch):
-        self.cursor_ids.remove(touch.uid)
-        _ = self.cursor.pop(touch.uid)
-
+        try:
+            self.cursor_ids.remove(touch.uid)
+            _ = self.cursor.pop(touch.uid)
+        except:
+            print('removing touch from pre-game screen')
+            
     def init(self, animal_names_dict=None, rew_in=None, task_in=None, rew_del=None,
         test=None, cap_on=None, hold=None, targ_structure=None,
         autoquit=None, drag=None):
