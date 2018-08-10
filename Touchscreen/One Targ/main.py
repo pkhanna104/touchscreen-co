@@ -112,7 +112,8 @@ class COGame(Widget):
                 self.use_cap_sensor = cap[i]
 
         if self.use_cap_sensor:
-            self.serial_port_cap = serial.Serial(port='COM3')
+            self.serial_port_cap = serial.Serial(port='COM5')
+
         self.rhtouch_sensor = 0.
 
         small_rew_opts = [.1, .3, .5]
@@ -214,8 +215,8 @@ class COGame(Widget):
         
         if self.use_center:
             self.FSM['RH_touch'] = dict(rhtouch='center', stop=None)
-            self.FSM['center'] = dict(touch_center='center_hold', center_timeout='timeout_error', stop=None)
-            self.FSM['center_hold'] = dict(finish_center_hold='target', early_leave_center_hold='hold_error',stop=None)
+            self.FSM['center'] = dict(touch_center='center_hold', center_timeout='timeout_error', non_rhtouch='RH_touch',stop=None)
+            self.FSM['center_hold'] = dict(finish_center_hold='target', early_leave_center_hold='hold_error', non_rhtouch='RH_touch', stop=None)
 
         self.FSM['target'] = dict(touch_target = 'targ_hold', target_timeout='timeout_error', stop=None,
             anytouch='rew_anytouch', non_rhtouch='RH_touch')#,touch_not_target='touch_error')
@@ -414,9 +415,15 @@ class COGame(Widget):
         return kwargs['ts'] > self.ITI
 
     def _start_RH_touch(self, **kwargs):
-        if self.use_cap_sensor:
+        if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
             self.periph_target.color = (1., 0., 0., 1.)
+            self.center_target.color = (1., 0., 0., 1.)
             Window.clearcolor = (1., 0., 0., 1.)
+
+            # Turn exit buttons redish:
+            self.exit_target1.color = (.9, 0, 0, 1.)
+            self.exit_target2.color = (.9, 0, 0, 1.)
+
 
     def rhtouch(self, **kwargs):
         if self.use_cap_sensor:
@@ -434,7 +441,11 @@ class COGame(Widget):
         return x
 
     def _start_center(self, **kwargs):
+        Window.clearcolor = (0., 0., 0., 1.)
         self.center_target.color = (1., 1., 0., 1.)
+        self.exit_target1.color = (.15, .15, .15, 1)
+        self.exit_target2.color = (.15, .15, .15, 1)
+        self.periph_target.color = (0., 0., 0., 1.)
 
     def _start_center_hold(self, **kwargs):
         self.center_target.color = (0., 1., 0., 1.)
@@ -479,6 +490,8 @@ class COGame(Widget):
         self.periph_target.move(self.periph_target_position)
         self.periph_target.color = (1., 1., 0., 1.)
         self.repeat = False
+        self.exit_target1.color = (.15, .15, .15, 1)
+        self.exit_target2.color = (.15, .15, .15, 1)
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
