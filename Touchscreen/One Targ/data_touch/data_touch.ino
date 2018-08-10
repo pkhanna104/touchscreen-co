@@ -67,7 +67,7 @@ void setup() {
   // Serial.println("CAP1188 found!");
 
   uint8_t reg = cap.readRegister( 0x1f ) & 0x0f;
-  cap.writeRegister( 0x1f, reg | 0x4F ); // or whatever value you want - 101 1111, want 
+  cap.writeRegister( 0x1f, reg | 0x5F ); // or whatever value you want - 101 1111, want 
 
   // Compute baseline: 
   for (int i=1; i < 200; i ++) {
@@ -94,13 +94,6 @@ void setup() {
 }
 
 void loop() {
-  uint8_t touched = cap.touched();
-  
-//  if (touched == 0) {
-//    // No touch detected
-//    return;
-//  }
-  
   for (uint8_t i=1; i<2; i++) {
     byte reg = cap.readRegister( 0x11 );
 
@@ -129,9 +122,7 @@ void loop() {
 //    Serial.print(chan_bD);
 
     if (chan_ratio > chan_rat_thresh) {
-      Serial.print("C"); Serial.print(i); // Serial.print("\t");
-      uint8_t reg = cap.readRegister( 0x1f ) & 0x0f;
-      cap.writeRegister( 0x1f, reg | 0x4F ); // or whatever value you want - 101 1111, want 
+      Serial.print("C"); Serial.print(i);
     }
     else {
       Serial.print("N"); Serial.print(i);
