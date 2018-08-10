@@ -112,7 +112,7 @@ class COGame(Widget):
                 self.use_cap_sensor = cap[i]
 
         if self.use_cap_sensor:
-            self.serial_port_cap = serial.Serial(port='COM5')
+            self.serial_port_cap = serial.Serial(port='COM3')
 
         self.rhtouch_sensor = 0.
 
