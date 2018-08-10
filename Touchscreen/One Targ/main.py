@@ -39,7 +39,7 @@ class COGame(Widget):
     center_target_rad = 1.5
     periph_target_rad = 1.5
 
-    exit_pos = np.array([5, 5])
+    exit_pos = np.array([7, 4])
     exit_rad = 1.
     exit_hold = 5 #seconds
 
@@ -197,7 +197,7 @@ class COGame(Widget):
         self.exit_target1.set_size(2*self.exit_rad)
         self.exit_target2.set_size(2*self.exit_rad)
         self.exit_target1.move(self.exit_pos)
-        self.exit_pos2 = np.array([-1*self.exit_pos[0], self.exit_pos[1]])
+        self.exit_pos2 = np.array([self.exit_pos[0], -1*self.exit_pos[1]])
         self.exit_target2.move(self.exit_pos2)
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
