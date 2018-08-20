@@ -100,6 +100,9 @@ class COGame(Widget):
         test=None, cap_on=None, hold=None, targ_structure=None,
         autoquit=None, drag=None):
 
+        from subprocess import call
+        call(["amixer", "-D", "pulse", "sset", "Master", "100%+"])
+
         holdz = [.25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
             if val:
@@ -236,7 +239,7 @@ class COGame(Widget):
         self.FSM['idle_exit'] = dict(stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM6',
+            self.reward_port = serial.Serial(port='COM3',
                 baudrate=115200)
             self.reward_port.close()
         except:
