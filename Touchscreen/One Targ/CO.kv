@@ -10,15 +10,15 @@
         BoxLayout
             id: starting
             orientation: 'vertical'
-    
+
             Label:
                 text: ''
                 fontsize: 50
 
             Label:
                 text: 'Welcome! Make a Selection in Each Row:'
-                fontsize: 50
-                color: 1,0,1,1
+                fontsize: 80
+                color: 0,0,1,1
                 canvas.before:
                     Color: 
                         rgb: 1,1,0
@@ -26,6 +26,12 @@
             BoxLayout 
                 id: top
                 orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
 
                 Label:
                     text: ''
@@ -138,6 +144,13 @@
             BoxLayout 
                 id: small_rew
                 orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.2, 0.2, 0.5, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -220,9 +233,17 @@
                 Label:
                     text: ''
                     fontsize: 50
+            
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -325,6 +346,12 @@
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.2, 0.2, 0.5, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
 
                 Label:
                     text: ''
@@ -412,6 +439,13 @@
             BoxLayout:
                 id: test
                 orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -486,6 +520,13 @@
             BoxLayout:
                 id: test
                 orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.2, 0.2, 0.5, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
                 Label:
                     text: ''
                     fontsize: 50

@@ -47,6 +47,13 @@ Adafruit_CAP1188 cap = Adafruit_CAP1188();
 // Or.. Software SPI: clock, miso, mosi, cs, reset
 //Adafruit_CAP1188 cap = Adafruit_CAP1188(CAP1188_CLK, CAP1188_MISO, CAP1188_MOSI, CAP1188_CS, CAP1188_RESET);
 
+int reg2;
+float chan_ratio;
+float chan_rat_thresh = 1.5;
+
+// Baseline, fixed when start task;
+float chan_bD=0;
+
 void setup() {
   Serial.begin(9600);
   // Serial.println("CAP1188 test!");
@@ -60,25 +67,66 @@ void setup() {
   // Serial.println("CAP1188 found!");
 
   uint8_t reg = cap.readRegister( 0x1f ) & 0x0f;
-  cap.writeRegister( 0x1f, reg | 0x6F ); // or whatever value you want
+  cap.writeRegister( 0x1f, reg | 0x5F ); // or whatever value you want - 101 1111, want 
 
+  // Compute baseline: 
+  for (int i=1; i < 200; i ++) {
+    // Read from register: 
+    byte reg = cap.readRegister( 0x11 );
+
+    // Convert to float:
+    if (bitRead(reg, 7) == 1) {
+      reg2 = -128  ;
+    }
+    else {
+      reg2 = 0;
+    }
+
+    for (int j=0; j < 7; j++) {
+      if (bitRead(reg, j) == 1) {
+        reg2 += pow(2, j);
+      }
+    }
+    reg2 += 128;
+    chan_bD=chan_bD+.005*reg2; 
+    delay(10); // wait 10 ms
+  }
 }
 
 void loop() {
-  uint8_t touched = cap.touched();
-  
-//  if (touched == 0) {
-//    // No touch detected
-//    return;
-//  }
-  
   for (uint8_t i=1; i<2; i++) {
-    if (touched & (1 << i)) {
-      Serial.print("C"); Serial.print(i); // Serial.print("\t");
+    byte reg = cap.readRegister( 0x11 );
+
+    if (bitRead(reg, 7) == 1) {
+      reg2 = -128  ;
+    }
+    else {
+      reg2 = 0;
+    }
+
+    for (int j=0; j < 7; j++) {
+      if (bitRead(reg, j) == 1) {
+        reg2 += pow(2, j);
+      }
+    }
+
+    reg2 += 128;
+    
+    // Get channel ratio: 
+    chan_ratio = max(0, reg2) / chan_bD;
+        
+//    Serial.print(reg2);
+//    Serial.print(" ");
+//    Serial.print(chan_ratio);
+//    Serial.print(" ");
+//    Serial.print(chan_bD);
+
+    if (chan_ratio > chan_rat_thresh) {
+      Serial.print("C"); Serial.print(i);
     }
     else {
       Serial.print("N"); Serial.print(i);
-    }
+    }   
   }
   Serial.println();
   delay(50);
