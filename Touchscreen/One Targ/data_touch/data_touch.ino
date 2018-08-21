@@ -67,7 +67,7 @@ void setup() {
   // Serial.println("CAP1188 found!");
 
   uint8_t reg = cap.readRegister( 0x1f ) & 0x0f;
-  cap.writeRegister( 0x1f, reg | 0x5F ); // or whatever value you want - 101 1111, want 
+  cap.writeRegister( 0x1f, reg | 0x4F ); // or whatever value you want - 101 1111, want 
 
   // Compute baseline: 
   for (int i=1; i < 200; i ++) {
@@ -115,9 +115,9 @@ void loop() {
     // Get channel ratio: 
     chan_ratio = max(0, reg2) / chan_bD;
         
-//    Serial.print(reg2);
-//    Serial.print(" ");
-//    Serial.print(chan_ratio);
+    Serial.print(reg2);
+    Serial.print(" ");
+    Serial.print(chan_ratio);
 //    Serial.print(" ");
 //    Serial.print(chan_bD);
 
