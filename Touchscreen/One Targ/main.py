@@ -350,6 +350,7 @@ class COGame(Widget):
                     self.rhtouch_sensor = False
                 elif str(port_read[:2]) == "b'C1'":
                     self.rhtouch_sensor = True
+                    print(self.rhtouch_sensor)
             except:
                 print('passing state! ')
                 pass     
