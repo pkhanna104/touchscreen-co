@@ -103,6 +103,9 @@ class COGame(Widget):
         test=None, cap_on=None, hold=None, targ_structure=None,
         autoquit=None, drag=None):
 
+        from sound import Sound
+        Sound.volume_max()
+
         holdz = [.25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
             if val:
