@@ -41,7 +41,7 @@ class COGame(Widget):
 
     exit_pos = np.array([7, 4])
     exit_rad = 1.
-    exit_hold = 5 #seconds
+    exit_hold = 2 #seconds
 
     ch_timeout = 10. # ch timeout
     cht = .001 # center hold time
