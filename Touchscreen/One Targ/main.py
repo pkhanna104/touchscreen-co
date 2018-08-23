@@ -629,7 +629,7 @@ class COGame(Widget):
             tgs.append(tmp[ix, :])
         return np.vstack((tgs))
 
-    def get_targets_rand(self, target_distance=8):
+    def get_targets_rand(self, target_distance=4):
         # Targets in CM: 
         angle = np.linspace(0, 2*np.pi, 1000)
         target_distance = np.linspace(target_distance/4., target_distance, 1000)
