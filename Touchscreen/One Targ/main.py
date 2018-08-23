@@ -41,7 +41,7 @@ class COGame(Widget):
 
     exit_pos = np.array([7, 4])
     exit_rad = 1.
-    exit_hold = 5 #seconds
+    exit_hold = 2 #seconds
 
     ch_timeout = 10. # ch timeout
     cht = .001 # center hold time
@@ -102,9 +102,6 @@ class COGame(Widget):
     def init(self, animal_names_dict=None, rew_in=None, task_in=None, rew_del=None,
         test=None, cap_on=None, hold=None, targ_structure=None,
         autoquit=None, drag=None):
-
-        from sound import Sound
-        Sound.volume_max()
 
         holdz = [.25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
@@ -630,7 +627,7 @@ class COGame(Widget):
             tgs.append(tmp[ix, :])
         return np.vstack((tgs))
 
-    def get_targets_rand(self, target_distance=8):
+    def get_targets_rand(self, target_distance=4):
         # Targets in CM: 
         angle = np.linspace(0, 2*np.pi, 1000)
         target_distance = np.linspace(target_distance/4., target_distance, 1000)
@@ -666,6 +663,8 @@ class COGame(Widget):
 class Splash(Widget):
     def init(self, *args):
         self.args = args
+        from sound import Sound
+        Sound.volume_max()
 
 class Target(Widget):
     
