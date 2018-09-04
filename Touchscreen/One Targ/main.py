@@ -1,5 +1,6 @@
 from kivy.app import App
 from kivy.core.window import Window
+from kivy.core.audio import SoundLoader
 from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -103,7 +104,7 @@ class COGame(Widget):
         test=None, cap_on=None, hold=None, targ_structure=None,
         autoquit=None, drag=None):
 
-        holdz = [.25, .5, .625, .75]
+        holdz = [0., .25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
             if val:
                 self.cht = holdz[i]
@@ -503,10 +504,12 @@ class COGame(Widget):
         self.periph_target.color = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
-        
+
         try:
             if self.reward_for_targtouch[0]:
-                winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+                sound = SoundLoader.load('reward1.wav')
+                sound.play()
 
                 if not self.skip_juice:
                     self.reward_port.open()
@@ -522,7 +525,10 @@ class COGame(Widget):
     def _start_rew_anytouch(self, **kwargs):
         try:
             if self.reward_for_anytouch[0]:
-                winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+                sound = SoundLoader.load('reward2.wav')
+                sound.play()
+                
                 self.reward_port.open()
                 rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
                 self.reward_port.write(rew_str)
