@@ -504,13 +504,11 @@ class COGame(Widget):
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
 
-        sound = SoundLoader.load('reward1.wav')
-        sound.play()
-
         try:
             if self.reward_for_targtouch[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-
+                sound = SoundLoader.load('reward1.wav')
+                sound.play()
 
                 if not self.skip_juice:
                     self.reward_port.open()
@@ -524,12 +522,11 @@ class COGame(Widget):
             pass
         
     def _start_rew_anytouch(self, **kwargs):
-        sound = SoundLoader.load('reward2.wav')
-        sound.play()
         try:
             if self.reward_for_anytouch[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-
+                sound = SoundLoader.load('reward2.wav')
+                sound.play()
                 
                 self.reward_port.open()
                 rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
