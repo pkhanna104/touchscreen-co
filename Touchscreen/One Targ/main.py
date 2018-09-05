@@ -1,5 +1,6 @@
 from kivy.app import App
 from kivy.core.window import Window
+from kivy.core.audio import SoundLoader
 from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -41,7 +42,7 @@ class COGame(Widget):
 
     exit_pos = np.array([7, 4])
     exit_rad = 1.
-    exit_hold = 5 #seconds
+    exit_hold = 2 #seconds
 
     ch_timeout = 10. # ch timeout
     cht = .001 # center hold time
@@ -103,10 +104,8 @@ class COGame(Widget):
         test=None, cap_on=None, hold=None, targ_structure=None,
         autoquit=None, drag=None):
 
-        from sound import Sound 
-        Sound.volume_max()
 
-        holdz = [.25, .5, .625, .75]
+        holdz = [0., .25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
             if val:
                 self.cht = holdz[i]
@@ -505,10 +504,12 @@ class COGame(Widget):
         self.periph_target.color = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
-        
+
         try:
             if self.reward_for_targtouch[0]:
-                winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+                sound = SoundLoader.load('reward1.wav')
+                sound.play()
 
                 if not self.skip_juice:
                     self.reward_port.open()
@@ -524,7 +525,10 @@ class COGame(Widget):
     def _start_rew_anytouch(self, **kwargs):
         try:
             if self.reward_for_anytouch[0]:
-                winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+                sound = SoundLoader.load('reward2.wav')
+                sound.play()
+                
                 self.reward_port.open()
                 rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
                 self.reward_port.write(rew_str)
@@ -631,7 +635,7 @@ class COGame(Widget):
             tgs.append(tmp[ix, :])
         return np.vstack((tgs))
 
-    def get_targets_rand(self, target_distance=8):
+    def get_targets_rand(self, target_distance=4):
         # Targets in CM: 
         angle = np.linspace(0, 2*np.pi, 1000)
         target_distance = np.linspace(target_distance/4., target_distance, 1000)
@@ -667,6 +671,8 @@ class COGame(Widget):
 class Splash(Widget):
     def init(self, *args):
         self.args = args
+        from sound import Sound
+        Sound.volume_max()
 
 class Target(Widget):
     
