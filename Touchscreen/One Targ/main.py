@@ -103,8 +103,8 @@ class COGame(Widget):
         test=None, cap_on=None, hold=None, targ_structure=None,
         autoquit=None, drag=None):
 
-        from subprocess import call
-        call(["amixer", "-D", "pulse", "sset", "Master", "100%+"])
+        from sound import Sound 
+        Sound.volume_max()
 
         holdz = [.25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
@@ -539,6 +539,8 @@ class COGame(Widget):
 
     def end_reward(self, **kwargs):
         if len(self.cursor_ids)== 0:
+            return True
+        else:
             return True
 
     def end_rewanytouch(self, **kwargs):
