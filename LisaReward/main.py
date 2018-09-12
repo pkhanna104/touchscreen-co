@@ -11,6 +11,8 @@ class Rew_Buttons(Widget):
         self.reward_port = serial.Serial(port='COM4',
             baudrate=115200)
         self.reward_port.close()
+        from sound import Sound
+        Sound.volume_max()
 
     def big_reward(self):
         sound = SoundLoader.load('reward1.wav')
