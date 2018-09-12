@@ -4,20 +4,22 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
 import serial, time
 from kivy.core.window import Window
+from kivy.core.audio import SoundLoader
 
 class Rew_Buttons(Widget):
     def init(self):
-        try:
-            self.reward_port = serial.Serial(port='COM6',
-                baudrate=115200)
-            self.reward_port.close()
-        except:
-            pass    
+        self.reward_port = serial.Serial(port='COM4',
+            baudrate=115200)
+        self.reward_port.close()
 
     def big_reward(self):
+        sound = SoundLoader.load('reward1.wav')
+        sound.play()
         self.deliver_juice(.5)
 
     def small_reward(self):
+        sound = SoundLoader.load('reward2.wav')
+        sound.play()
         self.deliver_juice(.1)
 
     def close(self):
@@ -25,16 +27,13 @@ class Rew_Buttons(Widget):
         Window.close()
 
     def deliver_juice(self, secs):
-        try:
-            self.reward_port.open()
-            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(secs)+' sec\n']
-            self.reward_port.write(rew_str)
-            time.sleep(.5 + self.reward_delay_time)
-            run_str = [ord(r) for r in 'run\n']
-            self.reward_port.write(run_str)
-            self.reward_port.close()
-        except:
-            print('in delivery: ', str(secs))
+        self.reward_port.open()
+        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(secs)+' sec\n']
+        self.reward_port.write(rew_str)
+        time.sleep(.5)
+        run_str = [ord(r) for r in 'run\n']
+        self.reward_port.write(run_str)
+        self.reward_port.close()
 
 
 class MainScreen(Screen):
