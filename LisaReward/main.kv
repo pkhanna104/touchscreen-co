@@ -1,0 +1,39 @@
+#:kivy 1.10.0
+
+
+ScreenManagement: 
+    Screen:
+        name: "start_screen"
+        Button: 
+            on_release: 
+                app.root.current = "reward_button_screen"
+                rew_butt.init()
+
+            text: "Startup Reward System!"
+            font_size: 50
+
+    Screen: 
+        name: "reward_button_screen"
+        Rew_Buttons:
+            id: rew_butt
+
+        BoxLayout:
+            id: test2
+            orientation: 'vertical'
+
+            Button:
+                text: 'BIG reward -- 0.5 sec'
+                font_size: 50
+                on_release: rew_butt.big_reward()
+
+            Button:
+                text: 'SMALL reward -- 0.1 sec'
+                font_size: 50
+                on_release: rew_butt.small_reward()
+
+
+            Button:
+                text: 'Exit Reward System'
+                font_size: 50
+                on_release: rew_butt.close()
+
