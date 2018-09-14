@@ -5,8 +5,12 @@ from kivy.uix.widget import Widget
 import serial, time
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
+from kivy.properties import NumericProperty
 
 class Rew_Buttons(Widget):
+    big_reward_cnt = NumericProperty(0)
+    small_reward_cnt = NumericProperty(0)
+
     def init(self):
         self.reward_port = serial.Serial(port='COM4',
             baudrate=115200)
@@ -18,12 +22,14 @@ class Rew_Buttons(Widget):
         sound = SoundLoader.load('reward1.wav')
         sound.play()
         self.deliver_juice(.5)
+        self.big_reward_cnt += 1
 
     def small_reward(self):
         sound = SoundLoader.load('reward2.wav')
         sound.play()
         self.deliver_juice(.1)
-
+        self.small_reward_cnt +=1
+        
     def close(self):
         App.get_running_app().stop()
         Window.close()
@@ -37,6 +43,27 @@ class Rew_Buttons(Widget):
         self.reward_port.write(run_str)
         self.reward_port.close()
 
+class Sound_Buttons(Widget):
+    big_reward_cnt = NumericProperty(0)
+    small_reward_cnt = NumericProperty(0)
+
+    def init(self):
+        from sound import Sound
+        Sound.volume_max()
+
+    def big_reward(self):
+        sound = SoundLoader.load('reward1.wav')
+        sound.play()
+        self.big_reward_cnt += 1
+
+    def small_reward(self):
+        sound = SoundLoader.load('reward2.wav')
+        sound.play()
+        self.small_reward_cnt += 1
+
+    def close(self):
+        App.get_running_app().stop()
+        Window.close()
 
 class MainScreen(Screen):
     pass
