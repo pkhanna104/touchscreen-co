@@ -20,7 +20,7 @@ void loop() {
   // print out the value you read:
   //Serial.print(sensorValue);
   //Serial.print(' ');
-  if (sensorValue > 40) {
+  if (sensorValue > 90) {
     Serial.println("C1");
   }
   else {
