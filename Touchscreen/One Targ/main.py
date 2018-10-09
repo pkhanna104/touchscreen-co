@@ -158,7 +158,7 @@ class COGame(Widget):
                 if 'co' in nm:
                     self.use_center = True
 
-        holdz = [.25,, .375, .5, '.25-.4', '.3-.55']
+        holdz = [.25, .375, .5, '.25-.4', '.3-.55']
         
         self.cht_type = None
         self.tht_type = None
@@ -166,10 +166,11 @@ class COGame(Widget):
         for i, val in enumerate(hold['hold']):
             if val:
                 if type(holdz[i]) is str:
+                    mx, mn = holdz[i].split('-')
                     self.cht_type = holdz[i]
-                    self.cht = 0.
+                    self.cht = (float(mn)+float(mx))*.5
                     self.tht_type = holdz[i]
-                    self.tht = 0.
+                    self.tht =  (float(mn)+float(mx))*.5
 
                 # If centerout task, set THT to 0.2 else set to same as CHT
                 if self.use_center:
@@ -435,7 +436,7 @@ class COGame(Widget):
         if type(self.tht_type) is str:
             tht_min, tht_max = self.tht_type.split('-')
             self.tht = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min)            
-
+        
         self.center_target.color = (0., 0., 0., 0.)
         self.periph_target.color = (0., 0., 0., 0.)
 
