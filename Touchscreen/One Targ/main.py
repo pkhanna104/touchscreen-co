@@ -9,13 +9,12 @@ from kivy.clock import Clock
 from random import randint
 from kivy.config import Config
 import serial, time, pickle, datetime, winsound
-# to install -- pyserial, pygame, 
+from numpy import binary_repr
+import struct
 
 Config.set('graphics', 'resizable', False)
-
 fixed_window_size = (1800, 1000)
 pix_per_cm = 85.
-
 Config.set('graphics', 'width', str(fixed_window_size[0]))
 Config.set('graphics', 'height', str(fixed_window_size[1]))
 
@@ -261,6 +260,11 @@ class COGame(Widget):
         except:
             pass
 
+        try:
+            self.dio_port = serial.Serial(port='', baudrate=115200)
+        except:
+            pass
+
         # save parameters: 
         d = dict(animal_name=animal_name, center_target_rad=self.center_target_rad,
             periph_target_rad=self.periph_target_rad, target_structure = generatorz.__name__, 
@@ -309,11 +313,11 @@ class COGame(Widget):
                 self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
                 self.h5_table = self.h5file.create_table('/', 'task', Data, '')
                 self.h5_table_row = self.h5_table.row
+                self.h5_table_row_cnt = 0
 
                 # Note in python 3 to open pkl files: 
                 #with open('xxxx_params.pkl', 'rb') as f:
                 #    data_params = pickle.load(f)
-
         except:
             pass
 
@@ -394,6 +398,26 @@ class COGame(Widget):
         self.h5_table_row['time'] = time.time()
         self.h5_table_row['cap_touch'] = self.rhtouch_sensor
         self.h5_table_row.append()
+
+        # Write DIO 
+        try:
+            self.write_row_to_dio()
+        except:
+            pass
+            
+        # Upgrade table row: 
+        self.h5_table_row_cnt += 1
+
+    def write_row_to_dio(self):
+        ### FROM TDT TABLE, 5 is GND, BYTE A ###
+        row_to_write = self.h5_table_row_cnt % 256
+
+        ### convert to binary: 
+        row_to_write = binary_repr(row_to_write).zfill(8)
+
+        ### write to arduino: 
+        word_str = 'd' + struct.pack('<H', word)
+        self.dio_port.write(word_str)
 
     def stop(self, **kwargs):
         # If past number of max trials then auto-quit: 
