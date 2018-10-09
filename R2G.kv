@@ -53,28 +53,28 @@
                     id: rew_noauto_chk
             
                 Label: 
-                    text: 'SMALL rew for any discrete touch'
+                    text: 'SMALL rew for start button touch'
 
                 CheckBox:
                     group: 'rew'
                     id: rew_anytouch_chk
            
                 Label: 
-                    text: 'SMALL rew for any discrete touch\n pls BIG rew for target touch'
+                    text: 'SMALL rew for start button touch\n pls BIG rew for grasp'
 
                 CheckBox:
                     group: 'rew'
                     id: rew_anytouch_pls_targ_chk
             
                 Label: 
-                    text: 'BIG rew for target touch'
+                    text: 'BIG rew for grasp'
 
                 CheckBox:
                     group: 'rew'
                     id: rew_targ_chk
 
                 Label: 
-                    text: 'SOUND for target touch'
+                    text: 'SOUND for grasp'
 
                 CheckBox:
                     group: 'rew'
@@ -237,73 +237,6 @@
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target Radius'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '.5 cm'
-                CheckBox:
-                    id: targ_rad_5
-                    group: 'targ_cm'
-
-                Label: 
-                    text: '.75 cm'
-                CheckBox:
-                    id: targ_rad_75
-                    group: 'targ_cm'
-
-                Label: 
-                    text: '1.0 cm'
-
-                CheckBox:
-                    id: targ_rad_10
-                    group: 'targ_cm'
-                Label: 
-                    text: '1.5 cm'
-
-                CheckBox:
-                    id: targ_rad_15
-                    group: 'targ_cm'
-                    active: True
-                    
-                Label: 
-                    text: '2.0 cm'
-
-                CheckBox:
-                    id: targ_rad_20
-                    group: 'targ_cm'
-                Label: 
-                    text: '3 cm'
-
-                CheckBox:
-                    id: targ_rad_30
-                    group: 'targ_cm'  
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-            
-            BoxLayout:
-                id: params:
-                orientation: 'horizontal'
                 Label:
                     text: ''
                     fontsize: 50
@@ -353,12 +286,6 @@
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.2, 0.2, 0.5, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
 
                 Label:
                     text: ''
@@ -368,60 +295,21 @@
                     fontsize: 50
 
                 Label: 
-                    text: 'Use RH Cap'
+                    text: 'Grasp Hold Time'
                     color: 1, 1, 0, 1
 
                 Label: 
-                    text: 'Yes!'
+                    text: '0 sec'
 
                 CheckBox:
-                    id: yes_cap
-                    group: 'cap'
-
-                Label: 
-                    text: 'No!'
-
-                CheckBox:
-                    id: no_cap
-                    group: 'cap'
-                    active: True
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-            BoxLayout:
-                id: params:
-                orientation: 'horizontal'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target Hold Time'
-                    color: 1, 1, 0, 1
-
+                    id: zero_sec
+                    group: 'hold_time'
 
                 Label: 
                     text: '0.25 sec'
 
                 CheckBox:
                     id: quarter_sec
-                    group: 'hold_time'
-
-                Label: 
-                    text: '0.375 sec'
-
-                CheckBox:
-                    id: three_sev_five_sec
                     group: 'hold_time'
 
                 Label: 
@@ -433,64 +321,20 @@
                     active: True
 
                 Label: 
-                    text: 'Rand: .25-.4'
+                    text: '0.625 sec'
 
                 CheckBox:
-                    id: small_rand
+                    id: five_eighth_sec
                     group: 'hold_time'
 
                 Label:
-                    text: 'Rand: .3-.55'
+                    text: '0.75 sec'
                     fontsize: 50
 
                 CheckBox:
-                    id: big_rand
+                    id: three_quart_sec
                     group: 'hold_time'
 
-                Label:
-                    text: ''
-                    fontsize: 50
-
-            BoxLayout:
-                id: test
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                
-                Label: 
-                    text: 'Target Structure'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: 'Random'
-                CheckBox:
-                    id: rand_targ
-                    group: 'targ_struct'
-
-                Label:
-                    text: '4 Targs'
-                CheckBox:
-                    id: four_targ
-                    group: 'targ_struct'
-                    active: True
-
-                Label:
-                    text: '2 step CO'
-                CheckBox:
-                    id: co_targ
-                    group: 'targ_struct'
-
-                Label:
-                    text: ''
-                    fontsize: 50
                 Label:
                     text: ''
                     fontsize: 50
@@ -535,33 +379,58 @@
             BoxLayout:
                 id: test
                 orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.2, 0.2, 0.5, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
                 Label:
                     text: ''
                     fontsize: 50
                 
                 Label: 
-                    text: 'Allow Drag Finger Into Targ: '
+                    text: 'Start Button Included? '
                     color: 1, 1, 0, 1
 
                 Label: 
                     text: 'Yes'
                 CheckBox:
-                    id: drag
-                    group: 'drag'
+                    id: start_button
+                    group: 'start'
+                    active: True
 
                 Label:
                     text: 'No'
                 CheckBox:
-                    id: no_drag
-                    group: 'drag'
+                    id: no_start_button
+                    group: 'start'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            BoxLayout:
+                id: test
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+                
+                Label: 
+                    text: 'Only Start Button?'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: 'Yes'
+                CheckBox:
+                    id: only_start_button
+                    group: 'start_only'
+
+                Label:
+                    text: 'No'
+                CheckBox:
+                    id: no_only_start_button
+                    group: 'start_only'
                     active: True
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -587,149 +456,38 @@
                     group: 'testing'
 
                 Label:
-                    text: 'Monkey Time -- in Room'
+                    text: 'Monkey Time'
                 CheckBox:
                     id: monk_time
                     group: 'testing'
                     active: True
 
-                Label:
-                    text: 'Monkey Time -- in Cage'
-                CheckBox:
-                    id: monk_time_in_cage
-                    group: 'testing'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
             Button:
-                text: 'Play Centerout Game'
+                text: 'Play R2G'
                 halign: 'center'
                 valign: 'middle'
                 font_size: 50
                 text_size: self.size
                 on_release: 
-                    root.current = 'splash_start'
-                    splash.init(dict(haun=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=rew_noauto_chk.active, rew_anytouch=rew_anytouch_chk.active, rew_any_pls_targ=rew_anytouch_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
-                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), dict(test=[testing.active, monk_time.active, monk_time_in_cage.active]), dict(cap=[yes_cap.active, no_cap.active]), dict(hold=[quarter_sec.active, three_sev_five_sec.active, half_sec.active, small_rand.active, big_rand.active]), dict(get_targets_rand=rand_targ.active, get_4targets=four_targ.active, get_targets_co=co_targ.active), dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), dict(drag=[drag.active, no_drag.active]))
+                    root.current = 'game_screen'
+                    game.init(dict(haun=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), 
+                    dict(rew_manual=rew_noauto_chk.active, rew_start=rew_anytouch_chk.active, rew_start_and_grasp=rew_anytouch_pls_targ_chk.active, rew_grasp=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
+                    dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), 
+                    dict(test=[testing.active, monk_time.active]), 
+                    dict(start_hold=[zero_sec.active, quarter_sec.active, half_sec.active, five_eighth_sec.active, three_quart_sec.active], grasp_hold = [zero_sec.active, quarter_sec.active, half_sec.active, five_eighth_sec.active, three_quart_sec.active]), 
+                    dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
+                    dict(start=[start_button.active, no_start_button.active]),
+                    dict(start=[only_start_button.active, no_only_start_button.active]))
 
+                    Clock.schedule_interval(game.update, 1.0 / 60.0)
             Label:
                 text: ''
                 fontsize: 50
-            Label:
-                text: ''
-                fontsize: 50
-
-    Screen: 
-        name: 'splash_start'
-        Splash:
-            id: splash
-
-        BoxLayout:
-            id: test
-            orientation: 'vertical'
-         
-            Label:
-                text: 'Parameters Cached!! \n \n Prepare the Monkey! \n \n Pausing Until Start Button Pressed. '
-                halign: 'center'
-                fontsize: 50
-
-            Label:
-                text: ''
-                fontsize: 50
-
-            Label:
-                text: ''
-                fontsize: 50
-
-            Label:
-                text: ''
-                fontsize: 50
-
-            Label:
-                text: ''
-                fontsize: 50
-                
-            BoxLayout:
-                id: test2
-                orientation: 'horizontal'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Button: 
-                    text: 'Start'
-                    color: .25, .25, .25, 1
-                    background_color: (.0, .0, .0, 1.0)
-
-                    on_release:
-                        root.current = 'game_screen'
-                        game.init(*splash.args)
-                        Clock.schedule_interval(game.update, 1.0 / 60.0)
-                
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
             Label:
                 text: ''
                 fontsize: 50
                 
     Screen:
         name: 'game_screen'
-        COGame:
+        R2Game:
             id: game
-
-<COGame>:
-    center_target: target_c
-    periph_target: target_p
-    exit_target1: target_e1
-    exit_target2: target_e2
-
-    Target:
-        id: target_c
-        
-    Target: 
-        id: target_p
-
-    Target:
-        id: target_e1
-
-    Target:
-        id: target_e2
-
-    Label:
-        color: .5,.5,.5,1
-        font_size: 50
-        center_x: root.width * 6/8
-        top: root.top - 70
-        text: str(root.trial_counter)
-
-<Target>:
-    canvas:
-        Color:
-            rgba:self.color
-        Ellipse: 
-            pos:self.pos
-            size:self.size

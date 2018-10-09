@@ -104,12 +104,6 @@ class COGame(Widget):
         test=None, cap_on=None, hold=None, targ_structure=None,
         autoquit=None, drag=None):
 
-        holdz = [0., .25, .5, .625, .75]
-        for i, val in enumerate(hold['hold']):
-            if val:
-                self.cht = holdz[i]
-                self.tht = holdz[i]
-
         cap = [1, 0]
         for i, val in enumerate(cap_on['cap']):
             if val:
@@ -163,6 +157,25 @@ class COGame(Widget):
                 generatorz = getattr(self, nm)
                 if 'co' in nm:
                     self.use_center = True
+
+        holdz = [.25,, .375, .5, '.25-.4', '.3-.55']
+        
+        self.cht_type = None
+        self.tht_type = None
+
+        for i, val in enumerate(hold['hold']):
+            if val:
+                if type(holdz[i]) is str:
+                    self.cht_type = holdz[i]
+                    self.cht = 0.
+                    self.tht_type = holdz[i]
+                    self.tht = 0.
+
+                # If centerout task, set THT to 0.2 else set to same as CHT
+                if self.use_center:
+                    self.tht = 0.2
+                    self.tht_type = None
+
         try:
             pygame.mixer.init()    
         except:
@@ -412,7 +425,17 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1.)
         self.exit_target2.color = (.15, .15, .15, 1.)
 
+        # Set ITI, CHT, THT
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
+
+        if type(self.cht_type) is str:
+            cht_min, cht_max = self.cht_type.split('-')
+            self.cht = ((float(cht_max) - float(cht_min)) * np.random.random()) + float(cht_min)
+
+        if type(self.tht_type) is str:
+            tht_min, tht_max = self.tht_type.split('-')
+            self.tht = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min)            
+
         self.center_target.color = (0., 0., 0., 0.)
         self.periph_target.color = (0., 0., 0., 0.)
 
