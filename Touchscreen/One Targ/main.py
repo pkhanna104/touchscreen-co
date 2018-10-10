@@ -263,7 +263,7 @@ class COGame(Widget):
             pass
 
         try:
-            self.dio_port = serial.Serial(port='', baudrate=115200)
+            self.dio_port = serial.Serial(port='COM13', baudrate=115200)
         except:
             pass
 
@@ -414,11 +414,8 @@ class COGame(Widget):
         ### FROM TDT TABLE, 5 is GND, BYTE A ###
         row_to_write = self.h5_table_row_cnt % 256
 
-        ### convert to binary: 
-        row_to_write = binary_repr(row_to_write).zfill(8)
-
         ### write to arduino: 
-        word_str = 'd' + struct.pack('<H', word)
+        word_str = 'd' + struct.pack('<H', row_to_write)
         self.dio_port.write(word_str)
 
     def stop(self, **kwargs):
