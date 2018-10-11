@@ -308,7 +308,7 @@ class R2Game(Widget):
 
                 if not self.skip_juice:
                     self.reward_port.open()
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_grasp[1])+' sec\n']
                     self.reward_port.write(rew_str)
                     time.sleep(.5 + self.reward_delay_time)
                     run_str = [ord(r) for r in 'run\n']
@@ -324,7 +324,7 @@ class R2Game(Widget):
                 sound.play()
                 
                 self.reward_port.open()
-                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
+                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
                 self.reward_port.write(rew_str)
                 time.sleep(.5)
                 run_str = [ord(r) for r in 'run\n']
