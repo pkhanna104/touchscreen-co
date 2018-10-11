@@ -152,37 +152,32 @@ class R2Game(Widget):
         # Open task arduino
         self.task_ard = serial.Serial(port='COM12')
 
-        try:
-            if self.testing:
-                pass
-            else:
-                import os
-                path = os.getcwd()
-                path = path.split('\\')
-                path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-                p = ''
-                for ip in path_data:
-                    p += ip+'/'
-                p += 'data/'
-                print ('')
-                print ('')
-                print('Data saving PATH: ', p)
-                print ('')
-                print ('')
-                self.filename = p+ animal_name+'_Grasp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-                if self.in_cage:
-                    self.filename = self.filename+'_cage'
-
-                pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
-                self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-                self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-                self.h5_table_row = self.h5_table.row
-
-                # Note in python 3 to open pkl files: 
-                #with open('xxxx_params.pkl', 'rb') as f:
-                #    data_params = pickle.load(f)
-        except:
+        if self.testing:
             pass
+        else:
+            import os
+            path = os.getcwd()
+            path = path.split('\\')
+            path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
+            p = ''
+            for ip in path_data:
+                p += ip+'/'
+            p += 'data/'
+            print ('')
+            print ('')
+            print('Data saving PATH: ', p)
+            print ('')
+            print ('')
+            self.filename = p+ animal_name+'_Grasp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+
+            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+            self.h5_table_row = self.h5_table.row
+
+            # Note in python 3 to open pkl files: 
+            #with open('xxxx_params.pkl', 'rb') as f:
+            #    data_params = pickle.load(f)
 
     def close_app(self):
         App.get_running_app().stop()
@@ -196,7 +191,8 @@ class R2Game(Widget):
         _ = self.task_ard.readline()
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('/t')
-        print(port_splits)
+        #print(port_splits)
+        print(self.state)
         if len(port_splits) != 4:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
@@ -263,14 +259,14 @@ class R2Game(Widget):
 
     def _start_start_button(self, **kwargs):
         self.task_ard.flushInput()
-        self.task_ard.write('n'.encode()) #morning
+        self.task_ard.write('m'.encode()) #morning
 
     def pushed_start(self, **kwargs):
         return self.button
 
     def _end_start_button(self, **kwargs):
         self.task_ard.flushInput()
-        self.task_ard.write('m'.encode()) #night
+        self.task_ard.write('n'.encode()) #night
 
     def start_button_timeout(self, **kwargs):
         return kwargs['ts'] > self.start_timeout
