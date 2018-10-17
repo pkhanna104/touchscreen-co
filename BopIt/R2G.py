@@ -30,7 +30,7 @@ class R2Game(Widget):
     ITI_mean = 1.
     ITI_std = .2
 
-    start_timeout = 10. 
+    start_timeout = 5000. 
     start_holdtime = .001
 
     grasp_timeout_time = 5000.
