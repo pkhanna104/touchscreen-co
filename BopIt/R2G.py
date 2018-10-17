@@ -40,16 +40,28 @@ class R2Game(Widget):
     trial_counter = NumericProperty(0)
     t0 = time.time()
 
+    big_reward_cnt = NumericProperty(0)
+    small_reward_cnt = NumericProperty(0)
+
     def init(self, animal_names_dict=None, rew_in=None, rew_del=None,
         test=None, hold=None, autoquit=None, use_start=None, only_start=None):
 
-        holdz = [0., .25, .5, .625, .75]
+        holdz = [0., '0-0.25', .25, '0.25-0.5', .5]
         for i, val in enumerate(hold['start_hold']):
             if val:
-                self.start_hold = holdz[i]
+                if type(holdz[i]) is str:
+                    self.start_hold_type = holdz[i]
+                    self.start_hold = 0.
+                else:
+                    self.start_hold = holdz[i]
+
         for i, val in enumerate(hold['grasp_hold']):
             if val:
-                self.grasp_hold = holdz[i]
+                if type(holdz[i]) is str:
+                    self.grasp_hold_type = holdz[i]
+                    self.grasp_hold = 0.
+                else:
+                    self.grasp_hold = holdz[i]
 
         small_rew_opts = [.1, .3, .5]
         for i, val in enumerate(rew_in['small_rew']):
@@ -261,6 +273,15 @@ class R2Game(Widget):
     def _start_ITI(self, **kwargs):
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
         
+        if type(self.start_hold_type) is str:
+            cht_min, cht_max = self.cht_type.split('-')
+            self.start_hold = ((float(cht_max) - float(cht_min)) * np.random.random()) + float(cht_min)
+
+        if type(self.grasp_hold_type) is str:
+            tht_min, tht_max = self.tht_type.split('-')
+            self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
+
+
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
 
@@ -306,6 +327,7 @@ class R2Game(Widget):
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
+        self.big_reward_cnt += 1
 
         try:
             if self.reward_for_grasp[0]:
@@ -325,6 +347,7 @@ class R2Game(Widget):
             pass
         
     def _start_rew_start(self, **kwargs):
+        self.small_rew_cnt += 1
         try:
             if self.reward_for_start[0]:
                 sound = SoundLoader.load('reward2.wav')
@@ -348,6 +371,12 @@ class Manager(ScreenManager):
 
 class R2GApp(App):
     def build(self, **kwargs):
+        from win32api import GetSystemMetrics
+        screenx = GetSystemMetrics(0)
+        screeny = GetSystemMetrics(1)
+        Window.size = (1800, 1000)
+        Window.left = (screenx - 1800)/2
+        Window.top = (screeny - 1000)/2
         return Manager()
         
 if __name__ == '__main__':

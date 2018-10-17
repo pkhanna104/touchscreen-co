@@ -60,7 +60,7 @@ class COGame(Widget):
     drag_error_timeout = 0.
 
     ntargets = 4.
-    target_distance = 5.
+    target_distance = 4.
     touch = False
 
     center_target = ObjectProperty(None)
@@ -72,6 +72,7 @@ class COGame(Widget):
     # Number of trials: 
     trial_counter = NumericProperty(0)
 
+    t0 = time.time()
 
     def on_touch_down(self, touch):
         #handle many touchs:
@@ -222,7 +223,7 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
 
-        self.target_list = generatorz()
+        self.target_list = generatorz(self.target_distance)
         self.target_index = 0
         self.repeat = False
         self.center_target_position = np.array([0., 0.])
@@ -262,10 +263,9 @@ class COGame(Widget):
         except:
             pass
 
-        try:
-            self.dio_port = serial.Serial(port='COM13', baudrate=115200)
-        except:
-            pass
+        self.dio_port = serial.Serial(port='COM13', baudrate=115200)
+        time.sleep(4.)
+
 
         # save parameters: 
         d = dict(animal_name=animal_name, center_target_rad=self.center_target_rad,
@@ -397,15 +397,15 @@ class COGame(Widget):
         self.h5_table_row['cursor_ids'] = cursor_id
 
         self.h5_table_row['target_pos'] = self.periph_target_position
-        self.h5_table_row['time'] = time.time()
+        self.h5_table_row['time'] = time.time() - self.t0
         self.h5_table_row['cap_touch'] = self.rhtouch_sensor
         self.h5_table_row.append()
 
         # Write DIO 
-        try:
-            self.write_row_to_dio()
-        except:
-            pass
+        #try:
+        self.write_row_to_dio()
+        #except:
+        #    pass
             
         # Upgrade table row: 
         self.h5_table_row_cnt += 1
@@ -415,7 +415,7 @@ class COGame(Widget):
         row_to_write = self.h5_table_row_cnt % 256
 
         ### write to arduino: 
-        word_str = 'd' + struct.pack('<H', row_to_write)
+        word_str = b'd' + struct.pack('<H', int(row_to_write))
         self.dio_port.write(word_str)
 
     def stop(self, **kwargs):
@@ -663,10 +663,10 @@ class COGame(Widget):
         else:
             return False
 
-    def get_4targets(self):
-        return self.get_targets_co()
+    def get_4targets(self, target_distance=4):
+        return self.get_targets_co(target_distance=target_distance)
 
-    def get_targets_co(self, ntargets=4, target_distance=4):
+    def get_targets_co(self, target_distance=4, ntargets=4):
         # Targets in CM: 
         angle = np.linspace(0, 2*np.pi, ntargets+1)[:-1]
         x = np.cos(angle)*target_distance
