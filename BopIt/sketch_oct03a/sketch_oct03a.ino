@@ -2,9 +2,9 @@
   IR Breakbeam sensor demo!
 */
 
-#define IR_SENSORPIN 4
-#define LEDPIN 9
-#define BUTTON 8
+#define IR_SENSORPIN 7
+#define LEDPIN 2
+#define BUTTON 5
 char LED;
 int LED_status = 0;
 int sensorState = 0, lastState = 0;

@@ -13,6 +13,11 @@ import time
 import numpy as np
 import tables
 
+Config.set('graphics', 'resizable', False)
+fixed_window_size = (1800, 1000)
+Config.set('graphics', 'width', str(fixed_window_size[0]))
+Config.set('graphics', 'height', str(fixed_window_size[1]))
+
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
     time = tables.Float32Col()
@@ -33,7 +38,8 @@ class R2Game(Widget):
 
     # Number of trials: 
     trial_counter = NumericProperty(0)
-            
+    t0 = time.time()
+
     def init(self, animal_names_dict=None, rew_in=None, rew_del=None,
         test=None, hold=None, autoquit=None, use_start=None, only_start=None):
 
@@ -67,6 +73,7 @@ class R2Game(Widget):
 
         if rew_in['snd_only']:
             self.reward_for_grasp = [True, 0.]
+            self.reward_for_start = [True, 0.]
             self.skip_juice = True
         else:
             self.skip_juice = False
@@ -238,7 +245,7 @@ class R2Game(Widget):
 
     def write_to_h5file(self):
         self.h5_table_row['state']= self.state
-        self.h5_table_row['time'] = time.time()
+        self.h5_table_row['time'] = time.time() - self.t0
         self.h5_table_row['force'] = self.force
         self.h5_table_row['beam'] = self.beam
         self.h5_table_row.append()
