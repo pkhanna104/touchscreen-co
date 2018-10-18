@@ -237,6 +237,13 @@
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -295,7 +302,7 @@
                     fontsize: 50
 
                 Label: 
-                    text: 'Grasp Hold Time'
+                    text: 'Button Hold Time'
                     color: 1, 1, 0, 1
 
                 Label: 
@@ -303,6 +310,13 @@
 
                 CheckBox:
                     id: zero_sec
+                    group: 'hold_time'
+
+                Label:
+                    text: '0-0.25 sec'
+
+                CheckBox:
+                    id: easy_rand_0_25
                     group: 'hold_time'
 
                 Label: 
@@ -314,25 +328,15 @@
 
                 Label: 
                     text: '0.5 sec'
-
                 CheckBox:
                     id: half_sec
                     group: 'hold_time'
-                    active: True
-
-                Label: 
-                    text: '0.625 sec'
-
-                CheckBox:
-                    id: five_eighth_sec
-                    group: 'hold_time'
 
                 Label:
-                    text: '0.75 sec'
-                    fontsize: 50
+                    text: '0.25-0.5 sec'
 
                 CheckBox:
-                    id: three_quart_sec
+                    id: hard_rand_25_50
                     group: 'hold_time'
 
                 Label:
@@ -342,6 +346,13 @@
             BoxLayout:
                 id: test
                 orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.2, 0.2, 0.5, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -394,6 +405,59 @@
                     group: 'start'
                     active: True
 
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'GRASP Hold Time'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0 sec'
+                CheckBox:
+                    id: g_zero_sec
+                    group: 'ghold_time'
+
+                Label:
+                    text: 'Easy Rand: 0-0.25 sec'
+                CheckBox:
+                    id: g_easy_rand_0_25
+                    group: 'ghold_time'
+
+                Label: 
+                    text: '0.25 sec'
+                CheckBox:
+                    id: g_quarter_sec
+                    group: 'ghold_time'
+
+                Label: 
+                    text: '0.5 sec'
+                CheckBox:
+                    id: g_half_sec
+                    group: 'ghold_time'
+
+                Label:
+                    text: 'Hard Rand: 0.25-0.5 sec'
+                CheckBox:
+                    id: g_hard_rand_25_50
+                    group: 'ghold_time'
+
+                Label:
+                    text: ''
+                    fontsize: 50
                 Label:
                     text: 'No'
                 CheckBox:
@@ -441,6 +505,12 @@
             BoxLayout:
                 id: test
                 orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.2, 0.2, 0.5, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
                 Label:
                     text: ''
                     fontsize: 50
@@ -474,7 +544,7 @@
                     dict(rew_manual=rew_noauto_chk.active, rew_start=rew_anytouch_chk.active, rew_start_and_grasp=rew_anytouch_pls_targ_chk.active, rew_grasp=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), 
                     dict(test=[testing.active, monk_time.active]), 
-                    dict(start_hold=[zero_sec.active, quarter_sec.active, half_sec.active, five_eighth_sec.active, three_quart_sec.active], grasp_hold = [zero_sec.active, quarter_sec.active, half_sec.active, five_eighth_sec.active, three_quart_sec.active]), 
+                    dict(start_hold=[zero_sec.active, easy_rand_0_25.active, quarter_sec.active, hard_rand_25_50.active, half_sec.active], grasp_hold = [g_zero_sec.active, g_easy_rand_0_25.active, g_quarter_sec.active, g_hard_rand_25_50.active, g_half_sec.active]), 
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
                     dict(start=[start_button.active, no_start_button.active]),
                     dict(start=[only_start_button.active, no_only_start_button.active]))
@@ -491,3 +561,33 @@
         name: 'game_screen'
         R2Game:
             id: game
+
+        BoxLayout:
+            id: test3
+            orientation: 'horizontal'
+            size_hint: (1., .35)
+
+            BoxLayout 
+                id: top
+                orientation: 'vertical'
+
+                Label:
+                    text: 'Big Reward Cnt:'
+                    font_size: 30
+
+                Label:
+                    text: str(game.big_reward_cnt)
+                    font_size: 30
+
+            BoxLayout:
+                id: test3
+                orientation: 'vertical'
+
+                Label:
+                    text: 'Small Reward Cnt:'
+                    font_size: 30
+
+                Label:
+                    text: str(game.small_reward_cnt)
+                    font_size: 30
+

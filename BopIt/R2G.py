@@ -13,6 +13,11 @@ import time
 import numpy as np
 import tables
 
+Config.set('graphics', 'resizable', False)
+fixed_window_size = (1800, 1000)
+Config.set('graphics', 'width', str(fixed_window_size[0]))
+Config.set('graphics', 'height', str(fixed_window_size[1]))
+
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
     time = tables.Float32Col()
@@ -25,7 +30,7 @@ class R2Game(Widget):
     ITI_mean = 1.
     ITI_std = .2
 
-    start_timeout = 10. 
+    start_timeout = 5000. 
     start_holdtime = .001
 
     grasp_timeout_time = 5000.
@@ -33,17 +38,30 @@ class R2Game(Widget):
 
     # Number of trials: 
     trial_counter = NumericProperty(0)
-            
+    t0 = time.time()
+
+    big_reward_cnt = NumericProperty(0)
+    small_reward_cnt = NumericProperty(0)
+
     def init(self, animal_names_dict=None, rew_in=None, rew_del=None,
         test=None, hold=None, autoquit=None, use_start=None, only_start=None):
 
-        holdz = [0., .25, .5, .625, .75]
+        holdz = [0., '0-0.25', .25, '0.25-0.5', .5]
         for i, val in enumerate(hold['start_hold']):
             if val:
-                self.start_hold = holdz[i]
+                if type(holdz[i]) is str:
+                    self.start_hold_type = holdz[i]
+                    self.start_hold = 0.
+                else:
+                    self.start_hold = holdz[i]
+
         for i, val in enumerate(hold['grasp_hold']):
             if val:
-                self.grasp_hold = holdz[i]
+                if type(holdz[i]) is str:
+                    self.grasp_hold_type = holdz[i]
+                    self.grasp_hold = 0.
+                else:
+                    self.grasp_hold = holdz[i]
 
         small_rew_opts = [.1, .3, .5]
         for i, val in enumerate(rew_in['small_rew']):
@@ -67,6 +85,7 @@ class R2Game(Widget):
 
         if rew_in['snd_only']:
             self.reward_for_grasp = [True, 0.]
+            self.reward_for_start = [True, 0.]
             self.skip_juice = True
         else:
             self.skip_juice = False
@@ -152,37 +171,32 @@ class R2Game(Widget):
         # Open task arduino
         self.task_ard = serial.Serial(port='COM12')
 
-        try:
-            if self.testing:
-                pass
-            else:
-                import os
-                path = os.getcwd()
-                path = path.split('\\')
-                path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-                p = ''
-                for ip in path_data:
-                    p += ip+'/'
-                p += 'data/'
-                print ('')
-                print ('')
-                print('Data saving PATH: ', p)
-                print ('')
-                print ('')
-                self.filename = p+ animal_name+'_Grasp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-                if self.in_cage:
-                    self.filename = self.filename+'_cage'
-
-                pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
-                self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-                self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-                self.h5_table_row = self.h5_table.row
-
-                # Note in python 3 to open pkl files: 
-                #with open('xxxx_params.pkl', 'rb') as f:
-                #    data_params = pickle.load(f)
-        except:
+        if self.testing:
             pass
+        else:
+            import os
+            path = os.getcwd()
+            path = path.split('\\')
+            path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
+            p = ''
+            for ip in path_data:
+                p += ip+'/'
+            p += 'data/'
+            print ('')
+            print ('')
+            print('Data saving PATH: ', p)
+            print ('')
+            print ('')
+            self.filename = p+ animal_name+'_Grasp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+
+            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+            self.h5_table_row = self.h5_table.row
+
+            # Note in python 3 to open pkl files: 
+            #with open('xxxx_params.pkl', 'rb') as f:
+            #    data_params = pickle.load(f)
 
     def close_app(self):
         App.get_running_app().stop()
@@ -196,7 +210,8 @@ class R2Game(Widget):
         _ = self.task_ard.readline()
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('/t')
-        print(port_splits)
+        #print(port_splits)
+        print(self.state)
         if len(port_splits) != 4:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
@@ -242,7 +257,7 @@ class R2Game(Widget):
 
     def write_to_h5file(self):
         self.h5_table_row['state']= self.state
-        self.h5_table_row['time'] = time.time()
+        self.h5_table_row['time'] = time.time() - self.t0
         self.h5_table_row['force'] = self.force
         self.h5_table_row['beam'] = self.beam
         self.h5_table_row.append()
@@ -258,19 +273,28 @@ class R2Game(Widget):
     def _start_ITI(self, **kwargs):
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
         
+        if type(self.start_hold_type) is str:
+            cht_min, cht_max = self.cht_type.split('-')
+            self.start_hold = ((float(cht_max) - float(cht_min)) * np.random.random()) + float(cht_min)
+
+        if type(self.grasp_hold_type) is str:
+            tht_min, tht_max = self.tht_type.split('-')
+            self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
+
+
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
 
     def _start_start_button(self, **kwargs):
         self.task_ard.flushInput()
-        self.task_ard.write('n'.encode()) #morning
+        self.task_ard.write('m'.encode()) #morning
 
     def pushed_start(self, **kwargs):
         return self.button
 
     def _end_start_button(self, **kwargs):
         self.task_ard.flushInput()
-        self.task_ard.write('m'.encode()) #night
+        self.task_ard.write('n'.encode()) #night
 
     def start_button_timeout(self, **kwargs):
         return kwargs['ts'] > self.start_timeout
@@ -303,6 +327,7 @@ class R2Game(Widget):
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
+        self.big_reward_cnt += 1
 
         try:
             if self.reward_for_grasp[0]:
@@ -312,7 +337,7 @@ class R2Game(Widget):
 
                 if not self.skip_juice:
                     self.reward_port.open()
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_grasp[1])+' sec\n']
                     self.reward_port.write(rew_str)
                     time.sleep(.5 + self.reward_delay_time)
                     run_str = [ord(r) for r in 'run\n']
@@ -322,13 +347,14 @@ class R2Game(Widget):
             pass
         
     def _start_rew_start(self, **kwargs):
+        self.small_rew_cnt += 1
         try:
             if self.reward_for_start[0]:
                 sound = SoundLoader.load('reward2.wav')
                 sound.play()
                 
                 self.reward_port.open()
-                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
+                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
                 self.reward_port.write(rew_str)
                 time.sleep(.5)
                 run_str = [ord(r) for r in 'run\n']
@@ -345,6 +371,12 @@ class Manager(ScreenManager):
 
 class R2GApp(App):
     def build(self, **kwargs):
+        from win32api import GetSystemMetrics
+        screenx = GetSystemMetrics(0)
+        screeny = GetSystemMetrics(1)
+        Window.size = (1800, 1000)
+        Window.left = (screenx - 1800)/2
+        Window.top = (screeny - 1000)/2
         return Manager()
         
 if __name__ == '__main__':

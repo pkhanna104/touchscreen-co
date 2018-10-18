@@ -9,13 +9,12 @@ from kivy.clock import Clock
 from random import randint
 from kivy.config import Config
 import serial, time, pickle, datetime, winsound
-# to install -- pyserial, pygame, 
+from numpy import binary_repr
+import struct
 
 Config.set('graphics', 'resizable', False)
-
 fixed_window_size = (1800, 1000)
 pix_per_cm = 85.
-
 Config.set('graphics', 'width', str(fixed_window_size[0]))
 Config.set('graphics', 'height', str(fixed_window_size[1]))
 
@@ -61,7 +60,7 @@ class COGame(Widget):
     drag_error_timeout = 0.
 
     ntargets = 4.
-    target_distance = 5.
+    target_distance = 4.
     touch = False
 
     center_target = ObjectProperty(None)
@@ -73,6 +72,7 @@ class COGame(Widget):
     # Number of trials: 
     trial_counter = NumericProperty(0)
 
+    t0 = time.time()
 
     def on_touch_down(self, touch):
         #handle many touchs:
@@ -174,6 +174,8 @@ class COGame(Widget):
 
                 # If centerout task, set THT to 0.2 else set to same as CHT
                 if self.use_center:
+                    self.cht_type = None
+                    self.cht = holdz[i]
                     self.tht = 0.2
                     self.tht_type = None
 
@@ -221,7 +223,7 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
 
-        self.target_list = generatorz()
+        self.target_list = generatorz(self.target_distance)
         self.target_index = 0
         self.repeat = False
         self.center_target_position = np.array([0., 0.])
@@ -260,6 +262,10 @@ class COGame(Widget):
             self.reward_port.close()
         except:
             pass
+
+        self.dio_port = serial.Serial(port='COM13', baudrate=115200)
+        time.sleep(4.)
+
 
         # save parameters: 
         d = dict(animal_name=animal_name, center_target_rad=self.center_target_rad,
@@ -309,11 +315,11 @@ class COGame(Widget):
                 self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
                 self.h5_table = self.h5file.create_table('/', 'task', Data, '')
                 self.h5_table_row = self.h5_table.row
+                self.h5_table_row_cnt = 0
 
                 # Note in python 3 to open pkl files: 
                 #with open('xxxx_params.pkl', 'rb') as f:
                 #    data_params = pickle.load(f)
-
         except:
             pass
 
@@ -392,9 +398,26 @@ class COGame(Widget):
         self.h5_table_row['cursor_ids'] = cursor_id
 
         self.h5_table_row['target_pos'] = self.periph_target_position
-        self.h5_table_row['time'] = time.time()
+        self.h5_table_row['time'] = time.time() - self.t0
         self.h5_table_row['cap_touch'] = self.rhtouch_sensor
         self.h5_table_row.append()
+
+        # Write DIO 
+        #try:
+        self.write_row_to_dio()
+        #except:
+        #    pass
+            
+        # Upgrade table row: 
+        self.h5_table_row_cnt += 1
+
+    def write_row_to_dio(self):
+        ### FROM TDT TABLE, 5 is GND, BYTE A ###
+        row_to_write = self.h5_table_row_cnt % 256
+
+        ### write to arduino: 
+        word_str = b'd' + struct.pack('<H', int(row_to_write))
+        self.dio_port.write(word_str)
 
     def stop(self, **kwargs):
         # If past number of max trials then auto-quit: 
@@ -641,10 +664,10 @@ class COGame(Widget):
         else:
             return False
 
-    def get_4targets(self):
-        return self.get_targets_co()
+    def get_4targets(self, target_distance=4):
+        return self.get_targets_co(target_distance=target_distance)
 
-    def get_targets_co(self, ntargets=4, target_distance=4):
+    def get_targets_co(self, target_distance=4, ntargets=4):
         # Targets in CM: 
         angle = np.linspace(0, 2*np.pi, ntargets+1)[:-1]
         x = np.cos(angle)*target_distance
