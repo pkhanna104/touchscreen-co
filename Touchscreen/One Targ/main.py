@@ -263,9 +263,11 @@ class COGame(Widget):
         except:
             pass
 
-        self.dio_port = serial.Serial(port='COM13', baudrate=115200)
-        time.sleep(4.)
-
+        try:
+            self.dio_port = serial.Serial(port='COM13', baudrate=115200)
+            time.sleep(4.)
+        except:
+            pass
 
         # save parameters: 
         d = dict(animal_name=animal_name, center_target_rad=self.center_target_rad,
@@ -402,10 +404,10 @@ class COGame(Widget):
         self.h5_table_row.append()
 
         # Write DIO 
-        #try:
-        self.write_row_to_dio()
-        #except:
-        #    pass
+        try:
+            self.write_row_to_dio()
+        except:
+            pass
             
         # Upgrade table row: 
         self.h5_table_row_cnt += 1
