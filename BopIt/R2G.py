@@ -331,9 +331,6 @@ class R2Game(Widget):
         return # not beam clear
 
     def _start_reward(self, **kwargs):
-        self.trial_counter += 1
-        self.big_reward_cnt += 1
-
         try:
             if self.reward_for_grasp[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
@@ -350,6 +347,9 @@ class R2Game(Widget):
                     self.reward_port.close()
         except:
             pass
+
+        self.trial_counter += 1
+        self.big_reward_cnt += 1
         
     def _start_rew_start(self, **kwargs):
         self.small_reward_cnt += 1
