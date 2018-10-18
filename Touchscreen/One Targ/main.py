@@ -171,10 +171,14 @@ class COGame(Widget):
 
                 # If centerout task, set THT to 0.2 else set to same as CHT
                 if self.use_center:
-                    self.cht_type = None
-                    self.cht = holdz[i]
-                    self.tht = 0.2
-                    self.tht_type = None
+                    if type(holdz[i]) is str:
+                        self.cht_type = holdz[i]
+                        self.cht = 0.5
+                    else:
+                        self.cht_type = None
+                        self.cht = holdz[i]
+                        self.tht = 0.2
+                        self.tht_type = None
 
         try:
             pygame.mixer.init()    
