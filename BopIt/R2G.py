@@ -279,11 +279,11 @@ class R2Game(Widget):
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
         
         if type(self.start_hold_type) is str:
-            cht_min, cht_max = self.cht_type.split('-')
+            cht_min, cht_max = self.start_hold_type.split('-')
             self.start_hold = ((float(cht_max) - float(cht_min)) * np.random.random()) + float(cht_min)
 
         if type(self.grasp_hold_type) is str:
-            tht_min, tht_max = self.tht_type.split('-')
+            tht_min, tht_max = self.grasp_hold_type.split('-')
             self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
 
 
