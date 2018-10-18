@@ -53,6 +53,7 @@ class R2Game(Widget):
                     self.start_hold_type = holdz[i]
                     self.start_hold = 0.
                 else:
+                    self.start_hold_type = 0
                     self.start_hold = holdz[i]
 
         for i, val in enumerate(hold['grasp_hold']):
@@ -61,6 +62,7 @@ class R2Game(Widget):
                     self.grasp_hold_type = holdz[i]
                     self.grasp_hold = 0.
                 else:
+                    self.grasp_hold_type = 0
                     self.grasp_hold = holdz[i]
 
         small_rew_opts = [.1, .3, .5]
@@ -202,6 +204,9 @@ class R2Game(Widget):
         App.get_running_app().stop()
         Window.close()
 
+    def quit_from_app(self):
+        self.close_app()
+
     def update(self, ts):
         self.state_length = time.time() - self.state_start
         
@@ -274,11 +279,11 @@ class R2Game(Widget):
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
         
         if type(self.start_hold_type) is str:
-            cht_min, cht_max = self.cht_type.split('-')
+            cht_min, cht_max = self.start_hold_type.split('-')
             self.start_hold = ((float(cht_max) - float(cht_min)) * np.random.random()) + float(cht_min)
 
         if type(self.grasp_hold_type) is str:
-            tht_min, tht_max = self.tht_type.split('-')
+            tht_min, tht_max = self.grasp_hold_type.split('-')
             self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
 
 
@@ -326,9 +331,6 @@ class R2Game(Widget):
         return # not beam clear
 
     def _start_reward(self, **kwargs):
-        self.trial_counter += 1
-        self.big_reward_cnt += 1
-
         try:
             if self.reward_for_grasp[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
@@ -345,9 +347,12 @@ class R2Game(Widget):
                     self.reward_port.close()
         except:
             pass
+
+        self.trial_counter += 1
+        self.big_reward_cnt += 1
         
     def _start_rew_start(self, **kwargs):
-        self.small_rew_cnt += 1
+        self.small_reward_cnt += 1
         try:
             if self.reward_for_start[0]:
                 sound = SoundLoader.load('reward2.wav')

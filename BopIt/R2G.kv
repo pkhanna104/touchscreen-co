@@ -300,9 +300,11 @@
                 Label:
                     text: ''
                     fontsize: 50
-
+                Label:
+                    text: ''
+                    fontsize: 50
                 Label: 
-                    text: 'Button Hold Time'
+                    text: 'Button Hold'
                     color: 1, 1, 0, 1
 
                 Label: 
@@ -311,6 +313,7 @@
                 CheckBox:
                     id: zero_sec
                     group: 'hold_time'
+                    active: True
 
                 Label:
                     text: '0-0.25 sec'
@@ -342,7 +345,73 @@
                 Label:
                     text: ''
                     fontsize: 50
+                
+                Label:
+                    text: ''
+                    fontsize: 50
+                
+                Label:
+                    text: ''
+                    fontsize: 50
 
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label: 
+                    text: 'GRASP Hold'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0 sec'
+                CheckBox:
+                    id: g_zero_sec
+                    group: 'ghold_time'
+                    active: True
+
+                Label:
+                    text: '0-0.25 sec'
+                CheckBox:
+                    id: g_easy_rand_0_25
+                    group: 'ghold_time'
+
+                Label: 
+                    text: '0.25 sec'
+                CheckBox:
+                    id: g_quarter_sec
+                    group: 'ghold_time'
+
+                Label: 
+                    text: '0.5 sec'
+                CheckBox:
+                    id: g_half_sec
+                    group: 'ghold_time'
+
+                Label:
+                    text: '0.25-0.5 sec'
+                CheckBox:
+                    id: g_hard_rand_25_50
+                    group: 'ghold_time'
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
             BoxLayout:
                 id: test
                 orientation: 'horizontal'
@@ -356,7 +425,13 @@
                 Label:
                     text: ''
                     fontsize: 50
-                
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
                 Label: 
                     text: 'Auto-Quit After: '
                     color: 1, 1, 0, 1
@@ -386,6 +461,12 @@
                 Label:
                     text: ''
                     fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
 
             BoxLayout:
                 id: test
@@ -400,60 +481,11 @@
 
                 Label: 
                     text: 'Yes'
+
                 CheckBox:
                     id: start_button
                     group: 'start'
                     active: True
-
-            BoxLayout:
-                id: params:
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'GRASP Hold Time'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '0 sec'
-                CheckBox:
-                    id: g_zero_sec
-                    group: 'ghold_time'
-
-                Label:
-                    text: 'Easy Rand: 0-0.25 sec'
-                CheckBox:
-                    id: g_easy_rand_0_25
-                    group: 'ghold_time'
-
-                Label: 
-                    text: '0.25 sec'
-                CheckBox:
-                    id: g_quarter_sec
-                    group: 'ghold_time'
-
-                Label: 
-                    text: '0.5 sec'
-                CheckBox:
-                    id: g_half_sec
-                    group: 'ghold_time'
-
-                Label:
-                    text: 'Hard Rand: 0.25-0.5 sec'
-                CheckBox:
-                    id: g_hard_rand_25_50
-                    group: 'ghold_time'
 
                 Label:
                     text: ''
@@ -474,6 +506,12 @@
             BoxLayout:
                 id: test
                 orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
                 Label:
                     text: ''
                     fontsize: 50
@@ -514,7 +552,13 @@
                 Label:
                     text: ''
                     fontsize: 50
-                
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
                 Label: 
                     text: 'Testing or Monkey Time?'
                     color: 1, 1, 0, 1
@@ -531,7 +575,12 @@
                     id: monk_time
                     group: 'testing'
                     active: True
-
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
             Button:
                 text: 'Play R2G'
                 halign: 'center'
@@ -591,3 +640,8 @@
                     text: str(game.small_reward_cnt)
                     font_size: 30
 
+                Button:
+                    text: 'Exit Gracefully'
+                    font_size: 30
+                    on_release: game.quit_from_app()
+                    background_color: (.1, 0.1, 0.8, 1.0)

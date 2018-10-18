@@ -101,13 +101,10 @@ class COGame(Widget):
             print('removing touch from pre-game screen')
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None, rew_del=None,
-        test=None, cap_on=None, hold=None, targ_structure=None,
+        test=None, hold=None, targ_structure=None,
         autoquit=None, drag=None):
 
-        cap = [1, 0]
-        for i, val in enumerate(cap_on['cap']):
-            if val:
-                self.use_cap_sensor = cap[i]
+        self.use_cap_sensor = False
 
         if self.use_cap_sensor:
             self.serial_port_cap = serial.Serial(port='COM5')
@@ -174,10 +171,14 @@ class COGame(Widget):
 
                 # If centerout task, set THT to 0.2 else set to same as CHT
                 if self.use_center:
-                    self.cht_type = None
-                    self.cht = holdz[i]
-                    self.tht = 0.2
-                    self.tht_type = None
+                    if type(holdz[i]) is str:
+                        self.cht_type = holdz[i]
+                        self.cht = 0.5
+                    else:
+                        self.cht_type = None
+                        self.cht = holdz[i]
+                        self.tht = 0.2
+                        self.tht_type = None
 
         try:
             pygame.mixer.init()    
