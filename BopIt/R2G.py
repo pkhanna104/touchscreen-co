@@ -53,6 +53,7 @@ class R2Game(Widget):
                     self.start_hold_type = holdz[i]
                     self.start_hold = 0.
                 else:
+                    self.start_hold_type = 0
                     self.start_hold = holdz[i]
 
         for i, val in enumerate(hold['grasp_hold']):
@@ -61,6 +62,7 @@ class R2Game(Widget):
                     self.grasp_hold_type = holdz[i]
                     self.grasp_hold = 0.
                 else:
+                    self.grasp_hold_type = 0
                     self.grasp_hold = holdz[i]
 
         small_rew_opts = [.1, .3, .5]
