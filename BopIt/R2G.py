@@ -347,7 +347,7 @@ class R2Game(Widget):
             pass
         
     def _start_rew_start(self, **kwargs):
-        self.small_rew_cnt += 1
+        self.small_reward_cnt += 1
         try:
             if self.reward_for_start[0]:
                 sound = SoundLoader.load('reward2.wav')
