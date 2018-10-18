@@ -380,7 +380,7 @@
                     active: True
 
                 Label:
-                    text: 'Easy Rand: 0-0.25 sec'
+                    text: '0-0.25 sec'
                 CheckBox:
                     id: g_easy_rand_0_25
                     group: 'ghold_time'
@@ -398,7 +398,7 @@
                     group: 'ghold_time'
 
                 Label:
-                    text: 'Hard Rand: 0.25-0.5 sec'
+                    text: '0.25-0.5 sec'
                 CheckBox:
                     id: g_hard_rand_25_50
                     group: 'ghold_time'
@@ -636,3 +636,8 @@
                     text: str(game.small_reward_cnt)
                     font_size: 30
 
+                Button:
+                    text: 'Exit Gracefully'
+                    font_size: 30
+                    on_release: game.quit_from_app()
+                    background_color: (.1, 0.1, 0.8, 1.0)

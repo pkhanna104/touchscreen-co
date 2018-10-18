@@ -202,6 +202,9 @@ class R2Game(Widget):
         App.get_running_app().stop()
         Window.close()
 
+    def quit_from_app(self):
+        self.close_app()
+
     def update(self, ts):
         self.state_length = time.time() - self.state_start
         
