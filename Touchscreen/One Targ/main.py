@@ -173,7 +173,7 @@ class COGame(Widget):
                 if 'co' in nm:
                     self.use_center = True
 
-        holdz = [.25, .375, .5, '.25-.4', '.3-.55']
+        holdz = [.25, .375, .5, '.3-.45', '.4-.55']
         
         self.cht_type = None
         self.tht_type = None
