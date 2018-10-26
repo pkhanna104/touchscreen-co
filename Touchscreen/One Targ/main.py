@@ -381,7 +381,7 @@ class COGame(Widget):
             self.generatorz_param = self.generatorz_param2
 
             self.nudge_text = 'Nudge 9oclock targ? '
-            self.nudge_param = self.nudge_dist
+            self.nudge_param = str(self.nudge_dist)
         else:
             App.get_running_app().stop()
             Window.close()
