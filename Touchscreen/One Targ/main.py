@@ -1,8 +1,9 @@
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
+from kivy.core.text import Label as CoreLabel
 from kivy.uix.widget import Widget
-from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty
+from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.vector import Vector
 from kivy.clock import Clock
@@ -11,6 +12,7 @@ from kivy.config import Config
 import serial, time, pickle, datetime, winsound
 from numpy import binary_repr
 import struct
+
 
 Config.set('graphics', 'resizable', False)
 fixed_window_size = (1800, 1000)
@@ -74,6 +76,18 @@ class COGame(Widget):
 
     t0 = time.time()
 
+    cht_text = StringProperty('')
+    tht_text = StringProperty('')
+    generatorz_text = StringProperty('')
+    targ_size_text = StringProperty('')
+    big_rew_text = StringProperty('')
+    cht_param = StringProperty('')
+    tht_param = StringProperty('')
+    targ_size_param = StringProperty('')
+    big_rew_time_param = StringProperty('')
+    generatorz_param = StringProperty('')
+    nudge_text = StringProperty('')
+    nudge_param = StringProperty('')
     def on_touch_down(self, touch):
         #handle many touchs:
         ud = touch.ud
@@ -102,7 +116,10 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None, rew_del=None,
         test=None, hold=None, targ_structure=None,
-        autoquit=None, drag=None):
+        autoquit=None, drag=None, nudge=None):
+
+        self.rew_cnt = 0
+        self.small_rew_cnt = 0
 
         self.use_cap_sensor = False
 
@@ -152,6 +169,7 @@ class COGame(Widget):
         for i, (nm, val) in enumerate(targ_structure.items()):
             if val:
                 generatorz = getattr(self, nm)
+                self.generatorz_param2 = nm
                 if 'co' in nm:
                     self.use_center = True
 
@@ -164,22 +182,19 @@ class COGame(Widget):
             if val:
                 if type(holdz[i]) is str:
                     mx, mn = holdz[i].split('-')
-                    self.cht_type = holdz[i]
-                    self.cht = (float(mn)+float(mx))*.5
                     self.tht_type = holdz[i]
                     self.tht =  (float(mn)+float(mx))*.5
+                else:
+                    self.tht = holdz[i]
 
-                # If centerout task, set THT to 0.2 else set to same as CHT
-                if self.use_center:
-                    if type(holdz[i]) is str:
-                        self.cht_type = holdz[i]
-                        self.cht = 0.5
-                    else:
-                        self.cht_type = None
-                        self.cht = holdz[i]
-                        self.tht = 0.2
-                        self.tht_type = None
-
+        for i, val in enumerate(hold['chold']):
+            if val:
+                if type(holdz[i]) is str:
+                    mx, mn = holdz[i].split('-')
+                    self.cht_type = holdz[i]
+                    self.cht = (float(mn)+float(mx))*.5
+                else:
+                    self.cht = holdz[i]
         try:
             pygame.mixer.init()    
         except:
@@ -207,6 +222,16 @@ class COGame(Widget):
             if val:
                 self.drag_ok = drag_ok[i]
 
+        nudge_9am_dist = [0., .5, 1.]
+        for i, val in enumerate(nudge['nudge']):
+            if val:
+                self.nudge_dist = nudge_9am_dist[i]
+
+
+        # Preload sounds: 
+        self.reward1 = SoundLoader.load('reward1.wav')
+        self.reward2 = SoundLoader.load('reward2.wav')
+
         self.state = 'ITI'
         self.state_start = time.time()
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
@@ -224,7 +249,7 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
 
-        self.target_list = generatorz(self.target_distance)
+        self.target_list = generatorz(self.target_distance, self.nudge_dist)
         self.target_index = 0
         self.repeat = False
         self.center_target_position = np.array([0., 0.])
@@ -333,12 +358,38 @@ class COGame(Widget):
         if self.idle:
             self.state = 'idle_exit'
             self.trial_counter = -1
+
+            # Set relevant params text: 
+            self.cht_text = 'Center Hold Time: '
+            self.tht_text = 'Target Hold Time: '
+            self.generatorz_text = 'Target Structure: '
+            self.targ_size_text = 'Target Radius: '
+            self.big_rew_text = 'Big Reward Time: '
+
+            if type(self.cht_type) is str:
+                self.cht_param = self.cht_type
+            else:
+                self.cht_param = 'Constant: ' + str(self.cht)
+
+            if type(self.tht_type) is str:
+                self.tht_param = self.tht_type
+            else:
+                self.tht_param = 'Constant: ' + str(self.tht)
+
+            self.targ_size_param = str(self.center_target_rad)
+            self.big_rew_time_param = str(self.reward_for_targtouch[1])
+            self.generatorz_param = self.generatorz_param2
+
+            self.nudge_text = 'Nudge 9oclock targ? '
+            self.nudge_param = self.nudge_dist
         else:
             App.get_running_app().stop()
             Window.close()
 
     def update(self, ts):
         self.state_length = time.time() - self.state_start
+        self.rew_cnt += 1
+        self.small_rew_cnt += 1
         
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
@@ -365,6 +416,11 @@ class COGame(Widget):
                     if hasattr(self, start_state_fn_name):
                         start_state_fn = getattr(self, start_state_fn_name)
                         start_state_fn()
+            else:
+                while_state_fn_name = "_while_%s" % self.state
+                if hasattr(self, while_state_fn_name):
+                    while_state_fn = getattr(self, while_state_fn_name)
+                    while_state_fn()
             
         if self.use_cap_sensor:
             try:
@@ -478,7 +534,6 @@ class COGame(Widget):
             self.exit_target1.color = (.9, 0, 0, 1.)
             self.exit_target2.color = (.9, 0, 0, 1.)
 
-
     def rhtouch(self, **kwargs):
         if self.use_cap_sensor:
             if self.rhtouch_sensor:
@@ -553,25 +608,37 @@ class COGame(Widget):
         self.periph_target.color = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
+        self.rew_cnt = 0
 
+    def _while_reward(self, **kwargs):
+        if self.rew_cnt == 1:
+            self.run_big_rew()
+            self.rew_cnt += 1
+
+    def _start_rew_anytouch(self, **kwargs):
+        #if self.small_rew_cnt == 1:
+        self.run_small_rew()
+            #self.small_rew_cnt += 1
+
+    def run_big_rew(self, **kwargs):
         try:
             if self.reward_for_targtouch[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                sound = SoundLoader.load('reward1.wav')
-                sound.play()
+                #sound = SoundLoader.load('reward1.wav')
+                self.reward1.play()
 
                 if not self.skip_juice:
                     self.reward_port.open()
                     rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
                     self.reward_port.write(rew_str)
-                    time.sleep(.5 + self.reward_delay_time)
+                    time.sleep(.25 + self.reward_delay_time)
                     run_str = [ord(r) for r in 'run\n']
                     self.reward_port.write(run_str)
                     self.reward_port.close()
         except:
             pass
         
-    def _start_rew_anytouch(self, **kwargs):
+    def run_small_rew(self, **kwargs):
         try:
             if self.reward_for_anytouch[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
@@ -581,7 +648,7 @@ class COGame(Widget):
                 self.reward_port.open()
                 rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
                 self.reward_port.write(rew_str)
-                time.sleep(.5)
+                time.sleep(.25)
                 run_str = [ord(r) for r in 'run\n']
                 self.reward_port.write(run_str)
                 self.reward_port.close()
@@ -595,7 +662,10 @@ class COGame(Widget):
             return True
 
     def end_rewanytouch(self, **kwargs):
-        return True
+        if self.small_rew_cnt > 1:
+            return True
+        else:
+            return False
 
     def end_touch_error(self, **kwargs):
         return kwargs['ts'] >= self.touch_error_timeout
@@ -666,21 +736,34 @@ class COGame(Widget):
         else:
             return False
 
-    def get_4targets(self, target_distance=4):
-        return self.get_targets_co(target_distance=target_distance)
+    def get_4targets(self, target_distance=4, nudge=0.):
+        return self.get_targets_co(target_distance=target_distance, nudge=0.)
 
-    def get_targets_co(self, target_distance=4, ntargets=4):
+    def get_targets_co(self, target_distance=4, nudge=0., ntargets=4):
         # Targets in CM: 
         angle = np.linspace(0, 2*np.pi, ntargets+1)[:-1]
         x = np.cos(angle)*target_distance
         y = np.sin(angle)*target_distance
         tmp = np.hstack((x[:, np.newaxis], y[:, np.newaxis]))
+        nudge_targ = np.array([0, 0, 1., 0])
 
         tgs = []
+        nudges = []
         for blks in range(100):
             ix = np.random.permutation(tmp.shape[0])
             tgs.append(tmp[ix, :])
-        return np.vstack((tgs))
+            nudges.append(nudge_targ[ix])
+
+        tgs = np.vstack((tgs))
+        nudges = np.hstack((nudges))
+        nudge_ix = np.nonzero(nudges==1)[0]
+        print('Nudges: ')
+        print(len(nudge_ix))
+
+        to_nudge = np.array([-1., 1.])*nudge
+        tgs[nudge_ix, :] = tgs[nudge_ix, :] + to_nudge[np.newaxis, :]
+
+        return tgs
 
     def get_targets_rand(self, target_distance=4):
         # Targets in CM: 

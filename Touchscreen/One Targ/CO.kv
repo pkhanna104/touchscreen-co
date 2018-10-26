@@ -299,7 +299,56 @@
                 Label:
                     text: ''
                     fontsize: 50
-            
+
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Nudge 9am Target Up and to the Left?'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0 cm'
+                CheckBox:
+                    id: zero_nudge
+                    group: 'nudge'
+                    active: True
+
+                Label: 
+                    text: '.5 cm'
+                CheckBox:
+                    id: half_nudge
+                    group: 'nudge'
+
+                Label: 
+                    text: '1.0 cm'
+
+                CheckBox:
+                    id: full_nudge
+                    group: 'nudge'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
@@ -341,6 +390,64 @@
                 CheckBox:
                     id: rew_del_12
                     group: 'rew_del'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'CENTER Hold Time'
+                    color: 1, 1, 0, 1
+
+
+                Label: 
+                    text: '0.25 sec'
+
+                CheckBox:
+                    id: c_quarter_sec
+                    group: 'chold_time'
+
+                Label: 
+                    text: '0.375 sec'
+
+                CheckBox:
+                    id: c_three_sev_five_sec
+                    group: 'chold_time'
+
+                Label: 
+                    text: '0.5 sec'
+
+                CheckBox:
+                    id: c_half_sec
+                    group: 'chold_time'
+                    active: True
+
+                Label: 
+                    text: 'Rand: .25-.4'
+
+                CheckBox:
+                    id: c_small_rand
+                    group: 'chold_time'
+
+                Label:
+                    text: 'Rand: .3-.55'
+                    fontsize: 50
+
+                CheckBox:
+                    id: c_big_rand
+                    group: 'chold_time'
 
                 Label:
                     text: ''
@@ -572,7 +679,9 @@
                 on_release: 
                     root.current = 'splash_start'
                     splash.init(dict(haun=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=rew_noauto_chk.active, rew_anytouch=rew_anytouch_chk.active, rew_any_pls_targ=rew_anytouch_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
-                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), dict(test=[testing.active, monk_time.active, monk_time_in_cage.active]), dict(hold=[quarter_sec.active, three_sev_five_sec.active, half_sec.active, small_rand.active, big_rand.active]), dict(get_targets_rand=rand_targ.active, get_4targets=four_targ.active, get_targets_co=co_targ.active), dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), dict(drag=[drag.active, no_drag.active]))
+                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), dict(test=[testing.active, monk_time.active, monk_time_in_cage.active]), dict(chold=[c_quarter_sec.active, c_three_sev_five_sec.active, c_half_sec.active, c_small_rand.active, c_big_rand.active],
+                    hold=[quarter_sec.active, three_sev_five_sec.active, half_sec.active, small_rand.active, big_rand.active]), 
+                    dict(get_targets_rand=rand_targ.active, get_4targets=four_targ.active, get_targets_co=co_targ.active), dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), dict(drag=[drag.active, no_drag.active]), dict(nudge=[zero_nudge.active, half_nudge.active, full_nudge.active]))
 
             Label:
                 text: ''
@@ -682,6 +791,79 @@
         center_x: root.width * 6/8
         top: root.top - 70
         text: str(root.trial_counter)
+
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 170
+        text: root.cht_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 170
+        text: root.cht_param
+
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 270
+        text: root.tht_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 270
+        text: root.tht_param
+
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 370
+        text: root.generatorz_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 370
+        text: root.generatorz_param
+
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 470
+        text: root.targ_size_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 470
+        text: root.targ_size_param
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 570
+        text: root.big_rew_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 570
+        text: root.big_rew_time_param
+
+
+
+
 
 <Target>:
     canvas:
