@@ -319,7 +319,10 @@ class R2Game(Widget):
         return False
 
     def clear_LED(self, **kwargs):
-        return self.beam
+    	if self.beam == 0:
+    		return True
+    	else:
+    		return False
 
     def grasp_timeout(self, **kwargs):
         return kwargs['ts'] > self.grasp_timeout_time
@@ -328,7 +331,10 @@ class R2Game(Widget):
         return kwargs['ts'] > self.grasp_hold
 
     def drop(self, **kwargs):
-        return # not beam clear
+        if self.beam == 1:
+        	return True
+        else:
+        	return False
 
     def _start_reward(self, **kwargs):
         try:
