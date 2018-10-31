@@ -124,6 +124,10 @@ class R2Game(Widget):
             if val:
                 self.only_start = start[i]
 
+        # Preload reward buttons: 
+        self.reward1 = SoundLoader.load('reward1.wav')
+        self.reward2 = SoundLoader.load('reward2.wav')
+
         self.state = 'ITI'
         self.state_start = time.time()
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
@@ -340,8 +344,8 @@ class R2Game(Widget):
         try:
             if self.reward_for_grasp[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                sound = SoundLoader.load('reward1.wav')
-                sound.play()
+                #sound = SoundLoader.load('reward1.wav')
+                self.reward1.play()
 
                 if not self.skip_juice:
                     self.reward_port.open()
@@ -361,8 +365,9 @@ class R2Game(Widget):
         self.small_reward_cnt += 1
         try:
             if self.reward_for_start[0]:
-                sound = SoundLoader.load('reward2.wav')
-                sound.play()
+                #sound = SoundLoader.load('reward2.wav')
+                #sound.play()
+                self.reward2.play()
                 
                 self.reward_port.open()
                 rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
