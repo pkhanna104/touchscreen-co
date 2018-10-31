@@ -175,7 +175,7 @@ class R2Game(Widget):
             only_start = self.only_start, reward_fcn=reward_fcn)
 
         # Open task arduino
-        self.task_ard = serial.Serial(port='COM12')
+        self.task_ard = serial.Serial(port='COM11')
 
         if self.testing:
             pass
@@ -205,6 +205,10 @@ class R2Game(Widget):
             #    data_params = pickle.load(f)
 
     def close_app(self):
+        # Turn off LED when cloisng : 
+        self.task_ard.flushInput()
+        self.task_ard.write('n'.encode()) #morn
+        
         App.get_running_app().stop()
         Window.close()
 
