@@ -360,36 +360,22 @@
                     fontsize: 50
 
                 Label: 
-                    text: 'Reward Delay'
+                    text: 'White Screen for Touching?'
                     color: 1, 1, 0, 1
 
                 Label: 
-                    text: '0 sec'
+                    text: 'Yes'
                 CheckBox:
-                    id: rew_del_0
-                    group: 'rew_del'
+                    id: white_screen_yes
+                    group: 'screen_white'
                     active: True
 
                 Label: 
-                    text: '.4 sec'
+                    text: 'No'
 
                 CheckBox:
-                    id: rew_del_4
-                    group: 'rew_del'
-
-                Label: 
-                    text: '.8 sec'
-
-                CheckBox:
-                    id: rew_del_8
-                    group: 'rew_del'
-
-                Label: 
-                    text: '1.2 sec'
-
-                CheckBox:
-                    id: rew_del_12
-                    group: 'rew_del'
+                    id: white_screen_no
+                    group: 'screen_white'
 
                 Label:
                     text: ''
@@ -679,7 +665,7 @@
                 on_release: 
                     root.current = 'splash_start'
                     splash.init(dict(haun=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=rew_noauto_chk.active, rew_anytouch=rew_anytouch_chk.active, rew_any_pls_targ=rew_anytouch_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
-                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), dict(test=[testing.active, monk_time.active, monk_time_in_cage.active]), dict(chold=[c_quarter_sec.active, c_three_sev_five_sec.active, c_half_sec.active, c_small_rand.active, c_big_rand.active],
+                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_10.active, targ_rad_15.active, targ_rad_20.active, targ_rad_30.active]), dict(white_screen=[white_screen_yes.active, white_screen_no.active]), dict(test=[testing.active, monk_time.active, monk_time_in_cage.active]), dict(chold=[c_quarter_sec.active, c_three_sev_five_sec.active, c_half_sec.active, c_small_rand.active, c_big_rand.active],
                     hold=[quarter_sec.active, three_sev_five_sec.active, half_sec.active, small_rand.active, big_rand.active]), 
                     dict(get_targets_rand=rand_targ.active, get_4targets=four_targ.active, get_targets_co=co_targ.active), dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), dict(drag=[drag.active, no_drag.active]), dict(nudge=[zero_nudge.active, half_nudge.active, full_nudge.active]))
 

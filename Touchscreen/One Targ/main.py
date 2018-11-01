@@ -114,7 +114,7 @@ class COGame(Widget):
         except:
             print('removing touch from pre-game screen')
             
-    def init(self, animal_names_dict=None, rew_in=None, task_in=None, rew_del=None,
+    def init(self, animal_names_dict=None, rew_in=None, task_in=None, white_screen=None,
         test=None, hold=None, targ_structure=None,
         autoquit=None, drag=None, nudge=None):
 
@@ -200,10 +200,15 @@ class COGame(Widget):
         except:
             pass
 
-        reward_delay_opts = [0., .4, .8, 1.2]
-        for i, val in enumerate(rew_del['rew_del']):
+        # reward_delay_opts = [0., .4, .8, 1.2]
+        # for i, val in enumerate(rew_del['rew_del']):
+        #     if val:
+        self.reward_delay_time = 0.0
+
+        white_screen_opts = [True, False]
+        for i, val in enumerate(white_screen['white_screen']):
             if val:
-                self.reward_delay_time = reward_delay_opts[i]
+                self.use_white_screen = white_screen_opts[i]
 
         test_vals = [True, False, False]
         in_cage_vals = [False, False, True]
@@ -365,7 +370,7 @@ class COGame(Widget):
     def close_app(self):
         # Save Data Eventually
          #Stop the video: 
-         self.cam_trig_port.write('0'.encode())
+        self.cam_trig_port.write('0'.encode())
 
         if self.use_cap_sensor:
             self.serial_port_cap.close()
@@ -673,7 +678,10 @@ class COGame(Widget):
         self.repeat = True
 
     def end_reward(self, **kwargs):
-        if len(self.cursor_ids)== 0:
+        if self.use_white_screen:
+            if len(self.cursor_ids)== 0:
+                return True
+        else:
             return True
 
     def end_rewanytouch(self, **kwargs):
