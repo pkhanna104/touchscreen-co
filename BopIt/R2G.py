@@ -124,6 +124,10 @@ class R2Game(Widget):
             if val:
                 self.only_start = start[i]
 
+        # Preload reward buttons: 
+        self.reward1 = SoundLoader.load('reward1.wav')
+        self.reward2 = SoundLoader.load('reward2.wav')
+
         self.state = 'ITI'
         self.state_start = time.time()
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
@@ -171,7 +175,7 @@ class R2Game(Widget):
             only_start = self.only_start, reward_fcn=reward_fcn)
 
         # Open task arduino
-        self.task_ard = serial.Serial(port='COM12')
+        self.task_ard = serial.Serial(port='COM11')
 
         if self.testing:
             pass
@@ -201,6 +205,10 @@ class R2Game(Widget):
             #    data_params = pickle.load(f)
 
     def close_app(self):
+        # Turn off LED when cloisng : 
+        self.task_ard.flushInput()
+        self.task_ard.write('n'.encode()) #morn
+        
         App.get_running_app().stop()
         Window.close()
 
@@ -319,7 +327,10 @@ class R2Game(Widget):
         return False
 
     def clear_LED(self, **kwargs):
-        return self.beam
+    	if self.beam == 0:
+    		return True
+    	else:
+    		return False
 
     def grasp_timeout(self, **kwargs):
         return kwargs['ts'] > self.grasp_timeout_time
@@ -328,14 +339,17 @@ class R2Game(Widget):
         return kwargs['ts'] > self.grasp_hold
 
     def drop(self, **kwargs):
-        return # not beam clear
+        if self.beam == 1:
+        	return True
+        else:
+        	return False
 
     def _start_reward(self, **kwargs):
         try:
             if self.reward_for_grasp[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                sound = SoundLoader.load('reward1.wav')
-                sound.play()
+                #sound = SoundLoader.load('reward1.wav')
+                self.reward1.play()
 
                 if not self.skip_juice:
                     self.reward_port.open()
@@ -355,8 +369,9 @@ class R2Game(Widget):
         self.small_reward_cnt += 1
         try:
             if self.reward_for_start[0]:
-                sound = SoundLoader.load('reward2.wav')
-                sound.play()
+                #sound = SoundLoader.load('reward2.wav')
+                #sound.play()
+                self.reward2.play()
                 
                 self.reward_port.open()
                 rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']

@@ -295,6 +295,17 @@ class COGame(Widget):
         except:
             pass
 
+        try:
+            self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
+            time.sleep(3.)
+            # Say hello: 
+            self.cam_trig_port.write('a'.encode())
+
+            # Start cams @ 50 Hz
+            self.cam_trig_port.write('1'.encode())
+        except:
+            pass
+
         # save parameters: 
         d = dict(animal_name=animal_name, center_target_rad=self.center_target_rad,
             periph_target_rad=self.periph_target_rad, target_structure = generatorz.__name__, 
@@ -353,8 +364,12 @@ class COGame(Widget):
 
     def close_app(self):
         # Save Data Eventually
+         #Stop the video: 
+         self.cam_trig_port.write('0'.encode())
+
         if self.use_cap_sensor:
             self.serial_port_cap.close()
+        
         if self.idle:
             self.state = 'idle_exit'
             self.trial_counter = -1

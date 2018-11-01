@@ -6,8 +6,9 @@
 #define LEDPIN 2
 #define BUTTON 5
 char LED;
+int FlexForcePin = A0;
 int LED_status = 0;
-int sensorState = 0, lastState = 0;
+int sensorState = 0, lastState = 1;
 int broken = 0;
 int force = 0;
 
@@ -39,6 +40,7 @@ void loop(){
       }
     }
   // Dummy variability for force
+  force = analogRead(FlexForcePin);
   Serial.print(force);
   Serial.print("/t");
   
