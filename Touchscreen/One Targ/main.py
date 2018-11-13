@@ -370,7 +370,10 @@ class COGame(Widget):
     def close_app(self):
         # Save Data Eventually
          #Stop the video: 
-        self.cam_trig_port.write('0'.encode())
+        try:
+            self.cam_trig_port.write('0'.encode())
+        except:
+            pass
 
         if self.use_cap_sensor:
             self.serial_port_cap.close()
@@ -629,6 +632,7 @@ class COGame(Widget):
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
+        self.cnts_in_rew = 0
 
     def _while_reward(self, **kwargs):
         if self.rew_cnt == 1:
@@ -642,9 +646,11 @@ class COGame(Widget):
 
     def run_big_rew(self, **kwargs):
         try:
+            print('in big reward:')
             if self.reward_for_targtouch[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
+                print('in big reward 2')
                 self.reward1.play()
 
                 if not self.skip_juice:
@@ -682,8 +688,11 @@ class COGame(Widget):
             if len(self.cursor_ids)== 0:
                 return True
         else:
-            return True
-
+            if self.cnts_in_rew > 30:
+                return True
+            else:
+                self.cnts_in_rew += 1
+                return False
     def end_rewanytouch(self, **kwargs):
         if self.small_rew_cnt > 1:
             return True
