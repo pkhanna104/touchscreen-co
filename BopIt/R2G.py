@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
 from kivy.uix.widget import Widget
-from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty
+from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.vector import Vector
 from kivy.clock import Clock
@@ -43,8 +43,25 @@ class R2Game(Widget):
     big_reward_cnt = NumericProperty(0)
     small_reward_cnt = NumericProperty(0)
 
+    # Set relevant params text: 
+    grasp_rew_txt = StringProperty('')
+    grasp_rew_param = StringProperty('')
+
+    button_rew_txt = StringProperty('')
+    button_rew_param = StringProperty('')
+
+    grasp_hold_param = StringProperty('')
+        
+    button_hold_txt = StringProperty('')
+    button_hold_param = StringProperty('')
+
+    n_trials_txt = StringProperty('')
+    n_trials_param = StringProperty('')
+
     def init(self, animal_names_dict=None, rew_in=None, rew_del=None,
         test=None, hold=None, autoquit=None, use_start=None, only_start=None):
+
+        self.h5_table_row_cnt = 0
 
         holdz = [0., '0-0.25', .25, '0.25-0.5', .5]
         for i, val in enumerate(hold['start_hold']):
@@ -176,6 +193,9 @@ class R2Game(Widget):
             # Say hello: 
             self.cam_trig_port.write('a'.encode())
 
+            # Pause
+            time.sleep(1.)
+
             # Start cams @ 50 Hz
             self.cam_trig_port.write('1'.encode())
         except:
@@ -231,10 +251,45 @@ class R2Game(Widget):
         self.task_ard.flushInput()
         self.task_ard.write('n'.encode()) #morn
         
-        App.get_running_app().stop()
-        Window.close()
+        if self.idle:
+            self.state = 'idle_exit'
+            self.trial_counter = -1
+
+            # Set relevant params text: 
+            self.grasp_rew_txt = 'Grasp Rew Time: '
+            self.grasp_rew_param = str(self.reward_for_grasp[1])
+
+            self.button_rew_txt = 'Button Rew Time: '
+            self.button_rew_param = str(self.reward_for_start[1])
+
+
+            self.grasp_hold_txt = 'Grasp Hold Time: '
+            if type(self.grasp_hold_type) is str:
+                self.grasp_hold_param = self.grasp_hold_type
+            else:
+                self.grasp_hold_param = str(self.grasp_hold)
+                
+            self.button_hold_txt = 'Button Hold Time: '
+            if type(self.start_hold_type) is str:
+                self.button_hold_param = self.start_hold_type
+            else:
+                self.button_hold_param = str(self.start_hold)
+
+            self.n_trials_txt = '# Trials: '
+            self.n_trials_param = str(self.big_reward_cnt)
+        else:
+            App.get_running_app().stop()
+            Window.close()
 
     def quit_from_app(self):
+        # If second click: 
+        if self.idle:
+            self.idle = False
+
+        # If first click: 
+        else:
+            self.idle = True
+
         self.close_app()
 
     def update(self, ts):
@@ -307,7 +362,7 @@ class R2Game(Widget):
         self.h5_table_row_cnt += 1
 
     def write_row_to_dio(self):
-        ### FROM TDT TABLE, 5 is GND, BYTE A ###
+        ### FROM TDT TABLE, 5 is GND, BYTE A #
         row_to_write = self.h5_table_row_cnt % 256
 
         ### write to arduino: 
