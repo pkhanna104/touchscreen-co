@@ -614,34 +614,36 @@
         BoxLayout:
             id: test3
             orientation: 'horizontal'
-            size_hint: (1., .35)
+            size_hint: (1., .5)
 
             BoxLayout 
                 id: top
                 orientation: 'vertical'
 
                 Label:
-                    text: 'GRASP reward count:'
+                    text: 'GRASP rew count:'
                     font_size: 30
 
                 Label:
                     text: str(game.big_reward_cnt)
                     font_size: 30
 
+            Button:
+                text: 'Exit Gracefully'
+                font_size: 30
+                on_release: game.quit_from_app()
+                background_color: (.1, 0.1, 0.8, 1.0)
+
             BoxLayout:
                 id: test3
                 orientation: 'vertical'
 
                 Label:
-                    text: 'BUTTON reward count:'
+                    text: 'BUTTON rew count:'
                     font_size: 30
 
                 Label:
                     text: str(game.small_reward_cnt)
                     font_size: 30
 
-                Button:
-                    text: 'Exit Gracefully'
-                    font_size: 30
-                    on_release: game.quit_from_app()
-                    background_color: (.1, 0.1, 0.8, 1.0)
+

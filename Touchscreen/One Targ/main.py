@@ -114,7 +114,7 @@ class COGame(Widget):
         except:
             print('removing touch from pre-game screen')
             
-    def init(self, animal_names_dict=None, rew_in=None, task_in=None, rew_del=None,
+    def init(self, animal_names_dict=None, rew_in=None, task_in=None, white_screen=None,
         test=None, hold=None, targ_structure=None,
         autoquit=None, drag=None, nudge=None):
 
@@ -200,10 +200,15 @@ class COGame(Widget):
         except:
             pass
 
-        reward_delay_opts = [0., .4, .8, 1.2]
-        for i, val in enumerate(rew_del['rew_del']):
+        # reward_delay_opts = [0., .4, .8, 1.2]
+        # for i, val in enumerate(rew_del['rew_del']):
+        #     if val:
+        self.reward_delay_time = 0.0
+
+        white_screen_opts = [True, False]
+        for i, val in enumerate(white_screen['white_screen']):
             if val:
-                self.reward_delay_time = reward_delay_opts[i]
+                self.use_white_screen = white_screen_opts[i]
 
         test_vals = [True, False, False]
         in_cage_vals = [False, False, True]
@@ -212,7 +217,7 @@ class COGame(Widget):
                 self.testing = test_vals[i]
                 self.in_cage = in_cage_vals[i]
         
-        autoquit_trls = [25, 50, 10**10]
+        autoquit_trls = [25, 50, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
@@ -365,7 +370,10 @@ class COGame(Widget):
     def close_app(self):
         # Save Data Eventually
          #Stop the video: 
-         self.cam_trig_port.write('0'.encode())
+        try:
+            self.cam_trig_port.write('0'.encode())
+        except:
+            pass
 
         if self.use_cap_sensor:
             self.serial_port_cap.close()
@@ -625,6 +633,7 @@ class COGame(Widget):
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
+        self.cnts_in_rew = 0
 
     def _while_reward(self, **kwargs):
         if self.rew_cnt == 1:
@@ -638,9 +647,11 @@ class COGame(Widget):
 
     def run_big_rew(self, **kwargs):
         try:
+            print('in big reward:')
             if self.reward_for_targtouch[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
+                print('in big reward 2')
                 self.reward1.play()
 
                 if not self.skip_juice:
@@ -674,9 +685,15 @@ class COGame(Widget):
         self.repeat = True
 
     def end_reward(self, **kwargs):
-        if len(self.cursor_ids)== 0:
-            return True
-
+        if self.use_white_screen:
+            if len(self.cursor_ids)== 0:
+                return True
+        else:
+            if self.cnts_in_rew > 30:
+                return True
+            else:
+                self.cnts_in_rew += 1
+                return False
     def end_rewanytouch(self, **kwargs):
         if self.small_rew_cnt > 1:
             return True
