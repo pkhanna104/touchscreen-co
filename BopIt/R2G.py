@@ -8,7 +8,7 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 from random import randint
 from kivy.config import Config
-import serial, time, pickle, datetime, winsound
+import serial, time, pickle, datetime, winsound, struct
 import time
 import numpy as np
 import tables
@@ -156,12 +156,29 @@ class R2Game(Widget):
             self.FSM['reward'] = dict(end_reward='ITI', stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM6',
+            self.reward_port = serial.Serial(port='COM4',
                 baudrate=115200)
             self.reward_port.close()
             reward_fcn = True
         except:
             reward_fcn = False
+            pass
+
+        try:
+            self.dio_port = serial.Serial(port='COM13', baudrate=115200)
+            time.sleep(4.)
+        except:
+            pass
+
+        try:
+            self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
+            time.sleep(3.)
+            # Say hello: 
+            self.cam_trig_port.write('a'.encode())
+
+            # Start cams @ 50 Hz
+            self.cam_trig_port.write('1'.encode())
+        except:
             pass
 
         # save parameters: 
@@ -205,6 +222,11 @@ class R2Game(Widget):
             #    data_params = pickle.load(f)
 
     def close_app(self):
+        try:
+            self.cam_trig_port.write('0'.encode())
+        except:
+            pass
+
         # Turn off LED when cloisng : 
         self.task_ard.flushInput()
         self.task_ard.write('n'.encode()) #morn
@@ -274,6 +296,24 @@ class R2Game(Widget):
         self.h5_table_row['force'] = self.force
         self.h5_table_row['beam'] = self.beam
         self.h5_table_row.append()
+
+        # Write DIO 
+        try:
+            self.write_row_to_dio()
+        except:
+            pass
+            
+        # Upgrade table row: 
+        self.h5_table_row_cnt += 1
+
+    def write_row_to_dio(self):
+        ### FROM TDT TABLE, 5 is GND, BYTE A ###
+        row_to_write = self.h5_table_row_cnt % 256
+
+        ### write to arduino: 
+        word_str = b'd' + struct.pack('<H', int(row_to_write))
+        self.dio_port.write(word_str)
+
 
     def stop(self, **kwargs):
         # If past number of max trials then auto-quit: 
