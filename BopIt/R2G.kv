@@ -614,7 +614,7 @@
         BoxLayout:
             id: test3
             orientation: 'horizontal'
-            size_hint: (1., .35)
+            size_hint: (1., .5)
 
             BoxLayout 
                 id: top
@@ -628,6 +628,12 @@
                     text: str(game.big_reward_cnt)
                     font_size: 30
 
+            Button:
+                text: 'Exit Gracefully'
+                font_size: 30
+                on_release: game.quit_from_app()
+                background_color: (.1, 0.1, 0.8, 1.0)
+
             BoxLayout:
                 id: test3
                 orientation: 'vertical'
@@ -640,8 +646,4 @@
                     text: str(game.small_reward_cnt)
                     font_size: 30
 
-                Button:
-                    text: 'Exit Gracefully'
-                    font_size: 30
-                    on_release: game.quit_from_app()
-                    background_color: (.1, 0.1, 0.8, 1.0)
+
