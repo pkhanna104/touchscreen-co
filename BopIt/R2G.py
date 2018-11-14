@@ -156,7 +156,7 @@ class R2Game(Widget):
             self.FSM['reward'] = dict(end_reward='ITI', stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM6',
+            self.reward_port = serial.Serial(port='COM4',
                 baudrate=115200)
             self.reward_port.close()
             reward_fcn = True
@@ -175,7 +175,7 @@ class R2Game(Widget):
             only_start = self.only_start, reward_fcn=reward_fcn)
 
         # Open task arduino
-        self.task_ard = serial.Serial(port='COM11')
+        self.task_ard = serial.Serial(port='COM5')
 
         if self.testing:
             pass
