@@ -46,6 +46,8 @@ class R2Game(Widget):
     def init(self, animal_names_dict=None, rew_in=None, rew_del=None,
         test=None, hold=None, autoquit=None, use_start=None, only_start=None):
 
+        self.h5_table_row_cnt = 0
+
         holdz = [0., '0-0.25', .25, '0.25-0.5', .5]
         for i, val in enumerate(hold['start_hold']):
             if val:
@@ -175,6 +177,9 @@ class R2Game(Widget):
             time.sleep(3.)
             # Say hello: 
             self.cam_trig_port.write('a'.encode())
+
+            # Pause
+            time.sleep(1.)
 
             # Start cams @ 50 Hz
             self.cam_trig_port.write('1'.encode())
