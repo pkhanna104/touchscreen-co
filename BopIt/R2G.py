@@ -65,7 +65,7 @@ class R2Game(Widget):
         self.idle = False
 
 
-        holdz = [0., '0-0.25', .25, '0.25-0.5', .5]
+        holdz = [0., 0.15, '0-0.25', .25, '0.25-0.5', .5]
         for i, val in enumerate(hold['start_hold']):
             if val:
                 if type(holdz[i]) is str:
@@ -353,6 +353,7 @@ class R2Game(Widget):
         self.h5_table_row['time'] = time.time() - self.t0
         self.h5_table_row['force'] = self.force
         self.h5_table_row['beam'] = self.beam
+        self.h5_table_row['start_button'] = self.button
         self.h5_table_row.append()
 
         # Write DIO 
