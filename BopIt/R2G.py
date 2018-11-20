@@ -51,7 +51,7 @@ class R2Game(Widget):
     button_rew_param = StringProperty('')
 
     grasp_hold_param = StringProperty('')
-        
+    grasp_hold_txt = StringProperty('')   
     button_hold_txt = StringProperty('')
     button_hold_param = StringProperty('')
 
@@ -62,6 +62,8 @@ class R2Game(Widget):
         test=None, hold=None, autoquit=None, use_start=None, only_start=None):
 
         self.h5_table_row_cnt = 0
+        self.idle = False
+
 
         holdz = [0., '0-0.25', .25, '0.25-0.5', .5]
         for i, val in enumerate(hold['start_hold']):
@@ -161,7 +163,7 @@ class R2Game(Widget):
         self.FSM['grasp_hold'] = dict(end_grasp_hold='reward', drop='grasp', grasp_timeout='ITI', stop=None)
         self.FSM['grasp'] = dict(clear_LED='grasp_hold', grasp_timeout='ITI', stop=None) # state to indictate 'grasp' w/o resetting timer
         self.FSM['reward'] = dict(end_reward='ITI', stop=None)
-
+        self.FSM['idle_exit'] = dict(stop=None)
         if not self.use_start:
             self.FSM['ITI'] = dict(end_ITI='grasp_trial_start', stop=None)
 
@@ -283,6 +285,7 @@ class R2Game(Widget):
 
     def quit_from_app(self):
         # If second click: 
+
         if self.idle:
             self.idle = False
 
