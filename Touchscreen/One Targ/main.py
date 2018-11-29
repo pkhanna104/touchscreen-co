@@ -155,7 +155,7 @@ class COGame(Widget):
         else:
             self.skip_juice = False
 
-        target_rad_opts = [.5, .75, 1.0, 1.5, 2.0, 3.0]
+        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5]
         for i, val in enumerate(task_in['targ_rad']):
             if val:
                 self.periph_target_rad = target_rad_opts[i]
