@@ -323,12 +323,6 @@
                     group: 'hold_time'
                     active: True
                     
-                Label:
-                    text: '0-0.25 sec'
-
-                CheckBox:
-                    id: easy_rand_0_25
-                    group: 'hold_time'
 
                 Label: 
                     text: '0.25 sec'
@@ -337,18 +331,20 @@
                     id: quarter_sec
                     group: 'hold_time'
 
+
+                Label: 
+                    text: '0.35 sec'
+
+                CheckBox:
+                    id: thirty_five_sec
+                    group: 'hold_time'
+
                 Label: 
                     text: '0.5 sec'
                 CheckBox:
                     id: half_sec
                     group: 'hold_time'
 
-                Label:
-                    text: '0.25-0.5 sec'
-
-                CheckBox:
-                    id: hard_rand_25_50
-                    group: 'hold_time'
 
                 Label:
                     text: ''
@@ -397,19 +393,18 @@
                     group: 'ghold_time'
                     active: True
 
-
-
-                Label:
-                    text: '0-0.25 sec'
-                CheckBox:
-                    id: g_easy_rand_0_25
-                    group: 'ghold_time'
-
                 Label: 
                     text: '0.25 sec'
                 CheckBox:
                     id: g_quarter_sec
                     group: 'ghold_time'
+
+                Label: 
+                    text: '0.35 sec'
+
+                CheckBox:
+                    id: g_thirty_five_sec
+                    group: 'hold_time'
 
                 Label: 
                     text: '0.5 sec'
@@ -418,13 +413,9 @@
                     group: 'ghold_time'
 
                 Label:
-                    text: '0.25-0.5 sec'
-                CheckBox:
-                    id: g_hard_rand_25_50
-                    group: 'ghold_time'
-                Label:
                     text: ''
                     fontsize: 50
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -609,7 +600,7 @@
                     dict(rew_manual=rew_noauto_chk.active, rew_start=rew_anytouch_chk.active, rew_start_and_grasp=rew_anytouch_pls_targ_chk.active, rew_grasp=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), 
                     dict(test=[testing.active, monk_time.active]), 
-                    dict(start_hold=[zero_sec.active, eighteen_sec.active, easy_rand_0_25.active, quarter_sec.active, hard_rand_25_50.active, half_sec.active], grasp_hold = [g_zero_sec.active, g_eighteen_sec.active, g_easy_rand_0_25.active, g_quarter_sec.active, g_hard_rand_25_50.active, g_half_sec.active]), 
+                    dict(start_hold=[zero_sec.active, eighteen_sec.active, quarter_sec.active, thirty_five_sec.active, half_sec.active], grasp_hold = [g_zero_sec.active, g_eighteen_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_half_sec.active]), 
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
                     dict(start=[start_button.active, no_start_button.active]),
                     dict(start=[only_start_button.active, no_only_start_button.active]))

@@ -116,7 +116,7 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None, white_screen=None,
         test=None, hold=None, targ_structure=None,
-        autoquit=None, drag=None, nudge=None):
+        autoquit=None, drag=None, nudge=None, targ_pos=None):
 
         self.rew_cnt = 0
         self.small_rew_cnt = 0
@@ -173,7 +173,7 @@ class COGame(Widget):
                 if 'co' in nm:
                     self.use_center = True
 
-        holdz = [.25, .375, .5, '.3-.45', '.4-.55']
+        holdz = [ .375, .5, .575, .6, '.4-.55']
         
         self.cht_type = None
         self.tht_type = None
@@ -232,6 +232,11 @@ class COGame(Widget):
             if val:
                 self.nudge_dist = nudge_9am_dist[i]
 
+        targ_pos = ['corners', None]
+        for i, val in enumerate(targ_pos['targ_pos']):
+            if val:
+                self.generator_kwarg = targ_pos[i]
+
 
         # Preload sounds: 
         self.reward1 = SoundLoader.load('reward1.wav')
@@ -254,7 +259,7 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
 
-        self.target_list = generatorz(self.target_distance, self.nudge_dist)
+        self.target_list = generatorz(self.target_distance, self.nudge_dist, self.generator_kwarg)
         self.target_index = 0
         self.repeat = False
         self.center_target_position = np.array([0., 0.])
@@ -769,12 +774,17 @@ class COGame(Widget):
         else:
             return False
 
-    def get_4targets(self, target_distance=4, nudge=0.):
+    def get_4targets(self, target_distance=4, nudge=0., gen_kwarg=None):
         return self.get_targets_co(target_distance=target_distance, nudge=0.)
 
-    def get_targets_co(self, target_distance=4, nudge=0., ntargets=4):
+    def get_targets_co(self, target_distance=4, nudge=0., gen_kwarg=None, ntargets=4):
         # Targets in CM: 
-        angle = np.linspace(0, 2*np.pi, ntargets+1)[:-1]
+        if gen_kwarg ==  'corners':
+            angle = np.linspace(0, 2*np.pi, 5)[:-1] + (np.pi/4.)
+            target_distance = 6.
+        else:
+            angle = np.linspace(0, 2*np.pi, ntargets+1)[:-1]
+    
         x = np.cos(angle)*target_distance
         y = np.sin(angle)*target_distance
         tmp = np.hstack((x[:, np.newaxis], y[:, np.newaxis]))

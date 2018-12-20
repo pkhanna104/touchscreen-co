@@ -65,7 +65,9 @@ class R2Game(Widget):
         self.idle = False
 
 
-        holdz = [0.001, 0.15, '0-0.25', .25, '0.25-0.5', .5]
+
+        holdz = [0.01, 0.15, .25, .35, .5]
+        
         for i, val in enumerate(hold['start_hold']):
             if val:
                 if type(holdz[i]) is str:
