@@ -65,7 +65,7 @@ class R2Game(Widget):
         self.idle = False
 
 
-        holdz = [0., 0.15, '0-0.25', .25, '0.25-0.5', .5]
+        holdz = [0.001, 0.15, '0-0.25', .25, '0.25-0.5', .5]
         for i, val in enumerate(hold['start_hold']):
             if val:
                 if type(holdz[i]) is str:
@@ -98,6 +98,9 @@ class R2Game(Widget):
             self.reward_for_start = [True, small_rew]
         else:
             self.reward_for_start = [False, 0]
+
+        ### amendment per lisa request:
+        self.reward_for_start = [True, 0.]
 
         if np.logical_or(rew_in['rew_grasp'], rew_in['rew_start_and_grasp']):
             self.reward_for_grasp = [True, big_rew]

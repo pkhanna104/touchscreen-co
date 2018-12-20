@@ -389,7 +389,6 @@
                 CheckBox:
                     id: g_zero_sec
                     group: 'ghold_time'
-                    active: True
 
                 Label: 
                     text: '0.15 sec'
@@ -615,7 +614,7 @@
                     dict(start=[start_button.active, no_start_button.active]),
                     dict(start=[only_start_button.active, no_only_start_button.active]))
 
-                    Clock.schedule_interval(game.update, 1.0 / 60.0)
+                    Clock.schedule_interval(game.update, 1.0 / 30.0)
             Label:
                 text: ''
                 fontsize: 50
