@@ -63,7 +63,7 @@ class R2Game(Widget):
 
         self.h5_table_row_cnt = 0
 
-        holdz = [0., 0.15, '0-0.25', .25, '0.25-0.5', .5]
+        holdz = [0., 0.15, .25, .35, .5]
         for i, val in enumerate(hold['start_hold']):
             if val:
                 if type(holdz[i]) is str:
