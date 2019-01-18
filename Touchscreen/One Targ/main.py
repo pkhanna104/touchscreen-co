@@ -36,6 +36,9 @@ class COGame(Widget):
     center = ObjectProperty(None)
     target = ObjectProperty(None)
 
+    # Time to wait after starting the video before getting to the center target display. 
+    pre_start_vid_ts = 0.1
+
     ITI_mean = 1.
     ITI_std = .2
     center_target_rad = 1.5
@@ -272,11 +275,11 @@ class COGame(Widget):
         self.periph_target_position = self.target_list[self.target_index, :]
 
         self.FSM = dict()
-        self.FSM['ITI'] = dict(end_ITI='RH_touch', stop=None)
-        self.FSM['RH_touch'] = dict(rhtouch='target', stop=None)
+        self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
+        self.FSM['vid_trig'] = dict(rhtouch='target', stop=None)
         
         if self.use_center:
-            self.FSM['RH_touch'] = dict(rhtouch='center', stop=None)
+            self.FSM['vid_trig'] = dict(end_vid_trig='center', stop=None)
             self.FSM['center'] = dict(touch_center='center_hold', center_timeout='timeout_error', non_rhtouch='RH_touch',stop=None)
             self.FSM['center_hold'] = dict(finish_center_hold='target', early_leave_center_hold='hold_error', non_rhtouch='RH_touch', stop=None)
 
@@ -538,6 +541,7 @@ class COGame(Widget):
                 return False
 
     def _start_ITI(self, **kwargs):
+        self.cam_trig_port.write('0'.encode())
         Window.clearcolor = (0., 0., 0., 1.)
         self.exit_target1.color = (.15, .15, .15, 1.)
         self.exit_target2.color = (.15, .15, .15, 1.)
@@ -559,7 +563,8 @@ class COGame(Widget):
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
 
-    def _start_RH_touch(self, **kwargs):
+    def _start_vid_trig(self, **kwargs):
+        self.cam_trig_port.write('1'.encode())
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
             self.periph_target.color = (1., 0., 0., 1.)
             self.center_target.color = (1., 0., 0., 1.)
@@ -568,6 +573,10 @@ class COGame(Widget):
             # Turn exit buttons redish:
             self.exit_target1.color = (.9, 0, 0, 1.)
             self.exit_target2.color = (.9, 0, 0, 1.)
+
+    def end_vid_trig(self, **kwargs):
+        return kwargs['ts'] > self.pre_start_vid_ts
+
 
     def rhtouch(self, **kwargs):
         if self.use_cap_sensor:
