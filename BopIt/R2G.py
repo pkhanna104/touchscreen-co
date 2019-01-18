@@ -27,6 +27,8 @@ class Data(tables.IsDescription):
     start_button = tables.Float32Col()
 
 class R2Game(Widget):
+    pre_start_vid_ts = 0.1
+
     ITI_mean = 1.
     ITI_std = .2
 
@@ -59,7 +61,8 @@ class R2Game(Widget):
     n_trials_param = StringProperty('')
 
     def init(self, animal_names_dict=None, rew_in=None, rew_del=None,
-        test=None, hold=None, autoquit=None, use_start=None, only_start=None):
+        test=None, hold=None, autoquit=None, use_start=None, only_start=None, 
+        grasp_to=None):
 
         self.h5_table_row_cnt = 0
 
@@ -141,6 +144,11 @@ class R2Game(Widget):
             if val:
                 self.only_start = start[i]
 
+        grasp_tos = [5., 10., 999999999.]
+        for i, val in enumerate(grasp_tos['gto']):
+            if val:
+                self.grasp_timeout_time = grasp_tos[i]
+
         # Preload reward buttons: 
         self.reward1 = SoundLoader.load('reward1.wav')
         self.reward2 = SoundLoader.load('reward2.wav')
@@ -154,7 +162,8 @@ class R2Game(Widget):
 
         # State transition matrix: 
         self.FSM = dict()
-        self.FSM['ITI'] = dict(end_ITI='start_button', stop=None)
+        self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
+        self.FSM['vid_trig'] = dict(end_vid_trig='start_button')
         self.FSM['start_button'] = dict(pushed_start='start_hold', start_button_timeout='ITI', stop=None)
         self.FSM['start_hold'] = dict(end_start_hold='grasp_trial_start', start_early_release = 'start_button', stop=None)
         self.FSM['grasp_trial_start'] = dict(clear_LED='grasp_hold', grasp_timeout='ITI', stop=None)
@@ -380,6 +389,8 @@ class R2Game(Widget):
             return False
 
     def _start_ITI(self, **kwargs):
+        # Stop video
+        self.cam_trig_port.write('0'.encode())
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
         
         if type(self.start_hold_type) is str:
@@ -393,6 +404,12 @@ class R2Game(Widget):
 
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
+
+    def _start_vid_trig(self, **kwargs):
+        self.cam_trig_port.write('1'.encode())
+
+    def end_vid_trig(self, **kwargs):
+        return kwargs['ts'] > self.pre_start_vid_ts
 
     def _start_start_button(self, **kwargs):
         self.task_ard.flushInput()
@@ -442,11 +459,10 @@ class R2Game(Widget):
 
     def _start_reward(self, **kwargs):
         try:
+            self.reward1.play()
             if self.reward_for_grasp[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
-                self.reward1.play()
-
                 if not self.skip_juice:
                     self.reward_port.open()
                     rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_grasp[1])+' sec\n']
@@ -463,12 +479,12 @@ class R2Game(Widget):
         
     def _start_rew_start(self, **kwargs):
         self.small_reward_cnt += 1
+        self.reward2.play()
+
         try:
             if self.reward_for_start[0]:
                 #sound = SoundLoader.load('reward2.wav')
                 #sound.play()
-                self.reward2.play()
-                
                 self.reward_port.open()
                 rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
                 self.reward_port.write(rew_str)
