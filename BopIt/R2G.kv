@@ -67,7 +67,7 @@
                     id: rew_anytouch_pls_targ_chk
             
                 Label: 
-                    text: 'BIG rew for grasp'
+                    text: 'BIG rew for grasp pls sound for both'
 
                 CheckBox:
                     group: 'rew'
@@ -419,6 +419,64 @@
                 Label:
                     text: ''
                     fontsize: 50
+
+
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label: 
+                    text: 'GRASP Timeout'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '5 sec'
+                CheckBox:
+                    id: gto_five_sec
+                    group: 'gto'
+                    active: True
+
+                Label: 
+                    text: '10 sec'
+                CheckBox:
+                    id: gto_ten_sec
+                    group: 'gto'
+
+                Label: 
+                    text: 'Infinity'
+                CheckBox:
+                    id: gto_inf
+                    group: 'gto'
+                    active: True
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+
             BoxLayout:
                 id: test
                 orientation: 'horizontal'
@@ -603,7 +661,8 @@
                     dict(start_hold=[zero_sec.active, eighteen_sec.active, quarter_sec.active, thirty_five_sec.active, half_sec.active], grasp_hold = [g_zero_sec.active, g_eighteen_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_half_sec.active]), 
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
                     dict(start=[start_button.active, no_start_button.active]),
-                    dict(start=[only_start_button.active, no_only_start_button.active]))
+                    dict(start=[only_start_button.active, no_only_start_button.active]),
+                    dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.sec]))
 
                     Clock.schedule_interval(game.update, 1.0 / 30.0)
             Label:
