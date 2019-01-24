@@ -69,7 +69,7 @@ class R2Game(Widget):
 
 
 
-        holdz = [0.01, 0.15, .25, .35, .5]
+        holdz = [0.01, 0.15, .25, .35, .5, '.25-.45']
         
         for i, val in enumerate(hold['start_hold']):
             if val:
