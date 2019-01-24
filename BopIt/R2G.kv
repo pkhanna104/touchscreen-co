@@ -461,8 +461,7 @@
                 CheckBox:
                     id: gto_inf
                     group: 'gto'
-                    active: True
-
+                    
                 Label:
                     text: ''
                     fontsize: 50
@@ -662,7 +661,7 @@
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
                     dict(start=[start_button.active, no_start_button.active]),
                     dict(start=[only_start_button.active, no_only_start_button.active]),
-                    dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.sec]))
+                    dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]))
 
                     Clock.schedule_interval(game.update, 1.0 / 30.0)
             Label:

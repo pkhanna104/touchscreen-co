@@ -152,7 +152,8 @@ class R2Game(Widget):
                 self.only_start = start[i]
 
         grasp_tos = [5., 10., 999999999.]
-        for i, val in enumerate(grasp_tos['gto']):
+
+        for i, val in enumerate(grasp_to['gto']):
             if val:
                 self.grasp_timeout_time = grasp_tos[i]
 
