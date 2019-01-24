@@ -476,14 +476,16 @@ class R2Game(Widget):
                 #sound = SoundLoader.load('reward2.wav')
                 #sound.play()
                 self.reward2.play()
+
+                if self.reward_for_start[1] > 0.:
                 
-                self.reward_port.open()
-                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
-                self.reward_port.write(rew_str)
-                time.sleep(.5)
-                run_str = [ord(r) for r in 'run\n']
-                self.reward_port.write(run_str)
-                self.reward_port.close()
+                    self.reward_port.open()
+                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
+                    self.reward_port.write(rew_str)
+                    time.sleep(.5)
+                    run_str = [ord(r) for r in 'run\n']
+                    self.reward_port.write(run_str)
+                    self.reward_port.close()
         except:
             pass
 
