@@ -104,9 +104,6 @@ class R2Game(Widget):
         else:
             self.reward_for_start = [False, 0]
 
-        ### amendment per lisa request:
-        self.reward_for_start = [True, 0.]
-
         if np.logical_or(rew_in['rew_grasp'], rew_in['rew_start_and_grasp']):
             self.reward_for_grasp = [True, big_rew]
         else:
@@ -427,17 +424,17 @@ class R2Game(Widget):
     def pushed_start(self, **kwargs):
         return self.button
 
-    def _end_start_button(self, **kwargs):
-        self.task_ard.flushInput()
-        self.task_ard.write('n'.encode()) #night
 
     def start_button_timeout(self, **kwargs):
         return kwargs['ts'] > self.start_timeout
 
     def end_start_hold(self, **kwargs):
         if kwargs['ts'] > self.start_hold:
-            if self.reward_for_start:
-                self._start_rew_start()
+            #if self.reward_for_start[0]:
+            self.task_ard.flushInput()
+            self.task_ard.write('n'.encode()) #night
+            self._start_rew_start()
+            
             return True
         else:
             return False
@@ -490,19 +487,19 @@ class R2Game(Widget):
         self.small_reward_cnt += 1
 
         try:
-            if self.reward_for_start[0]:
+            #if self.reward_for_start[0]:
                 #sound = SoundLoader.load('reward2.wav')
                 #sound.play()
-                self.reward2.play()
-                if self.reward_for_start[1] > 0.:
+            self.reward2.play()
+            if self.reward_for_start[1] > 0.:
                 
-                    self.reward_port.open()
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
-                    self.reward_port.write(rew_str)
-                    time.sleep(.5)
-                    run_str = [ord(r) for r in 'run\n']
-                    self.reward_port.write(run_str)
-                    self.reward_port.close()
+                self.reward_port.open()
+                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
+                self.reward_port.write(rew_str)
+                time.sleep(.5)
+                run_str = [ord(r) for r in 'run\n']
+                self.reward_port.write(run_str)
+                self.reward_port.close()
         except:
             pass
 
