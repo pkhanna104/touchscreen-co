@@ -306,14 +306,14 @@ class COGame(Widget):
         self.FSM['idle_exit'] = dict(stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM3',
+            self.reward_port = serial.Serial(port='COM4',
                 baudrate=115200)
             self.reward_port.close()
         except:
             pass
 
         try:
-            self.dio_port = serial.Serial(port='COM13', baudrate=115200)
+            self.dio_port = serial.Serial(port='COM5', baudrate=115200)
             time.sleep(4.)
         except:
             pass
