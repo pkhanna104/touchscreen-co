@@ -305,15 +305,7 @@
                     fontsize: 50
                 Label: 
                     text: 'Button Hold'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '0 sec'
-
-                CheckBox:
-                    id: zero_sec
-                    group: 'hold_time'
-                    
+                    color: 1, 1, 0, 1                    
 
                 Label: 
                     text: '0.15 sec'
@@ -333,22 +325,32 @@
 
 
                 Label: 
-                    text: '0.35 sec'
+                    text: 'Rand: 0.12 - .2 sec'
 
                 CheckBox:
-                    id: thirty_five_sec
+                    id: rand_12_2
                     group: 'hold_time'
 
                 Label: 
-                    text: '0.5 sec'
+                    text: 'Rand: 0.15 - .25 sec'
+
                 CheckBox:
-                    id: half_sec
+                    id: rand_15_25
                     group: 'hold_time'
 
                 Label: 
                     text: 'Rand: 0.25 - 0.45 sec'
+                
                 CheckBox:
                     id: rand_25_45_sec
+                    group: 'hold_time'
+
+
+                Label: 
+                    text: 'Rand: 0.2 - .5 sec'
+                    
+                CheckBox:
+                    id: rand_2_5
                     group: 'hold_time'
 
 
@@ -663,7 +665,7 @@
                     dict(rew_manual=rew_noauto_chk.active, rew_start=rew_anytouch_chk.active, rew_start_and_grasp=rew_anytouch_pls_targ_chk.active, rew_grasp=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(rew_del=[rew_del_0.active, rew_del_4.active, rew_del_8.active, rew_del_12.active]), 
                     dict(test=[testing.active, monk_time.active]), 
-                    dict(start_hold=[zero_sec.active, eighteen_sec.active, quarter_sec.active, thirty_five_sec.active, half_sec.active, rand_25_45_sec.active], grasp_hold = [g_zero_sec.active, g_eighteen_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_half_sec.active]), 
+                    dict(start_hold=[ eighteen_sec.active, quarter_sec.active, rand_12_2.active, rand_15_25.active, rand_25_45_sec.active, rand_2_5.active], grasp_hold = [g_zero_sec.active, g_eighteen_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_half_sec.active]), 
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
                     dict(start=[start_button.active, no_start_button.active]),
                     dict(start=[only_start_button.active, no_only_start_button.active]),
