@@ -260,7 +260,7 @@ class COGame(Widget):
 
         self.state = 'ITI'
         self.state_start = time.time()
-        self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
+        self.ITI = self.ITI_std + self.ITI_mean
 
         # Initialize targets: 
         self.center_target.set_size(2*self.center_target_rad)
@@ -572,6 +572,8 @@ class COGame(Widget):
         return kwargs['ts'] > self.ITI
 
     def _start_vid_trig(self, **kwargs):
+        if self.trial_counter == 0:
+            time.sleep(1.)
         self.cam_trig_port.write('1'.encode())
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
             self.periph_target.color = (1., 0., 0., 1.)
