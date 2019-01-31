@@ -225,7 +225,7 @@ class COGame(Widget):
                 self.testing = test_vals[i]
                 self.in_cage = in_cage_vals[i]
         
-        autoquit_trls = [25, 50, 100, 10**10]
+        autoquit_trls = [10, 25, 50, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
