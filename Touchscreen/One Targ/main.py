@@ -119,7 +119,7 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         test=None, hold=None, targ_structure=None,
-        autoquit=None, targ_pos=None):
+        autoquit=None, targ_pos=None, rew_var=None):
 
         holdz = [0., .25, .5, .625, .75]
         for i, val in enumerate(hold['hold']):
@@ -219,6 +219,19 @@ class COGame(Widget):
         # for i, val in enumerate(rew_del['rew_del']):
         #     if val:
         self.reward_delay_time = 0.0
+
+        reward_var_opt = [1.0, .5, .33]
+        for i, val in enumerate(rew_var['rew_var']):
+            if val:
+                self.percent_of_trials_rewarded = reward_var_opt[i]
+                if self.percent_of_trials_rewarded == 0.33:
+                    self.percent_of_trials_doubled = 0.1
+                else:
+                    self.percent_of_trials_doubled = 0.0
+        
+        self.reward_generator = self.gen_rewards(self.percent_of_trials_rewarded, self.percent_of_trials_doubled,
+            self.reward_for_grasp)
+
 
         # white_screen_opts = [True, False]
         # for i, val in enumerate(white_screen['white_screen']):
@@ -388,6 +401,22 @@ class COGame(Widget):
                 #    data_params = pickle.load(f)
         except:
             pass
+
+    def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
+        mini_block = 2*(1/np.round(self.percent_of_trials_rewarded))
+        rew = []
+
+        for i in range(500):
+            mini_block_array = np.zeros((mini_block))
+            ix = np.random.permutation(mini_block)
+            mini_block_array[ix[:2]] = reward_for_grasp[1]
+
+            rand = np.random.rand()
+
+            if rand <= perc_trials_2x:
+                mini_block_array[ix[0]] = 2*reward_for_grasp[1]
+            rew.append(mini_block_array)
+        return np.hstack((rew))
 
     def close_app(self):
         # Save Data Eventually
@@ -686,7 +715,8 @@ class COGame(Widget):
 
                 if not self.skip_juice:
                     self.reward_port.open()
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                    #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
                     self.reward_port.write(rew_str)
                     time.sleep(.25 + self.reward_delay_time)
                     run_str = [ord(r) for r in 'run\n']
