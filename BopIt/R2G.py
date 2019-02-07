@@ -264,18 +264,18 @@ class R2Game(Widget):
 
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
-        mini_block = 2*(1/np.round(self.percent_of_trials_rewarded))
+        mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
         rew = []
-
+        mini_block_count = 0
         for i in range(500):
             mini_block_array = np.zeros((mini_block))
             ix = np.random.permutation(mini_block)
             mini_block_array[ix[:2]] = reward_for_grasp[1]
-
-            rand = np.random.rand()
-
-            if rand <= perc_trials_2x:
-                mini_block_array[ix[0]] = 2*reward_for_grasp[1]
+            mini_block_count += mini_block
+            if (perc_trials_2x * perc_trials_rew) > 0:
+                if mini_block_count > int(1./(perc_trials_2x*perc_trials_rew)):
+                    mini_block_array[ix[0]] = 2*reward_for_grasp[1]
+                    mini_block_count = 0
             rew.append(mini_block_array)
         return np.hstack((rew))
 
@@ -340,7 +340,7 @@ class R2Game(Widget):
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('/t')
         #print(port_splits)
-        print(self.state)
+        #print(self.state)
         if len(port_splits) != 4:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
@@ -493,14 +493,20 @@ class R2Game(Widget):
             if self.reward_for_grasp[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
+                print('in reward: ')
+                print(self.trial_counter)
+                print(self.reward_for_grasp)
+                print(self.reward_generator[:200])
+                print('')
                 if not self.skip_juice:
-                    self.reward_port.open()
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                    self.reward_port.write(rew_str)
-                    time.sleep(.5 + self.reward_delay_time)
-                    run_str = [ord(r) for r in 'run\n']
-                    self.reward_port.write(run_str)
-                    self.reward_port.close()
+                    if self.reward_generator[self.trial_counter] > 0:
+                        self.reward_port.open()
+                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
+                        self.reward_port.write(rew_str)
+                        time.sleep(.5 + self.reward_delay_time)
+                        run_str = [ord(r) for r in 'run\n']
+                        self.reward_port.write(run_str)
+                        self.reward_port.close()
         except:
             pass
 
