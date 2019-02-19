@@ -413,10 +413,10 @@ class COGame(Widget):
             mini_block_array[ix[:2]] = reward_for_grasp[1]
 
             trial_cnt_bonus += mini_block
-
-            if trial_cnt_bonus > int(1./(perc_trials_rew*perc_trials_2x)):
-                mini_block_array[ix[0]] = reward_for_grasp[1]*2.
-                trial_cnt_bonus = 0
+            if perc_trials_2x > 0:
+                if trial_cnt_bonus > int(1./(perc_trials_rew*perc_trials_2x)):
+                    mini_block_array[ix[0]] = reward_for_grasp[1]*2.
+                    trial_cnt_bonus = 0
 
             rew.append(mini_block_array)
         return np.hstack((rew))
