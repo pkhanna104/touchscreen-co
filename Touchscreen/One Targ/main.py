@@ -45,6 +45,7 @@ class COGame(Widget):
     periph_target_rad = 1.5
 
     exit_pos = np.array([7, 4])
+    indicator_pos = np.array([8, 5])
     exit_rad = 1.
     exit_hold = 2 #seconds
 
@@ -76,8 +77,8 @@ class COGame(Widget):
 
     # Number of trials: 
     trial_counter = NumericProperty(0)
-    indicator_txt = StringProperty('o')
-    indicator_txt_color = ListProperty([.5, .5, .5, 1.])
+    #indicator_txt = StringProperty('o')
+    #indicator_txt_color = ListProperty([.5, .5, .5, 1.])
 
     t0 = time.time()
 
@@ -278,6 +279,10 @@ class COGame(Widget):
 
         self.exit_target1.set_size(2*self.exit_rad)
         self.exit_target2.set_size(2*self.exit_rad)
+        self.indicator_targ.set_size(self.exit_rad)
+        self.indicator_targ.move(self.indicator_pos)
+        self.indicator_targ.color = (0., 0., 0., 1.)
+
         self.exit_target1.move(self.exit_pos)
         self.exit_pos2 = np.array([self.exit_pos[0], -1*self.exit_pos[1]])
         self.exit_target2.move(self.exit_pos2)
@@ -595,7 +600,7 @@ class COGame(Widget):
         
         self.center_target.color = (0., 0., 0., 0.)
         self.periph_target.color = (0., 0., 0., 0.)
-        self.indicator_txt_color = (0., 0., 0., 0.)
+        self.indicator_targ.color = (0., 0., 0., 0.)
 
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
@@ -639,15 +644,15 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
         self.periph_target.color = (0., 0., 0., 1.)
-        self.indicator_txt_color = (.25, .25, .25, 1.)
+        self.indicator_targ.color = (.25, .25, .25, 1.)
 
     def _start_center_hold(self, **kwargs):
         self.center_target.color = (0., 1., 0., 1.)
-        self.indicator_txt_color = (0.75, .75, .75, 1.)
+        self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _start_targ_hold(self, **kwargs):
         self.periph_target.color = (0., 1., 0., 1.)
-        self.indicator_txt_color = (0.75, .75, .75, 1.)
+        self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _end_center_hold(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
@@ -688,7 +693,7 @@ class COGame(Widget):
         self.repeat = False
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.indicator_txt_color = (.25, .25, .25, 1.)
+        self.indicator_targ.color = (.25, .25, .25, 1.)
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
@@ -698,7 +703,7 @@ class COGame(Widget):
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
         self.cnts_in_rew = 0
-        self.indicator_txt_color = (1., 1., 1., 1.)
+        self.indicator_targ.color = (1., 1., 1., 1.)
 
     def _while_reward(self, **kwargs):
         if self.rew_cnt == 1:
