@@ -433,6 +433,9 @@ class R2Game(Widget):
             self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
 
 
+    def _start_grasp_trial_start(self, **kwargs):
+        self.start_grasp = time.time(); 
+
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
 
@@ -477,7 +480,7 @@ class R2Game(Widget):
     		return False
 
     def grasp_timeout(self, **kwargs):
-        return kwargs['ts'] > self.grasp_timeout_time
+        return (time.time() - self.start_grasp) > self.grasp_timeout_time
 
     def end_grasp_hold(self, **kwargs):
         return kwargs['ts'] > self.grasp_hold
