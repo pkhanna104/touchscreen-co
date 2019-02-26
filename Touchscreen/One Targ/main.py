@@ -76,6 +76,8 @@ class COGame(Widget):
 
     # Number of trials: 
     trial_counter = NumericProperty(0)
+    indicator_txt = StringProperty('o')
+    indicator_txt_color = ListProperty([.5, .5, .5, 1.])
 
     t0 = time.time()
 
@@ -119,7 +121,7 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         test=None, hold=None, targ_structure=None,
-        autoquit=None, targ_pos=None, rew_var=None):
+        autoquit=None, rew_var=None, targ_pos=None):
 
         self.rew_cnt = 0
         self.small_rew_cnt = 0
@@ -223,7 +225,7 @@ class COGame(Widget):
                     self.percent_of_trials_doubled = 0.0
         
         self.reward_generator = self.gen_rewards(self.percent_of_trials_rewarded, self.percent_of_trials_doubled,
-            self.reward_for_grasp)
+            self.reward_for_targtouch)
 
 
         # white_screen_opts = [True, False]
@@ -396,7 +398,7 @@ class COGame(Widget):
             pass
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
-        mini_block = 2*(1/np.round(self.percent_of_trials_rewarded))
+        mini_block = int(2*(1/np.round(self.percent_of_trials_rewarded)))
         rew = []
 
         for i in range(500):
@@ -571,7 +573,7 @@ class COGame(Widget):
                 return False
 
     def _start_ITI(self, **kwargs):
-        self.cam_trig_port.write('0'.encode())
+        #self.cam_trig_port.write('0'.encode())
         Window.clearcolor = (0., 0., 0., 1.)
         self.exit_target1.color = (.15, .15, .15, 1.)
         self.exit_target2.color = (.15, .15, .15, 1.)
@@ -589,12 +591,13 @@ class COGame(Widget):
         
         self.center_target.color = (0., 0., 0., 0.)
         self.periph_target.color = (0., 0., 0., 0.)
+        self.indicator_txt_color = (0., 0., 0., 0.)
 
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
 
     def _start_vid_trig(self, **kwargs):
-        self.cam_trig_port.write('1'.encode())
+       #self.cam_trig_port.write('1'.encode())
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
             self.periph_target.color = (1., 0., 0., 1.)
             self.center_target.color = (1., 0., 0., 1.)
@@ -629,12 +632,15 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
         self.periph_target.color = (0., 0., 0., 1.)
+        self.indicator_txt_color = (.25, .25, .25, 1.)
 
     def _start_center_hold(self, **kwargs):
         self.center_target.color = (0., 1., 0., 1.)
+        self.indicator_txt_color = (0.75, .75, .75, 1.)
 
     def _start_targ_hold(self, **kwargs):
         self.periph_target.color = (0., 1., 0., 1.)
+        self.indicator_txt_color = (0.75, .75, .75, 1.)
 
     def _end_center_hold(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
@@ -675,6 +681,7 @@ class COGame(Widget):
         self.repeat = False
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
+        self.indicator_txt_color = (.25, .25, .25, 1.)
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
@@ -684,6 +691,7 @@ class COGame(Widget):
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
         self.cnts_in_rew = 0
+        self.indicator_txt_color = (1., 1., 1., 1.)
 
     def _while_reward(self, **kwargs):
         if self.rew_cnt == 1:
@@ -739,6 +747,7 @@ class COGame(Widget):
         self.repeat = True
 
     def end_reward(self, **kwargs):
+        self.indicator_txt_color = (1.,1., 1., 1.)
         if self.use_white_screen:
             if len(self.cursor_ids)== 0:
                 return True
