@@ -378,10 +378,22 @@ class COGame(Widget):
                 path = os.getcwd()
                 path = path.split('\\')
                 path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-                p = ''
+                path_root = ''
                 for ip in path_data:
-                    p += ip+'/'
-                p += 'data/'
+                    path_root += ip+'/'
+                p = path_root + 'data/'
+
+                # Check if this directory exists: 
+                if os.path.exists(p):
+                    pass
+                else:
+                    p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')+'/'
+                    if os.path.exists(p):
+                        pass
+                    else:
+                        os.mkdir(p)
+                        print('Making temp directory: ', p)
+
                 print ('')
                 print ('')
                 print('Data saving PATH: ', p)

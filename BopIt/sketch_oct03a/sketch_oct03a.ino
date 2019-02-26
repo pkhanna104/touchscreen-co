@@ -4,7 +4,7 @@
 
 #define IR_SENSORPIN 7
 #define LEDPIN 2
-#define BUTTON 5
+#define BUTTON 4
 char LED;
 int FlexForcePin = A0;
 int LED_status = 0;
