@@ -67,7 +67,7 @@ class R2Game(Widget):
         self.h5_table_row_cnt = 0
         self.idle = False
 
-        button_holdz = [0.15, .25,'.12-.2', '.15-.25', '.25-.45', '.2-.5']
+        button_holdz = ['.12-.2', '.15-.25', '.2-.3', '.25-.45', '.2-.5']
         grasp_holdz = [0., .15, .25, .35, .50]
 
         for i, val in enumerate(hold['start_hold']):
@@ -243,18 +243,33 @@ class R2Game(Widget):
             path = os.getcwd()
             path = path.split('\\')
             path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-            p = ''
+            path_root = ''
             for ip in path_data:
-                p += ip+'/'
-            p += 'data/'
+                path_root += ip+'/'
+            p = path_root+'data/'
+
+            # Check if this directory exists: 
+            if os.path.exists(p):
+                pass
+
+            else:
+                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')+'/'
+                if os.path.exists(p):
+                    pass
+                else:
+                    os.mkdir(p)
+                    print('Making temp directory: ', p)
+                    
             print ('')
             print ('')
             print('Data saving PATH: ', p)
             print ('')
             print ('')
+
             self.filename = p+ animal_name+'_Grasp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
 
             pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+
             self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
             self.h5_table = self.h5file.create_table('/', 'task', Data, '')
             self.h5_table_row = self.h5_table.row
