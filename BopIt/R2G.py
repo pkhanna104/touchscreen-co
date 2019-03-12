@@ -44,6 +44,7 @@ class R2Game(Widget):
 
     big_reward_cnt = NumericProperty(0)
     small_reward_cnt = NumericProperty(0)
+    tried = NumericProperty(0)
 
     # Set relevant params text: 
     grasp_rew_txt = StringProperty('')
@@ -280,7 +281,6 @@ class R2Game(Widget):
             self.baseline_force = []
             self.trial_force = []
             self.baseline_done = False
-            self.tried = 0.
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
@@ -412,9 +412,11 @@ class R2Game(Widget):
         self.h5_table_row.append()
 
         if self.baseline_done:
-            pass
+            if 'grasp' in self.state:
+                self.trial_force.append(self.force)
         else:
             self.baseline_force.append(self.force)
+            
 
         # Write DIO 
         try:
@@ -457,7 +459,12 @@ class R2Game(Widget):
 
         if self.baseline_done:
             self.trial_force = np.array(self.trial_force)
-            if np.any(self.trial_force > self.baseline_thresh):
+            print('thresh: ')
+            print(self.baseline_thresh)
+            print('trial: ')
+            print(self.trial_force)
+            ix = np.nonzero(self.trial_force > self.baseline_thresh)[0]
+            if len(ix) > 0:
                 self.tried += 1
 
 
@@ -467,9 +474,13 @@ class R2Game(Widget):
         if self.baseline_done:
             self.trial_force = []
         else:
-            print ' computing baseline force '
+            print(' computing baseline force ')
             self.baseline_thresh = np.mean(self.baseline_force) + 5*np.std(self.baseline_force)
-            self.bsaeline_done = True
+            print('mean: ')
+            print(np.mean(self.baseline_force))
+            print('std: ')
+            print(np.std(self.baseline_force))
+            self.baseline_done = True
 
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
@@ -533,10 +544,6 @@ class R2Game(Widget):
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
                 print('in reward: ')
-                print(self.trial_counter)
-                print(self.reward_for_grasp)
-                print(self.reward_generator[:200])
-                print('')
                 if not self.skip_juice:
                     if self.reward_generator[self.trial_counter] > 0:
                         self.reward_port.open()
