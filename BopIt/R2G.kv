@@ -386,13 +386,14 @@
                 CheckBox:
                     id: g_eighteen_sec
                     group: 'ghold_time'
-                    active: True
+                    
 
                 Label: 
                     text: '0.25 sec'
                 CheckBox:
                     id: g_quarter_sec
                     group: 'ghold_time'
+                    active: True
 
                 Label: 
                     text: '0.35 sec'
@@ -500,13 +501,14 @@
                 CheckBox:
                     id: twenty_five_trials
                     group: 'trials'
+                    active: True
 
                 Label:
                     text: '50 trials'
                 CheckBox:
                     id: fifty_trials
                     group: 'trials'
-                    active: True
+                    
 
                 Label:
                     text: 'Dont AutoQuit'
@@ -773,4 +775,14 @@
                     text: str(game.small_reward_cnt)
                     font_size: 30
 
+            BoxLayout:
+                id: test3
+                orientation: 'vertical'
 
+                Label:
+                    text: 'TRIALS tried count:'
+                    font_size: 30
+
+                Label:
+                    text: str(game.tried)
+                    font_size: 30

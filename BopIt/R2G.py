@@ -277,7 +277,10 @@ class R2Game(Widget):
             # Note in python 3 to open pkl files: 
             #with open('xxxx_params.pkl', 'rb') as f:
             #    data_params = pickle.load(f)
-
+            self.baseline_force = []
+            self.trial_force = []
+            self.baseline_done = False
+            self.tried = 0.
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
@@ -408,6 +411,11 @@ class R2Game(Widget):
         self.h5_table_row['start_button'] = self.button
         self.h5_table_row.append()
 
+        if self.baseline_done:
+            pass
+        else:
+            self.baseline_force.append(self.force)
+
         # Write DIO 
         try:
             self.write_row_to_dio()
@@ -447,9 +455,21 @@ class R2Game(Widget):
             tht_min, tht_max = self.grasp_hold_type.split('-')
             self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
 
+        if self.baseline_done:
+            self.trial_force = np.array(self.trial_force)
+            if np.any(self.trial_force > self.baseline_thresh):
+                self.tried += 1
+
 
     def _start_grasp_trial_start(self, **kwargs):
         self.start_grasp = time.time(); 
+
+        if self.baseline_done:
+            self.trial_force = []
+        else:
+            print ' computing baseline force '
+            self.baseline_thresh = np.mean(self.baseline_force) + 5*np.std(self.baseline_force)
+            self.bsaeline_done = True
 
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
