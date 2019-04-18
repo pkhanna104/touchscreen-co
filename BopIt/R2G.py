@@ -12,6 +12,7 @@ import serial, time, pickle, datetime, winsound, struct
 import time
 import numpy as np
 import tables
+import subprocess, signal
 
 Config.set('graphics', 'resizable', False)
 fixed_window_size = (1800, 1000)
@@ -21,6 +22,7 @@ Config.set('graphics', 'height', str(fixed_window_size[1]))
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
     time = tables.Float32Col()
+    time_abs = tables.Float32Col()
     force = tables.Float32Col()
     beam = tables.Float32Col()
     start_led = tables.Float32Col()
@@ -44,6 +46,7 @@ class R2Game(Widget):
 
     big_reward_cnt = NumericProperty(0)
     small_reward_cnt = NumericProperty(0)
+    tried = NumericProperty(0)
 
     # Set relevant params text: 
     grasp_rew_txt = StringProperty('')
@@ -267,17 +270,22 @@ class R2Game(Widget):
             print ('')
 
             self.filename = p+ animal_name+'_Grasp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-
             pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
 
             self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
             self.h5_table = self.h5file.create_table('/', 'task', Data, '')
             self.h5_table_row = self.h5_table.row
 
+            # Get the task to start the accelerometer process
+            # Start the accelerometer: 
+            self.acc_process = subprocess.Popen(['python run_acc.py', p + animal_name + '_Grasp'])
+
             # Note in python 3 to open pkl files: 
             #with open('xxxx_params.pkl', 'rb') as f:
             #    data_params = pickle.load(f)
-
+            self.baseline_force = []
+            self.trial_force = []
+            self.baseline_done = False
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
@@ -300,6 +308,9 @@ class R2Game(Widget):
             self.cam_trig_port.write('0'.encode())
         except:
             pass
+
+        # Stop the accelerometer: 
+        self.acc_process.send_signal(signal.CTRL_C_EVENT)
 
         # Turn off LED when cloisng : 
         self.task_ard.flushInput()
@@ -403,10 +414,18 @@ class R2Game(Widget):
     def write_to_h5file(self):
         self.h5_table_row['state']= self.state
         self.h5_table_row['time'] = time.time() - self.t0
+        self.h5_table_row['time_abs'] = time.time()
         self.h5_table_row['force'] = self.force
         self.h5_table_row['beam'] = self.beam
         self.h5_table_row['start_button'] = self.button
         self.h5_table_row.append()
+
+        if self.baseline_done:
+            if 'grasp' in self.state:
+                self.trial_force.append(self.force)
+        else:
+            self.baseline_force.append(self.force)
+            
 
         # Write DIO 
         try:
@@ -447,9 +466,30 @@ class R2Game(Widget):
             tht_min, tht_max = self.grasp_hold_type.split('-')
             self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
 
+        if self.baseline_done:
+            self.trial_force = np.array(self.trial_force)
+            print('thresh: ')
+            print(self.baseline_thresh)
+            print('trial: ')
+            print(self.trial_force)
+            ix = np.nonzero(self.trial_force > self.baseline_thresh)[0]
+            if len(ix) > 0:
+                self.tried += 1
+
 
     def _start_grasp_trial_start(self, **kwargs):
         self.start_grasp = time.time(); 
+
+        if self.baseline_done:
+            self.trial_force = []
+        else:
+            print(' computing baseline force ')
+            self.baseline_thresh = np.mean(self.baseline_force) + 5*np.std(self.baseline_force)
+            print('mean: ')
+            print(np.mean(self.baseline_force))
+            print('std: ')
+            print(np.std(self.baseline_force))
+            self.baseline_done = True
 
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
@@ -513,10 +553,6 @@ class R2Game(Widget):
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
                 print('in reward: ')
-                print(self.trial_counter)
-                print(self.reward_for_grasp)
-                print(self.reward_generator[:200])
-                print('')
                 if not self.skip_juice:
                     if self.reward_generator[self.trial_counter] > 0:
                         self.reward_port.open()
