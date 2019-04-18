@@ -52,7 +52,7 @@ class COGame(Widget):
     ch_timeout = 10. # ch timeout
     cht = .001 # center hold time
 
-    target_timeout_time = 5000.
+    target_timeout_time = 5.
     tht = .001
 
     cursor = {}
@@ -122,7 +122,7 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         test=None, hold=None, targ_structure=None,
-        autoquit=None, rew_var=None, targ_pos=None):
+        autoquit=None, rew_var=None, targ_timeout = None, targ_pos=None):
 
         self.rew_cnt = 0
         self.small_rew_cnt = 0
@@ -134,6 +134,12 @@ class COGame(Widget):
             self.serial_port_cap = serial.Serial(port='COM5')
 
         self.rhtouch_sensor = 0.
+
+
+        targ_timeout_opts = [15, 30, 45, 60]
+        for i, val in enumerate(targ_timeout['tt']):
+            if val:
+                self.target_timeout_time = targ_timeout_opts[i]
 
         small_rew_opts = [.1, .3, .5]
         for i, val in enumerate(rew_in['small_rew']):
@@ -316,7 +322,7 @@ class COGame(Widget):
             return_ = 'target'
 
         self.FSM['touch_error'] = dict(end_touch_error=return_, stop=None, non_rhtouch='RH_touch')
-        self.FSM['timeout_error'] = dict(end_timeout_error=return_, stop=None, non_rhtouch='RH_touch')
+        self.FSM['timeout_error'] = dict(end_timeout_error='ITI', stop=None, non_rhtouch='RH_touch')
         self.FSM['hold_error'] = dict(end_hold_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['drag_error'] = dict(end_drag_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['rew_anytouch'] = dict(end_rewanytouch='target', stop=None, non_rhtouch='RH_touch')
@@ -368,6 +374,10 @@ class COGame(Widget):
             use_cap_sensor = self.use_cap_sensor,
             drag_ok = self.drag_ok,
             )
+
+        print(self.reward_for_center)
+        print(self.reward_for_targtouch)
+        print(self.reward_for_anytouch)
 
         try:
             if self.testing:
@@ -613,7 +623,7 @@ class COGame(Widget):
         self.center_target.color = (0., 0., 0., 0.)
         self.periph_target.color = (0., 0., 0., 0.)
         self.indicator_targ.color = (0., 0., 0., 0.)
-
+        
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
 
@@ -621,6 +631,7 @@ class COGame(Widget):
         if self.trial_counter == 0:
             time.sleep(1.)
         self.cam_trig_port.write('1'.encode())
+        self.first_target_attempt = True
 
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
             self.periph_target.color = (1., 0., 0., 1.)
@@ -646,8 +657,8 @@ class COGame(Widget):
 
     def non_rhtouch(self, **kwargs):
         x = not self.rhtouch()
-        if x:
-            self.repeat = True
+        # if x:
+        #     self.repeat = True
         return x
 
     def _start_center(self, **kwargs):
@@ -680,7 +691,7 @@ class COGame(Widget):
     def _start_timeout_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
         self.periph_target.color = (0., 0., 0., 1.)
-        self.repeat = True
+        #self.repeat = True
 
     def _start_hold_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
@@ -699,6 +710,8 @@ class COGame(Widget):
         if self.repeat is False:
             self.periph_target_position = self.target_list[self.target_index, :]
             self.target_index += 1
+            print(self.periph_target_position)
+            print(self.target_index)
 
         self.periph_target.move(self.periph_target_position)
         self.periph_target.color = (1., 1., 0., 1.)
@@ -706,6 +719,9 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
         self.indicator_targ.color = (.25, .25, .25, 1.)
+        if self.first_target_attempt:
+            self.first_target_attempt_t0 = time.time();
+            self.first_target_attempt = False
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
@@ -716,6 +732,7 @@ class COGame(Widget):
         self.rew_cnt = 0
         self.cnts_in_rew = 0
         self.indicator_targ.color = (1., 1., 1., 1.)
+        self.repeat = False
 
     def _while_reward(self, **kwargs):
         if self.rew_cnt == 1:
@@ -724,19 +741,23 @@ class COGame(Widget):
 
     def _start_rew_anytouch(self, **kwargs):
         #if self.small_rew_cnt == 1:
-        self.run_small_rew()
+        if self.reward_for_anytouch[0]:
+            self.run_small_rew()
+        else:
+            self.repeat = True
             #self.small_rew_cnt += 1
 
     def run_big_rew(self, **kwargs):
         try:
             print('in big reward:')
+            self.repeat = False
             if self.reward_for_targtouch[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
                 print('in big reward 2')
-                print(str(self.reward_generator[self.trial_counter]))
-                print(self.trial_counter)
-                print(self.reward_generator[:100])
+                #print(str(self.reward_generator[self.trial_counter]))
+                #print(self.trial_counter)
+                #print(self.reward_generator[:100])
                 self.reward1.play()
 
                 if not self.skip_juice:
@@ -772,7 +793,7 @@ class COGame(Widget):
         except:
             pass
 
-        self.repeat = True
+        #self.repeat = True
 
     def end_reward(self, **kwargs):
         self.indicator_txt_color = (1.,1., 1., 1.)
@@ -840,7 +861,10 @@ class COGame(Widget):
                 self.check_if_started_in_targ(self.periph_target_position, self.periph_target_rad))
 
     def target_timeout(self, **kwargs):
-        return kwargs['ts'] > self.target_timeout_time
+        #return kwargs['ts'] > self.target_timeout_time
+        if time.time() - self.first_target_attempt_t0 > self.target_timeout_time:
+            self.repeat = False
+            return True
 
     def finish_targ_hold(self, **kwargs):
         return self.tht <= kwargs['ts']
