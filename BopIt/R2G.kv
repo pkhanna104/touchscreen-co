@@ -358,6 +358,41 @@
                 orientation: 'horizontal'
                 canvas:
                     Color:
+                        rgba: 0.2, 0.2, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: 'Use Cap Touch instead of Button?'
+                    color: 1, 1, 0, 1
+                Label: 
+                    text: 'Yes'
+                CheckBox:
+                    id: yes_cap
+                    group: 'cap'
+                    active: True
+
+                Label: 
+                    text: 'No'
+                CheckBox:
+                    id: no_cap
+                    group: 'cap'
+
+
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+                canvas:
+                    Color:
                         rgba: 0.1, 0.1, 0.7, 0.5
                     Rectangle:
                         size: self.size
@@ -658,7 +693,8 @@
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
                     dict(start=[start_button.active, no_start_button.active]),
                     dict(start=[only_start_button.active, no_only_start_button.active]),
-                    dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]))
+                    dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]),
+                    dict(cap=[yes_cap.active, no_cap.active]))
 
                     Clock.schedule_interval(game.update, 1.0 / 30.0)
             Label:

@@ -65,10 +65,16 @@ class R2Game(Widget):
 
     def init(self, animal_names_dict=None, rew_in=None, rew_var=None,
         test=None, hold=None, autoquit=None, use_start=None, only_start=None, 
-        grasp_to=None):
+        grasp_to=None, use_cap=None):
 
         self.h5_table_row_cnt = 0
         self.idle = False
+
+
+        cap = [True, False]
+        for i, val in enumerate(use_cap['use_cap']):
+            if val:
+                self.use_cap_not_button = cap[i]
 
         button_holdz = ['.12-.2', '.15-.25', '.2-.3', '.25-.45', '.2-.5']
         grasp_holdz = [0., .15, .25, .35, .50]
@@ -175,6 +181,7 @@ class R2Game(Widget):
 
         self.start_led = 0
         self.button = 0
+        self.cap_button = 0.
 
         # State transition matrix: 
         self.FSM = dict()
@@ -226,6 +233,9 @@ class R2Game(Widget):
         except:
             pass
 
+        if self.use_cap_not_button:
+            self.cap_ard = serial.Serial(port='', baudrate=9600)
+
         # save parameters: 
         d = dict(animal_name=animal_name,
             ITI_mean=self.ITI_mean, ITI_std = self.ITI_std, start_hold=self.start_hold,
@@ -234,7 +244,7 @@ class R2Game(Widget):
             small_rew = small_rew, rew_for_start = self.reward_for_start[0], 
             reward_for_grasp = self.reward_for_grasp[0], skip_juice=self.skip_juice,
             rew_delay = self.reward_delay_time, use_start = self.use_start, 
-            only_start = self.only_start, reward_fcn=reward_fcn)
+            only_start = self.only_start, reward_fcn=reward_fcn, use_cap=self.use_cap_not_button)
 
         # Open task arduino
         self.task_ard = serial.Serial(port='COM5')
@@ -376,6 +386,15 @@ class R2Game(Widget):
         self.force = int(port_splits[0])
         self.beam = int(port_splits[1])
         self.button = int(port_splits[2])
+
+        if self.use_cap_not_button:
+            tmp = self.cap_ard.flushInput()
+            _ = self.cap_ard.readline()
+            tmp_read = self.cap_ard.readline()
+            if tmp_read == 'C5':
+                self.cap_button = 1.
+            elif tmp_read = ='N5':
+                self.cap_button = 0.
         
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
@@ -505,7 +524,10 @@ class R2Game(Widget):
         self.task_ard.write('m'.encode()) #morning
 
     def pushed_start(self, **kwargs):
-        return self.button
+        if self.use_cap_not_button:
+            return self.cap_button
+        else:
+            return self.button
 
 
     def start_button_timeout(self, **kwargs):
@@ -523,7 +545,10 @@ class R2Game(Widget):
             return False
 
     def start_early_release(self, **kwargs):
-        if self.button == 0:
+        but = self.button
+        if self.use_cap_not_button:
+            but = self.cap_button
+        if but == 0:
             if kwargs['ts'] < self.start_hold:
                 return True
         return False
