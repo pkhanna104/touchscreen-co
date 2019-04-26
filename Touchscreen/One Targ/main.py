@@ -45,13 +45,14 @@ class COGame(Widget):
     periph_target_rad = 1.5
 
     exit_pos = np.array([7, 4])
+    indicator_pos = np.array([8, 5])
     exit_rad = 1.
     exit_hold = 2 #seconds
 
     ch_timeout = 10. # ch timeout
     cht = .001 # center hold time
 
-    target_timeout_time = 5000.
+    target_timeout_time = 5.
     tht = .001
 
     cursor = {}
@@ -76,8 +77,8 @@ class COGame(Widget):
 
     # Number of trials: 
     trial_counter = NumericProperty(0)
-    indicator_txt = StringProperty('o')
-    indicator_txt_color = ListProperty([.5, .5, .5, 1.])
+    #indicator_txt = StringProperty('o')
+    #indicator_txt_color = ListProperty([.5, .5, .5, 1.])
 
     t0 = time.time()
 
@@ -121,10 +122,11 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         test=None, hold=None, targ_structure=None,
-        autoquit=None, rew_var=None, targ_pos=None):
+        autoquit=None, rew_var=None, targ_timeout = None, targ_pos=None):
 
         self.rew_cnt = 0
         self.small_rew_cnt = 0
+
 
         self.use_cap_sensor = False
 
@@ -132,6 +134,12 @@ class COGame(Widget):
             self.serial_port_cap = serial.Serial(port='COM5')
 
         self.rhtouch_sensor = 0.
+
+
+        targ_timeout_opts = [15, 30, 45, 60]
+        for i, val in enumerate(targ_timeout['tt']):
+            if val:
+                self.target_timeout_time = targ_timeout_opts[i]
 
         small_rew_opts = [.1, .3, .5]
         for i, val in enumerate(rew_in['small_rew']):
@@ -268,7 +276,7 @@ class COGame(Widget):
 
         self.state = 'ITI'
         self.state_start = time.time()
-        self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
+        self.ITI = self.ITI_std + self.ITI_mean
 
         # Initialize targets: 
         self.center_target.set_size(2*self.center_target_rad)
@@ -277,6 +285,10 @@ class COGame(Widget):
 
         self.exit_target1.set_size(2*self.exit_rad)
         self.exit_target2.set_size(2*self.exit_rad)
+        self.indicator_targ.set_size(self.exit_rad)
+        self.indicator_targ.move(self.indicator_pos)
+        self.indicator_targ.color = (0., 0., 0., 1.)
+
         self.exit_target1.move(self.exit_pos)
         self.exit_pos2 = np.array([self.exit_pos[0], -1*self.exit_pos[1]])
         self.exit_target2.move(self.exit_pos2)
@@ -310,7 +322,7 @@ class COGame(Widget):
             return_ = 'target'
 
         self.FSM['touch_error'] = dict(end_touch_error=return_, stop=None, non_rhtouch='RH_touch')
-        self.FSM['timeout_error'] = dict(end_timeout_error=return_, stop=None, non_rhtouch='RH_touch')
+        self.FSM['timeout_error'] = dict(end_timeout_error='ITI', stop=None, non_rhtouch='RH_touch')
         self.FSM['hold_error'] = dict(end_hold_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['drag_error'] = dict(end_drag_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['rew_anytouch'] = dict(end_rewanytouch='target', stop=None, non_rhtouch='RH_touch')
@@ -324,7 +336,7 @@ class COGame(Widget):
             pass
 
         try:
-            self.dio_port = serial.Serial(port='COM13', baudrate=115200)
+            self.dio_port = serial.Serial(port='COM5', baudrate=115200)
             time.sleep(4.)
         except:
             pass
@@ -363,6 +375,10 @@ class COGame(Widget):
             drag_ok = self.drag_ok,
             )
 
+        print(self.reward_for_center)
+        print(self.reward_for_targtouch)
+        print(self.reward_for_anytouch)
+
         try:
             if self.testing:
                 pass
@@ -381,7 +397,7 @@ class COGame(Widget):
                 if os.path.exists(p):
                     pass
                 else:
-                    p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')+'/'
+                    p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
                     if os.path.exists(p):
                         pass
                     else:
@@ -410,18 +426,21 @@ class COGame(Widget):
             pass
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
-        mini_block = int(2*(1/np.round(self.percent_of_trials_rewarded)))
+        mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
         rew = []
+        trial_cnt_bonus = 0
 
         for i in range(500):
             mini_block_array = np.zeros((mini_block))
             ix = np.random.permutation(mini_block)
             mini_block_array[ix[:2]] = reward_for_grasp[1]
 
-            rand = np.random.rand()
+            trial_cnt_bonus += mini_block
+            if perc_trials_2x > 0:
+                if trial_cnt_bonus > int(1./(perc_trials_rew*perc_trials_2x)):
+                    mini_block_array[ix[0]] = reward_for_grasp[1]*2.
+                    trial_cnt_bonus = 0
 
-            if rand <= perc_trials_2x:
-                mini_block_array[ix[0]] = 2*reward_for_grasp[1]
             rew.append(mini_block_array)
         return np.hstack((rew))
 
@@ -603,13 +622,17 @@ class COGame(Widget):
         
         self.center_target.color = (0., 0., 0., 0.)
         self.periph_target.color = (0., 0., 0., 0.)
-        self.indicator_txt_color = (0., 0., 0., 0.)
-
+        self.indicator_targ.color = (0., 0., 0., 0.)
+        
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
 
     def _start_vid_trig(self, **kwargs):
-       self.cam_trig_port.write('1'.encode())
+        if self.trial_counter == 0:
+            time.sleep(1.)
+        self.cam_trig_port.write('1'.encode())
+        self.first_target_attempt = True
+
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
             self.periph_target.color = (1., 0., 0., 1.)
             self.center_target.color = (1., 0., 0., 1.)
@@ -634,8 +657,8 @@ class COGame(Widget):
 
     def non_rhtouch(self, **kwargs):
         x = not self.rhtouch()
-        if x:
-            self.repeat = True
+        # if x:
+        #     self.repeat = True
         return x
 
     def _start_center(self, **kwargs):
@@ -644,15 +667,15 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
         self.periph_target.color = (0., 0., 0., 1.)
-        self.indicator_txt_color = (.25, .25, .25, 1.)
+        self.indicator_targ.color = (.25, .25, .25, 1.)
 
     def _start_center_hold(self, **kwargs):
         self.center_target.color = (0., 1., 0., 1.)
-        self.indicator_txt_color = (0.75, .75, .75, 1.)
+        self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _start_targ_hold(self, **kwargs):
         self.periph_target.color = (0., 1., 0., 1.)
-        self.indicator_txt_color = (0.75, .75, .75, 1.)
+        self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _end_center_hold(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
@@ -668,7 +691,7 @@ class COGame(Widget):
     def _start_timeout_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
         self.periph_target.color = (0., 0., 0., 1.)
-        self.repeat = True
+        #self.repeat = True
 
     def _start_hold_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
@@ -687,13 +710,18 @@ class COGame(Widget):
         if self.repeat is False:
             self.periph_target_position = self.target_list[self.target_index, :]
             self.target_index += 1
+            print(self.periph_target_position)
+            print(self.target_index)
 
         self.periph_target.move(self.periph_target_position)
         self.periph_target.color = (1., 1., 0., 1.)
         self.repeat = False
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.indicator_txt_color = (.25, .25, .25, 1.)
+        self.indicator_targ.color = (.25, .25, .25, 1.)
+        if self.first_target_attempt:
+            self.first_target_attempt_t0 = time.time();
+            self.first_target_attempt = False
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
@@ -703,7 +731,8 @@ class COGame(Widget):
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
         self.cnts_in_rew = 0
-        self.indicator_txt_color = (1., 1., 1., 1.)
+        self.indicator_targ.color = (1., 1., 1., 1.)
+        self.repeat = False
 
     def _while_reward(self, **kwargs):
         if self.rew_cnt == 1:
@@ -712,27 +741,35 @@ class COGame(Widget):
 
     def _start_rew_anytouch(self, **kwargs):
         #if self.small_rew_cnt == 1:
-        self.run_small_rew()
+        if self.reward_for_anytouch[0]:
+            self.run_small_rew()
+        else:
+            self.repeat = True
             #self.small_rew_cnt += 1
 
     def run_big_rew(self, **kwargs):
         try:
             print('in big reward:')
+            self.repeat = False
             if self.reward_for_targtouch[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
                 print('in big reward 2')
+                #print(str(self.reward_generator[self.trial_counter]))
+                #print(self.trial_counter)
+                #print(self.reward_generator[:100])
                 self.reward1.play()
 
                 if not self.skip_juice:
-                    self.reward_port.open()
-                    #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                    self.reward_port.write(rew_str)
-                    time.sleep(.25 + self.reward_delay_time)
-                    run_str = [ord(r) for r in 'run\n']
-                    self.reward_port.write(run_str)
-                    self.reward_port.close()
+                    if self.reward_generator[self.trial_counter] > 0:
+                        self.reward_port.open()
+                        #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
+                        self.reward_port.write(rew_str)
+                        time.sleep(.25 + self.reward_delay_time)
+                        run_str = [ord(r) for r in 'run\n']
+                        self.reward_port.write(run_str)
+                        self.reward_port.close()
         except:
             pass
         
@@ -756,7 +793,7 @@ class COGame(Widget):
         except:
             pass
 
-        self.repeat = True
+        #self.repeat = True
 
     def end_reward(self, **kwargs):
         self.indicator_txt_color = (1.,1., 1., 1.)
@@ -769,6 +806,7 @@ class COGame(Widget):
             else:
                 self.cnts_in_rew += 1
                 return False
+
     def end_rewanytouch(self, **kwargs):
         if self.small_rew_cnt > 1:
             return True
@@ -823,7 +861,10 @@ class COGame(Widget):
                 self.check_if_started_in_targ(self.periph_target_position, self.periph_target_rad))
 
     def target_timeout(self, **kwargs):
-        return kwargs['ts'] > self.target_timeout_time
+        #return kwargs['ts'] > self.target_timeout_time
+        if time.time() - self.first_target_attempt_t0 > self.target_timeout_time:
+            self.repeat = False
+            return True
 
     def finish_targ_hold(self, **kwargs):
         return self.tht <= kwargs['ts']

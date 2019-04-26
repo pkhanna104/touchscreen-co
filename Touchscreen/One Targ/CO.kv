@@ -64,6 +64,63 @@
                     text: ''
                     fontsize: 50
 
+            BoxLayout 
+                id: top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Target Timeout (from first att.)'
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: '15 sec'
+
+                CheckBox:
+                    group: 'tt'
+                    id: tt_15_sec
+            
+                Label: 
+                    text: '30 sec'
+
+                CheckBox:
+                    group: 'tt'
+                    id: tt_30_sec
+                    active: True
+
+                Label: 
+                    text: '45 sec'
+
+                CheckBox:
+                    group: 'tt'
+                    id: tt_45_sec
+
+                Label: 
+                    text: '60 sec'
+
+                CheckBox:
+                    group: 'tt'
+                    id: tt_60_sec
+            
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
             BoxLayout
                 id: starting2
                 orientation: 'horizontal'
@@ -185,7 +242,6 @@
                 CheckBox:
                     id: big_rew_pt3_sec
                     group: 'big_rew'
-                    active: True
 
                 Label: 
                     text: '0.5 sec'
@@ -200,6 +256,7 @@
                 CheckBox:
                     id: big_rew_pt7_sec
                     group: 'big_rew'
+                    active: True
 
                 Label:
                     text: ''
@@ -226,8 +283,7 @@
                 CheckBox:
                     id: rew_all
                     group: 'rew_var'
-                    active: True
-
+                    
                 Label: 
                     text: 'Reward 50% '
 
@@ -236,11 +292,12 @@
                     group: 'rew_var'
 
                 Label: 
-                    text: 'Reward 30% w/ 10% doubled'
+                    text: 'Reward 33% w/ 10% doubled'
 
                 CheckBox:
                     id: rew_30
                     group: 'rew_var'
+                    active: True
 
 
                 Label:
@@ -262,6 +319,9 @@
                         size: self.size
                         pos: self.pos
 
+                Label:
+                    text: ''
+                    fontsize: 50
                 Label:
                     text: ''
                     fontsize: 50
@@ -311,6 +371,9 @@
                     id: targ_rad_15
                     group: 'targ_cm'
                                         
+                Label:
+                    text: ''
+                    fontsize: 50
 
                 Label:
                     text: ''
@@ -322,6 +385,13 @@
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
 
                 Label:
                     text: ''
@@ -376,12 +446,21 @@
                 Label:
                     text: ''
                     fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
 
 
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
 
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
                 Label:
                     text: ''
                     fontsize: 50
@@ -435,6 +514,9 @@
                 Label:
                     text: ''
                     fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
 
             BoxLayout:
                 id: test
@@ -442,7 +524,13 @@
                 Label:
                     text: ''
                     fontsize: 50
-                
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
                 Label: 
                     text: 'Auto-Quit After: '
                     color: 1, 1, 0, 1
@@ -485,6 +573,9 @@
                 Label:
                     text: ''
                     fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
 
 
             Button:
@@ -500,7 +591,8 @@
                     hold=[three_sev_five_sec.active, half_sec.active, t_575.active, t_60.active, big_rand.active]), 
                     dict(get_targets_rand=False, get_4targets=False, get_targets_co=True), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
-                    dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]))
+                    dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
+                    dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]))
 
             Label:
                 text: ''
@@ -591,6 +683,10 @@
     periph_target: target_p
     exit_target1: target_e1
     exit_target2: target_e2
+    indicator_targ: indicator
+
+    Target:
+        id: indicator
 
     Target:
         id: target_c
@@ -610,13 +706,6 @@
         center_x: root.width * 6/8
         top: root.top - 70
         text: str(root.trial_counter)
-
-    Label:
-        color: root.indicator_txt_color
-        font_size: 50
-        center_x: root.width* 13/16
-        top: root.top - 10
-        text: root.indicator_txt
 
 
     Label:
