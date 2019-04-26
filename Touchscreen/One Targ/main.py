@@ -585,7 +585,7 @@ class COGame(Widget):
                 return False
 
     def _start_ITI(self, **kwargs):
-        #self.cam_trig_port.write('0'.encode())
+        self.cam_trig_port.write('0'.encode())
         Window.clearcolor = (0., 0., 0., 1.)
         self.exit_target1.color = (.15, .15, .15, 1.)
         self.exit_target2.color = (.15, .15, .15, 1.)
@@ -609,7 +609,7 @@ class COGame(Widget):
         return kwargs['ts'] > self.ITI
 
     def _start_vid_trig(self, **kwargs):
-       #self.cam_trig_port.write('1'.encode())
+       self.cam_trig_port.write('1'.encode())
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
             self.periph_target.color = (1., 0., 0., 1.)
             self.center_target.color = (1., 0., 0., 1.)
