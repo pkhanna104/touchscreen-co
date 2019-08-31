@@ -5,6 +5,8 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 from random import randint
 
+### Adding comment, as example git change
+
 class PongGame(Widget):
     ball = ObjectProperty(None)
     player1 = ObjectProperty(None)
