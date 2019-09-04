@@ -66,7 +66,7 @@ class COGame(Widget):
     drag_error_timeout = 0.
 
     ntargets = 4.
-    target_distance = 4.
+    target_distance = 6. 
     touch = False
 
     center_target = ObjectProperty(None)
@@ -94,6 +94,7 @@ class COGame(Widget):
     generatorz_param = StringProperty('')
     nudge_text = StringProperty('')
     nudge_param = StringProperty('')
+    
     def on_touch_down(self, touch):
         #handle many touchs:
         ud = touch.ud
@@ -120,58 +121,43 @@ class COGame(Widget):
         except:
             print('removing touch from pre-game screen')
             
+
+# root.current = 'splash_start'
+# splash.init(
+# dict(donu=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), 
+
+# dict(reward=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active, small_rew_pt7_sec.active]), 
+
+# dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active]), 
+
+# dict(test=[False, True, False]), 
+
+# dict(hold=[hold_4_6.active, hold_4_7.active, hold_5_8.active, hold_6_10.active, hold_7_13.active, hold_8_15.active, hold_9_17.active, hold_10_17.active, hold_12_20.active, hold_15_25.active, hold_20_30.active],
+
+# dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
+
+# dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
+
+# dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]))
+
+
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
-        test=None, hold=None, targ_structure=None,
-        autoquit=None, rew_var=None, targ_timeout = None, targ_pos=None):
+        hold=None, autoquit=None, rew_var=None, targ_timeout = None):
 
         self.rew_cnt = 0
         self.small_rew_cnt = 0
 
-
         self.use_cap_sensor = False
-
         if self.use_cap_sensor:
             self.serial_port_cap = serial.Serial(port='COM5')
-
         self.rhtouch_sensor = 0.
 
 
-        targ_timeout_opts = [15, 30, 45, 60]
-        for i, val in enumerate(targ_timeout['tt']):
+        rew_opts = [.1, .3, .5, .7]
+        for i, val in enumerate(rew_in['reward']):
             if val:
-                self.target_timeout_time = targ_timeout_opts[i]
-
-        small_rew_opts = [.1, .3, .5]
-        for i, val in enumerate(rew_in['small_rew']):
-            if val:
-                small_rew = small_rew_opts[i]
-
-        big_rew_opts = [.3, .5, .7]
-        for i, val in enumerate(rew_in['big_rew']):
-            if val:
-                big_rew = big_rew_opts[i]
-
-
-        if rew_in['rew_anytouch']:
-            self.reward_for_anytouch = [True, small_rew]
-        else:
-            self.reward_for_anytouch = [False, 0]
-
-        if np.logical_or(rew_in['rew_targ'], rew_in['rew_center_pls_targ']):
-            self.reward_for_targtouch = [True, big_rew]
-        else:
-            self.reward_for_targtouch = [False, 0]
-
-        if rew_in['rew_center_pls_targ']:
-            self.reward_for_center = [True, small_rew]
-        else:
-            self.reward_for_center = [False, 0]
-
-        if rew_in['snd_only']:
-            self.reward_for_targtouch = [True, 0.]
-            self.skip_juice = True
-        else:
-            self.skip_juice = False
+                small_rew = rew_opts[i]
+                self.reward_for_targtouch = [True, small_rew]
 
         target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5]
         for i, val in enumerate(task_in['targ_rad']):
@@ -179,48 +165,47 @@ class COGame(Widget):
                 self.periph_target_rad = target_rad_opts[i]
                 self.center_target_rad = target_rad_opts[i]
 
-        for i, (nm, val) in enumerate(animal_names_dict.items()):
-            if val:
-                animal_name = nm
+        self.testing = False; 
+        self.in_cage = False; 
 
-        self.use_center = False
-        for i, (nm, val) in enumerate(targ_structure.items()):
-            if val:
-                generatorz = getattr(self, nm)
-                self.generatorz_param2 = nm
-                if 'co' in nm:
-                    self.use_center = True
-
-        holdz = [ .375, .5, .575, .6, '.4-.6']
-        
-        self.cht_type = None
+        holdz = ['.4-.6', '.4-.7', '.5-.8', '.6-1.0', '.7-1.3', '.8-1.5', '.9-1.7', '1.0-1.7', '1.2-2.0', '1.5-2.5', '2.0-3.0']
         self.tht_type = None
+        self.cht_type = None; 
 
         for i, val in enumerate(hold['hold']):
             if val:
                 if type(holdz[i]) is str:
+
                     mx, mn = holdz[i].split('-')
                     self.tht_type = holdz[i]
                     self.tht =  (float(mn)+float(mx))*.5
-                else:
-                    self.tht = holdz[i]
 
-        for i, val in enumerate(hold['chold']):
-            if val:
-                if type(holdz[i]) is str:
-                    mx, mn = holdz[i].split('-')
                     self.cht_type = holdz[i]
                     self.cht = (float(mn)+float(mx))*.5
                 else:
+                    self.tht = holdz[i]
                     self.cht = holdz[i]
-        try:
-            pygame.mixer.init()    
-        except:
-            pass
+        
+        autoquit_trls = [10, 25, 50, 100, 10**10]
+        for i, val in enumerate(autoquit['autoquit']):
+            if val: 
+                self.max_trials = autoquit_trls[i]
 
-        # reward_delay_opts = [0., .4, .8, 1.2]
-        # for i, val in enumerate(rew_del['rew_del']):
-        #     if val:
+
+        targ_timeout_opts = [15, 30, 45, 60]
+        for i, val in enumerate(targ_timeout['tt']):
+            if val:
+                self.target_timeout_time = targ_timeout_opts[i]
+                self.ch_timeout = targ_timeout_opts[i]
+
+        self.reward_for_anytouch = False; 
+        self.skip_juice = False. 
+
+        for i, (nm, val) in enumerate(animal_names_dict.items()):
+            if val:
+                animal_name = nm
+
+
         self.reward_delay_time = 0.0
 
         reward_var_opt = [1.0, .5, .33]
@@ -232,47 +217,22 @@ class COGame(Widget):
                 else:
                     self.percent_of_trials_doubled = 0.0
         
+        ### Game initiates ####
+        try:
+            pygame.mixer.init()    
+        except:
+            pass
+
         self.reward_generator = self.gen_rewards(self.percent_of_trials_rewarded, self.percent_of_trials_doubled,
             self.reward_for_targtouch)
 
 
-        # white_screen_opts = [True, False]
-        # for i, val in enumerate(white_screen['white_screen']):
-        #     if val:
         self.use_white_screen = False
-
-        test_vals = [True, False, False]
-        in_cage_vals = [False, False, True]
-        for i, val in enumerate(test['test']):
-            if val:
-                self.testing = test_vals[i]
-                self.in_cage = in_cage_vals[i]
-        
-        autoquit_trls = [10, 25, 50, 100, 10**10]
-        for i, val in enumerate(autoquit['autoquit']):
-            if val: 
-                self.max_trials = autoquit_trls[i]
-
-        # drag_ok = [True, False]
-        # for i, val in enumerate(drag['drag']):
-        #     if val:
-        #         self.drag_ok = drag_ok[i]
         self.drag_ok = False;
-
-        # nudge_9am_dist = [0., .5, 1.]
-        # for i, val in enumerate(nudge['nudge']):
-        #     if val:
         self.nudge_dist = 0.
-
-        # targ_pos = ['corners', None]
-        # for i, val in enumerate(targ_pos['targ_pos']):
-        #     if val:
-        self.generator_kwarg = 'corners'
-
 
         # Preload sounds: 
         self.reward1 = SoundLoader.load('reward1.wav')
-        self.reward2 = SoundLoader.load('reward2.wav')
 
         self.state = 'ITI'
         self.state_start = time.time()
@@ -280,11 +240,17 @@ class COGame(Widget):
 
         # Initialize targets: 
         self.center_target.set_size(2*self.center_target_rad)
-        self.center_target.move(np.array([0., 0.]))
+        
+        # Initlize center target to be in the lower left corner: 
+        self.center_target.move(np.array([-4.24264069, -4.24264069]))
+
         self.periph_target.set_size(2*self.periph_target_rad)
 
+        ## Keep exit targets; 
         self.exit_target1.set_size(2*self.exit_rad)
         self.exit_target2.set_size(2*self.exit_rad)
+
+        ## Keep the photodiode target 
         self.indicator_targ.set_size(self.exit_rad)
         self.indicator_targ.move(self.indicator_pos)
         self.indicator_targ.color = (0., 0., 0., 1.)
@@ -295,39 +261,19 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
 
-        self.target_list = generatorz(self.target_distance, self.nudge_dist, self.generator_kwarg)
-        self.target_index = 0
-        self.repeat = False
-        self.center_target_position = np.array([0., 0.])
-        self.periph_target_position = self.target_list[self.target_index, :]
+        self.center_target_position = np.array([-4.24264069, -4.24264069])
 
         self.FSM = dict()
         self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
-        self.FSM['vid_trig'] = dict(rhtouch='target', stop=None)
-        
-        if self.use_center:
-            self.FSM['vid_trig'] = dict(end_vid_trig='center', stop=None)
-            self.FSM['center'] = dict(touch_center='center_hold', center_timeout='timeout_error', non_rhtouch='RH_touch',stop=None)
-            self.FSM['center_hold'] = dict(finish_center_hold='target', early_leave_center_hold='hold_error', non_rhtouch='RH_touch', stop=None)
-
-        self.FSM['target'] = dict(touch_target = 'targ_hold', target_timeout='timeout_error', stop=None,
-            anytouch='rew_anytouch', non_rhtouch='RH_touch')#,touch_not_target='touch_error')
-        self.FSM['targ_hold'] = dict(finish_targ_hold='reward', early_leave_target_hold = 'hold_error',
-         targ_drag_out = 'drag_error', stop=None, non_rhtouch='RH_touch')
+        self.FSM['vid_trig'] = dict(rhtouch='center', stop=None)
+        self.FSM['center'] = dict(touch_center='center_hold', center_timeout='timeout_error', non_rhtouch='RH_touch',stop=None)    
+        self.FSM['center_hold'] = dict(finish_center_hold='reward', early_leave_center_hold='hold_error', non_rhtouch='RH_touch', stop=None)
         self.FSM['reward'] = dict(end_reward = 'ITI', stop=None, non_rhtouch='RH_touch')
-
-        if self.use_center:
-            return_ = 'center'
-        else:
-            return_ = 'target'
-
-        self.FSM['touch_error'] = dict(end_touch_error=return_, stop=None, non_rhtouch='RH_touch')
+        self.FSM['hold_error'] = dict(end_hold_error='ITI', stop=None, non_rhtouch='RH_touch')
         self.FSM['timeout_error'] = dict(end_timeout_error='ITI', stop=None, non_rhtouch='RH_touch')
-        self.FSM['hold_error'] = dict(end_hold_error=return_, stop=None, non_rhtouch='RH_touch')
-        self.FSM['drag_error'] = dict(end_drag_error=return_, stop=None, non_rhtouch='RH_touch')
-        self.FSM['rew_anytouch'] = dict(end_rewanytouch='target', stop=None, non_rhtouch='RH_touch')
         self.FSM['idle_exit'] = dict(stop=None)
 
+        ### Initialize the reward 
         try:
             self.reward_port = serial.Serial(port='COM4',
                 baudrate=115200)
@@ -335,12 +281,14 @@ class COGame(Widget):
         except:
             pass
 
+        ### Initialize the DIO
         try:
             self.dio_port = serial.Serial(port='COM5', baudrate=115200)
             time.sleep(4.)
         except:
             pass
 
+        ### Initialize the Camera triggers
         try:
             self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
             time.sleep(3.)
@@ -353,23 +301,17 @@ class COGame(Widget):
             pass
 
         # save parameters: 
-        d = dict(animal_name=animal_name, center_target_rad=self.center_target_rad,
-            periph_target_rad=self.periph_target_rad, target_structure = generatorz.__name__, 
-            target_list = self.target_list, 
-            ITI_mean=self.ITI_mean, ITI_std = self.ITI_std, ch_timeout=self.ch_timeout, 
-            cht=self.cht, reward_time_small=self.reward_for_center[1],
-            reward_time_big=self.reward_for_targtouch[1],
-            reward_for_anytouch=self.reward_for_anytouch[0],
-            reward_for_center = self.reward_for_center[0],
-            reward_for_targtouch=self.reward_for_targtouch[0], 
-            touch_error_timeout = self.touch_error_timeout,
+        d = dict(animal_name=animal_name, 
+            center_target_rad=self.center_target_rad,
+            ITI_mean=self.ITI_mean, 
+            ITI_std = self.ITI_std, 
+            ch_timeout=self.ch_timeout, 
+            cht=self.cht, 
+            reward_time=self.reward_for_targtouch[1],
             timeout_error_timeout = self.timeout_error_timeout,
             hold_error_timeout = self.hold_error_timeout,
-            drag_error_timeout = self.drag_error_timeout,
-            ntargets = self.ntargets,
             target_distance = self.target_distance,
             start_time = datetime.datetime.now().strftime('%Y%m%d_%H%M'),
-            testing=self.testing,
             rew_delay = self.reward_delay_time,
             use_cap_sensor = self.use_cap_sensor,
             drag_ok = self.drag_ok,
@@ -409,7 +351,7 @@ class COGame(Widget):
                 print('Data saving PATH: ', p)
                 print ('')
                 print ('')
-                self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+                self.filename = p+ animal_name+'_ISP_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
                 if self.in_cage:
                     self.filename = self.filename+'_cage'
 
@@ -837,7 +779,7 @@ class COGame(Widget):
 
     def finish_center_hold(self, **kwargs):
         if self.cht <= kwargs['ts']:
-            if self.reward_for_center[0]:
+            if self.reward_for_targtouch[0]:
                 self.run_small_rew()
             return True
         else:
