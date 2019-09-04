@@ -158,6 +158,8 @@ class COGame(Widget):
             if val:
                 small_rew = rew_opts[i]
                 self.reward_for_targtouch = [True, small_rew]
+        self.reward_for_center = [False, 0.]
+        self.reward_for_anytouch = [False, 0.]
 
         target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5]
         for i, val in enumerate(task_in['targ_rad']):
@@ -199,7 +201,7 @@ class COGame(Widget):
                 self.ch_timeout = targ_timeout_opts[i]
 
         self.reward_for_anytouch = False; 
-        self.skip_juice = False. 
+        self.skip_juice = False
 
         for i, (nm, val) in enumerate(animal_names_dict.items()):
             if val:
@@ -321,51 +323,49 @@ class COGame(Widget):
         print(self.reward_for_targtouch)
         print(self.reward_for_anytouch)
 
-        try:
-            if self.testing:
+        if self.testing:
+            pass
+
+        else:
+            import os
+            path = os.getcwd()
+            path = path.split('\\')
+            path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
+            path_root = ''
+            for ip in path_data:
+                path_root += ip+'/'
+            p = path_root + 'data/'
+
+            # Check if this directory exists: 
+            if os.path.exists(p):
                 pass
-
             else:
-                import os
-                path = os.getcwd()
-                path = path.split('\\')
-                path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-                path_root = ''
-                for ip in path_data:
-                    path_root += ip+'/'
-                p = path_root + 'data/'
-
-                # Check if this directory exists: 
+                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
                 if os.path.exists(p):
                     pass
                 else:
-                    p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
-                    if os.path.exists(p):
-                        pass
-                    else:
-                        os.mkdir(p)
-                        print('Making temp directory: ', p)
+                    os.mkdir(p)
+                    print('Making temp directory: ', p)
 
-                print ('')
-                print ('')
-                print('Data saving PATH: ', p)
-                print ('')
-                print ('')
-                self.filename = p+ animal_name+'_ISP_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-                if self.in_cage:
-                    self.filename = self.filename+'_cage'
+            print ('')
+            print ('')
+            print('Data saving PATH: ', p)
+            print ('')
+            print ('')
+            self.filename = p+ animal_name+'_ISP_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+            if self.in_cage:
+                self.filename = self.filename+'_cage'
 
-                pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
-                self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-                self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-                self.h5_table_row = self.h5_table.row
-                self.h5_table_row_cnt = 0
+            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+            self.h5_table_row = self.h5_table.row
+            self.h5_table_row_cnt = 0
 
                 # Note in python 3 to open pkl files: 
                 #with open('xxxx_params.pkl', 'rb') as f:
                 #    data_params = pickle.load(f)
-        except:
-            pass
+
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
@@ -498,7 +498,7 @@ class COGame(Widget):
         cursor_id[:len(self.cursor_ids)] = self.cursor_ids
         self.h5_table_row['cursor_ids'] = cursor_id
 
-        self.h5_table_row['target_pos'] = self.periph_target_position
+        # self.h5_table_row['target_pos'] = self.periph_target_position
         self.h5_table_row['time'] = time.time() - self.t0
         self.h5_table_row['cap_touch'] = self.rhtouch_sensor
         self.h5_table_row.append()
