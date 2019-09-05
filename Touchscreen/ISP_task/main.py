@@ -329,6 +329,7 @@ class COGame(Widget):
         else:
             import os
             path = os.getcwd()
+            print ('test for cwd: ', path)
             path = path.split('\\')
             path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
             path_root = ''
@@ -340,7 +341,7 @@ class COGame(Widget):
             if os.path.exists(p):
                 pass
             else:
-                p = path_root+ 'data_tmp_'+'_ISP_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
+                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
                 if os.path.exists(p):
                     pass
                 else:
