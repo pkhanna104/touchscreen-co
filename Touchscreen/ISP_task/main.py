@@ -340,7 +340,7 @@ class COGame(Widget):
             if os.path.exists(p):
                 pass
             else:
-                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
+                p = path_root+ 'data_tmp_'+'_ISP_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
                 if os.path.exists(p):
                     pass
                 else:
