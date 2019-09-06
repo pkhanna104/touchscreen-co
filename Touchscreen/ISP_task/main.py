@@ -154,7 +154,7 @@ class COGame(Widget):
 
 
         rew_opts = [.1, .3, .5, .7]
-        for i, val in enumerate(rew_in['reward']):
+        for i, val in enumerate(rew_in['small_rew']):
             if val:
                 small_rew = rew_opts[i]
                 self.reward_for_targtouch = [True, small_rew]
