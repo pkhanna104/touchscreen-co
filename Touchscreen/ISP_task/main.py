@@ -605,15 +605,15 @@ class COGame(Widget):
         return x
 
     def _start_center(self, **kwargs):
-        Window.clearcolor = (0., 0., 0., 1.)
-        self.center_target.color = (1., 1., 0., 1.)
+        Window.clearcolor = (.5, .5, .5, 1.)
+        self.center_target.color = (1., 0., 0., 1.)
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target.color = (.5, .5, .5, 1.)
         self.indicator_targ.color = (.25, .25, .25, 1.)
 
     def _start_center_hold(self, **kwargs):
-        self.center_target.color = (0., 1., 0., 1.)
+        self.center_target.color = (0.75, 0., 0., 1.)
         self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _start_targ_hold(self, **kwargs):
