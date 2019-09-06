@@ -229,7 +229,7 @@ class COGame(Widget):
             self.reward_for_targtouch)
 
 
-        self.use_white_screen = False
+        self.use_white_screen = True
         self.drag_ok = False;
         self.nudge_dist = 0.
 
