@@ -39,7 +39,7 @@ class COGame(Widget):
     # Time to wait after starting the video before getting to the center target display. 
     pre_start_vid_ts = 0.1
 
-    ITI_mean = 1.
+    ITI_mean = 2.
     ITI_std = .2
     center_target_rad = 1.5
     periph_target_rad = 1.5
@@ -60,10 +60,10 @@ class COGame(Widget):
     cursor_ids = []
 
     anytouch_prev = False
-    touch_error_timeout = 0.
-    timeout_error_timeout = 0.
-    hold_error_timeout = 0.
-    drag_error_timeout = 0.
+    touch_error_timeout = 3.
+    timeout_error_timeout = 3.
+    hold_error_timeout = 3.
+    drag_error_timeout = 3.
 
     ntargets = 4.
     target_distance = 6. 
