@@ -1,3 +1,11 @@
+"""
+190908
+1. hide side quit buttons
+2. make the default value
+3. delete the extra button which is appeared with failure
+4. change the background color as white blue and do not use BNW
+5. when monkeys fail, immediately change the background and do not show the black button
+"""
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
