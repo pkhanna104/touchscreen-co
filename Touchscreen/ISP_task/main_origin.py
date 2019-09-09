@@ -34,7 +34,7 @@ class Data(tables.IsDescription):
 
 class COGame(Widget):
     center = ObjectProperty(None)
-    #target = ObjectProperty(None)
+    target = ObjectProperty(None)
 
     # Time to wait after starting the video before getting to the center target display. 
     pre_start_vid_ts = 0.1
@@ -70,15 +70,13 @@ class COGame(Widget):
     touch = False
 
     center_target = ObjectProperty(None)
-    #periph_target = ObjectProperty(None)
+    periph_target = ObjectProperty(None)
 
     done_init = False
     prev_exit_ts = np.array([0,0])
 
     # Number of trials: 
     trial_counter = NumericProperty(0)
-    tc_text = StringProperty('')
-    total_counter = NumericProperty(0)
     #indicator_txt = StringProperty('o')
     #indicator_txt_color = ListProperty([.5, .5, .5, 1.])
 
@@ -93,7 +91,7 @@ class COGame(Widget):
     tht_param = StringProperty('')
     targ_size_param = StringProperty('')
     big_rew_time_param = StringProperty('')
-    #generatorz_param = StringProperty('')
+    generatorz_param = StringProperty('')
     nudge_text = StringProperty('')
     nudge_param = StringProperty('')
     
@@ -248,7 +246,7 @@ class COGame(Widget):
         # Initlize center target to be in the lower left corner: 
         self.center_target.move(np.array([-4.24264069, -4.24264069]))
 
-        #self.periph_target.set_size(2*self.periph_target_rad)
+        self.periph_target.set_size(2*self.periph_target_rad)
 
         ## Keep exit targets; 
         self.exit_target1.set_size(2*self.exit_rad)
@@ -259,12 +257,11 @@ class COGame(Widget):
         self.indicator_targ.move(self.indicator_pos)
         self.indicator_targ.color = (0., 0., 0., 1.)
 
-        # this scene is appeared at just before the very first trial of the task
         self.exit_target1.move(self.exit_pos)
         self.exit_pos2 = np.array([self.exit_pos[0], -1*self.exit_pos[1]])
         self.exit_target2.move(self.exit_pos2)
-        self.exit_target1.color = (.5, .5, .5, 1)
-        self.exit_target2.color = (.5, .5, .5, 1)
+        self.exit_target1.color = (.15, .15, .15, 1)
+        self.exit_target2.color = (.15, .15, .15, 1)
 
         self.center_target_position = np.array([-4.24264069, -4.24264069])
 
@@ -403,9 +400,7 @@ class COGame(Widget):
         
         if self.idle:
             self.state = 'idle_exit'
-
-            # self.trial_counter = -1
-            self.trial_counter = str(self.trial_counter)
+            self.trial_counter = -1
 
             # Set relevant params text: 
             self.cht_text = 'Center Hold Time: '
@@ -426,10 +421,10 @@ class COGame(Widget):
 
             self.targ_size_param = str(self.center_target_rad)
             self.big_rew_time_param = str(self.reward_for_targtouch[1])
-            #self.generatorz_param = self.generatorz_param2
+            self.generatorz_param = self.generatorz_param2
 
-            self.nudge_text = 'Total trials? '
-            self.nudge_param = str(self.total_counter)
+            self.nudge_text = 'Nudge 9oclock targ? '
+            self.nudge_param = str(self.nudge_dist)
         else:
             App.get_running_app().stop()
             Window.close()
@@ -553,9 +548,9 @@ class COGame(Widget):
 
     def _start_ITI(self, **kwargs):
         self.cam_trig_port.write('0'.encode())
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
+        Window.clearcolor = (0., 0., 0., 1.)
+        self.exit_target1.color = (.15, .15, .15, 1.)
+        self.exit_target2.color = (.15, .15, .15, 1.)
 
         # Set ITI, CHT, THT
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
@@ -568,8 +563,8 @@ class COGame(Widget):
             tht_min, tht_max = self.tht_type.split('-')
             self.tht = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min)            
         
-        self.center_target.color = (.8, .9, 1., 1.)
-        #self.periph_target.color = (0., 0., 0., 0.)
+        self.center_target.color = (0., 0., 0., 0.)
+        self.periph_target.color = (0., 0., 0., 0.)
         self.indicator_targ.color = (0., 0., 0., 0.)
         
     def end_ITI(self, **kwargs):
@@ -582,18 +577,16 @@ class COGame(Widget):
         self.first_target_attempt = True
 
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
-            #self.periph_target.color = (1., 0., 0., 1.)
+            self.periph_target.color = (1., 0., 0., 1.)
             self.center_target.color = (1., 0., 0., 1.)
             Window.clearcolor = (1., 0., 0., 1.)
 
             # Turn exit buttons redish:
             self.exit_target1.color = (.9, 0, 0, 1.)
             self.exit_target2.color = (.9, 0, 0, 1.)
-         
 
     def end_vid_trig(self, **kwargs):
         return kwargs['ts'] > self.pre_start_vid_ts
-    
 
 
     def rhtouch(self, **kwargs):
@@ -614,9 +607,9 @@ class COGame(Widget):
     def _start_center(self, **kwargs):
         Window.clearcolor = (.5, .5, .5, 1.)
         self.center_target.color = (1., 0., 0., 1.)
-        self.exit_target1.color = (.5, .5, .5, 1)
-        self.exit_target2.color = (.5, .5, .5, 1)
-        #self.periph_target.color = (.5, .5, .5, 1.)
+        self.exit_target1.color = (.15, .15, .15, 1)
+        self.exit_target2.color = (.15, .15, .15, 1)
+        self.periph_target.color = (.5, .5, .5, 1.)
         self.indicator_targ.color = (.25, .25, .25, 1.)
 
     def _start_center_hold(self, **kwargs):
@@ -624,54 +617,35 @@ class COGame(Widget):
         self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _start_targ_hold(self, **kwargs):
-        #self.periph_target.color = (0., 1., 0., 1.)
+        self.periph_target.color = (0., 1., 0., 1.)
         self.indicator_targ.color = (0.75, .75, .75, 1.)
 
-    # ??
     def _end_center_hold(self, **kwargs):
-        Window.clearcolor = (.8, .9, 1., 1.)
         self.center_target.color = (0., 0., 0., 1.)
 
-    #def _end_target_hold(self, **kwargs):
-        #self.periph_target.color = (0., 0., 0., 1.)
+    def _end_target_hold(self, **kwargs):
+        self.periph_target.color = (0., 0., 0., 1.)
 
     def _start_touch_error(self, **kwargs):
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.center_target.color = (.8, .9, 1., 1.)
-        #self.periph_target.color = (0., 0., 0., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
-        self.total_counter += 1
+        self.center_target.color = (0., 0., 0., 1.)
+        self.periph_target.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_timeout_error(self, **kwargs):
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.center_target.color = (.8, .9, 1., 1.)
-        #self.periph_target.color = (0., 0., 0., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
-        self.total_counter += 1
-        self.repeat = True
+        self.center_target.color = (0., 0., 0., 1.)
+        self.periph_target.color = (0., 0., 0., 1.)
+        #self.repeat = True
 
     def _start_hold_error(self, **kwargs):
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.center_target.color = (.8, .9, 1., 1.)
-        #self.periph_target.color = (0., 0., 0., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
-        self.total_counter += 1
+        self.center_target.color = (0., 0., 0., 1.)
+        self.periph_target.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_drag_error(self, **kwargs):
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.center_target.color = (.8, .9, 1., 1.)
-        #self.periph_target.color = (0., 0., 0., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
-        self.total_counter += 1
+        self.center_target.color = (0., 0., 0., 1.)
+        self.periph_target.color = (0., 0., 0., 1.)
         self.repeat = True
 
-    # ??
     def _start_target(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
         self.center_target.color = (0., 0., 0., 0.)
@@ -682,11 +656,11 @@ class COGame(Widget):
             print(self.periph_target_position)
             print(self.target_index)
 
-        #self.periph_target.move(self.periph_target_position)
-        #self.periph_target.color = (1., 1., 0., 1.)
+        self.periph_target.move(self.periph_target_position)
+        self.periph_target.color = (1., 1., 0., 1.)
         self.repeat = False
-        self.exit_target1.color = (.5, .5, .5, 1)
-        self.exit_target2.color = (.5, .5, .5, 1)
+        self.exit_target1.color = (.15, .15, .15, 1)
+        self.exit_target2.color = (.15, .15, .15, 1)
         self.indicator_targ.color = (.25, .25, .25, 1.)
         if self.first_target_attempt:
             self.first_target_attempt_t0 = time.time();
@@ -694,12 +668,10 @@ class COGame(Widget):
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
-        self.total_counter += 1
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.center_target.color = (.8, .9, 1., 1.)
-        #self.periph_target.color = (.8, .9, 1., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
+        Window.clearcolor = (1., 1., 1., 1.)
+        self.periph_target.color = (1., 1., 1., 1.)
+        self.exit_target1.color = (1., 1., 1., 1.)
+        self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
         self.cnts_in_rew = 0
         self.indicator_targ.color = (1., 1., 1., 1.)

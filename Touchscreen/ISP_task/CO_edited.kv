@@ -23,7 +23,7 @@
                     Color: 
                         rgb: 1,1,0
 
-            BoxLayout 
+            BoxLayout       
                 id: top
                 orientation: 'horizontal'
                 canvas:
@@ -43,14 +43,12 @@
            
                 Label: 
                     text: '15 sec'
-
                 CheckBox:
                     group: 'tt'
                     id: tt_15_sec
             
                 Label: 
                     text: '30 sec'
-
                 CheckBox:
                     group: 'tt'
                     id: tt_30_sec
@@ -58,19 +56,16 @@
 
                 Label: 
                     text: '45 sec'
-
                 CheckBox:
                     group: 'tt'
                     id: tt_45_sec
 
                 Label: 
                     text: '60 sec'
-
                 CheckBox:
                     group: 'tt'
                     id: tt_60_sec
             
-
                 Label:
                     text: ''
                     fontsize: 50
@@ -79,8 +74,7 @@
                     text: ''
                     fontsize: 50
 
-
-            BoxLayout
+            BoxLayout       
                 id: starting2
                 orientation: 'horizontal'
                 Label:
@@ -100,7 +94,6 @@
                     text: 'Donut'
                     fontsize: 28
                     halign: 'center'                        
-                
                 CheckBox: 
                     group: 'check'
                     id: chk_h
@@ -110,7 +103,6 @@
                     text: 'Sandpiper'
                     fontsize: 28
                     halign: 'center'                        
-                
                 CheckBox: 
                     group: 'check'
                     id: chk_sand
@@ -119,7 +111,6 @@
                     text: 'Sabotage'
                     fontsize: 28
                     halign: 'center'                        
-                
                 CheckBox: 
                     group: 'check'
                     id: chk_sabo
@@ -131,7 +122,7 @@
                     text: ''
                     fontsize: 50
 
-            BoxLayout 
+            BoxLayout       
                 id: small_rew
                 orientation: 'horizontal'
                 canvas:
@@ -155,29 +146,25 @@
 
                 Label: 
                     text: '0.1 sec'
-
                 CheckBox:
                     id: small_rew_pt1_sec
-                    group: 'small_rew'
-
-                Label: 
-                    text: '0.3 sec'
-
-                CheckBox:
-                    id: small_rew_pt3_sec
                     group: 'small_rew'
                     active: True
 
                 Label: 
-                    text: '0.5 sec'
+                    text: '0.3 sec'
+                CheckBox:
+                    id: small_rew_pt3_sec
+                    group: 'small_rew'
 
+                Label: 
+                    text: '0.5 sec'
                 CheckBox:
                     id: small_rew_pt5_sec
                     group: 'small_rew'
 
                 Label: 
                     text: '0.7 sec'
-
                 CheckBox:
                     id: small_rew_pt7_sec
                     group: 'small_rew'
@@ -189,7 +176,7 @@
                     text: ''
                     fontsize: 50
             
-            BoxLayout 
+            BoxLayout       
                 id: big_rew
                 orientation: 'horizontal'
                 Label:
@@ -211,14 +198,12 @@
 
                 Label: 
                     text: 'Reward 50% '
-
                 CheckBox:
                     id: rew_50
                     group: 'rew_var'
 
                 Label: 
                     text: 'Reward 33% w/ 10% doubled'
-
                 CheckBox:
                     id: rew_30
                     group: 'rew_var'
@@ -226,11 +211,12 @@
                 Label:
                     text: ''
                     fontsize: 50
+
                 Label:
                     text: ''
                     fontsize: 50
 
-            BoxLayout:
+            BoxLayout:      
                 id: params:
                 orientation: 'horizontal'
                 canvas:
@@ -280,21 +266,16 @@
 
                 Label: 
                     text: '1.0 cm'
-
                 CheckBox:
                     id: targ_rad_10
                     group: 'targ_cm'
+
                 Label: 
                     text: '1.5 cm'
-
                 CheckBox:
                     id: targ_rad_15
                     group: 'targ_cm'
                     active: True
-                                        
-                Label:
-                    text: ''
-                    fontsize: 50
 
                 Label:
                     text: ''
@@ -302,8 +283,11 @@
                 Label:
                     text: ''
                     fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
 
-            BoxLayout:
+            BoxLayout:      
                 id: params:
                 orientation: 'horizontal'
                 Label:
@@ -325,7 +309,6 @@
                 Label:
                     text: 'Rand: .4-.6'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_4_6
                     group: 'chold_time'
@@ -334,7 +317,6 @@
                 Label:
                     text: 'Rand: .4-.7'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_4_7
                     group: 'chold_time'
@@ -343,25 +325,20 @@
                 Label:
                     text: 'Rand: .5-.8'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_5_8
                     group: 'chold_time'
 
-
                 Label:
                     text: 'Rand: .6-1.0'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_6_10
                     group: 'chold_time'
 
-
                 Label:
                     text: 'Rand: .7-1.3'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_7_13
                     group: 'chold_time'
@@ -369,7 +346,6 @@
                 Label:
                     text: 'Rand: .8-1.5'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_8_15
                     group: 'chold_time'
@@ -377,16 +353,13 @@
                 Label:
                     text: 'Rand: .9-1.7'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_9_17
                     group: 'chold_time'
 
-
                 Label:
                     text: 'Rand: 1.0-1.7'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_10_17
                     group: 'chold_time'
@@ -394,30 +367,24 @@
                 Label:
                     text: 'Rand: 1.2-2.0'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_12_20
                     group: 'chold_time'
 
-
                 Label:
                     text: 'Rand: 1.5-2.5'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_15_25
                     group: 'chold_time'
 
-
                 Label:
                     text: 'Rand: 2.-3.'
                     fontsize: 50
-
                 CheckBox:
                     id: hold_20_30
                     group: 'chold_time'
 
-
                 Label:
                     text: ''
                     fontsize: 50
@@ -428,7 +395,7 @@
                     text: ''
                     fontsize: 50
 
-            BoxLayout:
+            BoxLayout:      
                 id: test
                 orientation: 'horizontal'
                 Label:
@@ -486,7 +453,6 @@
                     text: ''
                     fontsize: 50
 
-
             Button:
                 text: 'Play Single Target Holding Game'
                 halign: 'center'
@@ -496,19 +462,19 @@
                 on_release: 
                     root.current = 'splash_start'
                     splash.init(
+                    dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]),
+
                     dict(donu=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), 
                     
                     dict(reward=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active, small_rew_pt7_sec.active]), 
-                    
+
+                    dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
+
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active]), 
 
                     dict(hold=[hold_4_6.active, hold_4_7.active, hold_5_8.active, hold_6_10.active, hold_7_13.active, hold_8_15.active, hold_9_17.active, hold_10_17.active, hold_12_20.active, hold_15_25.active, hold_20_30.active]),
                     
-                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
-                    
-                    dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
-                    
-                    dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]))
+                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]))
 
             Label:
                 text: ''
@@ -596,6 +562,7 @@
 
 <COGame>:
     center_target: target_c
+    periph_target: target_p
     exit_target1: target_e1
     exit_target2: target_e2
     indicator_targ: indicator
@@ -606,6 +573,8 @@
     Target:
         id: target_c
         
+    Target: 
+        id: target_p
 
     Target:
         id: target_e1
@@ -647,6 +616,20 @@
         center_x: root.width * 5/8
         top: root.top - 270
         text: root.tht_param
+
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 370
+        text: root.generatorz_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 370
+        text: root.generatorz_param
 
 
     Label:
