@@ -5,6 +5,7 @@
 3. delete the extra button which is appeared with failure
 4. change the background color as white blue and do not use BNW
 5. when monkeys fail, immediately change the background and do not show the black button
+6. change bg color during ISI
 """
 from kivy.app import App
 from kivy.core.window import Window
@@ -561,9 +562,9 @@ class COGame(Widget):
 
     def _start_ITI(self, **kwargs):
         self.cam_trig_port.write('0'.encode())
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
+        Window.clearcolor = (.62, .32, 0.17, 1.)
+        self.exit_target1.color = (.62, .32, 0.17, 1.)
+        self.exit_target2.color = (.62, .32, 0.17, 1.)
 
         # Set ITI, CHT, THT
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
@@ -576,7 +577,7 @@ class COGame(Widget):
             tht_min, tht_max = self.tht_type.split('-')
             self.tht = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min)            
         
-        self.center_target.color = (.8, .9, 1., 1.)
+        self.center_target.color = (.62, .32, 0.17, 1.)
         #self.periph_target.color = (0., 0., 0., 0.)
         self.indicator_targ.color = (0., 0., 0., 0.)
         
@@ -644,38 +645,38 @@ class COGame(Widget):
         #self.periph_target.color = (0., 0., 0., 1.)
 
     def _start_touch_error(self, **kwargs):
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.center_target.color = (.8, .9, 1., 1.)
+        Window.clearcolor = (.62, .32, 0.17, 1.)
+        self.center_target.color = (.62, .32, 0.17, 1.)
         #self.periph_target.color = (0., 0., 0., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
+        self.exit_target1.color = (.62, .32, 0.17, 1.)
+        self.exit_target2.color = (.62, .32, 0.17, 1.)
         self.total_counter += 1
         self.repeat = True
 
     def _start_timeout_error(self, **kwargs):
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.center_target.color = (.8, .9, 1., 1.)
+        Window.clearcolor = (.62, .32, 0.17, 1.)
+        self.center_target.color = (.62, .32, 0.17, 1.)
         #self.periph_target.color = (0., 0., 0., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
+        self.exit_target1.color = (.62, .32, 0.17, 1.)
+        self.exit_target2.color = (.62, .32, 0.17, 1.)
         self.total_counter += 1
         self.repeat = True
 
     def _start_hold_error(self, **kwargs):
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.center_target.color = (.8, .9, 1., 1.)
+        Window.clearcolor = (.62, .32, 0.17, 1.)
+        self.center_target.color = (.62, .32, 0.17, 1.)
         #self.periph_target.color = (0., 0., 0., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
+        self.exit_target1.color = (.62, .32, 0.17, 1.)
+        self.exit_target2.color = (.62, .32, 0.17, 1.)
         self.total_counter += 1
         self.repeat = True
 
     def _start_drag_error(self, **kwargs):
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.center_target.color = (.8, .9, 1., 1.)
+        Window.clearcolor = (.62, .32, 0.17, 1.)
+        self.center_target.color = (.62, .32, 0.17, 1.)
         #self.periph_target.color = (0., 0., 0., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
+        self.exit_target1.color = (.62, .32, 0.17, 1.)
+        self.exit_target2.color = (.62, .32, 0.17, 1.)
         self.total_counter += 1
         self.repeat = True
 
@@ -703,11 +704,11 @@ class COGame(Widget):
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
         self.total_counter += 1
-        Window.clearcolor = (.8, .9, 1., 1.)
-        self.center_target.color = (.8, .9, 1., 1.)
+        Window.clearcolor = (.62, .32, 0.17, 1.)
+        self.center_target.color = (.62, .32, 0.17, 1.)
         #self.periph_target.color = (.8, .9, 1., 1.)
-        self.exit_target1.color = (.8, .9, 1., 1.)
-        self.exit_target2.color = (.8, .9, 1., 1.)
+        self.exit_target1.color = (.62, .32, 0.17, 1.)
+        self.exit_target2.color = (.62, .32, 0.17, 1.)
         self.rew_cnt = 0
         self.cnts_in_rew = 0
         self.indicator_targ.color = (1., 1., 1., 1.)
