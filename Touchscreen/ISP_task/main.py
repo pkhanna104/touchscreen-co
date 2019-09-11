@@ -150,7 +150,7 @@ class COGame(Widget):
 
 # dict(test=[False, True, False]), 
 
-# dict(hold=[hold_6_10.active, hold_7_11.active, hold_8_12.active, hold_9_14.active, hold_10_16.active, hold_12_18.active, hold_14_20.active, hold_15_25.active, hold_16_23.active, hold_20_30.active]),
+# dict(hold=[hold_6_10.active, hold_7_11.active, hold_8_12.active, hold_9_14.active, hold_10_16.active, hold_12_18.active, hold_14_20.active, hold_15_23.active, hold_16_25.active, hold_20_30.active]),
 
 # dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
 
@@ -188,7 +188,7 @@ class COGame(Widget):
         self.testing = False; 
         self.in_cage = False; 
 
-        holdz = ['.6-1.0', '.7-1.1', '.8-1.2', '.9-1.4', '1.0-1.6', '1.2-1.8', '1.4-2.0', '1.5-2.5', '1.6-2.3', '2.0-3.0']
+        holdz = ['.6-1.0', '.7-1.1', '.8-1.2', '.9-1.4', '1.0-1.6', '1.2-1.8', '1.4-2.0', '1.5-2.3', '1.6-2.5', '2.0-3.0']
         self.tht_type = None
         self.cht_type = None; 
 
