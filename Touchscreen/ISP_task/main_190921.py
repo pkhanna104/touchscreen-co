@@ -321,7 +321,7 @@ class COGame(Widget):
         #     if val:
         #         self.target_timeout_time = targ_timeout_opts[i]
         #         self.ch_timeout = targ_timeout_opts[i]
-        # 
+		# 
         # self.reward_for_anytouch = False; 
         # self.skip_juice = False
         # 
@@ -346,7 +346,7 @@ class COGame(Widget):
         self.center_target.set_size(2*self.center_target_rad)
         self.center_target.move(np.array([-4.24264069, -2.5]))
 
-        # Initlize peripheral targets to be in 2 and 4 o'clock from the center target: 
+		# Initlize peripheral targets to be in 2 and 4 o'clock from the center target: 
         self.periph_target1.set_size(2*self.periph_target_rad)
         self.periph_target2.set_size(2*self.periph_target_rad)
         self.periph_target1.move(np.array([0, -1.]))
@@ -455,50 +455,50 @@ class COGame(Widget):
         # print(self.reward_for_anytouch)
 
         try:
-            if self.testing:
-                pass
-            else:
-                import os
-                path = os.getcwd()
-                print ('test for cwd: ', path)
-                path = path.split('\\')
-                path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-                path_root = ''
-                for ip in path_data:
-                    path_root += ip+'/'
-                p = path_root + 'data/'
+        	if self.testing:
+	            pass
+	        else:
+	            import os
+	            path = os.getcwd()
+	            print ('test for cwd: ', path)
+	            path = path.split('\\')
+	            path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
+	            path_root = ''
+	            for ip in path_data:
+	                path_root += ip+'/'
+	            p = path_root + 'data/'
 
-                # Check if this directory exists: 
-                if os.path.exists(p):
-                    pass
-                else:
-                    p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
-                    if os.path.exists(p):
-                        pass
-                    else:
-                        os.mkdir(p)
-                        print('Making temp directory: ', p)
+	            # Check if this directory exists: 
+	            if os.path.exists(p):
+	                pass
+	            else:
+	                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
+	                if os.path.exists(p):
+	                    pass
+	                else:
+	                    os.mkdir(p)
+	                    print('Making temp directory: ', p)
 
-                print ('')
-                print ('')
-                print('Data saving PATH: ', p)
-                print ('')
-                print ('')
-                self.filename = p+ animal_name+'_ISP_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-                if self.in_cage:
-                    self.filename = self.filename+'_cage'
+	            print ('')
+	            print ('')
+	            print('Data saving PATH: ', p)
+	            print ('')
+	            print ('')
+	            self.filename = p+ animal_name+'_ISP_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+	            if self.in_cage:
+	                self.filename = self.filename+'_cage'
 
-                pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
-                self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-                self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-                self.h5_table_row = self.h5_table.row
-                self.h5_table_row_cnt = 0
+	            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+	            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+	            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+	            self.h5_table_row = self.h5_table.row
+	            self.h5_table_row_cnt = 0
 
-                    # Note in python 3 to open pkl files: 
-                    #with open('xxxx_params.pkl', 'rb') as f:
-                    #    data_params = pickle.load(f)
+	                # Note in python 3 to open pkl files: 
+	                #with open('xxxx_params.pkl', 'rb') as f:
+	                #    data_params = pickle.load(f)
         except:
-            pass
+        	pass
 
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
@@ -694,9 +694,9 @@ class COGame(Widget):
 
         # Set ITI, CHT, THT
         if self.reward_for_targtouch[0]:
-            self.ITI = np.random.random()*self.ITI_std + self.ITI_s
+        	self.ITI = np.random.random()*self.ITI_std + self.ITI_s
         else:
-            self.ITI = np.random.random()*self.ITI_std + self.ITI_f
+        	self.ITI = np.random.random()*self.ITI_std + self.ITI_f
 
         if type(self.cht_type) is str:
             cht_min, cht_max = self.cht_type.split('-')
@@ -758,9 +758,9 @@ class COGame(Widget):
     def _start_center(self, **kwargs):
         print(self.stims)
         if self.stims == 'stim_on':
-            bgcolor = (0., 0., 0., 1.)
+        	bgcolor = (0., 0., 0., 1.)
         elif self.stims == 'stim_off':
-            bgcolor = (1., 1., 1., 1.)
+        	bgcolor = (1., 1., 1., 1.)
 
         Window.clearcolor = bgcolor
         self.center_target.color = (1., 0., 0., 1.)
@@ -778,13 +778,13 @@ class COGame(Widget):
         bgcolor = (.5, .5, .5, 1.)
         Window.clearcolor = bgcolor
         if self.stims == 'stim_on':
-            tgcolor = (0.2, 0.2, 0.2, 1.)
-            self.periph_target1.color = tgcolor
-            self.periph_target2.color = bgcolor
+        	tgcolor = (0.2, 0.2, 0.2, 1.)
+        	self.periph_target1.color = tgcolor
+        	self.periph_target2.color = bgcolor
         elif self.stims == 'stim_off':
-            tgcolor = (0.8, 0.8, 0.8, 1.)
-            self.periph_target1.color = bgcolor
-            self.periph_target2.color = tgcolor
+        	tgcolor = (0.8, 0.8, 0.8, 1.)
+        	self.periph_target1.color = bgcolor
+        	self.periph_target2.color = tgcolor
         self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     # ??
@@ -845,13 +845,13 @@ class COGame(Widget):
         Window.clearcolor = bgcolor
         self.center_target.color = bgcolor
         if self.stims == 'stim_on':
-            tgcolor = (0., 0., 0., 1.)
-            self.periph_target1.color = tgcolor
-            self.periph_target2.color = bgcolor
+        	tgcolor = (0., 0., 0., 1.)
+        	self.periph_target1.color = tgcolor
+        	self.periph_target2.color = bgcolor
         elif self.stims == 'stim_off':
-            tgcolor = (1., 1., 1., 1.)
-            self.periph_target1.color = bgcolor
-            self.periph_target2.color = tgcolor
+        	tgcolor = (1., 1., 1., 1.)
+        	self.periph_target1.color = bgcolor
+        	self.periph_target2.color = tgcolor
         
         if self.repeat is False:
             self.periph_target1_position = np.array([0, -1.])
@@ -1008,18 +1008,18 @@ class COGame(Widget):
 
     def touch_target(self, **kwargs):
         if self.drag_ok:
-            if self.stims == 'stim_on':
-                return self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad)
-            elif self.stims == 'stim_off':
-                return self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad)
+        	if self.stims == 'stim_on':
+        		return self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad)
+        	elif self.stims == 'stim_off':
+        		return self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad)
 
         else:
-            if self.stims == 'stim_on':
-                return np.logical_and(self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad),
-                    self.check_if_started_in_targ(self.periph_target1_position, self.periph_target_rad))
-            elif self.stims == 'stim_off':
-                return np.logical_and(self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad),
-                    self.check_if_started_in_targ(self.periph_target2_position, self.periph_target_rad))
+        	if self.stims == 'stim_on':
+	            return np.logical_and(self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad),
+	                self.check_if_started_in_targ(self.periph_target1_position, self.periph_target_rad))
+        	elif self.stims == 'stim_off':
+	            return np.logical_and(self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad),
+	                self.check_if_started_in_targ(self.periph_target2_position, self.periph_target_rad))
 
     def target_timeout(self, **kwargs):
         #return kwargs['ts'] > self.target_timeout_time
@@ -1031,18 +1031,18 @@ class COGame(Widget):
         return self.tht <= kwargs['ts']
 
     def early_leave_target_hold(self, **kwargs):
-        if self.stims == 'stim_on':
-            return not self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad)
-        elif self.stims == 'stim_off':
-            return not self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad)
+    	if self.stims == 'stim_on':
+    		return not self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad)
+    	elif self.stims == 'stim_off':
+    		return not self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad)
 
     def targ_drag_out(self, **kwargs):
         touch = self.touch
         self.touch = True
         if self.stims == 'stim_on':
-            stay_in = self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad)
+        	stay_in = self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad)
         elif self.stims == 'stim_off':
-            stay_in = self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad)
+        	stay_in = self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad)
         self.touch = touch
         return not stay_in
 
