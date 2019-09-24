@@ -427,7 +427,7 @@ class COGame(Widget):
             self.stim_port = serial.Serial(port='COM7', baudrate=115200)
             time.sleep(4.)
             # Say hello: 
-            self.stim_port.write('b'.encode())
+            self.stim_port.write('c'.encode())
         except:
             pass
 
