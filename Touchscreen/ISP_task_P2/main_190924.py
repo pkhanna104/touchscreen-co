@@ -185,9 +185,9 @@ class COGame(Widget):
             self.stim_order = np.random.permutation(1000)
             self.stim_order = self.stim_order%2
         elif self.stims == 'stim_on':
-            self.stim_order = np.ones((1000,), dtype=int)
+        	self.stim_order = np.ones((1000,), dtype=int)
         elif self.stims == 'stim_off':
-            self.stim_order = np.zeros((1000,), dtype=int)
+        	self.stim_order = np.zeros((1000,), dtype=int)
 
         # if stims==['stim_on']:
         #     self.stims = 'on'
@@ -763,9 +763,9 @@ class COGame(Widget):
 
     def _start_center(self, **kwargs):
         if self.stim_order[self.total_counter] == 0:
-            self.stims = 'stim_off'
+        	self.stims = 'stim_off'
         elif self.stim_order[self.total_counter] == 1:
-            self.stims = 'stim_on'
+        	self.stims = 'stim_on'
         print(self.stims)
         # if self.stims == 'stim_on':
         #     bgcolor = (0., 0., 0., 1.)
@@ -783,10 +783,10 @@ class COGame(Widget):
     def _start_center_hold(self, **kwargs):
         print("----- Start to push the center button")
         if self.stims == 'stim_on':
-            self.stim_port.write('1'.encode())
-            print("---------- Stim Start !")
+        	self.stim_port.write('1'.encode())
+        	print("---------- Stim Start !")
         elif self.stims == 'stim_off':
-            print("---------- No Stim Start !")
+        	print("---------- No Stim Start !")
         self.center_target.color = (0.70, 0., 0., 1.)
         self.indicator_targ.color = (0.75, .75, .75, 1.)
 
@@ -806,10 +806,10 @@ class COGame(Widget):
     # ??: It passed quickly but not skipped. It exist!
     def _end_center_hold(self, **kwargs):
         if self.stims == 'stim_on':
-            self.stim_port.write('0'.encode())
-            print("---------- Stim Off !")
+        	self.stim_port.write('0'.encode())
+        	print("---------- Stim Off !")
         elif self.stims == 'stim_off':
-            print("---------- No Stim Off !")
+        	print("---------- No Stim Off !")
         Window.clearcolor = (.8, .9, 1., 1.)
         self.center_target.color = (0., 0., 0., 1.)
 
@@ -819,10 +819,10 @@ class COGame(Widget):
 
     def _start_touch_error(self, **kwargs):
         if self.stims == 'stim_on':
-            self.stim_port.write('er'.encode())
-            print("---------- Stim Error ! : start touch error")
+        	self.stim_port.write('er'.encode())
+        	print("---------- Stim Error ! : start touch error")
         elif self.stims == 'stim_off':
-            print("---------- No Stim Error ! : start touch error")
+        	print("---------- No Stim Error ! : start touch error")
         bgcolor = (.62, .32, 0.17, 1.)
         Window.clearcolor = bgcolor
         self.center_target.color = bgcolor
@@ -835,10 +835,10 @@ class COGame(Widget):
 
     def _start_timeout_error(self, **kwargs):
         if self.stims == 'stim_on':
-            self.stim_port.write('er'.encode())
-            print("---------- Stim Error ! : start timeout error")
+        	self.stim_port.write('er'.encode())
+        	print("---------- Stim Error ! : start timeout error")
         elif self.stims == 'stim_off':
-            print("---------- No Stim Error ! : start timeout error")
+        	print("---------- No Stim Error ! : start timeout error")
         bgcolor = (.62, .32, 0.17, 1.)
         Window.clearcolor = bgcolor
         self.center_target.color = bgcolor
@@ -851,10 +851,10 @@ class COGame(Widget):
 
     def _start_hold_error(self, **kwargs):
         if self.stims == 'stim_on':
-            self.stim_port.write('er'.encode())
-            print("---------- Stim Error ! : start hold error")
+        	self.stim_port.write('er'.encode())
+        	print("---------- Stim Error ! : start hold error")
         elif self.stims == 'stim_off':
-            print("---------- No Stim Error ! : start hold error")
+        	print("---------- No Stim Error ! : start hold error")
         bgcolor = (.62, .32, 0.17, 1.)
         Window.clearcolor = bgcolor
         self.center_target.color = bgcolor
@@ -867,10 +867,10 @@ class COGame(Widget):
 
     def _start_drag_error(self, **kwargs):
         if self.stims == 'stim_on':
-            self.stim_port.write('er'.encode())
-            print("---------- Stim Error ! : start drag error")
+        	self.stim_port.write('er'.encode())
+        	print("---------- Stim Error ! : start drag error")
         elif self.stims == 'stim_off':
-            print("---------- No Stim Error ! : start drag error")
+        	print("---------- No Stim Error ! : start drag error")
         bgcolor = (.62, .32, 0.17, 1.)
         Window.clearcolor = bgcolor
         self.center_target.color = bgcolor
