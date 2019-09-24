@@ -346,8 +346,8 @@ class COGame(Widget):
         # Initlize peripheral targets to be in 2 and 4 o'clock from the center target: 
         self.periph_target1.set_size(2*self.periph_target_rad)
         self.periph_target2.set_size(2*self.periph_target_rad)
-        self.periph_target1.move(np.array([0, -1.]))
-        self.periph_target2.move(np.array([0, -4.]))
+        self.periph_target1.move(np.array([0, 0]))
+        self.periph_target2.move(np.array([0, -3.]))
 
         ## Keep exit targets; 
         self.exit_target1.set_size(2*self.exit_rad)
@@ -371,8 +371,8 @@ class COGame(Widget):
         self.repeat = False
 
         self.center_target_position = np.array([-4.24264069, -2.5])
-        self.periph_target1_position = np.array([0, -1.])
-        self.periph_target2_position = np.array([0, -4.])
+        self.periph_target1_position = np.array([0, 0])
+        self.periph_target2_position = np.array([0, -3.])
 
         self.FSM = dict()
         self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
@@ -425,9 +425,9 @@ class COGame(Widget):
         ### Initialize the stim trigger
         try:
             self.stim_port = serial.Serial(port='COM7', baudrate=115200)
-            time.sleep(4.)
+            time.sleep(1.)
             # Say hello: 
-            self.stim_port.write('c'.encode())
+            # self.stim_port.write('c'.encode())
         except:
             pass
 
