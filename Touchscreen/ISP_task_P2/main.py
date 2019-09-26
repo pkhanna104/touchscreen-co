@@ -895,8 +895,8 @@ class COGame(Widget):
             self.periph_target2.color = tgcolor
         
         if self.repeat is False:
-            self.periph_target1_position = np.array([0, -1.])
-            self.periph_target2_position = np.array([0, -4.])
+            self.periph_target1_position = np.array([0, 0.])
+            self.periph_target2_position = np.array([0, -3.])
             self.target_index += 1
             print(self.periph_target1_position)
             print(self.periph_target2_position)
