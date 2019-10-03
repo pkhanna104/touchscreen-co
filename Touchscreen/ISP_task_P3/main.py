@@ -1073,6 +1073,7 @@ class COGame(Widget):
     def finish_center_hold(self, **kwargs):
         if self.cht <= kwargs['ts']:
             if self.stims == 'stim_on':
+                # print('finish_center_hold?')
                 self.stim_port.write('0'.encode())
             if self.reward_for_targtouch[0]:
                 self.run_small_rew()
@@ -1083,8 +1084,9 @@ class COGame(Widget):
         return True
 
     def early_leave_center_hold(self, **kwargs):
-        if self.stims == 'stim_on':
-            self.stim_port.write('0'.encode())        
+        # if self.stims == 'stim_on':
+        #     print('early_leave_center_hold?')
+        #     self.stim_port.write('0'.encode())        
         return not self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad)
         
     # def center_drag_out(self, **kwargs):
