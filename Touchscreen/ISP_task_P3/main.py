@@ -1065,8 +1065,9 @@ class COGame(Widget):
                 self.check_if_started_in_targ(self.center_target_position, self.center_target_rad))
 
     def center_timeout(self, **kwargs):
-        if self.stims == 'stim_on':
-            self.stim_port.write('0'.encode())
+        # if self.stims == 'stim_on':
+            # print('center_timeout?')
+            # self.stim_port.write('0'.encode())
         return kwargs['ts'] > self.ch_timeout
 
     def finish_center_hold(self, **kwargs):
