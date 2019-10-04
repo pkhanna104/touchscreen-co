@@ -892,9 +892,11 @@ class COGame(Widget):
             self.periph_target1.color = tgcolor
             self.periph_target1_BE.color = tgbecolor
             self.periph_target2.color = bgcolor
+            self.periph_target2_BE.color = bgcolor
         elif self.stims == 'stim_off':
             tgcolor = (0.8, 0.8, 0.8, 1.)
             self.periph_target1.color = bgcolor
+            self.periph_target1_BE.color = bgcolor
             self.periph_target2.color = tgcolor
             self.periph_target2_BE.color = tgbecolor
         self.indicator_targ.color = (0.75, .75, .75, 1.)
