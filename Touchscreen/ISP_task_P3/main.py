@@ -363,7 +363,7 @@ class COGame(Widget):
         # Initlize peripheral targets to be in 2 and 4 o'clock from the center target: 
         self.periph_target1.set_size(2*self.periph_target_rad)
         self.periph_target2.set_size(2*self.periph_target_rad)
-        self.periph_target1_pos = np.array([-2.51, 1.5]) 
+        self.periph_target1_pos = np.array([-1.65, 1]) 
         self.periph_target2_pos = np.array([0, -1.5]) 
         self.periph_target1.move(self.periph_target1_pos)
         self.periph_target2.move(self.periph_target2_pos)
