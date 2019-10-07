@@ -12,6 +12,7 @@
 1. Roll back to the previous target1 position
 2. Add bad noise for the error
 3. Add some error information in the end screen
+4. Adjust target positions
 """
 
 from kivy.app import App
@@ -106,9 +107,9 @@ class COGame(Widget):
     tc_text = StringProperty('')
     total_counter = NumericProperty(0)
 
-    center_error_counter
-    wrong_target_counter
-    target_error_counter
+    center_error_counter = NumericProperty(0)
+    wrong_target_counter = NumericProperty(0)
+    target_error_counter = NumericProperty(0)
     #indicator_txt = StringProperty('o')
     #indicator_txt_color = ListProperty([.5, .5, .5, 1.])
 
@@ -124,8 +125,18 @@ class COGame(Widget):
     targ_size_param = StringProperty('')
     big_rew_time_param = StringProperty('')
     # generatorz_param = StringProperty('')
-    nudge_text = StringProperty('')
-    nudge_param = StringProperty('')
+    tdbt_text = StringProperty('')
+    tdbt_param = StringProperty('')
+
+    total_counter_text = StringProperty('')
+    total_counter_param = StringProperty('')
+
+    center_error_counter_text = StringProperty('')
+    center_error_counter_param = StringProperty('')
+    wrong_target_counter_text = StringProperty('')
+    wrong_target_counter_param = StringProperty('')
+    target_error_counter_text = StringProperty('')
+    target_error_counter_param = StringProperty('')
 
     def on_touch_down(self, touch):
         #handle many touchs:
@@ -382,9 +393,9 @@ class COGame(Widget):
         self.periph_target1_BE.set_size(.5)
         self.periph_target2.set_size(2*self.periph_target_rad)
         self.periph_target2_BE.set_size(.5)
-        self.periph_target1_pos = np.array([-2.51, 1.5])
+        self.periph_target1_pos = np.array([-3.5, 3])
         # self.periph_target1_pos = np.array([-1.65, 1])
-        self.periph_target2_pos = np.array([0, -1.5])
+        self.periph_target2_pos = np.array([1, -0.68])
         self.periph_target1.move(self.periph_target1_pos)
         self.periph_target2.move(self.periph_target2_pos)
         self.periph_target1_BE.move(self.periph_target1_pos)
@@ -610,9 +621,18 @@ class COGame(Widget):
             self.targ_size_param = str(self.center_target_rad)
             self.big_rew_time_param = str(self.reward_for_targtouch[1])
             # self.generatorz_param = self.generatorz_param2
+            self.tdbt_text = 'Time Diff between Targets'
+            self.tdbt_param = str(self.tdbt)
 
-            self.nudge_text = 'Total trials? '
-            self.nudge_param = str(self.total_counter)
+            self.total_counter_text = 'Total trials? '
+            self.total_counter_param = str(self.total_counter)
+            self.center_error_counter_text = 'Start Button Errors? '
+            self.center_error_counter_param = str(self.center_error_counter)
+            self.wrong_target_counter_text = 'Wrong Target Errors? '
+            self.wrong_target_counter_param = str(self.wrong_target_counter)
+            self.target_error_counter_text = 'Target Hold/Drag Errors? '
+            self.target_error_counter_param = str(self.target_error_counter)
+
         else:
             App.get_running_app().stop()
             Window.close()
@@ -949,7 +969,7 @@ class COGame(Widget):
         self.periph_target2_BE.color = bgcolor
         self.exit_target1.color = bgcolor
         self.exit_target2.color = bgcolor
-        self.total_counter += 1
+        self.total_counter += 1     
         self.repeat = True
 
     def _start_hold_error(self, **kwargs):
@@ -966,6 +986,8 @@ class COGame(Widget):
         self.exit_target1.color = bgcolor
         self.exit_target2.color = bgcolor
         self.total_counter += 1
+        if self.prev_state == 'center_hold':
+            self.center_error_counter += 1
         self.repeat = True
 
     def _start_target_error(self, **kwargs):
@@ -982,11 +1004,12 @@ class COGame(Widget):
         self.periph_target2_BE.color = bgcolor
         self.exit_target1.color = bgcolor
         self.exit_target2.color = bgcolor
-        # self.total_counter += 1
+        self.wrong_target_counter += 1
         self.repeat = True
 
     def _start_drag_error(self, **kwargs):
-        print("-------------X- Drag Error !")
+        if self.prev_state == 'hold_error':
+            print("-------------X- Drag Error !")
         if self.stims == 'stim_on':
             self.stim_port.write('er'.encode())
         bgcolor = (.62, .32, 0.17, 1.)
@@ -998,7 +1021,8 @@ class COGame(Widget):
         self.periph_target2_BE.color = bgcolor
         self.exit_target1.color = bgcolor
         self.exit_target2.color = bgcolor
-        # self.total_counter += 1
+        if self.prev_state == 'hold_error':
+            self.target_error_counter += 1
         self.repeat = True
 
     def _start_reward(self, **kwargs):
