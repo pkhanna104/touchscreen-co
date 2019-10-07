@@ -4,9 +4,14 @@
 2. Add time difference between two targets
 3. Some minor changes
 
-191004
+191004-1
 1. Move the position of target1 for Sandpiper
 2. Make some bullseye for Sandpiper
+
+191004-2
+1. Roll back to the previous target1 position
+2. Add bad noise for the error
+3. Add some error information in the end screen
 """
 
 from kivy.app import App
@@ -79,6 +84,7 @@ class COGame(Widget):
     touch_error_timeout = 3.
     timeout_error_timeout = 3.
     hold_error_timeout = 3.
+    target_error_timeout = 3.
     drag_error_timeout = 3.
 
     ntargets = 2.
@@ -357,6 +363,7 @@ class COGame(Widget):
 
         # Preload sounds: 
         self.reward1 = SoundLoader.load('reward1.wav')
+        self.wrong = SoundLoader.load('wrong.wav')
 
         self.state = 'ITI'
         self.state_start = time.time()
@@ -371,7 +378,8 @@ class COGame(Widget):
         self.periph_target1_BE.set_size(.5)
         self.periph_target2.set_size(2*self.periph_target_rad)
         self.periph_target2_BE.set_size(.5)
-        self.periph_target1_pos = np.array([-1.65, 1])
+        self.periph_target1_pos = np.array([-2.51, 1.5])
+        # self.periph_target1_pos = np.array([-1.65, 1])
         self.periph_target2_pos = np.array([0, -1.5])
         self.periph_target1.move(self.periph_target1_pos)
         self.periph_target2.move(self.periph_target2_pos)
@@ -414,7 +422,7 @@ class COGame(Widget):
         self.FSM['tdbt'] = dict(dummy = 'target2', stop=None)
         self.FSM['target2'] = dict(touch_target = 'targ_hold', target_timeout='timeout_error', stop=None,
             non_rhtouch='RH_touch') # anytouch='rew_anytouch',touch_not_target='touch_error')
-        self.FSM['targ_hold'] = dict(finish_targ_hold='reward', early_leave_target_hold = 'hold_error',
+        self.FSM['targ_hold'] = dict(finish_targ_hold='reward', early_leave_target_hold = 'hold_error', touch_wrong_target = 'target_error',
          targ_drag_out = 'drag_error', stop=None, non_rhtouch='RH_touch')
 
         self.FSM['reward'] = dict(end_reward = 'ITI', stop=None, non_rhtouch='RH_touch')
@@ -423,6 +431,7 @@ class COGame(Widget):
 
         self.FSM['touch_error'] = dict(end_touch_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['hold_error'] = dict(end_hold_error='ITI', stop=None, non_rhtouch='RH_touch')
+        self.FSM['target_error'] = dict(end_target_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['drag_error'] = dict(end_drag_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['timeout_error'] = dict(end_timeout_error='ITI', stop=None, non_rhtouch='RH_touch')
         self.FSM['idle_exit'] = dict(stop=None)
@@ -478,6 +487,7 @@ class COGame(Widget):
             touch_error_timeout = self.touch_error_timeout,
             timeout_error_timeout = self.timeout_error_timeout,
             hold_error_timeout = self.hold_error_timeout,
+            target_error_timeout = self.target_error_timeout,
             drag_error_timeout = self.drag_error_timeout,
             ntargets = self.ntargets,
             target_distance = self.target_distance,
@@ -954,6 +964,23 @@ class COGame(Widget):
         self.total_counter += 1
         self.repeat = True
 
+    def _start_target_error(self, **kwargs):
+        print("-------------X- Target Error !")
+        self.wrong.play()
+        if self.stims == 'stim_on':
+            self.stim_port.write('er'.encode())
+        bgcolor = (.62, .32, 0.17, 1.)
+        Window.clearcolor = bgcolor
+        self.center_target.color = bgcolor
+        self.periph_target1.color = bgcolor
+        self.periph_target2.color = bgcolor
+        self.periph_target1_BE.color = bgcolor
+        self.periph_target2_BE.color = bgcolor
+        self.exit_target1.color = bgcolor
+        self.exit_target2.color = bgcolor
+        # self.total_counter += 1
+        self.repeat = True
+
     def _start_drag_error(self, **kwargs):
         print("-------------X- Drag Error !")
         if self.stims == 'stim_on':
@@ -1085,6 +1112,9 @@ class COGame(Widget):
     def end_hold_error(self, **kwargs):
         return kwargs['ts'] >= self.hold_error_timeout
 
+    def end_target_error(self, **kwargs):
+        return kwargs['ts'] >= self.target_error_timeout
+
     def end_drag_error(self, **kwargs):
         return kwargs['ts'] >= self.drag_error_timeout
 
@@ -1146,6 +1176,13 @@ class COGame(Widget):
                 self.check_if_started_in_targ(self.periph_target1_position, self.periph_target_rad)),
                 np.logical_and(self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad),
                 self.check_if_started_in_targ(self.periph_target2_position, self.periph_target_rad)))
+
+    def touch_wrong_target(self, **kwargs):
+        if self.stims == 'stim_on':
+            self.twrongt = self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad)
+        elif self.stims == 'stim_off':
+            self.twrongt = self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad)
+        return self.twrongt
 
     def target_timeout(self, **kwargs):
         #return kwargs['ts'] > self.target_timeout_time
