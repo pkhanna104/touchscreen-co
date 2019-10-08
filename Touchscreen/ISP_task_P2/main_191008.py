@@ -220,7 +220,7 @@ class COGame(Widget):
             if val:
                 self.target_timeout_time = targ_timeout_opts[i]
 
-        small_rew_opts = [.1, .3, .5]
+        small_rew_opts = [.0, .1, .3, .5]
         for i, val in enumerate(rew_in['small_rew']):
             if val:
                 small_rew = small_rew_opts[i]
@@ -1032,17 +1032,17 @@ class COGame(Widget):
                 print('-------------O- reward_for_centertouch')
                 sound = SoundLoader.load('reward2.wav')
                 sound.play()
-                
-                self.reward_port.open()
-                # if self.reward_for_anytouch[0]:
-                #     rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
-                if self.reward_for_center[0]:
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_center[1])+' sec\n']
-                self.reward_port.write(rew_str)
-                time.sleep(.25)
-                run_str = [ord(r) for r in 'run\n']
-                self.reward_port.write(run_str)
-                self.reward_port.close()
+                if not self.reward_for_center[1] == .0:
+                    self.reward_port.open()
+                    # if self.reward_for_anytouch[0]:
+                    #     rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
+                    if self.reward_for_center[0]:
+                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_center[1])+' sec\n']
+                    self.reward_port.write(rew_str)
+                    time.sleep(.25)
+                    run_str = [ord(r) for r in 'run\n']
+                    self.reward_port.write(run_str)
+                    self.reward_port.close()
         except:
             pass
 
