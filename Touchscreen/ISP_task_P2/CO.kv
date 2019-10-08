@@ -214,6 +214,12 @@
                     color: 1, 1, 0, 1
 
                 Label: 
+                    text: '0.0 sec'
+                CheckBox:
+                    id: small_rew_pt0_sec
+                    group: 'small_rew'
+
+                Label: 
                     text: '0.1 sec'
                 CheckBox:
                     id: small_rew_pt1_sec
@@ -230,12 +236,6 @@
                     text: '0.5 sec'
                 CheckBox:
                     id: small_rew_pt5_sec
-                    group: 'small_rew'
-
-                Label: 
-                    text: '0.7 sec'
-                CheckBox:
-                    id: small_rew_pt7_sec
                     group: 'small_rew'
 
                 Label:
@@ -263,6 +263,7 @@
                 CheckBox:
                     id: big_rew_pt3_sec
                     group: 'big_rew'
+                    active: True
 
                 Label: 
                     text: '0.5 sec'
@@ -275,7 +276,6 @@
                 CheckBox:
                     id: big_rew_pt7_sec
                     group: 'big_rew'
-                    active: True
 
                 Label:
                     text: ''
@@ -587,7 +587,7 @@
                     dict(donu=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), 
                     
                     dict(rew_manual=False, rew_anytouch=False, rew_center_pls_targ=rew_center_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=False, 
-                    small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active, small_rew_pt7_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
+                    small_rew=[small_rew_pt0_sec.active, small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     
                     dict(targ_rad=[targ_rad_10.active, targ_rad_12.active, targ_rad_15.active]), 
 
@@ -681,7 +681,9 @@
 <COGame>:
     center_target: target_c
     periph_target1: target_p1
+    periph_target1_BE: target_p1_be
     periph_target2: target_p2
+    periph_target2_BE: target_p2_be
     exit_target1: target_e1
     exit_target2: target_e2
     indicator_targ: indicator
@@ -694,9 +696,13 @@
         
     Target: 
         id: target_p1
+    Target: 
+        id: target_p1_be
 
     Target: 
         id: target_p2
+    Target: 
+        id: target_p2_be
 
     Target:
         id: target_e1
@@ -728,53 +734,79 @@
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 2/8
-        top: root.top - 270
+        top: root.top - 220
         text: root.tht_text
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 5/8
-        top: root.top - 270
+        top: root.top - 220
         text: root.tht_param
 
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 2/8
-        top: root.top - 470
+        top: root.top - 270
         text: root.targ_size_text
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 5/8
-        top: root.top - 470
+        top: root.top - 270
         text: root.targ_size_param
 
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 2/8
-        top: root.top - 570
+        top: root.top - 320
         text: root.big_rew_text
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 5/8
-        top: root.top - 570
+        top: root.top - 320
         text: root.big_rew_time_param
 
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 2/8
+        top: root.top - 570
+        text: root.total_counter_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 570
+        text: root.total_counter_param
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 620
+        text: root.center_error_counter_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 620
+        text: root.center_error_counter_param
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
         top: root.top - 670
-        text: root.nudge_text
+        text: root.target_error_counter_text
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 5/8
         top: root.top - 670
-        text: root.nudge_param
+        text: root.target_error_counter_param
 
 
 <Target>:
