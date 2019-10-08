@@ -292,28 +292,28 @@
                     color: 1, 1, 0, 1
 
                 Label: 
+                    text: '0.0 sec'
+                CheckBox:
+                    id: small_rew_pt0_sec
+                    group: 'small_rew'
+
+                Label: 
                     text: '0.1 sec'
                 CheckBox:
                     id: small_rew_pt1_sec
                     group: 'small_rew'
+                    active: True
 
                 Label: 
                     text: '0.3 sec'
                 CheckBox:
                     id: small_rew_pt3_sec
                     group: 'small_rew'
-                    active: True
 
                 Label: 
                     text: '0.5 sec'
                 CheckBox:
                     id: small_rew_pt5_sec
-                    group: 'small_rew'
-
-                Label: 
-                    text: '0.7 sec'
-                CheckBox:
-                    id: small_rew_pt7_sec
                     group: 'small_rew'
 
                 Label:
@@ -668,7 +668,7 @@
                     tdbt_0.active, tdbt_7_4.active, tdbt_3_0.active]),
                     
                     dict(rew_manual=False, rew_anytouch=False, rew_center_pls_targ=rew_center_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=False, 
-                    small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active, small_rew_pt7_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
+                    small_rew=[small_rew_pt0_sec.active, small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     
                     dict(targ_rad=[targ_rad_10.active, targ_rad_12.active, targ_rad_15.active]), 
 
