@@ -418,7 +418,7 @@ class COGame(Widget):
 
         self.FSM['reward'] = dict(end_reward = 'ITI', stop=None, non_rhtouch='RH_touch')
 
-        return_ = 'center'
+        return_ = 'target'
 
         self.FSM['touch_error'] = dict(end_touch_error=return_, stop=None, non_rhtouch='RH_touch')
         self.FSM['hold_error'] = dict(end_hold_error='ITI', stop=None, non_rhtouch='RH_touch')
