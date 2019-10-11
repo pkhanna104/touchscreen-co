@@ -17,6 +17,11 @@
 191008
 1. Fix the random juice reward
 2. Add 0 small reward
+
+191010
+1. Reduce the sensing area for Sanpiper
+ - sensing area is a little bit smaller than the actual button size
+
 """
 
 from kivy.app import App
@@ -1170,10 +1175,10 @@ class COGame(Widget):
 
     def touch_center(self, **kwargs):
         if self.drag_ok:
-            return self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad)
+            return self.check_if_cursors_in_targ_properly(self.center_target_position, self.center_target_rad)
         else:
-            return np.logical_and(self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad),
-                self.check_if_started_in_targ(self.center_target_position, self.center_target_rad))
+            return np.logical_and(self.check_if_cursors_in_targ_properly(self.center_target_position, self.center_target_rad),
+                self.check_if_started_in_targ_properly(self.center_target_position, self.center_target_rad))
 
     def center_timeout(self, **kwargs):
         # if self.stims == 'stim_on':
@@ -1198,7 +1203,7 @@ class COGame(Widget):
         # if self.stims == 'stim_on':
         #     print('early_leave_center_hold?')
         #     self.stim_port.write('0'.encode())        
-        return not self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad)
+        return not self.check_if_cursors_in_targ_properly(self.center_target_position, self.center_target_rad)
         
     # def center_drag_out(self, **kwargs):
     #     touch = self.touch
@@ -1213,7 +1218,7 @@ class COGame(Widget):
             #     return self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad)
             # elif self.stims == 'stim_off':
             #     return self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad)
-            return np.logical_or(self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad),self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad))
+            return np.logical_or(self.check_if_cursors_in_targ_properly(self.periph_target1_position, self.periph_target_rad),self.check_if_cursors_in_targ_properly(self.periph_target2_position, self.periph_target_rad))
 
         else:
             # if self.stims == 'stim_on':
@@ -1222,10 +1227,10 @@ class COGame(Widget):
             # elif self.stims == 'stim_off':
             #     return np.logical_and(self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad),
             #         self.check_if_started_in_targ(self.periph_target2_position, self.periph_target_rad))
-            return np.logical_or(np.logical_and(self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad),
-                self.check_if_started_in_targ(self.periph_target1_position, self.periph_target_rad)),
-                np.logical_and(self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad),
-                self.check_if_started_in_targ(self.periph_target2_position, self.periph_target_rad)))
+            return np.logical_or(np.logical_and(self.check_if_cursors_in_targ_properly(self.periph_target1_position, self.periph_target_rad),
+                self.check_if_started_in_targ_properly(self.periph_target1_position, self.periph_target_rad)),
+                np.logical_and(self.check_if_cursors_in_targ_properly(self.periph_target2_position, self.periph_target_rad),
+                self.check_if_started_in_targ_properly(self.periph_target2_position, self.periph_target_rad)))
 
     def touch_wrong_target(self, **kwargs):
         if self.stims == 'stim_on':
@@ -1245,17 +1250,17 @@ class COGame(Widget):
 
     def early_leave_target_hold(self, **kwargs):
         if self.stims == 'stim_on':
-            return not self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad)
+            return not self.check_if_cursors_in_targ_properly(self.periph_target1_position, self.periph_target_rad)
         elif self.stims == 'stim_off':
-            return not self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad)
+            return not self.check_if_cursors_in_targ_properly(self.periph_target2_position, self.periph_target_rad)
 
     def targ_drag_out(self, **kwargs):
         touch = self.touch
         self.touch = True
         if self.stims == 'stim_on':
-            stay_in = self.check_if_cursors_in_targ(self.periph_target1_position, self.periph_target_rad)
+            stay_in = self.check_if_cursors_in_targ_properly(self.periph_target1_position, self.periph_target_rad)
         elif self.stims == 'stim_off':
-            stay_in = self.check_if_cursors_in_targ(self.periph_target2_position, self.periph_target_rad)
+            stay_in = self.check_if_cursors_in_targ_properly(self.periph_target2_position, self.periph_target_rad)
         self.touch = touch
         return not stay_in
 
@@ -1326,11 +1331,32 @@ class COGame(Widget):
                         startedInTarg = True
         return startedInTarg
 
+    def check_if_started_in_targ_properly(self, targ_center, targ_rad):
+        startedInTarg = False
+        if self.touch:
+            for id_ in self.cursor_ids:
+                # If in target: 
+                if np.linalg.norm(np.array(self.cursor[id_]) - targ_center) < targ_rad:
+                    if np.linalg.norm(np.array(self.cursor_start[id_]) - targ_center) < targ_rad-0.5:
+                        startedInTarg = True
+        return startedInTarg
+
     def check_if_cursors_in_targ(self, targ_center, targ_rad):
         if self.touch:
             inTarg = False
             for id_ in self.cursor_ids:
                 if np.linalg.norm(np.array(self.cursor[id_]) - targ_center) < targ_rad:
+                    inTarg = True
+
+            return inTarg
+        else:
+            return False
+
+    def check_if_cursors_in_targ_properly(self, targ_center, targ_rad):
+        if self.touch:
+            inTarg = False
+            for id_ in self.cursor_ids:
+                if np.linalg.norm(np.array(self.cursor[id_]) - targ_center) < (targ_rad-0.5):
                     inTarg = True
 
             return inTarg
