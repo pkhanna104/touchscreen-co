@@ -5,6 +5,7 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 from random import randint
 from kivy.config import Config
+from kivy.core.audio import SoundLoader
 
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -129,6 +130,9 @@ class COGame(Widget):
             baudrate=115200)
         self.reward_port.close()
 
+        # Preload sounds: 
+        self.reward1 = SoundLoader.load('reward1.wav')
+        self.reward2 = SoundLoader.load('reward2.wav')
 
     def update(self, ts):
         self.state_length = time.time() - self.state_start
@@ -217,6 +221,7 @@ class COGame(Widget):
         rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_time)+' sec\n']
         self.reward_port.write(rew_str)
         time.sleep(.25 + self.reward_delay_time)
+        self.reward1.play()
         run_str = [ord(r) for r in 'run\n']
         self.reward_port.write(run_str)
         self.reward_port.close()
