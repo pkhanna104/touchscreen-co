@@ -47,6 +47,7 @@
                 CheckBox:
                     group: 'rew'
                     id: rew_center_pls_targ_chk
+                    active: True
             
                 Label: 
                     text: 'Big rew for TARGET touch'
@@ -54,7 +55,6 @@
                 CheckBox:
                     group: 'rew'
                     id: rew_targ_chk
-                    active: True
 
                 Label:
                     text: ''
@@ -95,8 +95,7 @@
                 CheckBox:
                     group: 'tt'
                     id: tt_30_sec
-                    active: True
-
+                    
                 Label: 
                     text: '45 sec'
 
@@ -110,8 +109,8 @@
                 CheckBox:
                     group: 'tt'
                     id: tt_60_sec
+                    active: True
             
-
                 Label:
                     text: ''
                     fontsize: 50
@@ -145,8 +144,7 @@
                 CheckBox: 
                     group: 'check'
                     id: chk_h
-                    active: True
-
+                    
                 Label: 
                     text: 'Sandpiper'
                     fontsize: 28
@@ -159,11 +157,13 @@
                 Label: 
                     text: 'Sabotage'
                     fontsize: 28
-                    halign: 'center'                        
+                    halign: 'center' 
+                                         
                 
                 CheckBox: 
                     group: 'check'
                     id: chk_sabo
+                    active: True  
                    
                 Label:
                     text: ''
@@ -193,6 +193,12 @@
                 Label: 
                     text: 'Center Targ reward'
                     color: 1, 1, 0, 1
+
+                Label:
+                    text: '0.0 sec'
+                CheckBox:
+                    id: small_rew_zero_sec
+                    group: 'small_rew'
 
                 Label: 
                     text: '0.1 sec'
@@ -283,6 +289,7 @@
                 CheckBox:
                     id: rew_all
                     group: 'rew_var'
+                    active: True
                     
                 Label: 
                     text: 'Reward 50% '
@@ -297,7 +304,6 @@
                 CheckBox:
                     id: rew_30
                     group: 'rew_var'
-                    active: True
 
 
                 Label:
@@ -344,8 +350,7 @@
                 CheckBox:
                     id: targ_rad_75
                     group: 'targ_cm'
-                    active: True
-
+                    
                 Label: 
                     text: '.82 cm'
                 CheckBox:
@@ -369,6 +374,19 @@
 
                 CheckBox:
                     id: targ_rad_15
+                    group: 'targ_cm'
+
+                Label: 
+                    text: '2.25cm'
+                CheckBox:
+                    id: targ_rad_22
+                    group: 'targ_cm'
+                    active: True
+
+                Label:
+                    text: '3.0 cm'
+                CheckBox:
+                    id: targ_rad_30
                     group: 'targ_cm'
                                         
                 Label:
@@ -401,6 +419,18 @@
                     text: 'CENTER Hold Time'
                     color: 1, 1, 0, 1
 
+                Label: 
+                    text: '0.0 sec'
+                CheckBox: 
+                    id: c_zero_sec
+                    group: 'chold_time'
+                    active: True
+
+                Label:  
+                    text: '0.1 sec'
+                CheckBox:
+                    id: c_hund_sec
+                    group: 'chold_time'
 
                 Label: 
                     text: '0.375 sec'
@@ -438,7 +468,6 @@
                 CheckBox:
                     id: c_big_rand
                     group: 'chold_time'
-                    active: True
 
                 Label:
                     text: ''
@@ -469,6 +498,18 @@
                     text: 'Target Hold Time'
                     color: 1, 1, 0, 1
 
+                Label: 
+                    text: '0.0 sec'
+                CheckBox:
+                    id: zero_sec
+                    group: 'hold_time'
+                    active: True
+
+                Label: 
+                    text: '0.1 sec'
+                CheckBox: 
+                    id: hund_sec
+                    group: 'hold_time'
 
                 Label: 
                     text: '0.375 sec'
@@ -483,7 +524,6 @@
                 CheckBox:
                     id: half_sec
                     group: 'hold_time'
-                    active: True
 
                 Label: 
                     text: '0.575 sec'
@@ -540,13 +580,13 @@
                 CheckBox:
                     id: ten_trials
                     group: 'trials'
+                    active: True
 
                 Label: 
                     text: '25 trials'
                 CheckBox:
                     id: twenty_five_trials
                     group: 'trials'
-                    active: True
 
                 Label:
                     text: '50 trials'
@@ -586,9 +626,9 @@
                 text_size: self.size
                 on_release: 
                     root.current = 'splash_start'
-                    splash.init(dict(donu=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=False, rew_anytouch=False, rew_center_pls_targ=rew_center_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=False, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
-                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active]), dict(test=[False, True, False]), dict(chold=[c_three_sev_five_sec.active, c_half_sec.active, c_575.active, c_60.active, c_big_rand.active],
-                    hold=[three_sev_five_sec.active, half_sec.active, t_575.active, t_60.active, big_rand.active]), 
+                    splash.init(dict(donu=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=False, rew_anytouch=False, rew_center_pls_targ=rew_center_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=False, small_rew=[small_rew_zero_sec.active, small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
+                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_22.active, targ_rad_30.active]), dict(test=[False, True, False]), dict(chold=[c_zero_sec.active, c_hund_sec.active, c_three_sev_five_sec.active, c_half_sec.active, c_575.active, c_60.active, c_big_rand.active],
+                    hold=[zero_sec.active, hund_sec.active, three_sev_five_sec.active, half_sec.active, t_575.active, t_60.active, big_rand.active]), 
                     dict(get_targets_rand=False, get_4targets=False, get_targets_co=True), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),

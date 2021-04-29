@@ -141,7 +141,7 @@ class COGame(Widget):
             if val:
                 self.target_timeout_time = targ_timeout_opts[i]
 
-        small_rew_opts = [.1, .3, .5]
+        small_rew_opts = [0., .1, .3, .5]
         for i, val in enumerate(rew_in['small_rew']):
             if val:
                 small_rew = small_rew_opts[i]
@@ -173,7 +173,7 @@ class COGame(Widget):
         else:
             self.skip_juice = False
 
-        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5]
+        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 2.25, 3.0]
         for i, val in enumerate(task_in['targ_rad']):
             if val:
                 self.periph_target_rad = target_rad_opts[i]
@@ -191,7 +191,7 @@ class COGame(Widget):
                 if 'co' in nm:
                     self.use_center = True
 
-        holdz = [ .375, .5, .575, .6, '.4-.6']
+        holdz = [0.0, 0.1, .375, .5, .575, .6, '.4-.6']
         
         self.cht_type = None
         self.tht_type = None
@@ -604,7 +604,10 @@ class COGame(Widget):
                 return False
 
     def _start_ITI(self, **kwargs):
-        self.cam_trig_port.write('0'.encode())
+        try:
+            self.cam_trig_port.write('0'.encode())
+        except:
+            pass
         Window.clearcolor = (0., 0., 0., 1.)
         self.exit_target1.color = (.15, .15, .15, 1.)
         self.exit_target2.color = (.15, .15, .15, 1.)
@@ -630,7 +633,10 @@ class COGame(Widget):
     def _start_vid_trig(self, **kwargs):
         if self.trial_counter == 0:
             time.sleep(1.)
-        self.cam_trig_port.write('1'.encode())
+        try:    
+            self.cam_trig_port.write('1'.encode())
+        except:
+            pass
         self.first_target_attempt = True
 
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
@@ -779,17 +785,21 @@ class COGame(Widget):
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 sound = SoundLoader.load('reward2.wav')
                 sound.play()
-                
-                self.reward_port.open()
-                if self.reward_for_anytouch[0]:
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
-                elif self.reward_for_center[0]:
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_center[1])+' sec\n']
-                self.reward_port.write(rew_str)
-                time.sleep(.25)
-                run_str = [ord(r) for r in 'run\n']
-                self.reward_port.write(run_str)
-                self.reward_port.close()
+
+                ### To trigger reward make sure reward is > 0:
+                if np.logical_or(np.logical_and(self.reward_for_anytouch[0], self.reward_for_anytouch[1] > 0), 
+                    np.logical_and(self.reward_for_center[0], self.reward_for_center[1] > 0)):
+
+                    self.reward_port.open()
+                    if self.reward_for_anytouch[0]:
+                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
+                    elif self.reward_for_center[0]:
+                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_center[1])+' sec\n']
+                    self.reward_port.write(rew_str)
+                    time.sleep(.25)
+                    run_str = [ord(r) for r in 'run\n']
+                    self.reward_port.write(run_str)
+                    self.reward_port.close()
         except:
             pass
 
