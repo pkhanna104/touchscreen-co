@@ -182,7 +182,7 @@ class R2Game(Widget):
         self.start_led = 0
         self.button = 0
         self.cap_button = 0.
-        self.door_state = -1
+        self.door_state = 0.
 
         # State transition matrix: 
         self.FSM = dict()
@@ -248,11 +248,13 @@ class R2Game(Widget):
             only_start = self.only_start, reward_fcn=reward_fcn, use_cap=self.use_cap_not_button)
 
         # Open task arduino -- IR sensor 
-        self.task_ard = serial.Serial(port='COM5')
-        self.button_ard = serial.Serial(port='COM?')
+        self.task_ard = serial.Serial(port='COM3')
+        self.button_ard = serial.Serial(port='COM10', baudrate=9600)
 
         if self.testing:
-            pass
+            self.baseline_done = False
+            self.baseline_force = []
+            self.trial_force = []
         else:
             import os
             path = os.getcwd()
@@ -393,21 +395,32 @@ class R2Game(Widget):
         ser = self.button_ard.flushInput()
         _ = self.button_ard.readline()
         port_read = self.button_ard.readline()
-        port_splits = port_read.decode('ascii').split('/t')
-        assert(len(port_splits == 2))
+        port_read = port_read.decode('ascii')
+        print('start reading')
+        port_splits = port_read.split('\t')
+        #print(port_splits)
+        print(self.state)
+        #assert(len(port_splits == 2))
+        while port_splits[0] == 'm' or port_splits[0] == 'n':
+            self.button_ard.flushInput()
+            port_read = self.button_ard.readline()
+            port_read = port_read.decode('ascii')
+            port_splits = port_read.split('\t')
 
         if port_splits[0] == 'button_active':
             self.button = 1
         elif port_splits[0] == 'button_inactive':
             self.button = 0
         else:
-            raise Exception('unrecognized button ')
+            print(port_splits)
+            #raise Exception('unrecognized button ')
 
         if port_splits[1] == 'door_open':
             self.door_state = 1
         elif port_splits[1] == 'door_closed':
             self.door_state = 0
-
+        print('button %d'%self.button)
+        print('door %d'%self.door_state)
         if self.use_cap_not_button:
             tmp = self.cap_ard.flushInput()
             _ = self.cap_ard.readline()
@@ -495,7 +508,10 @@ class R2Game(Widget):
 
     def _start_ITI(self, **kwargs):
         # Stop video
-        self.cam_trig_port.write('0'.encode())
+        try:
+            self.cam_trig_port.write('0'.encode())
+        except:
+            pass
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
         
         if type(self.start_hold_type) is str:
@@ -532,14 +548,16 @@ class R2Game(Widget):
             self.baseline_done = True
 
     def end_ITI(self, **kwargs):
-        if self.door_state == 1: ## only start next trial if door is closed 
+        if self.door_state == 0: ## only start next trial if door is closed 
             return kwargs['ts'] > self.ITI
         else:
             return False
 
     def _start_vid_trig(self, **kwargs):
-        self.cam_trig_port.write('1'.encode())
-
+        try:
+            self.cam_trig_port.write('1'.encode())
+        except:
+            pass
     def end_vid_trig(self, **kwargs):
         return kwargs['ts'] > self.pre_start_vid_ts
 
@@ -566,7 +584,10 @@ class R2Game(Widget):
 
             ### Also open the door 
             self.button_ard.flushInput()
-            self.button_ard.write('open_door'.encode())
+            self.button_ard.write('m'.encode())
+            print('#############')
+            print('tried to open teh door')
+            print('##############')
 
             return True
         else:
@@ -620,7 +641,7 @@ class R2Game(Widget):
 
         ##### Close teh door ####
         self.button_ard.flushInput()
-        self.button_ard.write('close_door'.encode())
+        self.button_ard.write('n'.encode())
 
         self.trial_counter += 1
         self.big_reward_cnt += 1
