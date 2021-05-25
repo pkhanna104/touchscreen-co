@@ -31,7 +31,7 @@ class Data(tables.IsDescription):
 class R2Game(Widget):
     pre_start_vid_ts = 0.1
 
-    ITI_mean = 1.
+    ITI_mean = 3.
     ITI_std = .2
 
     start_timeout = 5000. 
@@ -65,7 +65,7 @@ class R2Game(Widget):
 
     def init(self, animal_names_dict=None, rew_in=None, rew_var=None,
         test=None, hold=None, autoquit=None, use_start=None, only_start=None, 
-        grasp_to=None, use_cap=None):
+        grasp_to=None, use_cap=None, tsk_opt=None):
 
         self.h5_table_row_cnt = 0
         self.idle = False
@@ -184,6 +184,12 @@ class R2Game(Widget):
         self.cap_button = 0.
         self.door_state = 0.
 
+        task_opt = ['grip', 'button', 'both']
+        for i, val in enumerate(tsk_opt['tsk_opt']):
+            if val: 
+                self.task_opt = task_opt[i]
+
+
         # State transition matrix: 
         self.FSM = dict()
         self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
@@ -195,10 +201,15 @@ class R2Game(Widget):
         self.FSM['grasp'] = dict(clear_LED='grasp_hold', grasp_timeout='ITI', stop=None) # state to indictate 'grasp' w/o resetting timer
         self.FSM['reward'] = dict(end_reward='ITI', stop=None)
         self.FSM['idle_exit'] = dict(stop=None)
-        if not self.use_start:
+        
+
+        if self.task_opt == 'both':
+            pass
+
+        elif self.task_opt == 'grip':
             self.FSM['ITI'] = dict(end_ITI='grasp_trial_start', stop=None)
 
-        if self.only_start:
+        elif self.task_opt == 'button':
             self.FSM = dict()
             self.FSM['ITI'] = dict(end_ITI='start_button', stop=None)
             self.FSM['start_button'] = dict(pushed_start='start_hold', start_button_timeout='ITI', stop=None)
@@ -249,7 +260,7 @@ class R2Game(Widget):
 
         # Open task arduino -- IR sensor 
         self.task_ard = serial.Serial(port='COM3')
-        self.button_ard = serial.Serial(port='COM10', baudrate=9600)
+        self.button_ard = serial.Serial(port='COM4', baudrate=9600)
 
         if self.testing:
             self.baseline_done = False
@@ -292,7 +303,7 @@ class R2Game(Widget):
 
             # Get the task to start the accelerometer process
             # Start the accelerometer: 
-            self.acc_process = subprocess.Popen(['python run_acc.py', p + animal_name + '_Grasp'])
+            #self.acc_process = subprocess.Popen(['python run_acc.py', p + animal_name + '_Grasp'])
 
             # Note in python 3 to open pkl files: 
             #with open('xxxx_params.pkl', 'rb') as f:
@@ -324,7 +335,7 @@ class R2Game(Widget):
             pass
 
         # Stop the accelerometer: 
-        self.acc_process.send_signal(signal.CTRL_C_EVENT)
+        #self.acc_process.send_signal(signal.CTRL_C_EVENT)
 
         # Turn off LED when cloisng : 
         self.task_ard.flushInput()
@@ -399,7 +410,7 @@ class R2Game(Widget):
         print('start reading')
         port_splits = port_read.split('\t')
         #print(port_splits)
-        print(self.state)
+        #print(self.state)
         #assert(len(port_splits == 2))
         while port_splits[0] == 'm' or port_splits[0] == 'n':
             self.button_ard.flushInput()
@@ -535,7 +546,14 @@ class R2Game(Widget):
 
     def _start_grasp_trial_start(self, **kwargs):
         self.start_grasp = time.time(); 
-
+        
+        ### Also open the door 
+        self.button_ard.flushInput()
+        self.button_ard.write('m'.encode())
+        print('#############')
+        print('tried to open teh door')
+        print('##############')
+        
         if self.baseline_done:
             self.trial_force = []
         else:
@@ -581,13 +599,6 @@ class R2Game(Widget):
             self.task_ard.flushInput()
             self.task_ard.write('n'.encode()) #night
             self._start_rew_start()
-
-            ### Also open the door 
-            self.button_ard.flushInput()
-            self.button_ard.write('m'.encode())
-            print('#############')
-            print('tried to open teh door')
-            print('##############')
 
             return True
         else:
@@ -640,6 +651,7 @@ class R2Game(Widget):
             pass
 
         ##### Close teh door ####
+        time.sleep(1.)
         self.button_ard.flushInput()
         self.button_ard.write('n'.encode())
 

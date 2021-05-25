@@ -91,6 +91,61 @@
                     fontsize: 50
 
             BoxLayout
+                id: starting3
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: 'Task Opts:'
+                    color: 1, 1, 0, 1
+                    fontsize: 50
+                    
+                Label: 
+                    text: 'Only Gripper'
+                    fontsize: 28
+                    halign: 'center'                        
+                
+                CheckBox: 
+                    group: 'tsk'
+                    id: tsk_grip
+                    active: True
+
+                Label: 
+                    text: 'Only Button'
+                    fontsize: 28
+                    halign: 'center'                        
+                
+                CheckBox: 
+                    group: 'tsk'
+                    id: tsk_button
+                
+                Label: 
+                    text: 'Both Button and Grip'
+                    fontsize: 28
+                    halign: 'center'                        
+                
+                CheckBox: 
+                    group: 'tsk'
+                    id: tsk_both
+                   
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+
+
+
+            BoxLayout
                 id: starting2
                 orientation: 'horizontal'
                 Label:
@@ -353,43 +408,6 @@
                     text: ''
                     fontsize: 50
 
-            BoxLayout:
-                id: params:
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.2, 0.2, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: 'Use Cap Touch instead of Button?'
-                    color: 1, 1, 0, 1
-                Label: 
-                    text: 'Yes'
-                CheckBox:
-                    id: yes_cap
-                    group: 'cap'
-                    active: True
-
-                Label: 
-                    text: 'No'
-                CheckBox:
-                    id: no_cap
-                    group: 'cap'
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
@@ -696,7 +714,8 @@
                     dict(start=[start_button.active, no_start_button.active]),
                     dict(start=[only_start_button.active, no_only_start_button.active]),
                     dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]),
-                    dict(use_cap=[yes_cap.active, no_cap.active]))
+                    dict(use_cap=[False, True]), 
+                    dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]))
 
                     Clock.schedule_interval(game.update, 1.0 / 30.0)
             Label:
