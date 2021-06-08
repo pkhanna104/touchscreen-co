@@ -201,7 +201,7 @@ class SequenceGame(Widget):
         
     
         self.possible_target_pos_x = np.array([1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 18])
-        self.possible_target_pos_y = np.array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4])
+        self.possible_target_pos_y = np.array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 12])
         
         # self.possible_target_pos_x = np.array([fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
         #                                        fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
