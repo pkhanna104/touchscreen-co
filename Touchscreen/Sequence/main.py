@@ -89,7 +89,7 @@ class SequenceGame(Widget):
     # exit_pos1 = np.array([9*fixed_window_size[0]/(10*pix_per_cm), 9*fixed_window_size[1]/(10*pix_per_cm)]) # cm
     # exit_pos2 = np.array([9*fixed_window_size[0]/(10*pix_per_cm), 1*fixed_window_size[1]/(10*pix_per_cm)]) # cm
     exit_pos1 = np.array([17, 2])
-    exit_pos1 = np.array([17, 10])
+    exit_pos2 = np.array([17, 10])
     exit_rad = 1. # cm
     exit_hold = 2 # seconds
     
