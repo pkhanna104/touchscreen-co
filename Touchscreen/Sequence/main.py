@@ -1255,15 +1255,15 @@ def cm2pix(pos_cm, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):
 
     if type(pix_pos) is np.ndarray:
         # Translate to coordinate system w/ 0, 0 at bottom left
-        pix_pos[0] = pix_pos[0] + (fixed_window_size[0]/2.)
-        pix_pos[1] = pix_pos[1] + (fixed_window_size[1]/2.)
+        pix_pos[0] = pix_pos[0] #+ (fixed_window_size[0]/2.)
+        pix_pos[1] = pix_pos[1] #+ (fixed_window_size[1]/2.)
 
     return pix_pos    
     
 def pix2cm(pos_pix, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):
     # First shift coordinate system: 
-    pos_pix[0] = pos_pix[0] - (fixed_window_size[0]/2.)
-    pos_pix[1] = pos_pix[1] - (fixed_window_size[1]/2.)
+    pos_pix[0] = pos_pix[0] #- (fixed_window_size[0]/2.)
+    pos_pix[1] = pos_pix[1] #- (fixed_window_size[1]/2.)
 
     pos_cm = pos_pix*(1./pix_per_cm)
     return pos_cm    
