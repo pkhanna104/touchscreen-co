@@ -449,7 +449,7 @@ class SequenceGame(Widget):
         
         self.FSM['targ1_pressed'] = dict(touch_target2 ='t1p_targ2_hold', set_timeout='timeout_error', stop=None,
             non_rhtouch='RH_touch')
-        self.FSM['targ2_pressed'] = dict(touch_target1 ='t2p_targ1_hold', set_timeout='timeout_error', stop=None,
+        self.FSM['targ2_pressed'] = dict(t2p_first_error = 'set_error', touch_target1 ='t2p_targ1_hold', set_timeout='timeout_error', stop=None,
             non_rhtouch='RH_touch')
         
         self.FSM['t1p_targ2_hold'] = dict(finish_targ_hold='set_complete', early_leave_target2_hold = 'hold_error_t1p',
@@ -457,7 +457,7 @@ class SequenceGame(Widget):
         self.FSM['t2p_targ1_hold'] = dict(finish_targ_hold='IHSI', early_leave_target1_hold = 'hold_error_t2p',
             targ1_drag_out = 'drag_error_t2p', stop=None, non_rhtouch='RH_touch')
         
-        
+        self.FSM['set_error'] = dict(end_set_error='IHSI', stop=None)
         self.FSM['set_complete'] = dict(hyperset_complete = 'reward_hyperset', next_set = 'reward_set', stop=None, non_rhtouch='RH_touch')
         self.FSM['reward_set'] = dict(end_reward_set = 'set', stop=None, non_rhtouch='RH_touch')
         self.FSM['reward_hyperset'] = dict(end_reward_hyperset = 'IHSI', stop=None, non_rhtouch='RH_touch')
@@ -914,7 +914,6 @@ class SequenceGame(Widget):
             return np.logical_and(self.check_if_cursors_in_targ(self.target1_position, self.target_rad),
                 self.check_if_started_in_targ(self.target1_position, self.target_rad))
     
-    # Touch Target
     def touch_target2(self, **kwargs):
         if self.drag_ok:
             return self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
@@ -922,6 +921,9 @@ class SequenceGame(Widget):
             return np.logical_and(self.check_if_cursors_in_targ(self.target2_position, self.target_rad),
                 self.check_if_started_in_targ(self.target2_position, self.target_rad))
     
+    # Starting with target 2 gives an error
+    def t2p_first_error(self, **kwargs):
+        return self.t2p_first_is_error
     
     # Start Target Holds --> Change the Color of the target to yellow?
     def _start_targ1_hold(self, **kwargs):
@@ -957,10 +959,17 @@ class SequenceGame(Widget):
         self.target2.color = (1., 1., 0., 1.)
         # self.indicator_targ.color = (0.75, .75, .75, 1.)
         
+        if self.reward_for_targtouch[0]:
+            self.run_anytarg_rew()
+        
     def _start_targ2_pressed(self, **kwargs):
         self.target1.color = (1., 1., 0., 1.)
         self.target2.color = (0., 0., 0., 1.)
         # self.indicator_targ.color = (0.75, .75, .75, 1.)
+        
+        if self.reward_for_targtouch[0]:
+            self.run_anytarg_rew()
+
     
     # Once a set is complete, determine whether to restart or move to the next set
     def hyperset_complete(self, **kwargs):
@@ -1018,6 +1027,52 @@ class SequenceGame(Widget):
             
     def end_reward_hyperset(self, **kwargs):
         return True
+    
+    ################################### ERROR STATES ################################3
+    # Set Error
+    def _start_set_error(self, **kwargs):
+        # Play an error tone
+        
+        
+        # Make the screen red
+        Window.clearcolor = (1., 0., 0., 1.)
+        self.button1_out.color = (1., 0., 0., 1.)
+        self.button1_in.color = (1., 0., 0., 1.)
+        self.button2_out.color = (1., 0., 0., 1.)
+        self.button2_in.color = (1., 0., 0., 1.)
+        self.button3_out.color = (1., 0., 0., 1.)
+        self.button3_in.color = (1., 0., 0., 1.)
+        self.button4_out.color = (1., 0., 0., 1.)
+        self.button4_in.color = (1., 0., 0., 1.)
+        self.button5_out.color = (1., 0., 0., 1.)
+        self.button5_in.color = (1., 0., 0., 1.)
+        self.button6_out.color = (1., 0., 0., 1.)
+        self.button6_in.color = (1., 0., 0., 1.)
+        self.button7_out.color = (1., 0., 0., 1.)
+        self.button7_in.color = (1., 0., 0., 1.)
+        self.button8_out.color = (1., 0., 0., 1.)
+        self.button8_in.color = (1., 0., 0., 1.)
+        self.button9_out.color = (1., 0., 0., 1.)
+        self.button9_in.color = (1., 0., 0., 1.)
+        self.button10_out.color = (1., 0., 0., 1.)
+        self.button10_in.color = (1., 0., 0., 1.)
+        self.button11_out.color = (1., 0., 0., 1.)
+        self.button11_in.color = (1., 0., 0., 1.)
+        self.button12_out.color = (1., 0., 0., 1.)
+        self.button12_in.color = (1., 0., 0., 1.)
+        self.button13_out.color = (1., 0., 0., 1.)
+        self.button13_in.color = (1., 0., 0., 1.)
+        self.button14_out.color = (1., 0., 0., 1.)
+        self.button14_in.color = (1., 0., 0., 1.)
+        self.button15_out.color = (1., 0., 0., 1.)
+        self.button15_in.color = (1., 0., 0., 1.)
+        self.button16_out.color = (1., 0., 0., 1.)
+        self.button16_in.color = (1., 0., 0., 1.)
+        
+    
+    def end_set_error(self, **kwargs):
+        # end the set error after the timeout period
+        return kwargs['ts'] > self.set_error_timeout
     
     # Early leave from target --> hold error (buttons turn invisible)
     def early_leave_target1_hold(self, **kwargs):
