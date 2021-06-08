@@ -178,7 +178,7 @@ class SequenceGame(Widget):
         
         # Initialize a count of the number of rewards
         self.rew_cnt = 0
-        self.small_rew_cnt = 0
+        self.set_rew_cnt = 0
 
         # Do you want to use an exxternal capacitive touch sensor?
         self.use_cap_sensor = False
@@ -229,31 +229,28 @@ class SequenceGame(Widget):
         
         # How long to give rewards for touching any target?
         anytarg_rew_opts = [0., .1, .3, .5]
+        import pdb; pdb.set_trace()
         for i, val in enumerate(rew_in['anytarg_rew']):
             if val:
-                anytarg_rew = anytarg_rew_opts[i]
+                self.anytarg_rew = anytarg_rew_opts[i]
+        self.reward_for_targtouch = [self.anytarg_rew > 0, self.anytarg_rew]
         
         # How long to give rewards for a complete set?
         set_rew_opts = [0., .1, .3, .5]
         for i, val in enumerate(rew_in['set_rew']):
             if val:
-                small_rew = small_rew_opts[i]
+                self.set_rew = set_rew_opts[i]
+        self.reward_for_set = [self.set_rew > 0, self.set_rew]
         
         # How long to give rewards for a complete hyperset?
         hs_rew_opts = [.3, .5, .7]
         for i, val in enumerate(rew_in['hs_rew']):
             if val:
-                hs_rew = hs_rew_opts[i]
+                self.hs_rew = hs_rew_opts[i]
                 
-        # Reward for simply touching the target?
-        self.reward_for_targtouch = [True, hs_rew]
         
-        # NOT SURE WHAT THESE DO
-        self.reward_for_center = [False, 0]
-        self.skip_juice = False
-        self.reward_for_anytouch = [False, 0]
-        self.testing = False
-        self.in_cage = False
+        # Is this a test session?
+        self.testing = True
         
         # How big are the targets?
         target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 2.25, 3.0]
@@ -504,16 +501,14 @@ class SequenceGame(Widget):
 
         # save parameters: 
         d = dict(animal_name=animal_name, target_rad=self.target_rad,
-            target_list = self.target_list, 
+            sets_selected = self.sets_selected, 
             ISetI_mean=self.ISetI_mean, ISetI_std = self.ISetI_std, 
             IHSI_mean=self.IHSI_mean, IHSI_std = self.IHSI_std, 
+            targ_hold_time = self.tht,
             ch_timeout=self.ch_timeout, 
-            cht=self.cht, reward_time_small=self.reward_for_center[1],
-            reward_time_big=self.reward_for_targtouch[1],
-            reward_for_anytouch=self.reward_for_anytouch[0],
-            reward_for_center = self.reward_for_center[0],
-            reward_for_targtouch=self.reward_for_targtouch[0], 
-            touch_error_timeout = self.touch_error_timeout,
+            anytarg_rew_time=self.anytarg_rew,
+            set_rew_time = self.set_rew,
+            hs_rew_time=self.hs_rew,
             timeout_error_timeout = self.timeout_error_timeout,
             hold_error_timeout = self.hold_error_timeout,
             drag_error_timeout = self.drag_error_timeout,
@@ -524,9 +519,9 @@ class SequenceGame(Widget):
             drag_ok = self.drag_ok,
             )
 
-        print(self.reward_for_center)
-        print(self.reward_for_targtouch)
-        print(self.reward_for_anytouch)
+        print(self.anytarg_rew)
+        print(self.set_rew)
+        print(self.hs_rew)
 
         try:
             if self.testing:
@@ -616,7 +611,7 @@ class SequenceGame(Widget):
     def update(self, ts):
         self.state_length = time.time() - self.state_start
         self.rew_cnt += 1
-        self.small_rew_cnt += 1
+        self.set_rew_cnt += 1
         
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
