@@ -9,6 +9,7 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 from random import randint
 from kivy.config import Config
+from sys import platform
 import serial, time, pickle, datetime #, winsound
 from numpy import binary_repr
 import struct
@@ -19,7 +20,10 @@ import tables
 
 Config.set('kivy', 'exit_on_escape', 1)
 Config.set('graphics', 'resizable', False)
-fixed_window_size = (1800, 1000)
+if platform == 'darwin':
+    fixed_window_size = (1800, 1000)
+elif platform == 'win32':
+    fixed_window_size = (1800, 1000)
 pix_per_cm = 85.
 Config.set('graphics', 'width', str(fixed_window_size[0]))
 Config.set('graphics', 'height', str(fixed_window_size[1]))
@@ -176,8 +180,8 @@ class SequenceGame(Widget):
     
     # Get the initial parameters
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
-        set_id_selected = None, test=None, hold=None, 
-        autoquit=None, rew_var=None, set_timeout = None, targ_pos=None):
+        set_id_selected = None, test=None, hold=None, error_types_selected=None,
+        autoquit=None, rew_var=None, set_timeout = None, error_timeout_time=None, ):
         
         # Initialize a count of the number of rewards
         self.rew_cnt = 0
@@ -201,7 +205,7 @@ class SequenceGame(Widget):
         #     self.center_y-0.125*self.height, self.center_y-0.125*self.height, self.center_y-0.125*self.height, self.center_y-0.125*self.height, 
         #     self.center_y-0.375*self.height, self.center_y-0.375*self.height, self.center_y-0.375*self.height, self.center_y-0.375*self.height])
         
-    
+        
         self.possible_target_pos_x = np.array([6.75, 9, 11.25, 13.5, 6.75, 9, 11.25, 13.5, 6.75, 9, 11.25, 13.5, 6.75, 9, 11.25, 13.5]) # determined through trial and error
         self.possible_target_pos_y = np.array([2.25, 2.25, 2.25, 2.25, 4.5, 4.5, 4.5, 4.5, 6.75, 6.75, 6.75, 6.75, 9, 9, 9, 9])
         
@@ -250,6 +254,15 @@ class SequenceGame(Widget):
             if val:
                 self.hs_rew = hs_rew_opts[i]
                 
+        # What counts as an error?
+        self.nontarg_is_error = error_types_selected['error_type'][0]
+        self.t2p_first_is_error = error_types_selected['error_type'][1]
+        
+        # How long is the error timmeout?
+        error_timeout_opts = [0.5, 1.0, 1.5, 2.0]
+        for i, val in enumerate(error_timeout_time['error_to_time']):
+            if val:
+                self.error_timeout_time = error_timeout_opts[i]
         
         # Is this a test session?
         self.testing = True
@@ -1036,43 +1049,12 @@ class SequenceGame(Widget):
         
         # Make the screen red
         Window.clearcolor = (1., 0., 0., 1.)
-        self.button1_out.color = (1., 0., 0., 1.)
-        self.button1_in.color = (1., 0., 0., 1.)
-        self.button2_out.color = (1., 0., 0., 1.)
-        self.button2_in.color = (1., 0., 0., 1.)
-        self.button3_out.color = (1., 0., 0., 1.)
-        self.button3_in.color = (1., 0., 0., 1.)
-        self.button4_out.color = (1., 0., 0., 1.)
-        self.button4_in.color = (1., 0., 0., 1.)
-        self.button5_out.color = (1., 0., 0., 1.)
-        self.button5_in.color = (1., 0., 0., 1.)
-        self.button6_out.color = (1., 0., 0., 1.)
-        self.button6_in.color = (1., 0., 0., 1.)
-        self.button7_out.color = (1., 0., 0., 1.)
-        self.button7_in.color = (1., 0., 0., 1.)
-        self.button8_out.color = (1., 0., 0., 1.)
-        self.button8_in.color = (1., 0., 0., 1.)
-        self.button9_out.color = (1., 0., 0., 1.)
-        self.button9_in.color = (1., 0., 0., 1.)
-        self.button10_out.color = (1., 0., 0., 1.)
-        self.button10_in.color = (1., 0., 0., 1.)
-        self.button11_out.color = (1., 0., 0., 1.)
-        self.button11_in.color = (1., 0., 0., 1.)
-        self.button12_out.color = (1., 0., 0., 1.)
-        self.button12_in.color = (1., 0., 0., 1.)
-        self.button13_out.color = (1., 0., 0., 1.)
-        self.button13_in.color = (1., 0., 0., 1.)
-        self.button14_out.color = (1., 0., 0., 1.)
-        self.button14_in.color = (1., 0., 0., 1.)
-        self.button15_out.color = (1., 0., 0., 1.)
-        self.button15_in.color = (1., 0., 0., 1.)
-        self.button16_out.color = (1., 0., 0., 1.)
-        self.button16_in.color = (1., 0., 0., 1.)
+        self.change_allbutton_color(1, 0, 0, 1)
         
     
     def end_set_error(self, **kwargs):
         # end the set error after the timeout period
-        return kwargs['ts'] > self.set_error_timeout
+        return kwargs['ts'] > self.error_timeout_time
     
     # Early leave from target --> hold error (buttons turn invisible)
     def early_leave_target1_hold(self, **kwargs):
@@ -1269,6 +1251,44 @@ class SequenceGame(Widget):
         except:
             pass
     
+    # Other utilities
+    def change_allbutton_color(self, r, g, b, a):
+        self.target1.color = (r, g, b, a)
+        self.target2.color = (r, g, b, a)
+        self.button1_out.color = (r, g, b, a)
+        self.button1_in.color = (r, g, b, a)
+        self.button2_out.color = (r, g, b, a)
+        self.button2_in.color = (r, g, b, a)
+        self.button3_out.color = (r, g, b, a)
+        self.button3_in.color = (r, g, b, a)
+        self.button4_out.color = (r, g, b, a)
+        self.button4_in.color = (r, g, b, a)
+        self.button5_out.color = (r, g, b, a)
+        self.button5_in.color = (r, g, b, a)
+        self.button6_out.color = (r, g, b, a)
+        self.button6_in.color = (r, g, b, a)
+        self.button7_out.color = (r, g, b, a)
+        self.button7_in.color = (r, g, b, a)
+        self.button8_out.color = (r, g, b, a)
+        self.button8_in.color = (r, g, b, a)
+        self.button9_out.color = (r, g, b, a)
+        self.button9_in.color = (r, g, b, a)
+        self.button10_out.color = (r, g, b, a)
+        self.button10_in.color = (r, g, b, a)
+        self.button11_out.color = (r, g, b, a)
+        self.button11_in.color = (r, g, b, a)
+        self.button12_out.color = (r, g, b, a)
+        self.button12_in.color = (r, g, b, a)
+        self.button13_out.color = (r, g, b, a)
+        self.button13_in.color = (r, g, b, a)
+        self.button14_out.color = (r, g, b, a)
+        self.button14_in.color = (r, g, b, a)
+        self.button15_out.color = (r, g, b, a)
+        self.button15_in.color = (r, g, b, a)
+        self.button16_out.color = (r, g, b, a)
+        self.button16_in.color = (r, g, b, a)
+        
+    
     
 class Splash(Widget):
     def init(self, *args):
@@ -1296,11 +1316,14 @@ class Manager(ScreenManager):
     
 class SequenceApp(App):
     def build(self, **kwargs):
-        from win32api import GetSystemMetrics
-        screenx = GetSystemMetrics(0)
-        screeny = GetSystemMetrics(1)
-        # screenx = 1000
-        # screeny = 1000
+        if platform == 'darwin':
+            screenx = 1800
+            screeny = 1000
+        elif platform =='win32':
+            from win32api import GetSystemMetrics
+            screenx = GetSystemMetrics(0)
+            screeny = GetSystemMetrics(1)
+        
         Window.size = (1800, 1000)
         Window.left = (screenx - 1800)/2
         Window.top = (screeny - 1000)/2

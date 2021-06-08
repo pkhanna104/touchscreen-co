@@ -23,62 +23,6 @@
                     Color: 
                         rgb: 1,1,0
 
-            BoxLayout 
-                id: top
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target Timeout (from first att.)'
-                    color: 1, 1, 0, 1
-           
-                Label: 
-                    text: '15 sec'
-
-                CheckBox:
-                    group: 'tt'
-                    id: tt_15_sec
-            
-                Label: 
-                    text: '30 sec'
-
-                CheckBox:
-                    group: 'tt'
-                    id: tt_30_sec
-                    
-                Label: 
-                    text: '45 sec'
-
-                CheckBox:
-                    group: 'tt'
-                    id: tt_45_sec
-
-                Label: 
-                    text: '60 sec'
-
-                CheckBox:
-                    group: 'tt'
-                    id: tt_60_sec
-                    active: True
-            
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-
             BoxLayout
                 id: starting2
                 orientation: 'horizontal'
@@ -403,8 +347,155 @@
                 Label:
                     text: ''
                     fontsize: 50
+            
+            BoxLayout 
+                id: top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
 
+                Label:
+                    text: ''
+                    fontsize: 50
 
+                Label: 
+                    text: 'Idle time until error'
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: '15 sec'
+
+                CheckBox:
+                    group: 'tt'
+                    id: tt_15_sec
+            
+                Label: 
+                    text: '30 sec'
+
+                CheckBox:
+                    group: 'tt'
+                    id: tt_30_sec
+                    
+                Label: 
+                    text: '45 sec'
+
+                CheckBox:
+                    group: 'tt'
+                    id: tt_45_sec
+
+                Label: 
+                    text: '60 sec'
+
+                CheckBox:
+                    group: 'tt'
+                    id: tt_60_sec
+                    active: True
+            
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+            BoxLayout
+                id: error_types_selected
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: 'Errors include:'
+                    color: 1, 1, 0, 1
+                    fontsize: 50
+                    
+                Label: 
+                    text: 'Target 2 pressed first'
+                    fontsize: 28
+                    halign: 'center'                        
+                
+                CheckBox: 
+                    id: t2p_1st_error
+                    
+                Label: 
+                    text: 'Non-target touch'
+                    fontsize: 28
+                    halign: 'center'                        
+                
+                CheckBox: 
+                    id: nontarg_error
+                   
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                    
+            BoxLayout 
+                id: error_to
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Error timeout time'
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: '0.5 sec'
+
+                CheckBox:
+                    group: 'error_to'
+                    id: to_pt5_sec
+                    active: True
+            
+                Label: 
+                    text: '1.0 sec'
+
+                CheckBox:
+                    group: 'error_to'
+                    id: to_1_sec
+                    
+                Label: 
+                    text: '1.5 sec'
+
+                CheckBox:
+                    group: 'error_to'
+                    id: to_1pt5_sec
+
+                Label: 
+                    text: '2.0 sec'
+
+                CheckBox:
+                    group: 'error_to'
+                    id: to_2_sec
+            
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
 
             BoxLayout:
                 id: params:
@@ -465,19 +556,6 @@
 
                 CheckBox:
                     id: targ_rad_15
-                    group: 'targ_cm'
-
-                Label: 
-                    text: '2.25cm'
-                CheckBox:
-                    id: targ_rad_22
-                    group: 'targ_cm'
-                    active: True
-
-                Label:
-                    text: '3.0 cm'
-                CheckBox:
-                    id: targ_rad_30
                     group: 'targ_cm'
                                         
                 Label:
@@ -719,13 +797,15 @@
                     root.current = 'splash_start'
                     splash.init(dict(hari=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butt=chk_but.active), 
                     dict(rew_manual=False, anytarg_rew=[anytarg_rew_zero_sec.active, anytarg_rew_pt1_sec.active, anytarg_rew_pt3_sec.active, anytarg_rew_pt5_sec.active], set_rew=[set_rew_zero_sec.active, set_rew_pt1_sec.active, set_rew_pt3_sec.active, set_rew_pt5_sec.active], hs_rew=[hs_rew_pt3_sec.active, hs_rew_pt5_sec.active, hs_rew_pt7_sec.active]), 
-                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_22.active, targ_rad_30.active]), 
+                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active]), 
                     dict(set_sel=[set_sel_A.active, set_sel_B.active, set_sel_C.active, set_sel_D.active, set_sel_E.active]), 
                     dict(test=[False, True, False]), 
                     dict(chold=[c_zero_sec.active, c_hund_sec.active, c_three_sev_five_sec.active, c_half_sec.active, c_575.active, c_60.active, c_big_rand.active], hold=[zero_sec.active, hund_sec.active, three_sev_five_sec.active, half_sec.active, t_575.active, t_60.active, big_rand.active]), 
+                    dict(error_type=[nontarg_error.active, t2p_1st_error.active]),
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
-                    dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]))
+                    dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]), 
+                    dict(error_to_time=[to_pt5_sec.active, to_1_sec.active, to_1pt5_sec.active, to_2_sec.active]))
 
             Label:
                 text: ''
