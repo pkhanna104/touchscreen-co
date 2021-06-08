@@ -200,17 +200,17 @@ class SequenceGame(Widget):
         #     self.center_y-0.375*self.height, self.center_y-0.375*self.height, self.center_y-0.375*self.height, self.center_y-0.375*self.height])
         
     
-        # self.possible_target_pos_x = np.array([1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4])
-        # self.possible_target_pos_y = np.array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4])
+        self.possible_target_pos_x = np.array([1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4])
+        self.possible_target_pos_y = np.array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4])
         
-        self.possible_target_pos_x = np.array([fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
-                                               fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
-                                               fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
-                                               fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm)])
-        self.possible_target_pos_y = np.array([fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), 
-                                               2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 
-                                               3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 
-                                               4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm)])
+        # self.possible_target_pos_x = np.array([fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
+        #                                        fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
+        #                                        fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
+        #                                        fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm)])
+        # self.possible_target_pos_y = np.array([fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), 
+        #                                        2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 
+        #                                        3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 
+        #                                        4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm)])
         
         
         # Which sets comprise the hyperset? 
@@ -807,7 +807,7 @@ class SequenceGame(Widget):
     # Start a new set
     def _start_set(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
-        import pdb; pdb.set_trace()
+        
         # Display outlines of all of the buttons
         self.button1_out.move(np.array([self.possible_target_pos_x[0], self.possible_target_pos_y[0]]))
         self.button1_out.color = (1., 1., 0., 1.)
