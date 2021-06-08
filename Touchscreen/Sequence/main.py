@@ -229,7 +229,6 @@ class SequenceGame(Widget):
         
         # How long to give rewards for touching any target?
         anytarg_rew_opts = [0., .1, .3, .5]
-        import pdb; pdb.set_trace()
         for i, val in enumerate(rew_in['anytarg_rew']):
             if val:
                 self.anytarg_rew = anytarg_rew_opts[i]
