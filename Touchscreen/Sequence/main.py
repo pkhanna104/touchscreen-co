@@ -807,7 +807,7 @@ class SequenceGame(Widget):
     # Start a new set
     def _start_set(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
-        
+        import pdb; pdb.set_trace()
         # Display outlines of all of the buttons
         self.button1_out.move(np.array([self.possible_target_pos_x[0], self.possible_target_pos_y[0]]))
         self.button1_out.color = (1., 1., 0., 1.)
