@@ -18,6 +18,7 @@ import tables
 
 
 Config.set('kivy', 'exit_on_escape', 1)
+Config.set('graphics', 'resizable', False)
 fixed_window_size = (1800, 1000)
 pix_per_cm = 85.
 Config.set('graphics', 'width', str(fixed_window_size[0]))
