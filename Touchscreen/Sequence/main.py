@@ -18,7 +18,7 @@ import tables
 
 
 Config.set('kivy', 'exit_on_escape', 1)
-fixed_window_size = (1000, 1000)
+fixed_window_size = (1800, 1000)
 pix_per_cm = 85.
 Config.set('graphics', 'width', str(fixed_window_size[0]))
 Config.set('graphics', 'height', str(fixed_window_size[1]))
@@ -1238,11 +1238,11 @@ class Manager(ScreenManager):
     
 class SequenceApp(App):
     def build(self, **kwargs):
-        # from win32api import GetSystemMetrics
-        # screenx = GetSystemMetrics(0)
-        # screeny = GetSystemMetrics(1)
-        screenx = 1000
-        screeny = 1000
+        from win32api import GetSystemMetrics
+        screenx = GetSystemMetrics(0)
+        screeny = GetSystemMetrics(1)
+        # screenx = 1000
+        # screeny = 1000
         Window.size = (1000, 1000)
         Window.left = (screenx - 1000)/2
         Window.top = (screeny - 1000)/2
