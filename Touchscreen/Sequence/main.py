@@ -31,16 +31,41 @@ class Data(tables.IsDescription):
     cap_touch = tables.Float32Col()
     time = tables.Float32Col()
 
-class TargetSet(Widget):
-    pos_x = NumericProperty(0)
-    pos_y = NumericProperty(0)
-    
-    def move(self, pos_x, pos_y):
-        self.pos = pos_x, pos_y
-
 class SequenceGame(Widget):
     target1 = ObjectProperty(None)
     target2 = ObjectProperty(None)
+    button1_in = ObjectProperty(None)
+    button1_out = ObjectProperty(None)
+    button2_in = ObjectProperty(None)
+    button2_out = ObjectProperty(None)
+    button3_in = ObjectProperty(None)
+    button3_out = ObjectProperty(None)
+    button4_in = ObjectProperty(None)
+    button4_out = ObjectProperty(None)
+    button5_in = ObjectProperty(None)
+    button5_out = ObjectProperty(None)
+    button6_in = ObjectProperty(None)
+    button6_out = ObjectProperty(None)
+    button7_in = ObjectProperty(None)
+    button7_out = ObjectProperty(None)
+    button8_in = ObjectProperty(None)
+    button8_out = ObjectProperty(None)
+    button9_in = ObjectProperty(None)
+    button9_out = ObjectProperty(None)
+    button10_in = ObjectProperty(None)
+    button10_out = ObjectProperty(None)
+    button11_in = ObjectProperty(None)
+    button11_out = ObjectProperty(None)
+    button12_in = ObjectProperty(None)
+    button12_out = ObjectProperty(None)
+    button13_in = ObjectProperty(None)
+    button13_out = ObjectProperty(None)
+    button14_in = ObjectProperty(None)
+    button14_out = ObjectProperty(None)
+    button15_in = ObjectProperty(None)
+    button15_out = ObjectProperty(None)
+    button16_in = ObjectProperty(None)
+    button16_out = ObjectProperty(None)
     
     # Time to wait after starting the video before getting to the first set display
     pre_start_vid_ts = 0.1
@@ -60,7 +85,8 @@ class SequenceGame(Widget):
     target_rad = 1.5 # cm
     
     # Exit Button Settings 
-    exit_pos = np.array([7, 4]) # cm
+    exit_pos1 = np.array([9*fixed_window_size[0]/(10*pix_per_cm), 9*fixed_window_size[1]/(10*pix_per_cm)]) # cm
+    exit_pos2 = np.array([9*fixed_window_size[0]/(10*pix_per_cm), 1*fixed_window_size[1]/(10*pix_per_cm)]) # cm
     exit_rad = 1. # cm
     exit_hold = 2 # seconds
     
@@ -100,6 +126,9 @@ class SequenceGame(Widget):
     trial_counter = NumericProperty(0)
     #indicator_txt = StringProperty('o')
     #indicator_txt_color = ListProperty([.5, .5, .5, 1.])
+    
+    # Percent of hyperset complete
+    percent_done = NumericProperty(0)
 
     t0 = time.time()
 
@@ -144,7 +173,7 @@ class SequenceGame(Widget):
     
     # Get the initial parameters
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
-        test=None, hold=None, 
+        set_id_selected = None, test=None, hold=None, 
         autoquit=None, rew_var=None, set_timeout = None, targ_pos=None):
         
         # Initialize a count of the number of rewards
@@ -169,29 +198,55 @@ class SequenceGame(Widget):
         #     self.center_y-0.125*self.height, self.center_y-0.125*self.height, self.center_y-0.125*self.height, self.center_y-0.125*self.height, 
         #     self.center_y-0.375*self.height, self.center_y-0.375*self.height, self.center_y-0.375*self.height, self.center_y-0.375*self.height])
         
-        self.possible_target_pos_x = np.array([1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4])
-        self.possible_target_pos_y = np.array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4])
-
+    
+        # self.possible_target_pos_x = np.array([1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4])
+        # self.possible_target_pos_y = np.array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4])
+        
+        self.possible_target_pos_x = np.array([fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
+                                               fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
+                                               fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
+                                               fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm)])
+        self.possible_target_pos_y = np.array([fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), 
+                                               2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 
+                                               3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 
+                                               4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm)])
+        
+        
+        # Which sets comprise the hyperset? 
+        self.sets_selected = []
+        for i, val in enumerate(set_id_selected['set_sel']):
+            if val:
+                self.sets_selected.append(i)
+        
+        # Record the number of sets per hyperset
+        self.nsets_per_hyperset = len(self.sets_selected)
+        
         # How long does the set stay on the screen until it disappears and move to next trial? 
         set_timeout_opts = [15, 30, 45, 60]
         for i, val in enumerate(set_timeout['tt']):
             if val:
                 self.set_timeout_time = set_timeout_opts[i]
         
-        # How long to give small rewards?
-        small_rew_opts = [0., .1, .3, .5]
-        for i, val in enumerate(rew_in['small_rew']):
+        # How long to give rewards for touching any target?
+        anytarg_rew_opts = [0., .1, .3, .5]
+        for i, val in enumerate(rew_in['anytarg_rew']):
             if val:
-                small_rew_opts = small_rew_opts[i]
+                anytarg_rew = anytarg_rew_opts[i]
         
-        # How long to give big rewards?
-        big_rew_opts = [.3, .5, .7]
-        for i, val in enumerate(rew_in['big_rew']):
+        # How long to give rewards for a complete set?
+        set_rew_opts = [0., .1, .3, .5]
+        for i, val in enumerate(rew_in['set_rew']):
             if val:
-                big_rew = big_rew_opts[i]
+                small_rew = small_rew_opts[i]
+        
+        # How long to give rewards for a complete hyperset?
+        hs_rew_opts = [.3, .5, .7]
+        for i, val in enumerate(rew_in['hs_rew']):
+            if val:
+                hs_rew = hs_rew_opts[i]
                 
         # Reward for simply touching the target?
-        self.reward_for_targtouch = [True, big_rew]
+        self.reward_for_targtouch = [True, hs_rew]
         
         # NOT SURE WHAT THESE DO
         self.reward_for_center = [False, 0]
@@ -280,27 +335,95 @@ class SequenceGame(Widget):
         
         # Initialize the set number
         self.set_ix = 1
-
+        
         # Initialize targets
         self.target1.set_size(2*self.target_rad)
         self.target1.move(np.array([0., 0.]))
         self.target2.set_size(2*self.target_rad)
         self.target2.move(np.array([0., 0.]))
         
-        # self.exit_target1.set_size(2*self.exit_rad)
-        # self.exit_target2.set_size(2*self.exit_rad)
+        # Initialize buttons
+        self.button1_out.set_size(2*self.target_rad)
+        self.button1_out.move(np.array([0., 0.]))
+        self.button1_in.set_size(2*self.target_rad-0.1)
+        self.button1_in.move(np.array([0., 0.]))
+        self.button2_out.set_size(2*self.target_rad)
+        self.button2_out.move(np.array([0., 0.]))
+        self.button2_in.set_size(2*self.target_rad-0.1)
+        self.button2_in.move(np.array([0., 0.]))
+        self.button3_out.set_size(2*self.target_rad)
+        self.button3_out.move(np.array([0., 0.]))
+        self.button3_in.set_size(2*self.target_rad-0.1)
+        self.button3_in.move(np.array([0., 0.]))
+        self.button4_out.set_size(2*self.target_rad)
+        self.button4_out.move(np.array([0., 0.]))
+        self.button4_in.set_size(2*self.target_rad-0.1)
+        self.button4_in.move(np.array([0., 0.]))
+        self.button5_out.set_size(2*self.target_rad)
+        self.button5_out.move(np.array([0., 0.]))
+        self.button5_in.set_size(2*self.target_rad-0.1)
+        self.button5_in.move(np.array([0., 0.]))
+        self.button6_out.set_size(2*self.target_rad)
+        self.button6_out.move(np.array([0., 0.]))
+        self.button6_in.set_size(2*self.target_rad-0.1)
+        self.button6_in.move(np.array([0., 0.]))
+        self.button7_out.set_size(2*self.target_rad)
+        self.button7_out.move(np.array([0., 0.]))
+        self.button7_in.set_size(2*self.target_rad-0.1)
+        self.button7_in.move(np.array([0., 0.]))
+        self.button8_out.set_size(2*self.target_rad)
+        self.button8_out.move(np.array([0., 0.]))
+        self.button8_in.set_size(2*self.target_rad-0.1)
+        self.button8_in.move(np.array([0., 0.]))
+        self.button9_out.set_size(2*self.target_rad)
+        self.button9_out.move(np.array([0., 0.]))
+        self.button9_in.set_size(2*self.target_rad-0.1)
+        self.button9_in.move(np.array([0., 0.]))
+        self.button10_out.set_size(2*self.target_rad)
+        self.button10_out.move(np.array([0., 0.]))
+        self.button10_in.set_size(2*self.target_rad-0.1)
+        self.button10_in.move(np.array([0., 0.]))
+        self.button11_out.set_size(2*self.target_rad)
+        self.button11_out.move(np.array([0., 0.]))
+        self.button11_in.set_size(2*self.target_rad-0.1)
+        self.button11_in.move(np.array([0., 0.]))
+        self.button12_out.set_size(2*self.target_rad)
+        self.button12_out.move(np.array([0., 0.]))
+        self.button12_in.set_size(2*self.target_rad-0.1)
+        self.button12_in.move(np.array([0., 0.]))
+        self.button13_out.set_size(2*self.target_rad)
+        self.button13_out.move(np.array([0., 0.]))
+        self.button13_in.set_size(2*self.target_rad-0.1)
+        self.button13_in.move(np.array([0., 0.]))
+        self.button14_out.set_size(2*self.target_rad)
+        self.button14_out.move(np.array([0., 0.]))
+        self.button14_in.set_size(2*self.target_rad-0.1)
+        self.button14_in.move(np.array([0., 0.]))
+        self.button15_out.set_size(2*self.target_rad)
+        self.button15_out.move(np.array([0., 0.]))
+        self.button15_in.set_size(2*self.target_rad-0.1)
+        self.button15_in.move(np.array([0., 0.]))
+        self.button16_out.set_size(2*self.target_rad)
+        self.button16_out.move(np.array([0., 0.]))
+        self.button16_in.set_size(2*self.target_rad-0.1)
+        self.button16_in.move(np.array([0., 0.]))
+        
+        
+        #  Initialize the exit buttons
+        self.exit_target1.set_size(2*self.exit_rad)
+        self.exit_target1.move(self.exit_pos1)
+        self.exit_target1.color = (.15, .15, .15, 1)
+        self.exit_target2.set_size(2*self.exit_rad)
+        self.exit_target2.move(self.exit_pos2)
+        self.exit_target2.color = (.15, .15, .15, 1)
+        
+        # # Initialize PD Indicator
         # self.indicator_targ.set_size(self.exit_rad)
         # self.indicator_targ.move(self.indicator_pos)
         # self.indicator_targ.color = (0., 0., 0., 1.)
-
-        # self.exit_target1.move(self.exit_pos)
-        # self.exit_pos2 = np.array([self.exit_pos[0], -1*self.exit_pos[1]])
-        # self.exit_target2.move(self.exit_pos2)
-        # self.exit_target1.color = (.15, .15, .15, 1)
-        # self.exit_target2.color = (.15, .15, .15, 1)
         
-        # Determine the hypersets
-        self.target_list = np.array([[1, 2, 4, 5, 7, 8, 10, 11, 13, 14], [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]])
+        # Determine the hypersets (every 2 numbers comprises a set)
+        self.target_list = np.array([[1, 12, 4, 15, 7, 8, 10, 11, 13, 14], [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]])
         
         # Initialize the Target and Home position
         self.target_HS_index = 0
@@ -451,27 +574,6 @@ class SequenceGame(Widget):
         except:
             pass
     
-    # Function for Generating Rewards
-    def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
-        mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
-        rew = []
-        trial_cnt_bonus = 0
-
-        for i in range(500):
-            mini_block_array = np.zeros((mini_block))
-            ix = np.random.permutation(mini_block)
-            mini_block_array[ix[:2]] = reward_for_grasp[1]
-
-            trial_cnt_bonus += mini_block
-            if perc_trials_2x > 0:
-                if trial_cnt_bonus > int(1./(perc_trials_rew*perc_trials_2x)):
-                    mini_block_array[ix[0]] = reward_for_grasp[1]*2.
-                    trial_cnt_bonus = 0
-
-            rew.append(mini_block_array)
-        return np.hstack((rew))
-    
-    
     # Function for Closing the App
     def close_app(self):
         # Save Data Eventually
@@ -520,7 +622,7 @@ class SequenceGame(Widget):
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
             kw = dict(ts=self.state_length)
             print(self.state)
-            # import pdb; pdb.set_trace()
+
             fcn_test = getattr(self, fcn_test_name)
             if fcn_test(**kw):
                 # if stop: close the app
@@ -614,26 +716,26 @@ class SequenceGame(Widget):
         if np.logical_and(self.trial_counter >= self.max_trials, self.state == 'IHSI'):
             self.idle = True
             return True
-        # else:
+        else:
             # Stop if both exit targets are held
-            # e = [0, 0]
-            # e[0] = self.check_if_cursors_in_targ(self.exit_pos, self.exit_rad)
-            # e[1] = self.check_if_cursors_in_targ(self.exit_pos2, self.exit_rad)
-            # t = [0, 0]
-            # for i in range(2):
-            #     if np.logical_and(self.prev_exit_ts[i] !=0, e[i] == True):
-            #         t[i] = time.time() - self.prev_exit_ts[i]
-            #     elif np.logical_and(self.prev_exit_ts[i] == 0, e[i]==True):
-            #         self.prev_exit_ts[i] = time.time()
-            #     else:
-            #         self.prev_exit_ts[i] = 0
+            e = [0, 0]
+            e[0] = self.check_if_cursors_in_targ(self.exit_pos1, self.exit_rad)
+            e[1] = self.check_if_cursors_in_targ(self.exit_pos2, self.exit_rad)
+            t = [0, 0]
+            for i in range(2):
+                if np.logical_and(self.prev_exit_ts[i] !=0, e[i] == True):
+                    t[i] = time.time() - self.prev_exit_ts[i]
+                elif np.logical_and(self.prev_exit_ts[i] == 0, e[i]==True):
+                    self.prev_exit_ts[i] = time.time()
+                else:
+                    self.prev_exit_ts[i] = 0
                     
-            # if t[0] > self.exit_hold and t[1] > self.exit_hold:
-            #     self.idle = False
-            #     return True
+            if t[0] > self.exit_hold and t[1] > self.exit_hold:
+                self.idle = False
+                return True
 
-            # else:
-            #     return False
+            else:
+                return False
     
     # IHSI State
     def _start_IHSI(self, **kwargs):
@@ -642,8 +744,8 @@ class SequenceGame(Widget):
         except:
             pass
         Window.clearcolor = (0., 0., 0., 1.)
-        # self.exit_target1.color = (.15, .15, .15, 1.)
-        # self.exit_target2.color = (.15, .15, .15, 1.)
+        self.exit_target1.color = (.15, .15, .15, 1.)
+        self.exit_target2.color = (.15, .15, .15, 1.)
         
         # Set the set index to 1
         self.set_ix = 1;
@@ -685,8 +787,8 @@ class SequenceGame(Widget):
             Window.clearcolor = (1., 0., 0., 1.)
 
             # # Turn exit buttons redish:
-            # self.exit_target1.color = (.9, 0, 0, 1.)
-            # self.exit_target2.color = (.9, 0, 0, 1.)
+            self.exit_target1.color = (.9, 0, 0, 1.)
+            self.exit_target2.color = (.9, 0, 0, 1.)
 
     def end_vid_trig(self, **kwargs):
         return kwargs['ts'] > self.pre_start_vid_ts
@@ -711,7 +813,78 @@ class SequenceGame(Widget):
     def _start_set(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
         
-        self.target_index = np.array([2*(self.set_ix-1), 2*(self.set_ix-1)+1])
+        # Display outlines of all of the buttons
+        self.button1_out.move(np.array([self.possible_target_pos_x[0], self.possible_target_pos_y[0]]))
+        self.button1_out.color = (1., 1., 0., 1.)
+        self.button1_in.move(np.array([self.possible_target_pos_x[0], self.possible_target_pos_y[0]]))
+        self.button1_in.color = (0., 0., 0., 1.)
+        self.button2_out.move(np.array([self.possible_target_pos_x[1], self.possible_target_pos_y[1]]))
+        self.button2_out.color = (1., 1., 0., 1.)
+        self.button2_in.move(np.array([self.possible_target_pos_x[1], self.possible_target_pos_y[1]]))
+        self.button2_in.color = (0., 0., 0., 1.)
+        self.button3_out.move(np.array([self.possible_target_pos_x[2], self.possible_target_pos_y[2]]))
+        self.button3_out.color = (1., 1., 0., 1.)
+        self.button3_in.move(np.array([self.possible_target_pos_x[2], self.possible_target_pos_y[2]]))
+        self.button3_in.color = (0., 0., 0., 1.)
+        self.button4_out.move(np.array([self.possible_target_pos_x[3], self.possible_target_pos_y[3]]))
+        self.button4_out.color = (1., 1., 0., 1.)
+        self.button4_in.move(np.array([self.possible_target_pos_x[3], self.possible_target_pos_y[3]]))
+        self.button4_in.color = (0., 0., 0., 1.)
+        self.button5_out.move(np.array([self.possible_target_pos_x[4], self.possible_target_pos_y[4]]))
+        self.button5_out.color = (1., 1., 0., 1.)
+        self.button5_in.move(np.array([self.possible_target_pos_x[4], self.possible_target_pos_y[4]]))
+        self.button5_in.color = (0., 0., 0., 1.)
+        self.button6_out.move(np.array([self.possible_target_pos_x[5], self.possible_target_pos_y[5]]))
+        self.button6_out.color = (1., 1., 0., 1.)
+        self.button6_in.move(np.array([self.possible_target_pos_x[5], self.possible_target_pos_y[5]]))
+        self.button6_in.color = (0., 0., 0., 1.)
+        self.button7_out.move(np.array([self.possible_target_pos_x[6], self.possible_target_pos_y[6]]))
+        self.button7_out.color = (1., 1., 0., 1.)
+        self.button7_in.move(np.array([self.possible_target_pos_x[6], self.possible_target_pos_y[6]]))
+        self.button7_in.color = (0., 0., 0., 1.)
+        self.button8_out.move(np.array([self.possible_target_pos_x[7], self.possible_target_pos_y[7]]))
+        self.button8_out.color = (1., 1., 0., 1.)
+        self.button8_in.move(np.array([self.possible_target_pos_x[7], self.possible_target_pos_y[7]]))
+        self.button8_in.color = (0., 0., 0., 1.)
+        self.button9_out.move(np.array([self.possible_target_pos_x[8], self.possible_target_pos_y[8]]))
+        self.button9_out.color = (1., 1., 0., 1.)
+        self.button9_in.move(np.array([self.possible_target_pos_x[8], self.possible_target_pos_y[8]]))
+        self.button9_in.color = (0., 0., 0., 1.)
+        self.button10_out.move(np.array([self.possible_target_pos_x[9], self.possible_target_pos_y[9]]))
+        self.button10_out.color = (1., 1., 0., 1.)
+        self.button10_in.move(np.array([self.possible_target_pos_x[9], self.possible_target_pos_y[9]]))
+        self.button10_in.color = (0., 0., 0., 1.)
+        self.button11_out.move(np.array([self.possible_target_pos_x[10], self.possible_target_pos_y[10]]))
+        self.button11_out.color = (1., 1., 0., 1.)
+        self.button11_in.move(np.array([self.possible_target_pos_x[10], self.possible_target_pos_y[10]]))
+        self.button11_in.color = (0., 0., 0., 1.)
+        self.button12_out.move(np.array([self.possible_target_pos_x[11], self.possible_target_pos_y[11]]))
+        self.button12_out.color = (1., 1., 0., 1.)
+        self.button12_in.move(np.array([self.possible_target_pos_x[11], self.possible_target_pos_y[11]]))
+        self.button12_in.color = (0., 0., 0., 1.)
+        self.button13_out.move(np.array([self.possible_target_pos_x[12], self.possible_target_pos_y[12]]))
+        self.button13_out.color = (1., 1., 0., 1.)
+        self.button13_in.move(np.array([self.possible_target_pos_x[12], self.possible_target_pos_y[12]]))
+        self.button13_in.color = (0., 0., 0., 1.)
+        self.button14_out.move(np.array([self.possible_target_pos_x[13], self.possible_target_pos_y[13]]))
+        self.button14_out.color = (1., 1., 0., 1.)
+        self.button14_in.move(np.array([self.possible_target_pos_x[13], self.possible_target_pos_y[13]]))
+        self.button14_in.color = (0., 0., 0., 1.)
+        self.button15_out.move(np.array([self.possible_target_pos_x[14], self.possible_target_pos_y[14]]))
+        self.button15_out.color = (1., 1., 0., 1.)
+        self.button15_in.move(np.array([self.possible_target_pos_x[14], self.possible_target_pos_y[14]]))
+        self.button15_in.color = (0., 0., 0., 1.)
+        self.button16_out.move(np.array([self.possible_target_pos_x[15], self.possible_target_pos_y[15]]))
+        self.button16_out.color = (1., 1., 0., 1.)
+        self.button16_in.move(np.array([self.possible_target_pos_x[15], self.possible_target_pos_y[15]]))
+        self.button16_in.color = (0., 0., 0., 1.)
+        
+        # Update the progress bar
+        self.percent_done = 100*(self.set_ix/self.nsets_per_hyperset)
+        
+        # Determine which targets to show for this set
+        self.target_index = np.array([2*(self.sets_selected[self.set_ix-1]), 2*(self.sets_selected[self.set_ix-1])+1])
+        
         # Change the position of the targets
         if self.repeat is False:
             self.target1_position = np.array([self.possible_target_pos_x[self.target_list[self.target_HS_index, self.target_index[0]]], self.possible_target_pos_y[self.target_list[self.target_HS_index, self.target_index[0]]]])
@@ -726,8 +899,10 @@ class SequenceGame(Widget):
         self.target1.color = (1., 1., 0., 1.)
         self.target2.color = (1., 1., 0., 1.)
         self.repeat = False
-        # self.exit_target1.color = (.15, .15, .15, 1)
-        # self.exit_target2.color = (.15, .15, .15, 1)
+        
+        # Turn exit buttons gray
+        self.exit_target1.color = (.15, .15, .15, 1)
+        self.exit_target2.color = (.15, .15, .15, 1)
         # self.indicator_targ.color = (.25, .25, .25, 1.)
         
         if self.first_set_attempt:
@@ -802,8 +977,10 @@ class SequenceGame(Widget):
         Window.clearcolor = (1., 1., 1., 1.)
         self.target1.color = (1., 1., 1., 1.)
         self.target2.color = (1., 1., 1., 1.)
-        # self.exit_target1.color = (1., 1., 1., 1.)
-        # self.exit_target2.color = (1., 1., 1., 1.)
+        
+        # Turn exit targets white
+        self.exit_target1.color = (1., 1., 1., 1.)
+        self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
         self.cnts_in_rew = 0
         # self.indicator_targ.color = (1., 1., 1., 1.)
@@ -811,7 +988,7 @@ class SequenceGame(Widget):
         
     def _while_reward_set(self, **kwargs):
         if self.rew_cnt == 1:
-            self.run_small_rew()
+            self.run_set_rew()
             self.rew_cnt += 1
             
     def end_reward_set(self, **kwargs):
@@ -822,22 +999,24 @@ class SequenceGame(Widget):
         self.first_set_attempt = True
         
         return True
-      
-    def _start_reward_set(self, **kwargs):
+    
+    def _start_reward_hyperset(self, **kwargs):
         self.trial_counter += 1
         Window.clearcolor = (1., 1., 1., 1.)
         self.target1.color = (1., 1., 1., 1.)
         self.target2.color = (1., 1., 1., 1.)
-        # self.exit_target1.color = (1., 1., 1., 1.)
-        # self.exit_target2.color = (1., 1., 1., 1.)
+        
+        # Turn exit targets white
+        self.exit_target1.color = (1., 1., 1., 1.)
+        self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
         self.cnts_in_rew = 0
         # self.indicator_targ.color = (1., 1., 1., 1.)
         self.repeat = False
-    
+        
     def _while_reward_hyperset(self, **kwargs):
         if self.rew_cnt == 1:
-            self.run_big_rew()
+            self.run_HS_rew()
             self.rew_cnt += 1
             
     def end_reward_hyperset(self, **kwargs):
@@ -953,79 +1132,90 @@ class SequenceGame(Widget):
             return False
     
     
+    # Generate reward schedule
+    def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
+        mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
+        rew = []
+        trial_cnt_bonus = 0
+
+        for i in range(500):
+            mini_block_array = np.zeros((mini_block))
+            ix = np.random.permutation(mini_block)
+            mini_block_array[ix[:2]] = reward_for_grasp[1]
+
+            trial_cnt_bonus += mini_block
+            if perc_trials_2x > 0:
+                if trial_cnt_bonus > int(1./(perc_trials_rew*perc_trials_2x)):
+                    mini_block_array[ix[0]] = reward_for_grasp[1]*2.
+                    trial_cnt_bonus = 0
+
+            rew.append(mini_block_array)
+        return np.hstack((rew))
+    
     # Run Rewards
-    def run_big_rew(self, **kwargs):
+    def run_anytarg_rew(self, **kwargs):
         try:
-            print('in big reward:')
-            self.repeat = False
-            if self.reward_for_targtouch[0]:
-                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                #sound = SoundLoader.load('reward1.wav')
-                print('in big reward 2')
-                #print(str(self.reward_generator[self.trial_counter]))
-                #print(self.trial_counter)
-                #print(self.reward_generator[:100])
-                self.reward1.play()
+            #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+            sound = SoundLoader.load('reward2.wav')
+            sound.play()
 
-                if not self.skip_juice:
-                    if self.reward_generator[self.trial_counter] > 0:
-                        self.reward_port.open()
-                        #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                        self.reward_port.write(rew_str)
-                        time.sleep(.25 + self.reward_delay_time)
-                        run_str = [ord(r) for r in 'run\n']
-                        self.reward_port.write(run_str)
-                        self.reward_port.close()
-        except:
-            pass
-        
-    def run_small_rew(self, **kwargs):
-        try:
-            if np.logical_or(self.reward_for_anytouch[0], self.reward_for_center[0]):
-                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                sound = SoundLoader.load('reward2.wav')
-                sound.play()
-
-                ### To trigger reward make sure reward is > 0:
-                if np.logical_or(np.logical_and(self.reward_for_anytouch[0], self.reward_for_anytouch[1] > 0), 
-                    np.logical_and(self.reward_for_center[0], self.reward_for_center[1] > 0)):
-
-                    self.reward_port.open()
-                    if self.reward_for_anytouch[0]:
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
-                    elif self.reward_for_center[0]:
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_center[1])+' sec\n']
-                    self.reward_port.write(rew_str)
-                    time.sleep(.25)
-                    run_str = [ord(r) for r in 'run\n']
-                    self.reward_port.write(run_str)
-                    self.reward_port.close()
+            ### To trigger reward make sure reward is > 0:
+            if self.anytarg_rew > 0:
+                self.reward_port.open()
+                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.anytarg_rew)+' sec\n']
+                self.reward_port.write(rew_str)
+                time.sleep(.25)
+                run_str = [ord(r) for r in 'run\n']
+                self.reward_port.write(run_str)
+                self.reward_port.close()
         except:
             pass
 
         #self.repeat = True
     
+    def run_set_rew(self, **kwargs):
+        try:
+            #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+            sound = SoundLoader.load('reward2.wav')
+            sound.play()
+
+            ### To trigger reward make sure reward is > 0:
+            if self.set_rew > 0:
+                self.reward_port.open()
+                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.set_rew)+' sec\n']
+                self.reward_port.write(rew_str)
+                time.sleep(.25)
+                run_str = [ord(r) for r in 'run\n']
+                self.reward_port.write(run_str)
+                self.reward_port.close()
+        except:
+            pass
+
+        #self.repeat = True
     
-   # def new_set(self):
-   #      self.x_grid1 = randint(1,4)
-   #      self.y_grid1 = randint(1,4)
-   #      self.x_grid2 = randint(1,4)
-   #      self.y_grid2 = randint(1,4)
-        
-   #  def update(self, dt):
-   #      pos_x1 = self.center_x+(self.x_grid1-3)*self.height/6
-   #      pos_y1 = self.center_y+(self.y_grid1-3)*self.height/6
-   #      pos_x2 = self.center_x+(self.x_grid2-3)*self.height/6
-   #      pos_y2 = self.center_y+(self.y_grid2-3)*self.height/6
-   #      self.target1.move(pos_x1, pos_y1)
-   #      self.target2.move(pos_x2, pos_y2)
-        
-   #      try:
-   #          if self.curs[0] < pos_x1:
-   #              self.new_set()
-   #      except:
-   #          pass
+    def run_HS_rew(self, **kwargs):
+        try:
+            print('in big reward:')
+            self.repeat = False
+            #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+            #sound = SoundLoader.load('reward1.wav')
+            #print(str(self.reward_generator[self.trial_counter]))
+            #print(self.trial_counter)
+            #print(self.reward_generator[:100])
+            self.reward1.play()
+
+            if not self.skip_juice:
+                if self.reward_generator[self.trial_counter] > 0:
+                    self.reward_port.open()
+                    #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.hs_rew)+' sec\n']
+                    self.reward_port.write(rew_str)
+                    time.sleep(.25 + self.reward_delay_time)
+                    run_str = [ord(r) for r in 'run\n']
+                    self.reward_port.write(run_str)
+                    self.reward_port.close()
+        except:
+            pass
     
     
 class Splash(Widget):
@@ -1042,9 +1232,10 @@ class Target(Widget):
         self.size=size_pix
 
     def move(self, pos):
+        # Convert cm to pixels
         pos_pix = cm2pix(pos).astype(int)
         pos_pix_int = tuple((int(pos_pix[0]), int(pos_pix[1])))
-        self.center = pos_pix_int    
+        self.center = pos_pix_int
     
     
 class Manager(ScreenManager):
@@ -1058,9 +1249,9 @@ class SequenceApp(App):
         # screeny = GetSystemMetrics(1)
         screenx = 1000
         screeny = 1000
-        Window.size = (800, 800)
-        Window.left = (screenx - 800)/2
-        Window.top = (screeny - 800)/2
+        Window.size = (1000, 1000)
+        Window.left = (screenx - 1000)/2
+        Window.top = (screeny - 1000)/2
         return Manager()    
     
 def cm2pix(pos_cm, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):

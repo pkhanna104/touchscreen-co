@@ -142,6 +142,127 @@
                     text: ''
                     fontsize: 50
 
+            BoxLayout
+                id: set_select
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: 'Sets to train:'
+                    color: 1, 1, 0, 1
+                    fontsize: 50
+                    
+                Label: 
+                    text: 'A'
+                    fontsize: 28
+                    halign: 'center'                        
+                
+                CheckBox: 
+                    id: set_sel_A
+                    active: True 
+                    
+                Label: 
+                    text: 'B'
+                    fontsize: 28
+                    halign: 'center'                        
+                
+                CheckBox: 
+                    id: set_sel_B
+                
+                Label: 
+                    text: 'C'
+                    fontsize: 28
+                    halign: 'center' 
+                                           
+                CheckBox: 
+                    id: set_sel_C
+                    
+                Label: 
+                    text: 'D'
+                    fontsize: 28
+                    halign: 'center' 
+                                         
+                CheckBox: 
+                    id: set_sel_D
+
+                Label: 
+                    text: 'E'
+                    fontsize: 28
+                    halign: 'center' 
+                    
+                CheckBox: 
+                    id: set_sel_E
+                   
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+            BoxLayout 
+                id: anytarg_rew
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0, 0, 0, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Any target reward'
+                    color: 1, 1, 0, 1
+
+                Label:
+                    text: '0.0 sec'
+                CheckBox:
+                    id: anytarg_rew_zero_sec
+                    group: 'small_rew'
+
+                Label: 
+                    text: '0.1 sec'
+
+                CheckBox:
+                    id: anytarg_rew_pt1_sec
+                    group: 'small_rew'
+                    active: True
+
+                Label: 
+                    text: '0.3 sec'
+
+                CheckBox:
+                    id: anytarg_rew_pt3_sec
+                    group: 'small_rew'
+
+                Label: 
+                    text: '0.5 sec'
+
+                CheckBox:
+                    id: anytarg_rew_pt5_sec
+                    group: 'small_rew'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                    
             BoxLayout 
                 id: small_rew
                 orientation: 'horizontal'
@@ -167,14 +288,14 @@
                 Label:
                     text: '0.0 sec'
                 CheckBox:
-                    id: small_rew_zero_sec
+                    id: set_rew_zero_sec
                     group: 'small_rew'
 
                 Label: 
                     text: '0.1 sec'
 
                 CheckBox:
-                    id: small_rew_pt1_sec
+                    id: set_rew_pt1_sec
                     group: 'small_rew'
                     active: True
 
@@ -182,14 +303,14 @@
                     text: '0.3 sec'
 
                 CheckBox:
-                    id: small_rew_pt3_sec
+                    id: set_rew_pt3_sec
                     group: 'small_rew'
 
                 Label: 
                     text: '0.5 sec'
 
                 CheckBox:
-                    id: small_rew_pt5_sec
+                    id: set_rew_pt5_sec
                     group: 'small_rew'
 
                 Label:
@@ -216,21 +337,21 @@
                     text: '0.3 sec'
 
                 CheckBox:
-                    id: big_rew_pt3_sec
+                    id: hs_rew_pt3_sec
                     group: 'big_rew'
 
                 Label: 
                     text: '0.5 sec'
 
                 CheckBox:
-                    id: big_rew_pt5_sec
+                    id: hs_rew_pt5_sec
                     group: 'big_rew'
 
                 Label: 
                     text: '0.7 sec'
 
                 CheckBox:
-                    id: big_rew_pt7_sec
+                    id: hs_rew_pt7_sec
                     group: 'big_rew'
                     active: True
 
@@ -242,7 +363,7 @@
                     fontsize: 50
             
             BoxLayout 
-                id: big_rew
+                id: rew_var
                 orientation: 'horizontal'
                 Label:
                     text: ''
@@ -597,8 +718,9 @@
                 on_release: 
                     root.current = 'splash_start'
                     splash.init(dict(hari=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butt=chk_but.active), 
-                    dict(rew_manual=False, rew_anytouch=False, small_rew=[small_rew_zero_sec.active, small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
+                    dict(rew_manual=False, anytarg_rew=[anytarg_rew_zero_sec.active, anytarg_rew_pt1_sec.active, anytarg_rew_pt3_sec.active, anytarg_rew_pt5_sec.active], set_rew=[set_rew_zero_sec.active, set_rew_pt1_sec.active, set_rew_pt3_sec.active, set_rew_pt5_sec.active], hs_rew=[hs_rew_pt3_sec.active, hs_rew_pt5_sec.active, hs_rew_pt7_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_22.active, targ_rad_30.active]), 
+                    dict(set_sel=[set_sel_A.active, set_sel_B.active, set_sel_C.active, set_sel_D.active, set_sel_E.active]), 
                     dict(test=[False, True, False]), 
                     dict(chold=[c_zero_sec.active, c_hund_sec.active, c_three_sev_five_sec.active, c_half_sec.active, c_575.active, c_60.active, c_big_rand.active], hold=[zero_sec.active, hund_sec.active, three_sev_five_sec.active, half_sec.active, t_575.active, t_60.active, big_rand.active]), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
@@ -691,15 +813,156 @@
 
 
 <SequenceGame>:   
+    canvas:
+        Rectangle:
+            pos: 0.2*root.width, root.top - root.height/10
+            size: (root.percent_done/100)*0.6*root.width, root.height/10
+            
     target1: target_one
     target2: target_two
+    button1_in: button_one_in
+    button1_out: button_one_out
+    button2_in: button_two_in
+    button2_out: button_two_out
+    button3_in: button_three_in
+    button3_out: button_three_out
+    button4_in: button_four_in
+    button4_out: button_four_out
+    button5_in: button_five_in
+    button5_out: button_five_out
+    button6_in: button_six_in
+    button6_out: button_six_out
+    button7_in: button_seven_in
+    button7_out: button_seven_out
+    button8_in: button_eight_in
+    button8_out: button_eight_out
+    button9_in: button_nine_in
+    button9_out: button_nine_out
+    button10_in: button_ten_in
+    button10_out: button_ten_out
+    button11_in: button_eleven_in
+    button11_out: button_eleven_out
+    button12_in: button_twelve_in
+    button12_out: button_twelve_out
+    button13_in: button_thirteen_in
+    button13_out: button_thirteen_out
+    button14_in: button_fourteen_in
+    button14_out: button_fourteen_out
+    button15_in: button_fifteen_in
+    button15_out: button_fifteen_out
+    button16_in: button_sixteen_in
+    button16_out: button_sixteen_out
+    exit_target1: target_e1
+    exit_target2: target_e2
     
+    Target:
+        id: button_one_out
+    
+    Target:
+        id: button_one_in
+        
+    Target:
+        id: button_two_out
+    
+    Target:
+        id: button_two_in
+        
+    Target:
+        id: button_three_out
+    
+    Target:
+        id: button_three_in
+        
+    Target:
+        id: button_four_out
+    
+    Target:
+        id: button_four_in
+        
+    Target:
+        id: button_five_out
+    
+    Target:
+        id: button_five_in
+        
+    Target:
+        id: button_six_out
+    
+    Target:
+        id: button_six_in
+        
+    Target:
+        id: button_seven_out
+    
+    Target:
+        id: button_seven_in
+        
+    Target:
+        id: button_eight_out
+    
+    Target:
+        id: button_eight_in
+        
+    Target:
+        id: button_nine_out
+    
+    Target:
+        id: button_nine_in
+        
+    Target:
+        id: button_ten_out
+    
+    Target:
+        id: button_ten_in
+        
+    Target:
+        id: button_eleven_out
+    
+    Target:
+        id: button_eleven_in
+        
+    Target:
+        id: button_twelve_out
+    
+    Target:
+        id: button_twelve_in
+        
+    Target:
+        id: button_thirteen_out
+    
+    Target:
+        id: button_thirteen_in
+        
+    Target:
+        id: button_fourteen_out
+    
+    Target:
+        id: button_fourteen_in
+        
+    Target:
+        id: button_fifteen_out
+    
+    Target:
+        id: button_fifteen_in
+        
+    Target:
+        id: button_sixteen_out
+    
+    Target:
+        id: button_sixteen_in
+        
     Target:
         id: target_one
         
     Target:
         id: target_two
-     
+        
+    Target:
+        id: target_e1
+
+    Target:
+        id: target_e2
+    
     Label:
         color: .5,.5,.5,1
         font_size: 50
@@ -773,25 +1036,6 @@
             size:self.size
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<TargetSet>:
-    canvas:
-        Rectangle:
-            pos: self.pos
-            size: self.height/6, self.height/6
 
 
         
