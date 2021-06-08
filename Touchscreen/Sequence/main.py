@@ -1244,8 +1244,8 @@ class SequenceApp(App):
         screeny = GetSystemMetrics(1)
         # screenx = 1000
         # screeny = 1000
-        Window.size = (1000, 1000)
-        Window.left = (screenx - 1000)/2
+        Window.size = (1800, 1000)
+        Window.left = (screenx - 1800)/2
         Window.top = (screeny - 1000)/2
         return Manager()    
     
