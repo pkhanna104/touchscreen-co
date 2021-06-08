@@ -88,8 +88,8 @@ class SequenceGame(Widget):
     # Exit Button Settings 
     # exit_pos1 = np.array([9*fixed_window_size[0]/(10*pix_per_cm), 9*fixed_window_size[1]/(10*pix_per_cm)]) # cm
     # exit_pos2 = np.array([9*fixed_window_size[0]/(10*pix_per_cm), 1*fixed_window_size[1]/(10*pix_per_cm)]) # cm
-    exit_pos1 = np.array([17, 2])
-    exit_pos2 = np.array([17, 10])
+    exit_pos1 = np.array([18, 2])
+    exit_pos2 = np.array([18, 10])
     exit_rad = 1. # cm
     exit_hold = 2 # seconds
     
@@ -202,17 +202,17 @@ class SequenceGame(Widget):
         #     self.center_y-0.375*self.height, self.center_y-0.375*self.height, self.center_y-0.375*self.height, self.center_y-0.375*self.height])
         
     
-        self.possible_target_pos_x = np.array([6, 9, 12, 15, 6, 9, 12, 15, 6, 9, 12, 15, 6, 9, 12, 15]) # determined through trial and error
-        self.possible_target_pos_y = np.array([3, 3, 3, 3, 5, 5, 5, 5, 7, 7, 7, 7, 9, 9, 9, 9])
+        # self.possible_target_pos_x = np.array([6, 9, 12, 15, 6, 9, 12, 15, 6, 9, 12, 15, 6, 9, 12, 15]) # determined through trial and error
+        # self.possible_target_pos_y = np.array([2.25, 2.25, 2.25, 2.25, 4.5, 4.5, 4.5, 4.5, 6.75, 6.75, 6.75, 6.75, 9, 9, 9, 9])
         
-        # self.possible_target_pos_x = np.array([fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
-        #                                        fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
-        #                                        fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
-        #                                        fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm)])
-        # self.possible_target_pos_y = np.array([fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), 
-        #                                        2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 
-        #                                        3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 
-        #                                        4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm)])
+        self.possible_target_pos_x = np.array([fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
+                                                fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
+                                                fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm), 
+                                                fixed_window_size[0]/(5*pix_per_cm), 2*fixed_window_size[0]/(5*pix_per_cm), 3*fixed_window_size[0]/(5*pix_per_cm), 4*fixed_window_size[0]/(5*pix_per_cm)])
+        self.possible_target_pos_y = np.array([fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), fixed_window_size[1]/(5*pix_per_cm), 
+                                                2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 2*fixed_window_size[1]/(5*pix_per_cm), 
+                                                3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 3*fixed_window_size[1]/(5*pix_per_cm), 
+                                                4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm)])
         
         
         # Which sets comprise the hyperset? 
@@ -1257,15 +1257,15 @@ def cm2pix(pos_cm, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):
 
     if type(pix_pos) is np.ndarray:
         # Translate to coordinate system w/ 0, 0 at bottom left
-        pix_pos[0] = pix_pos[0] #+ (fixed_window_size[0]/2.)
-        pix_pos[1] = pix_pos[1] #+ (fixed_window_size[1]/2.)
+        pix_pos[0] = pix_pos[0] + (fixed_window_size[0]/2.)
+        pix_pos[1] = pix_pos[1] + (fixed_window_size[1]/2.)
 
     return pix_pos    
     
 def pix2cm(pos_pix, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):
     # First shift coordinate system: 
-    pos_pix[0] = pos_pix[0] #- (fixed_window_size[0]/2.)
-    pos_pix[1] = pos_pix[1] #- (fixed_window_size[1]/2.)
+    pos_pix[0] = pos_pix[0] - (fixed_window_size[0]/2.)
+    pos_pix[1] = pos_pix[1] - (fixed_window_size[1]/2.)
 
     pos_cm = pos_pix*(1./pix_per_cm)
     return pos_cm    
