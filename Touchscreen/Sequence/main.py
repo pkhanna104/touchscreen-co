@@ -171,6 +171,7 @@ class SequenceGame(Widget):
         self.touch = True
     
     def on_touch_up(self, touch):
+        self.touch = False
         try:
             self.cursor_ids.remove(touch.uid)
             _ = self.cursor.pop(touch.uid)
@@ -180,10 +181,12 @@ class SequenceGame(Widget):
     
     # Get the initial parameters
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
-        set_id_selected = None, test=None, hold=None, error_types_selected=None,
+        set_id_selected = None, test=None, hold=None, error_types_selected=None, nontarg_tol=None,
         autoquit=None, rew_var=None, set_timeout = None, error_timeout_time=None, ):
         
         # Initialize a count of the number of rewards
+        # NOTE: this is necessary for scheduling rewards if you are not rewarding
+        # 100% of the time, but the option to reward <100% of the time is NOT supported yet
         self.rew_cnt = 0
         self.set_rew_cnt = 0
 
@@ -255,8 +258,14 @@ class SequenceGame(Widget):
                 self.hs_rew = hs_rew_opts[i]
                 
         # What counts as an error?
-        self.nontarg_is_error = error_types_selected['error_type'][0]
-        self.t2p_first_is_error = error_types_selected['error_type'][1]
+        # self.nontarg_is_error = error_types_selected['error_type'][0]
+        self.t2p_first_is_error = error_types_selected['error_type'][0]
+        
+        # How far away from a target do we tolerate touches?
+        nontarg_tol_opts = [100, 3.0, 2.5, 2.0, 1.5] # convert the percentage options to proportion of radius
+        for i, val in enumerate(nontarg_tol['nontarg_touch_tolerance']):
+            if val:
+                self.nontarget_error_tolerance = nontarg_tol_opts[i]
         
         # How long is the error timmeout?
         error_timeout_opts = [0.5, 1.0, 1.5, 2.0]
@@ -268,7 +277,7 @@ class SequenceGame(Widget):
         self.testing = True
         
         # How big are the targets?
-        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 2.25, 3.0]
+        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.25]
         for i, val in enumerate(task_in['targ_rad']):
             if val:
                 self.target_rad = target_rad_opts[i]
@@ -452,7 +461,7 @@ class SequenceGame(Widget):
         self.FSM['IHSI'] = dict(end_IHSI='vid_trig', stop=None)
         self.FSM['vid_trig'] = dict(rhtouch='set', stop=None)
         
-        self.FSM['set'] = dict(touch_target1 = 'targ1_hold', touch_target2 = 'targ2_hold', set_timeout='timeout_error', stop=None,
+        self.FSM['set'] = dict(touch_target1 = 'targ1_hold', touch_target2 = 'targ2_hold', touch_nontarg = 'set_error', set_timeout='timeout_error', stop=None,
             non_rhtouch='RH_touch')#,touch_not_target='touch_error')
         
         self.FSM['targ1_hold'] = dict(finish_targ_hold='targ1_pressed', early_leave_target1_hold = 'hold_error_nopress', 
@@ -460,14 +469,14 @@ class SequenceGame(Widget):
         self.FSM['targ2_hold'] = dict(finish_targ_hold='targ2_pressed', early_leave_target2_hold = 'hold_error_nopress',
             targ2_drag_out = 'drag_error_nopress', stop=None, non_rhtouch='RH_touch')
         
-        self.FSM['targ1_pressed'] = dict(touch_target2 ='t1p_targ2_hold', set_timeout='timeout_error', stop=None,
+        self.FSM['targ1_pressed'] = dict(touch_target2 ='t1p_targ2_hold', touch_nontarg = 'set_error', set_timeout='timeout_error', stop=None,
             non_rhtouch='RH_touch')
-        self.FSM['targ2_pressed'] = dict(t2p_first_error = 'set_error', touch_target1 ='t2p_targ1_hold', set_timeout='timeout_error', stop=None,
+        self.FSM['targ2_pressed'] = dict(t2p_first_error = 'set_error', touch_target1 ='t2p_targ1_hold', touch_nontarg = 'set_error', set_timeout='timeout_error', stop=None,
             non_rhtouch='RH_touch')
         
         self.FSM['t1p_targ2_hold'] = dict(finish_targ_hold='set_complete', early_leave_target2_hold = 'hold_error_t1p',
             targ2_drag_out = 'drag_error_t1p', stop=None, non_rhtouch='RH_touch')
-        self.FSM['t2p_targ1_hold'] = dict(finish_targ_hold='IHSI', early_leave_target1_hold = 'hold_error_t2p',
+        self.FSM['t2p_targ1_hold'] = dict(finish_targ_hold='set_error', early_leave_target1_hold = 'hold_error_t2p',
             targ1_drag_out = 'drag_error_t2p', stop=None, non_rhtouch='RH_touch')
         
         self.FSM['set_error'] = dict(end_set_error='IHSI', stop=None)
@@ -625,8 +634,8 @@ class SequenceGame(Widget):
     
     def update(self, ts):
         self.state_length = time.time() - self.state_start
-        self.rew_cnt += 1
-        self.set_rew_cnt += 1
+        # self.rew_cnt += 1
+        # self.set_rew_cnt += 1
         
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
@@ -753,7 +762,10 @@ class SequenceGame(Widget):
             self.cam_trig_port.write('0'.encode())
         except:
             pass
+        
+        # Make the screen dark
         Window.clearcolor = (0., 0., 0., 1.)
+        self.change_allbutton_color(0, 0, 0, 1)
         self.exit_target1.color = (.15, .15, .15, 1.)
         self.exit_target2.color = (.15, .15, .15, 1.)
         
@@ -933,6 +945,14 @@ class SequenceGame(Widget):
         else:
             return np.logical_and(self.check_if_cursors_in_targ(self.target2_position, self.target_rad),
                 self.check_if_started_in_targ(self.target2_position, self.target_rad))
+        
+    def touch_nontarg(self, **kwargs):
+        nontarg_error = False
+        if np.logical_and(self.nontarget_error_tolerance < 100, self.touch):
+            nontarg_error = not np.logical_or(self.check_if_cursors_in_targ(self.target1_position, self.nontarget_error_tolerance*self.target_rad), 
+                                           self.check_if_cursors_in_targ(self.target2_position, self.nontarget_error_tolerance*self.target_rad))
+
+        return nontarg_error
     
     # Starting with target 2 gives an error
     def t2p_first_error(self, **kwargs):
@@ -991,6 +1011,8 @@ class SequenceGame(Widget):
     def next_set(self, **kwargs):
         return self.set_ix < self.nsets_per_hyperset
     
+    
+    ################################### REWARD STATES ################################
     def _start_reward_set(self, **kwargs):
         self.trial_counter += 1
         Window.clearcolor = (1., 1., 1., 1.)
@@ -1000,15 +1022,15 @@ class SequenceGame(Widget):
         # Turn exit targets white
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
-        self.rew_cnt = 0
+        # self.rew_cnt = 0
         self.cnts_in_rew = 0
         # self.indicator_targ.color = (1., 1., 1., 1.)
         self.repeat = False
         
     def _while_reward_set(self, **kwargs):
-        if self.rew_cnt == 1:
-            self.run_set_rew()
-            self.rew_cnt += 1
+        # if self.rew_cnt == 1:
+        self.run_set_rew()
+        # self.rew_cnt += 1
             
     def end_reward_set(self, **kwargs):
         # Advance to the next set
@@ -1021,33 +1043,33 @@ class SequenceGame(Widget):
     
     def _start_reward_hyperset(self, **kwargs):
         self.trial_counter += 1
-        Window.clearcolor = (1., 1., 1., 1.)
-        self.target1.color = (1., 1., 1., 1.)
-        self.target2.color = (1., 1., 1., 1.)
         
-        # Turn exit targets white
-        self.exit_target1.color = (1., 1., 1., 1.)
-        self.exit_target2.color = (1., 1., 1., 1.)
-        self.rew_cnt = 0
+        # Turn the screen green
+        Window.clearcolor = (0., 1., 0., 1.)
+        self.change_allbutton_color(0, 1, 0, 1)
+        
+        # self.rew_cnt = 0
         self.cnts_in_rew = 0
         # self.indicator_targ.color = (1., 1., 1., 1.)
         self.repeat = False
         
     def _while_reward_hyperset(self, **kwargs):
-        if self.rew_cnt == 1:
-            self.run_HS_rew()
-            self.rew_cnt += 1
+        # if self.rew_cnt == 1:
+        self.run_HS_rew()
+        # self.rew_cnt += 1
             
     def end_reward_hyperset(self, **kwargs):
         return True
     
-    ################################### ERROR STATES ################################3
+    ################################### ERROR STATES ################################
     # Set Error
     def _start_set_error(self, **kwargs):
         # Play an error tone
-        
+        sound = SoundLoader.load('error1.wav')
+        sound.play()
         
         # Make the screen red
+        self.percent_done = 0
         Window.clearcolor = (1., 0., 0., 1.)
         self.change_allbutton_color(1, 0, 0, 1)
         
@@ -1190,7 +1212,7 @@ class SequenceGame(Widget):
     def run_anytarg_rew(self, **kwargs):
         try:
             #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-            sound = SoundLoader.load('reward2.wav')
+            sound = SoundLoader.load('reward1.wav')
             sound.play()
 
             ### To trigger reward make sure reward is > 0:
@@ -1210,7 +1232,7 @@ class SequenceGame(Widget):
     def run_set_rew(self, **kwargs):
         try:
             #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-            sound = SoundLoader.load('reward2.wav')
+            sound = SoundLoader.load('reward1.wav')
             sound.play()
 
             ### To trigger reward make sure reward is > 0:
@@ -1229,6 +1251,10 @@ class SequenceGame(Widget):
     
     def run_HS_rew(self, **kwargs):
         try:
+            #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+            sound = SoundLoader.load('reward2.wav')
+            sound.play()
+            
             print('in big reward:')
             self.repeat = False
             #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
@@ -1236,7 +1262,7 @@ class SequenceGame(Widget):
             #print(str(self.reward_generator[self.trial_counter]))
             #print(self.trial_counter)
             #print(self.reward_generator[:100])
-            self.reward1.play()
+            # self.reward1.play()
 
             if not self.skip_juice:
                 if self.reward_generator[self.trial_counter] > 0:
@@ -1253,6 +1279,8 @@ class SequenceGame(Widget):
     
     # Other utilities
     def change_allbutton_color(self, r, g, b, a):
+        self.exit_target1.color = (r, g, b, a)
+        self.exit_target2.color = (r, g, b, a)
         self.target1.color = (r, g, b, a)
         self.target2.color = (r, g, b, a)
         self.button1_out.color = (r, g, b, a)

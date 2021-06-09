@@ -85,7 +85,238 @@
                 Label:
                     text: ''
                     fontsize: 50
+            
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
 
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Target Radius'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '.5 cm'
+                CheckBox:
+                    id: targ_rad_5
+                    group: 'targ_cm'
+
+                Label: 
+                    text: '.75 cm'
+                CheckBox:
+                    id: targ_rad_75
+                    group: 'targ_cm'
+                    
+                Label: 
+                    text: '.82 cm'
+                CheckBox:
+                    id: targ_rad_82
+                    group: 'targ_cm'
+
+                Label: 
+                    text: '.91 cm'
+                CheckBox:
+                    id: targ_rad_91
+                    group: 'targ_cm'
+
+                Label: 
+                    text: '1.0 cm'
+
+                CheckBox:
+                    id: targ_rad_10
+                    group: 'targ_cm'
+                Label: 
+                    text: '1.25 cm'
+
+                CheckBox:
+                    id: targ_rad_125
+                    group: 'targ_cm'
+                    active: True
+                                        
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'HOME Hold Time'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0.0 sec'
+                CheckBox: 
+                    id: c_zero_sec
+                    group: 'chold_time'
+                    active: True
+
+                Label:  
+                    text: '0.1 sec'
+                CheckBox:
+                    id: c_hund_sec
+                    group: 'chold_time'
+
+                Label: 
+                    text: '0.375 sec'
+
+                CheckBox:
+                    id: c_three_sev_five_sec
+                    group: 'chold_time'
+
+                Label: 
+                    text: '0.5 sec'
+
+                CheckBox:
+                    id: c_half_sec
+                    group: 'chold_time'
+                
+                Label: 
+                    text: '0.575 sec'
+
+                CheckBox:
+                    id: c_575
+                    group: 'chold_time'
+
+                Label: 
+                    text: '0.6 sec'
+
+                CheckBox:
+                    id: c_60
+                    group: 'chold_time'
+             
+
+                Label:
+                    text: 'Rand: .4-.6'
+                    fontsize: 50
+
+                CheckBox:
+                    id: c_big_rand
+                    group: 'chold_time'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Target Hold Time'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0.0 sec'
+                CheckBox:
+                    id: zero_sec
+                    group: 'hold_time'
+                    active: True
+
+                Label: 
+                    text: '0.1 sec'
+                CheckBox: 
+                    id: hund_sec
+                    group: 'hold_time'
+
+                Label: 
+                    text: '0.375 sec'
+
+                CheckBox:
+                    id: three_sev_five_sec
+                    group: 'hold_time'
+
+                Label: 
+                    text: '0.5 sec'
+
+                CheckBox:
+                    id: half_sec
+                    group: 'hold_time'
+
+                Label: 
+                    text: '0.575 sec'
+
+                CheckBox:
+                    id: t_575
+                    group: 'hold_time'
+
+                Label: 
+                    text: '0.6 sec'
+
+                CheckBox:
+                    id: t_60
+                    group: 'hold_time'
+
+
+                Label:
+                    text: 'Rand: .4-.6'
+                    fontsize: 50
+
+                CheckBox:
+                    id: big_rand
+                    group: 'hold_time'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
             BoxLayout
                 id: set_select
                 orientation: 'horizontal'
@@ -426,14 +657,7 @@
                 
                 CheckBox: 
                     id: t2p_1st_error
-                    
-                Label: 
-                    text: 'Non-target touch'
-                    fontsize: 28
-                    halign: 'center'                        
-                
-                CheckBox: 
-                    id: nontarg_error
+
                    
                 Label:
                     text: ''
@@ -442,6 +666,68 @@
                     text: ''
                     fontsize: 50
                     
+            BoxLayout 
+                id: nontarg_touch_tolerance
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Non-target touch tolerance'
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: '+Infinity'
+
+                CheckBox:
+                    group: 'nontarg_touch_tolerance'
+                    id: nontarg_tol_inf
+                    active: True
+            
+                Label: 
+                    text: '+200%'
+
+                CheckBox:
+                    group: 'nontarg_touch_tolerance'
+                    id: nontarg_tol_200
+                    
+                Label: 
+                    text: '+150%'
+
+                CheckBox:
+                    group: 'nontarg_touch_tolerance'
+                    id: nontarg_tol_150
+
+                Label: 
+                    text: '+100%'
+
+                CheckBox:
+                    group: 'nontarg_touch_tolerance'
+                    id: nontarg_tol_100
+                    
+                Label: 
+                    text: '+50%'
+
+                CheckBox:
+                    group: 'nontarg_touch_tolerance'
+                    id: nontarg_tol_50
+            
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+            
             BoxLayout 
                 id: error_to
                 orientation: 'horizontal'
@@ -497,235 +783,7 @@
                     text: ''
                     fontsize: 50
 
-            BoxLayout:
-                id: params:
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target Radius'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '.5 cm'
-                CheckBox:
-                    id: targ_rad_5
-                    group: 'targ_cm'
-
-                Label: 
-                    text: '.75 cm'
-                CheckBox:
-                    id: targ_rad_75
-                    group: 'targ_cm'
-                    
-                Label: 
-                    text: '.82 cm'
-                CheckBox:
-                    id: targ_rad_82
-                    group: 'targ_cm'
-
-                Label: 
-                    text: '.91 cm'
-                CheckBox:
-                    id: targ_rad_91
-                    group: 'targ_cm'
-
-                Label: 
-                    text: '1.0 cm'
-
-                CheckBox:
-                    id: targ_rad_10
-                    group: 'targ_cm'
-                Label: 
-                    text: '1.5 cm'
-
-                CheckBox:
-                    id: targ_rad_15
-                    group: 'targ_cm'
-                                        
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-            BoxLayout:
-                id: params:
-                orientation: 'horizontal'
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'HOME Hold Time'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '0.0 sec'
-                CheckBox: 
-                    id: c_zero_sec
-                    group: 'chold_time'
-                    active: True
-
-                Label:  
-                    text: '0.1 sec'
-                CheckBox:
-                    id: c_hund_sec
-                    group: 'chold_time'
-
-                Label: 
-                    text: '0.375 sec'
-
-                CheckBox:
-                    id: c_three_sev_five_sec
-                    group: 'chold_time'
-
-                Label: 
-                    text: '0.5 sec'
-
-                CheckBox:
-                    id: c_half_sec
-                    group: 'chold_time'
-                
-                Label: 
-                    text: '0.575 sec'
-
-                CheckBox:
-                    id: c_575
-                    group: 'chold_time'
-
-                Label: 
-                    text: '0.6 sec'
-
-                CheckBox:
-                    id: c_60
-                    group: 'chold_time'
-             
-
-                Label:
-                    text: 'Rand: .4-.6'
-                    fontsize: 50
-
-                CheckBox:
-                    id: c_big_rand
-                    group: 'chold_time'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-
-            BoxLayout:
-                id: params:
-                orientation: 'horizontal'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target Hold Time'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '0.0 sec'
-                CheckBox:
-                    id: zero_sec
-                    group: 'hold_time'
-                    active: True
-
-                Label: 
-                    text: '0.1 sec'
-                CheckBox: 
-                    id: hund_sec
-                    group: 'hold_time'
-
-                Label: 
-                    text: '0.375 sec'
-
-                CheckBox:
-                    id: three_sev_five_sec
-                    group: 'hold_time'
-
-                Label: 
-                    text: '0.5 sec'
-
-                CheckBox:
-                    id: half_sec
-                    group: 'hold_time'
-
-                Label: 
-                    text: '0.575 sec'
-
-                CheckBox:
-                    id: t_575
-                    group: 'hold_time'
-
-                Label: 
-                    text: '0.6 sec'
-
-                CheckBox:
-                    id: t_60
-                    group: 'hold_time'
-
-
-                Label:
-                    text: 'Rand: .4-.6'
-                    fontsize: 50
-
-                CheckBox:
-                    id: big_rand
-                    group: 'hold_time'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
+            
 
             BoxLayout:
                 id: test
@@ -797,11 +855,12 @@
                     root.current = 'splash_start'
                     splash.init(dict(hari=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butt=chk_but.active), 
                     dict(rew_manual=False, anytarg_rew=[anytarg_rew_zero_sec.active, anytarg_rew_pt1_sec.active, anytarg_rew_pt3_sec.active, anytarg_rew_pt5_sec.active], set_rew=[set_rew_zero_sec.active, set_rew_pt1_sec.active, set_rew_pt3_sec.active, set_rew_pt5_sec.active], hs_rew=[hs_rew_pt3_sec.active, hs_rew_pt5_sec.active, hs_rew_pt7_sec.active]), 
-                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active]), 
+                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_125.active]), 
                     dict(set_sel=[set_sel_A.active, set_sel_B.active, set_sel_C.active, set_sel_D.active, set_sel_E.active]), 
                     dict(test=[False, True, False]), 
                     dict(chold=[c_zero_sec.active, c_hund_sec.active, c_three_sev_five_sec.active, c_half_sec.active, c_575.active, c_60.active, c_big_rand.active], hold=[zero_sec.active, hund_sec.active, three_sev_five_sec.active, half_sec.active, t_575.active, t_60.active, big_rand.active]), 
-                    dict(error_type=[nontarg_error.active, t2p_1st_error.active]),
+                    dict(error_type=[t2p_1st_error.active]),
+                    dict(nontarg_touch_tolerance=[nontarg_tol_inf.active, nontarg_tol_200.active, nontarg_tol_150.active, nontarg_tol_100.active, nontarg_tol_50.active]), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
                     dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]), 
