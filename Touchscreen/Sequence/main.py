@@ -634,7 +634,7 @@ class SequenceGame(Widget):
     
     def update(self, ts):
         self.state_length = time.time() - self.state_start
-        # self.rew_cnt += 1
+        self.rew_cnt += 1
         # self.set_rew_cnt += 1
         
         # Run task update functions: 
@@ -1022,15 +1022,15 @@ class SequenceGame(Widget):
         # # Turn exit targets white
         # self.exit_target1.color = (1., 1., 1., 1.)
         # self.exit_target2.color = (1., 1., 1., 1.)
-        # self.rew_cnt = 0
+        self.rew_cnt = 0
         self.cnts_in_rew = 0
         # self.indicator_targ.color = (1., 1., 1., 1.)
         self.repeat = False
         
     def _while_reward_set(self, **kwargs):
-        # if self.rew_cnt == 1:
-        self.run_set_rew()
-        # self.rew_cnt += 1
+        if self.rew_cnt == 1:
+            self.run_set_rew()
+            self.rew_cnt += 1
             
     def end_reward_set(self, **kwargs):
         # Advance to the next set
@@ -1048,15 +1048,15 @@ class SequenceGame(Widget):
         Window.clearcolor = (0., 1., 0., 1.)
         self.change_allbutton_color(0, 1, 0, 1)
         
-        # self.rew_cnt = 0
+        self.rew_cnt = 0
         self.cnts_in_rew = 0
         # self.indicator_targ.color = (1., 1., 1., 1.)
         self.repeat = False
         
     def _while_reward_hyperset(self, **kwargs):
-        # if self.rew_cnt == 1:
-        self.run_HS_rew()
-        # self.rew_cnt += 1
+        if self.rew_cnt == 1:
+            self.run_HS_rew()
+            self.rew_cnt += 1
             
     def end_reward_hyperset(self, **kwargs):
         return True
