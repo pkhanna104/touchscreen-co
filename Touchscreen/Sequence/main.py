@@ -1019,9 +1019,9 @@ class SequenceGame(Widget):
         self.target1.color = (1., 1., 1., 1.)
         self.target2.color = (1., 1., 1., 1.)
         
-        # Turn exit targets white
-        self.exit_target1.color = (1., 1., 1., 1.)
-        self.exit_target2.color = (1., 1., 1., 1.)
+        # # Turn exit targets white
+        # self.exit_target1.color = (1., 1., 1., 1.)
+        # self.exit_target2.color = (1., 1., 1., 1.)
         # self.rew_cnt = 0
         self.cnts_in_rew = 0
         # self.indicator_targ.color = (1., 1., 1., 1.)
@@ -1264,16 +1264,16 @@ class SequenceGame(Widget):
             #print(self.reward_generator[:100])
             # self.reward1.play()
 
-            if not self.skip_juice:
-                if self.reward_generator[self.trial_counter] > 0:
-                    self.reward_port.open()
-                    #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.hs_rew)+' sec\n']
-                    self.reward_port.write(rew_str)
-                    time.sleep(.25 + self.reward_delay_time)
-                    run_str = [ord(r) for r in 'run\n']
-                    self.reward_port.write(run_str)
-                    self.reward_port.close()
+            # if not self.skip_juice:
+                # if self.reward_generator[self.trial_counter] > 0:
+            self.reward_port.open()
+            #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.hs_rew)+' sec\n']
+            self.reward_port.write(rew_str)
+            time.sleep(.25 + self.reward_delay_time)
+            run_str = [ord(r) for r in 'run\n']
+            self.reward_port.write(run_str)
+            self.reward_port.close()
         except:
             pass
     
