@@ -277,7 +277,7 @@ class SequenceGame(Widget):
         self.testing = True
         
         # How big are the targets?
-        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.25]
+        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.125]
         for i, val in enumerate(task_in['targ_rad']):
             if val:
                 self.target_rad = target_rad_opts[i]
@@ -640,7 +640,6 @@ class SequenceGame(Widget):
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
             kw = dict(ts=self.state_length)
-            print(self.state)
 
             fcn_test = getattr(self, fcn_test_name)
             if fcn_test(**kw):
@@ -656,7 +655,7 @@ class SequenceGame(Widget):
                         end_state_fn()
                         
                     # Advance to the next state
-                    self.prev_state = self.state
+                    self.prev_state = self.state_length
                     self.state = next_state
                     self.state_start = time.time()
 
@@ -1028,7 +1027,7 @@ class SequenceGame(Widget):
         self.repeat = False
         
     def _while_reward_set(self, **kwargs):
-        if self.rew_cnt == 1:
+        if self.rew_cnt == 0:
             self.run_set_rew()
             self.rew_cnt += 1
             
@@ -1054,7 +1053,7 @@ class SequenceGame(Widget):
         self.repeat = False
         
     def _while_reward_hyperset(self, **kwargs):
-        if self.rew_cnt == 1:
+        if self.rew_cnt == 0:
             self.run_HS_rew()
             self.rew_cnt += 1
             
