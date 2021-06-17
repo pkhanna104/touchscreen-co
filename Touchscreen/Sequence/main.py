@@ -1064,8 +1064,9 @@ class SequenceGame(Widget):
     # Set Error
     def _start_set_error(self, **kwargs):
         # Play an error tone
-        sound = SoundLoader.load('error1.wav')
-        sound.play()
+        if self.anytarg_rew > 0
+            sound = SoundLoader.load('error1.wav')
+            sound.play()
         
         # Make the screen red
         self.percent_done = 0
@@ -1211,7 +1212,7 @@ class SequenceGame(Widget):
     def run_anytarg_rew(self, **kwargs):
         try:
             #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-            sound = SoundLoader.load('reward1.wav')
+            sound = SoundLoader.load('reward2.wav')
             sound.play()
 
             ### To trigger reward make sure reward is > 0:
@@ -1231,7 +1232,7 @@ class SequenceGame(Widget):
     def run_set_rew(self, **kwargs):
         try:
             #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-            sound = SoundLoader.load('reward1.wav')
+            sound = SoundLoader.load('reward2.wav')
             sound.play()
 
             ### To trigger reward make sure reward is > 0:
@@ -1251,7 +1252,7 @@ class SequenceGame(Widget):
     def run_HS_rew(self, **kwargs):
         try:
             #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-            sound = SoundLoader.load('reward2.wav')
+            sound = SoundLoader.load('reward1.wav')
             sound.play()
             
             print('in big reward:')
