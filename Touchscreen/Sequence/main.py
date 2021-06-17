@@ -262,7 +262,7 @@ class SequenceGame(Widget):
         self.t2p_first_is_error = error_types_selected['error_type'][0]
         
         # How far away from a target do we tolerate touches?
-        nontarg_tol_opts = [100, 3.0, 2.5, 2.0, 1.5] # convert the percentage options to proportion of radius
+        nontarg_tol_opts = [100, 3.0, 2.5, 2.0, 1.5, 1.0] # convert the percentage options to proportion of radius
         for i, val in enumerate(nontarg_tol['nontarg_touch_tolerance']):
             if val:
                 self.nontarget_error_tolerance = nontarg_tol_opts[i]
@@ -656,7 +656,10 @@ class SequenceGame(Widget):
                         
                     # Advance to the next state
                     self.prev_state = self.state_length
+                    if next_state is 'set_error':
+                        import pdb; pdb.set_trace()
                     self.state = next_state
+                    
                     self.state_start = time.time()
 
                     # Run any starting functions: 
@@ -1064,14 +1067,14 @@ class SequenceGame(Widget):
     # Set Error
     def _start_set_error(self, **kwargs):
         # Play an error tone
-        if self.anytarg_rew > 0
+        if self.anytarg_rew == 0:
             sound = SoundLoader.load('error1.wav')
             sound.play()
         
-        # Make the screen red
-        self.percent_done = 0
-        Window.clearcolor = (1., 0., 0., 1.)
-        self.change_allbutton_color(1, 0, 0, 1)
+            # Make the screen red
+            self.percent_done = 0
+            Window.clearcolor = (1., 0., 0., 1.)
+            self.change_allbutton_color(1, 0, 0, 1)
         
     
     def end_set_error(self, **kwargs):

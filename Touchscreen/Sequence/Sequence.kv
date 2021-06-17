@@ -745,6 +745,14 @@
                 CheckBox:
                     group: 'nontarg_touch_tolerance'
                     id: nontarg_tol_50
+                    
+                Label: 
+                    text: '0%'
+                    fontsize: 28
+
+                CheckBox:
+                    group: 'nontarg_touch_tolerance'
+                    id: nontarg_tol_0
             
                 Label:
                     text: ''
@@ -892,7 +900,7 @@
                     dict(test=[False, True, False]), 
                     dict(chold=[c_zero_sec.active, c_hund_sec.active, c_three_sev_five_sec.active, c_half_sec.active, c_575.active, c_60.active, c_big_rand.active], hold=[zero_sec.active, hund_sec.active, three_sev_five_sec.active, half_sec.active, t_575.active, t_60.active, big_rand.active]), 
                     dict(error_type=[t2p_1st_error.active]),
-                    dict(nontarg_touch_tolerance=[nontarg_tol_inf.active, nontarg_tol_200.active, nontarg_tol_150.active, nontarg_tol_100.active, nontarg_tol_50.active]), 
+                    dict(nontarg_touch_tolerance=[nontarg_tol_inf.active, nontarg_tol_200.active, nontarg_tol_150.active, nontarg_tol_100.active, nontarg_tol_50.active, nontarg_tol_0]), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
                     dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]), 
