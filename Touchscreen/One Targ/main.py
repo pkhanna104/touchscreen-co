@@ -246,8 +246,15 @@ class COGame(Widget):
         for i, val in enumerate(test['test']):
             if val:
                 self.testing = test_vals[i]
-                self.in_cage = in_cage_vals[i]
+                #self.in_cage = in_cage_vals[i]
         
+        import os 
+        path = os.getcwd()
+        if 'BasalGangulia' in path:
+            self.in_cage = True
+        else:
+            self.in_cage = False
+
         autoquit_trls = [10, 25, 50, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
@@ -280,7 +287,11 @@ class COGame(Widget):
 
         # Initialize targets: 
         self.center_target.set_size(2*self.center_target_rad)
-        self.center_target.move(np.array([0., 0.]))
+
+        if self.in_cage:
+            self.center_target.move(np.array([-4., 0.]))
+        else:
+            self.center_target.move(np.array([0., 0.]))
         self.periph_target.set_size(2*self.periph_target_rad)
 
         self.exit_target1.set_size(2*self.exit_rad)
@@ -298,7 +309,10 @@ class COGame(Widget):
         self.target_list = generatorz(self.target_distance, self.nudge_dist, self.generator_kwarg)
         self.target_index = 0
         self.repeat = False
-        self.center_target_position = np.array([0., 0.])
+        if self.in_cage:
+            self.center_target_position = np.array([-4., 0.])
+        else:
+            self.center_target_position = np.array([0., 0.])
         self.periph_target_position = self.target_list[self.target_index, :]
 
         self.FSM = dict()
@@ -410,6 +424,7 @@ class COGame(Widget):
             print ('')
             print ('')
             self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+            
             if self.in_cage:
                 self.filename = self.filename+'_cage'
 
@@ -910,11 +925,23 @@ class COGame(Widget):
             target_distance = 6.
         else:
             angle = np.linspace(0, 2*np.pi, ntargets+1)[:-1]
+
+        if self.in_cage:
+            offset = np.array([-4., 0.])
+            nudge_targ = np.array([0, 0, 0, 0])
+            target_distance = 3.
+        else:
+            offset = np.array([0., 0.])
+            nudge_targ = np.array([0, 0, 1., 0])
     
         x = np.cos(angle)*target_distance
         y = np.sin(angle)*target_distance
         tmp = np.hstack((x[:, np.newaxis], y[:, np.newaxis]))
-        nudge_targ = np.array([0, 0, 1., 0])
+        
+
+
+        ### Add offset to the target positions 
+        tmp = tmp + offset[np.newaxis, :]
 
         tgs = []
         nudges = []
@@ -926,8 +953,8 @@ class COGame(Widget):
         tgs = np.vstack((tgs))
         nudges = np.hstack((nudges))
         nudge_ix = np.nonzero(nudges==1)[0]
-        print('Nudges: ')
-        print(len(nudge_ix))
+        #print('Nudges: ')
+        #print(len(nudge_ix))
 
         to_nudge = np.array([-1., 1.])*nudge
         tgs[nudge_ix, :] = tgs[nudge_ix, :] + to_nudge[np.newaxis, :]
