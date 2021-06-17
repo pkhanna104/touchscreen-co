@@ -687,7 +687,7 @@ class COGame(Widget):
         self.center_target.color = (1., 1., 0., 1.)
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target.color = (0., 0., 0., 0.) ### Make peripheral target alpha = 0 so doesn't obscure 
         self.indicator_targ.color = (.25, .25, .25, 1.)
 
     def _start_center_hold(self, **kwargs):
@@ -702,7 +702,7 @@ class COGame(Widget):
         self.center_target.color = (0., 0., 0., 1.)
 
     def _end_target_hold(self, **kwargs):
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target.color = (0., 0., 0., 0.)
 
     def _start_touch_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
