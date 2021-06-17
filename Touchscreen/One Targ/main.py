@@ -379,51 +379,51 @@ class COGame(Widget):
         print(self.reward_for_targtouch)
         print(self.reward_for_anytouch)
 
-        try:
-            if self.testing:
+        #try:
+        if self.testing:
+            pass
+
+        else:
+            import os
+            path = os.getcwd()
+            path = path.split('\\')
+            path_data = [p for p in path if np.logical_and('Touch' not in p, 'Targ' not in p)]
+            path_root = ''
+            for ip in path_data:
+                path_root += ip+'/'
+            p = path_root + 'data/'
+            print('Auto path : %s'%p)
+            # Check if this directory exists: 
+            if os.path.exists(p):
                 pass
-
             else:
-                import os
-                path = os.getcwd()
-                path = path.split('\\')
-                path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-                path_root = ''
-                for ip in path_data:
-                    path_root += ip+'/'
-                p = path_root + 'data/'
-
-                # Check if this directory exists: 
+                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
                 if os.path.exists(p):
                     pass
                 else:
-                    p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
-                    if os.path.exists(p):
-                        pass
-                    else:
-                        os.mkdir(p)
-                        print('Making temp directory: ', p)
+                    os.mkdir(p)
+                    print('Making temp directory: ', p)
 
-                print ('')
-                print ('')
-                print('Data saving PATH: ', p)
-                print ('')
-                print ('')
-                self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-                if self.in_cage:
-                    self.filename = self.filename+'_cage'
+            print ('')
+            print ('')
+            print('Data saving PATH: ', p)
+            print ('')
+            print ('')
+            self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+            if self.in_cage:
+                self.filename = self.filename+'_cage'
 
-                pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
-                self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-                self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-                self.h5_table_row = self.h5_table.row
-                self.h5_table_row_cnt = 0
+            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+            self.h5_table_row = self.h5_table.row
+            self.h5_table_row_cnt = 0
 
-                # Note in python 3 to open pkl files: 
-                #with open('xxxx_params.pkl', 'rb') as f:
-                #    data_params = pickle.load(f)
-        except:
-            pass
+            # Note in python 3 to open pkl files: 
+            #with open('xxxx_params.pkl', 'rb') as f:
+            #    data_params = pickle.load(f)
+        # except:
+        #     pass
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
