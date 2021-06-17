@@ -656,8 +656,8 @@ class SequenceGame(Widget):
                         
                     # Advance to the next state
                     self.prev_state = self.state_length
-                    if next_state is 'set_error':
-                        import pdb; pdb.set_trace()
+                    # if next_state is 'set_error':
+                    #     import pdb; pdb.set_trace()
                     self.state = next_state
                     
                     self.state_start = time.time()
@@ -835,6 +835,7 @@ class SequenceGame(Widget):
     
     # Start a new set
     def _start_set(self, **kwargs):
+        self.touch = False ## We need to start with this being false or else if non-target touch tolerance is not infinity, the previous touch will carry over and cause an error
         Window.clearcolor = (0., 0., 0., 1.)
         
         # Display outlines of all of the buttons
