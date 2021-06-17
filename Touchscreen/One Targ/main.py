@@ -146,7 +146,7 @@ class COGame(Widget):
             if val:
                 small_rew = small_rew_opts[i]
 
-        big_rew_opts = [.3, .5, .7]
+        big_rew_opts = [0., .3, .5, .7]
         for i, val in enumerate(rew_in['big_rew']):
             if val:
                 big_rew = big_rew_opts[i]
@@ -191,7 +191,7 @@ class COGame(Widget):
                 if 'co' in nm:
                     self.use_center = True
 
-        holdz = [0.0, 0.1, .375, .5, .575, .6, '.4-.6']
+        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
         
         self.cht_type = None
         self.tht_type = None
