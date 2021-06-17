@@ -2,8 +2,8 @@
   IR Breakbeam sensor demo!
 */
 
-#define IR_SENSORPIN 7
-#define LEDPIN 2
+#define IR_SENSORPIN 2 //7
+#define LEDPIN 6 //2
 #define BUTTON 4
 char LED;
 int FlexForcePin = A0;

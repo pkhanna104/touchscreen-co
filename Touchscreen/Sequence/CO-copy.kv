@@ -243,13 +243,6 @@
                     color: 1, 1, 0, 1
 
                 Label: 
-                    text: '0.0 sec'
-
-                CheckBox:
-                    id: big_rew_zero_sec
-                    group: 'big_rew'
-
-                Label: 
                     text: '0.3 sec'
 
                 CheckBox:
@@ -421,13 +414,6 @@
                 Label:
                     text: ''
                     fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
 
                 Label: 
                     text: 'CENTER Hold Time'
@@ -446,23 +432,11 @@
                     id: c_hund_sec
                     group: 'chold_time'
 
-                Label:  
-                    text: '0.2 sec'
-                CheckBox:
-                    id: c_twohund_sec
-                    group: 'chold_time'
-
-                Label:  
-                    text: '0.3 sec'
-                CheckBox:
-                    id: c_threehund_sec
-                    group: 'chold_time'
-
                 Label: 
-                    text: '0.4 sec'
+                    text: '0.375 sec'
 
                 CheckBox:
-                    id: c_fourhund_sec
+                    id: c_three_sev_five_sec
                     group: 'chold_time'
 
                 Label: 
@@ -472,6 +446,12 @@
                     id: c_half_sec
                     group: 'chold_time'
                 
+                Label: 
+                    text: '0.575 sec'
+
+                CheckBox:
+                    id: c_575
+                    group: 'chold_time'
 
                 Label: 
                     text: '0.6 sec'
@@ -498,12 +478,7 @@
                 Label:
                     text: ''
                     fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
+
 
             BoxLayout:
                 id: params:
@@ -518,13 +493,7 @@
                 Label:
                     text: ''
                     fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
 
-                Label:
-                    text: ''
-                    fontsize: 50
                 Label: 
                     text: 'Target Hold Time'
                     color: 1, 1, 0, 1
@@ -543,22 +512,10 @@
                     group: 'hold_time'
 
                 Label: 
-                    text: '0.2 sec'
-                CheckBox: 
-                    id: twohund_sec
-                    group: 'hold_time'
-
-                Label: 
-                    text: '0.3 sec'
-                CheckBox: 
-                    id: threehund_sec
-                    group: 'hold_time'
-
-                Label: 
-                    text: '0.4 sec'
+                    text: '0.375 sec'
 
                 CheckBox:
-                    id: fourhund_sec
+                    id: three_sev_five_sec
                     group: 'hold_time'
 
                 Label: 
@@ -569,11 +526,19 @@
                     group: 'hold_time'
 
                 Label: 
+                    text: '0.575 sec'
+
+                CheckBox:
+                    id: t_575
+                    group: 'hold_time'
+
+                Label: 
                     text: '0.6 sec'
 
                 CheckBox:
                     id: t_60
                     group: 'hold_time'
+
 
                 Label:
                     text: 'Rand: .4-.6'
@@ -592,12 +557,7 @@
                 Label:
                     text: ''
                     fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
+
             BoxLayout:
                 id: test
                 orientation: 'horizontal'
@@ -666,10 +626,9 @@
                 text_size: self.size
                 on_release: 
                     root.current = 'splash_start'
-                    splash.init(dict(donu=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=False, rew_anytouch=False, rew_center_pls_targ=rew_center_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=False, small_rew=[small_rew_zero_sec.active, small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_zero_sec.active, big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
-                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_22.active, targ_rad_30.active]), dict(test=[False, True, False]), dict(chold=[c_zero_sec.active, c_hund_sec.active, c_twohund_sec.active, c_threehund_sec.active, c_fourhund_sec.active, c_half_sec.active, c_60.active, c_big_rand.active],
-                    hold=[zero_sec.active, hund_sec.active, twohund_sec.active, 
-                    threehund_sec.active, fourhund_sec.active, half_sec.active, t_60.active, big_rand.active]), 
+                    splash.init(dict(donu=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), dict(rew_manual=False, rew_anytouch=False, rew_center_pls_targ=rew_center_pls_targ_chk.active, rew_targ=rew_targ_chk.active, snd_only=False, small_rew=[small_rew_zero_sec.active, small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
+                    dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_22.active, targ_rad_30.active]), dict(test=[False, True, False]), dict(chold=[c_zero_sec.active, c_hund_sec.active, c_three_sev_five_sec.active, c_half_sec.active, c_575.active, c_60.active, c_big_rand.active],
+                    hold=[zero_sec.active, hund_sec.active, three_sev_five_sec.active, half_sec.active, t_575.active, t_60.active, big_rand.active]), 
                     dict(get_targets_rand=False, get_4targets=False, get_targets_co=True), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
