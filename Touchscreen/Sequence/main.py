@@ -910,6 +910,8 @@ class SequenceGame(Widget):
         # Determine which targets to show for this set
         self.target_index = np.array([2*(self.sets_selected[self.set_ix-1]), 2*(self.sets_selected[self.set_ix-1])+1])
         
+        self.targtouch_rew_given = False
+        
         # Change the position of the targets
         if self.repeat is False:
             self.target1_position = np.array([self.possible_target_pos_x[self.target_list[self.target_HS_index, self.target_index[0]]], self.possible_target_pos_y[self.target_list[self.target_HS_index, self.target_index[0]]]])
@@ -995,16 +997,18 @@ class SequenceGame(Widget):
         self.target2.color = (1., 1., 0., 1.)
         # self.indicator_targ.color = (0.75, .75, .75, 1.)
         
-        if self.reward_for_targtouch[0]:
+        if self.reward_for_targtouch[0] and not self.targtouch_rew_given:
             self.run_anytarg_rew()
+            self.targtouch_rew_given = True
         
     def _start_targ2_pressed(self, **kwargs):
         self.target1.color = (1., 1., 0., 1.)
         self.target2.color = (0., 0., 0., 1.)
         # self.indicator_targ.color = (0.75, .75, .75, 1.)
         
-        if self.reward_for_targtouch[0]:
+        if self.reward_for_targtouch[0] and not self.targtouch_rew_given:
             self.run_anytarg_rew()
+            self.targtouch_rew_given = True
 
     
     # Once a set is complete, determine whether to restart or move to the next set
@@ -1214,6 +1218,7 @@ class SequenceGame(Widget):
     
     # Run Rewards
     def run_anytarg_rew(self, **kwargs):
+        print('Run anytarg reward')
         try:
             #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
             sound = SoundLoader.load('reward2.wav')
