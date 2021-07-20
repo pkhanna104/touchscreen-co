@@ -77,14 +77,11 @@ class SequenceGame(Widget):
     # Time to wait after starting the video before getting to the first set display
     pre_start_vid_ts = 0.1
     
-    # Sets per hyperset
-    nsets_per_hyperset = 5
-    
     # Inter Set Interval
     ISetI_mean = .5
     ISetI_std = .1
     
-    # Inter HyperSet Interval
+    # Intertrial Interval
     ITI_mean = 1.
     ITI_std = .2
     
@@ -136,7 +133,7 @@ class SequenceGame(Widget):
     #indicator_txt = StringProperty('o')
     #indicator_txt_color = ListProperty([.5, .5, .5, 1.])
     
-    # Percent of hyperset complete
+    # Percent of set complete
     percent_done = NumericProperty(0)
 
     t0 = time.time()
@@ -224,7 +221,7 @@ class SequenceGame(Widget):
         #                                        4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm), 4*fixed_window_size[1]/(5*pix_per_cm)])
         
         
-        # Which sets comprise the hyperset? 
+        # Which set are we training/testing? 
         for i, val in enumerate(set_id_selected['set_sel']):
             if val:
                 self.set_selected = i
@@ -493,7 +490,7 @@ class SequenceGame(Widget):
         self.FSM['targ_hold'] = dict(finish_targ_hold='targ_pressed', early_leave_target_hold = 'hold_error', 
             targ_drag_out = 'drag_error', stop=None, non_rhtouch='RH_touch')
         
-        self.FSM['targ_pressed'] = dict(incorrect_immediate_error = 'set_error', all_targs_pressed = 'set_complete', targets_remain = 'set', 
+        self.FSM['targ_pressed'] = dict(all_targs_pressed = 'set_complete', targets_remain = 'set', incorrect_immediate_error = 'set_error', 
             stop=None, non_rhtouch='RH_touch')
         
         self.FSM['set_error'] = dict(end_set_error='ITI', stop=None, non_rhtouch='RH_touch')
@@ -647,7 +644,7 @@ class SequenceGame(Widget):
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
             kw = dict(ts=self.state_length)
-
+            # print(fcn_test_name)
             fcn_test = getattr(self, fcn_test_name)
             if fcn_test(**kw):
                 # if stop: close the app
@@ -1035,7 +1032,10 @@ class SequenceGame(Widget):
     
     # Starting with target 2 gives an error
     def incorrect_immediate_error(self, **kwargs):
-        return self.immediate_error
+        if self.immediate_error:
+            return self.target_touched is not len(self.targets_pressed)
+        else:
+            return False
     
     # Start Target Holds --> Change the Color of the target to yellow?
     def _start_targ_hold(self, **kwargs):
@@ -1291,7 +1291,7 @@ class SequenceGame(Widget):
             self.repeat = False
             if platform == 'win32': 
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                sound = SoundLoader.load('reward2.wav')
+                sound = SoundLoader.load('reward1.wav')
                 sound.play()
 
             ### To trigger reward make sure reward is > 0:
@@ -1313,6 +1313,8 @@ class SequenceGame(Widget):
         self.exit_target2.color = (r, g, b, a)
         self.target1.color = (r, g, b, a)
         self.target2.color = (r, g, b, a)
+        self.target3.color = (r, g, b, a)
+        self.target4.color = (r, g, b, a)
         self.button1_out.color = (r, g, b, a)
         self.button1_in.color = (r, g, b, a)
         self.button2_out.color = (r, g, b, a)

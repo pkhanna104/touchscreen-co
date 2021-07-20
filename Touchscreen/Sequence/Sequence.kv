@@ -761,6 +761,7 @@
                 
                 CheckBox: 
                     id: immediate_error_no
+                    group: 'immediate_error'
                     active: True
 
                    
@@ -1087,9 +1088,9 @@
 
 <SequenceGame>:   
     canvas:
-        Rectangle:
-            pos: 0, 0.2*root.height
-            size: root.width/25, (root.percent_done/100)*0.6*root.height
+        # Rectangle:
+            # pos: 0, 0.2*root.height
+            # size: root.width/25, (root.percent_done/100)*0.6*root.height
             
     target1: target_one
     target2: target_two
