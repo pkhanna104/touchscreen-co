@@ -130,6 +130,7 @@ class SequenceGame(Widget):
 
     # Number of trials: 
     trial_counter = NumericProperty(0)
+    percent_correct = StringProperty('')
     #indicator_txt = StringProperty('o')
     #indicator_txt_color = ListProperty([.5, .5, .5, 1.])
     
@@ -138,6 +139,8 @@ class SequenceGame(Widget):
 
     t0 = time.time()
 
+    trial_text = StringProperty('')
+    correct_text = StringProperty('')
     cht_text = StringProperty('')
     tht_text = StringProperty('')
     targ_size_text = StringProperty('')
@@ -611,14 +614,17 @@ class SequenceGame(Widget):
         
         if self.idle:
             self.state = 'idle_exit'
-            self.trial_counter = -1
 
             # Set relevant params text: 
+            self.trial_text = '# Trials Attempted: '
+            self.correct_text = '% Trials Correct: '
             self.cht_text = 'Home Hold Time: '
             self.tht_text = 'Target Hold Time: '
             self.targ_size_text = 'Target Radius: '
             self.big_rew_text = 'Big Reward Time: '
-
+            
+            self.percent_correct = str(round(100*self.trial_correct_counter/self.trial_counter)) + '%'
+            
             if type(self.cht_type) is str:
                 self.cht_param = self.cht_type
             else:
@@ -1122,6 +1128,7 @@ class SequenceGame(Widget):
     def _start_reward_set(self, **kwargs):
         self.trial_counter += 1
         self.trial_correct_counter += 1
+        self.percent_correct = str(round(100*self.trial_correct_counter/self.trial_counter)) + '%'
         # Make the screen green
         Window.clearcolor = (0., 1., 0., 1.)
         self.change_allbutton_color(0, 1, 0, 1)
@@ -1146,6 +1153,7 @@ class SequenceGame(Widget):
     # Set Error
     def _start_set_error(self, **kwargs):
         self.trial_counter += 1
+        self.percent_correct = str(round(100*self.trial_correct_counter/self.trial_counter)) + '%'
         
         # Play an error tone
         if self.anytarg_rew == 0:
