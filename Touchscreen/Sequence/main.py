@@ -242,18 +242,25 @@ class SequenceGame(Widget):
             if val:
                 self.set_timeout_time = set_timeout_opts[i]
         
+        # How long to give rewards for touching any target?
+        anytarg_rew_opts = [0., .1, .3, .5]
+        for i, val in enumerate(rew_in['anytarg_rew']):
+            if val:
+                self.anytarg_rew = anytarg_rew_opts[i]
+        self.reward_for_anytarg = [self.anytarg_rew > 0, self.anytarg_rew]
+        
         # Play reward tone for every correct press?
         if rew_tone_every['rew_tone_every'][0]:
             self.rew_tone_every = True
         else:
             self.rew_tone_every = False
         
-        # How long to give rewards for touching any target?
-        anytarg_rew_opts = [0., .1, .3, .5]
-        for i, val in enumerate(rew_in['anytarg_rew']):
+        # How long to give rewards for touching every correct target?
+        everycorrect_rew_opts = [0., .1, .3, .5]
+        for i, val in enumerate(rew_in['everycorrect_rew']):
             if val:
-                self.anytarg_rew = anytarg_rew_opts[i]
-        self.reward_for_targtouch = [self.anytarg_rew > 0, self.anytarg_rew]
+                self.everycorrect_rew = everycorrect_rew_opts[i]
+        self.reward_for_everycorrect = [self.everycorrect_rew > 0, self.everycorrect_rew]
         
         # How long to give rewards for a complete set?
         set_rew_opts = [.1, .3, .5, .7]
@@ -337,7 +344,7 @@ class SequenceGame(Widget):
         
         # Generate the rewards
         self.reward_generator = self.gen_rewards(self.percent_of_trials_rewarded, self.percent_of_trials_doubled,
-            self.reward_for_targtouch)
+            self.reward_for_anytarg)
         
         # Auto-quit after how many trials?
         autoquit_trls = [10, 25, 50, 100, 10**10]
@@ -636,7 +643,7 @@ class SequenceGame(Widget):
                 self.tht_param = 'Constant: ' + str(self.tht)
 
             self.targ_size_param = str(self.target_rad)
-            self.big_rew_time_param = str(self.reward_for_targtouch[1])
+            self.big_rew_time_param = str(self.reward_for_anytarg[1])
 
         else:
             App.get_running_app().stop()
@@ -946,6 +953,7 @@ class SequenceGame(Widget):
                     self.target4.color = (1., 1., 0., 1.)
 
         self.targtouch_rew_given = False
+        self.everycorrect_rew_given = False
         self.repeat = False
         
         # Turn exit buttons gray
@@ -1086,10 +1094,22 @@ class SequenceGame(Widget):
                     if platform == 'win32':
                         sound = SoundLoader.load('reward2.wav')
                         sound.play()
+            # Are we supposed to reward every correct touch with juice?         
+            if self.reward_for_everycorrect[0] and not self.everycorrect_rew_given:
+                n_targ_pressed = len(self.targets_pressed)
+                if list(self.targets_pressed) == list(range(1, n_targ_pressed+1)): 
+                    # if the list of targets pressed is in the correct order
+                    print('reward juice for correct target touch')
+                    self.run_small_rew()
+                    self.everycorrect_rew_given = True
             
             # Are we supposed to reward any target touch with juice?
-            if self.reward_for_targtouch[0] and not self.targtouch_rew_given:
-                self.run_anytarg_rew()
+            if self.reward_for_anytarg[0] and not self.targtouch_rew_given:
+                print('reward tone for any target touch')
+                if platform == 'win32':
+                    sound = SoundLoader.load('reward2.wav')
+                    sound.play()
+                self.run_small_rew()
                 self.targtouch_rew_given = True
             
     
@@ -1276,18 +1296,16 @@ class SequenceGame(Widget):
         return np.hstack((rew))
     
     # Run Rewards
-    def run_anytarg_rew(self, **kwargs):
-        print('Run anytarg reward')
+    def run_small_rew(self, **kwargs):
+        print('Run small reward')
         try:
-            ### To trigger reward make sure reward is > 0:
-            if self.anytarg_rew > 0:
-                self.reward_port.open()
-                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.anytarg_rew)+' sec\n']
-                self.reward_port.write(rew_str)
-                time.sleep(.25)
-                run_str = [ord(r) for r in 'run\n']
-                self.reward_port.write(run_str)
-                self.reward_port.close()
+            self.reward_port.open()
+            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.anytarg_rew)+' sec\n']
+            self.reward_port.write(rew_str)
+            time.sleep(.25)
+            run_str = [ord(r) for r in 'run\n']
+            self.reward_port.write(run_str)
+            self.reward_port.close()
         except:
             pass
 
@@ -1295,7 +1313,7 @@ class SequenceGame(Widget):
     
     def run_set_rew(self, **kwargs):
         try:
-            print('Set Reward')
+            print('Run large (set) Reward')
             self.repeat = False
             if platform == 'win32': 
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
