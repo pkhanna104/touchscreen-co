@@ -339,7 +339,7 @@
                     fontsize: 50
 
                 Label:
-                    text: 'Sets to train:'
+                    text: 'Set to train:'
                     color: 1, 1, 0, 1
                     fontsize: 50
                     
@@ -565,66 +565,6 @@
                     text: ''
                     fontsize: 50
             
-            
-            BoxLayout 
-                id: everycorrect_rew
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.2, 0.2, 0.5, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                    
-                Label:
-                    text: ''
-                    fontsize: 50
-
-
-                Label: 
-                    text: 'Every correct reward juice'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '0.0 sec'
-
-                CheckBox:
-                    id: everycorrect_rew_zero_sec
-                    group: 'everycorrect_rew'
-                
-                Label: 
-                    text: '0.1 sec'
-
-                CheckBox:
-                    id: everycorrect_rew_pt1_sec
-                    group: 'everycorrect_rew'
-                    active: True
-
-                Label: 
-                    text: '0.3 sec'
-
-                CheckBox:
-                    id: everycorrect_rew_pt3_sec
-                    group: 'everycorrect_rew'
-
-                Label: 
-                    text: '0.5 sec'
-
-                CheckBox:
-                    id: everycorrect_rew_pt5_sec
-                    group: 'everycorrect_rew'
-                
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
                     
             BoxLayout 
                 id: set_rew
@@ -1047,7 +987,7 @@
                     root.current = 'splash_start'
                     splash.init(dict(hari=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butt=chk_but.active), 
                     dict(rew_tone_every=[rew_tone_every_yes.active, rew_tone_every_no.active]), 
-                    dict(rew_manual=False, anytarg_rew=[anytarg_rew_zero_sec.active, anytarg_rew_pt1_sec.active, anytarg_rew_pt3_sec.active, anytarg_rew_pt5_sec.active], everycorrect_rew=[everycorrect_rew_zero_sec.active, everycorrect_rew_pt1_sec.active, everycorrect_rew_pt3_sec.active, everycorrect_rew_pt5_sec.active], set_rew=[set_rew_pt1_sec.active, set_rew_pt3_sec.active, set_rew_pt5_sec.active, set_rew_pt7_sec.active]), 
+                    dict(rew_manual=False, anytarg_rew=[anytarg_rew_zero_sec.active, anytarg_rew_pt1_sec.active, anytarg_rew_pt3_sec.active, anytarg_rew_pt5_sec.active], set_rew=[set_rew_pt1_sec.active, set_rew_pt3_sec.active, set_rew_pt5_sec.active, set_rew_pt7_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_125.active]), 
                     dict(set_sel=[set_sel_A.active, set_sel_B.active, set_sel_C.active, set_sel_D.active, set_sel_E.active]), 
                     dict(num_targets=[num_targets_2.active, num_targets_3.active, num_targets_4.active]), 

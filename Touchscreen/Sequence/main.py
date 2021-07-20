@@ -255,13 +255,6 @@ class SequenceGame(Widget):
         else:
             self.rew_tone_every = False
         
-        # How long to give rewards for touching every correct target?
-        everycorrect_rew_opts = [0., .1, .3, .5]
-        for i, val in enumerate(rew_in['everycorrect_rew']):
-            if val:
-                self.everycorrect_rew = everycorrect_rew_opts[i]
-        self.reward_for_everycorrect = [self.everycorrect_rew > 0, self.everycorrect_rew]
-        
         # How long to give rewards for a complete set?
         set_rew_opts = [.1, .3, .5, .7]
         for i, val in enumerate(rew_in['set_rew']):
@@ -953,7 +946,6 @@ class SequenceGame(Widget):
                     self.target4.color = (1., 1., 0., 1.)
 
         self.targtouch_rew_given = False
-        self.everycorrect_rew_given = False
         self.repeat = False
         
         # Turn exit buttons gray
@@ -1085,32 +1077,30 @@ class SequenceGame(Widget):
             
         # if this is not the last target, then we might have to deal with handing out some rewards here
         if not list(np.sort(np.unique(self.targets_pressed))) == list(range(1, self.num_targets+1)):
-            # Are we supposed to reward every correct touch with a tone?
-            if self.rew_tone_every:
-                n_targ_pressed = len(self.targets_pressed)
-                if list(self.targets_pressed) == list(range(1, n_targ_pressed+1)): 
-                    # if the list of targets pressed is in the correct order
+            n_targ_pressed = len(self.targets_pressed)
+            if list(self.targets_pressed) == list(range(1, n_targ_pressed+1)): 
+                # if the list of targets pressed is in the correct order
+                # Are we supposed to reward every correct touch with a tone?
+                if self.rew_tone_every:
                     print('reward tone for correct target touch')
                     if platform == 'win32':
                         sound = SoundLoader.load('reward2.wav')
                         sound.play()
-            # Are we supposed to reward every correct touch with juice?         
-            if self.reward_for_everycorrect[0] and not self.everycorrect_rew_given:
-                n_targ_pressed = len(self.targets_pressed)
-                if list(self.targets_pressed) == list(range(1, n_targ_pressed+1)): 
-                    # if the list of targets pressed is in the correct order
+                        
+                # Are we supposed to reward any correct touch with juice?
+                if self.reward_for_anytarg[0] and not self.targtouch_rew_given and self.immediate_error:
                     print('reward juice for correct target touch')
                     self.run_small_rew()
-                    self.everycorrect_rew_given = True
-            
-            # Are we supposed to reward any target touch with juice?
-            if self.reward_for_anytarg[0] and not self.targtouch_rew_given:
-                print('reward tone for any target touch')
-                if platform == 'win32':
-                    sound = SoundLoader.load('reward2.wav')
-                    sound.play()
-                self.run_small_rew()
-                self.targtouch_rew_given = True
+                    self.targtouch_rew_given = True
+            else: # if this was not a correct target touch
+                # Are we supposed to reward any target touch with juice?
+                if self.reward_for_anytarg[0] and not self.targtouch_rew_given and not self.immediate_error:
+                    print('reward tone and juice for any target touch')
+                    if platform == 'win32':
+                        sound = SoundLoader.load('reward2.wav')
+                        sound.play()
+                    self.run_small_rew()
+                    self.targtouch_rew_given = True
             
     
     # Have all targets been pressed?
@@ -1176,16 +1166,15 @@ class SequenceGame(Widget):
         self.percent_correct = str(round(100*self.trial_correct_counter/self.trial_counter)) + '%'
         
         # Play an error tone
-        if self.anytarg_rew == 0:
-            print('Set Error')
-            if platform == 'win32':
-                sound = SoundLoader.load('error1.wav')
-                sound.play()
-        
-            # Make the screen red
-            self.percent_done = 0
-            Window.clearcolor = (1., 0., 0., 1.)
-            self.change_allbutton_color(1, 0, 0, 1)
+        print('Run set error')
+        if platform == 'win32':
+            sound = SoundLoader.load('error1.wav')
+            sound.play()
+    
+        # Make the screen red
+        self.percent_done = 0
+        Window.clearcolor = (1., 0., 0., 1.)
+        self.change_allbutton_color(1, 0, 0, 1)
         
     
     def end_set_error(self, **kwargs):
