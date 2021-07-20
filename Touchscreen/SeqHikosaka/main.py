@@ -39,8 +39,6 @@ class Data(tables.IsDescription):
 class SequenceGame(Widget):
     target1 = ObjectProperty(None)
     target2 = ObjectProperty(None)
-    target3 = ObjectProperty(None)
-    target4 = ObjectProperty(None)
     button1_in = ObjectProperty(None)
     button1_out = ObjectProperty(None)
     button2_in = ObjectProperty(None)
@@ -85,8 +83,8 @@ class SequenceGame(Widget):
     ISetI_std = .1
     
     # Inter HyperSet Interval
-    ITI_mean = 1.
-    ITI_std = .2
+    IHSI_mean = 1.
+    IHSI_std = .2
     
     # Target Radius 
     target_rad = 1.5 # cm
@@ -183,7 +181,7 @@ class SequenceGame(Widget):
     
     # Get the initial parameters
     def init(self, animal_names_dict=None, rew_tone_every=None, rew_in=None, task_in=None,
-        set_id_selected = None, num_targets = None, test=None, hold=None, immediate_error=None, nontarg_tol=None,
+        set_id_selected = None, test=None, hold=None, error_types_selected=None, nontarg_tol=None,
         autoquit=None, rew_var=None, set_timeout = None, error_timeout_time=None, ):
         
         # Initialize a count of the number of rewards
@@ -225,16 +223,13 @@ class SequenceGame(Widget):
         
         
         # Which sets comprise the hyperset? 
+        self.sets_selected = []
         for i, val in enumerate(set_id_selected['set_sel']):
             if val:
-                self.set_selected = i
+                self.sets_selected.append(i)
         
-        
-        # How many buttons per set?
-        num_target_opts = [2, 3, 4];
-        for i, val in enumerate(num_targets['num_targets']):
-            if val:
-                self.num_targets = num_target_opts[i]
+        # Record the number of sets per hyperset
+        self.nsets_per_hyperset = len(self.sets_selected)
         
         # How long does the set stay on the screen until it disappears and move to next trial? 
         set_timeout_opts = [15, 30, 45, 60]
@@ -256,17 +251,21 @@ class SequenceGame(Widget):
         self.reward_for_targtouch = [self.anytarg_rew > 0, self.anytarg_rew]
         
         # How long to give rewards for a complete set?
-        set_rew_opts = [.1, .3, .5, .7]
+        set_rew_opts = [0., .1, .3, .5]
         for i, val in enumerate(rew_in['set_rew']):
             if val:
                 self.set_rew = set_rew_opts[i]
         self.reward_for_set = [self.set_rew > 0, self.set_rew]
+        
+        # How long to give rewards for a complete hyperset?
+        hs_rew_opts = [.3, .5, .7]
+        for i, val in enumerate(rew_in['hs_rew']):
+            if val:
+                self.hs_rew = hs_rew_opts[i]
                 
-        # Do incorrectt presses immediately lead to an error?
-        if immediate_error['immediate_error'][0]:
-            self.immediate_error = True
-        else:
-            self.immediate_error = False
+        # What counts as an error?
+        # self.nontarg_is_error = error_types_selected['error_type'][0]
+        self.t2p_first_is_error = error_types_selected['error_type'][0]
         
         # How far away from a target do we tolerate touches?
         nontarg_tol_opts = [100, 3.0, 2.5, 2.0, 1.5, 1.0] # convert the percentage options to proportion of radius
@@ -353,30 +352,22 @@ class SequenceGame(Widget):
         self.drag_ok = False;
     
         # Preload sounds: 
-        if platform == 'win32':
-            self.reward1 = SoundLoader.load('reward1.wav')
-            self.reward2 = SoundLoader.load('reward2.wav')
+        self.reward1 = SoundLoader.load('reward1.wav')
+        self.reward2 = SoundLoader.load('reward2.wav')
         
         # Initialize what state we are in
-        self.state = 'ITI'
+        self.state = 'IHSI'
         self.state_start = time.time()
-        self.ITI = self.ITI_std + self.ITI_mean
+        self.IHSI = self.IHSI_std + self.IHSI_mean
         
-        # Initialize Trial Counter
-        self.trial_counter = 0
-        self.trial_correct_counter = 0
+        # Initialize the set number
+        self.set_ix = 1
         
         # Initialize targets
         self.target1.set_size(2*self.target_rad)
         self.target1.move(np.array([0., 0.]))
         self.target2.set_size(2*self.target_rad)
         self.target2.move(np.array([0., 0.]))
-        if self.num_targets > 2:
-            self.target3.set_size(2*self.target_rad)
-            self.target3.move(np.array([0., 0.]))
-            if self.num_targets > 3:
-                self.target4.set_size(2*self.target_rad)
-                self.target4.move(np.array([0., 0.]))
         
         # Initialize buttons
         self.button1_out.set_size(2*self.target_rad)
@@ -458,51 +449,56 @@ class SequenceGame(Widget):
         # self.indicator_targ.move(self.indicator_pos)
         # self.indicator_targ.color = (0., 0., 0., 1.)
         
-        # Initialize the set options
-        self.target_list = np.array([[1, 12, 7, 14], [4, 15, 1, 3], [14, 3, 5, 11], [4, 11, 2, 9], [7, 0, 8, 3]])
-        self.first_set_attempt = True
+        # Determine the hypersets (every 2 numbers comprises a set)
+        self.target_list = np.array([[1, 12, 4, 15, 14, 3, 4, 11, 7, 0], [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]])
         
         # Initialize the Target and Home position
+        self.target_HS_index = 0
+        self.target_index = np.array([2*(self.set_ix-1), 2*(self.set_ix-1)+1])
         self.repeat = False
         self.home_position = np.array([0., 0.])
-        self.target1_position = np.array([self.possible_target_pos_x[self.target_list[self.set_selected][0]], self.possible_target_pos_y[self.target_list[self.set_selected][0]]])
-        self.target1.move(self.target1_position)
-        self.target2_position = np.array([self.possible_target_pos_x[self.target_list[self.set_selected][1]], self.possible_target_pos_y[self.target_list[self.set_selected][1]]])
-        self.target2.move(self.target2_position)
-        if self.num_targets > 2:
-            self.target3_position = np.array([self.possible_target_pos_x[self.target_list[self.set_selected][2]], self.possible_target_pos_y[self.target_list[self.set_selected][2]]])
-            self.target3.move(self.target3_position)
-            if self.num_targets > 3:
-                self.target4_position = np.array([self.possible_target_pos_x[self.target_list[self.set_selected][3]], self.possible_target_pos_y[self.target_list[self.set_selected][3]]])
-                self.target4.move(self.target4_position)
-            
-        
-        # Initialize What Targets Have Been Pressed
-        self.targets_pressed = []
+        self.target1_position = np.array([self.possible_target_pos_x[self.target_list[self.target_HS_index, self.target_index[0]]], self.possible_target_pos_y[self.target_list[self.target_HS_index, self.target_index[0]]]])
+        self.target2_position = np.array([self.possible_target_pos_x[self.target_list[self.target_HS_index, self.target_index[1]]], self.possible_target_pos_y[self.target_list[self.target_HS_index, self.target_index[1]]]])
         
         # Initialize FSM Dictionary
         self.FSM = dict()
         
         # Determine the relative task update functions for each task state
-        self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
+        self.FSM['IHSI'] = dict(end_IHSI='vid_trig', stop=None)
         self.FSM['vid_trig'] = dict(rhtouch='set', stop=None)
         
-        self.FSM['set'] = dict(touch_target = 'targ_hold', touch_nontarg = 'set_error', set_timeout='timeout_error', stop=None,
+        self.FSM['set'] = dict(touch_target1 = 'targ1_hold', touch_target2 = 'targ2_hold', touch_nontarg = 'set_error', set_timeout='timeout_error', stop=None,
             non_rhtouch='RH_touch')#,touch_not_target='touch_error')
         
-        self.FSM['targ_hold'] = dict(finish_targ_hold='targ_pressed', early_leave_target_hold = 'hold_error', 
-            targ_drag_out = 'drag_error', stop=None, non_rhtouch='RH_touch')
+        self.FSM['targ1_hold'] = dict(finish_targ_hold='targ1_pressed', early_leave_target1_hold = 'hold_error_nopress', 
+            targ1_drag_out = 'drag_error_nopress', stop=None, non_rhtouch='RH_touch')
+        self.FSM['targ2_hold'] = dict(finish_targ_hold='targ2_pressed', early_leave_target2_hold = 'hold_error_nopress',
+            targ2_drag_out = 'drag_error_nopress', stop=None, non_rhtouch='RH_touch')
         
-        self.FSM['targ_pressed'] = dict(incorrect_immediate_error = 'set_error', all_targs_pressed = 'set_complete', targets_remain = 'set', 
-            stop=None, non_rhtouch='RH_touch')
+        self.FSM['targ1_pressed'] = dict(touch_target2 ='t1p_targ2_hold', touch_nontarg = 'set_error', set_timeout='timeout_error', stop=None,
+            non_rhtouch='RH_touch')
+        self.FSM['targ2_pressed'] = dict(t2p_first_error = 'set_error', touch_target1 ='t2p_targ1_hold', touch_nontarg = 'set_error', set_timeout='timeout_error', stop=None,
+            non_rhtouch='RH_touch')
         
-        self.FSM['set_error'] = dict(end_set_error='ITI', stop=None, non_rhtouch='RH_touch')
-        self.FSM['set_complete'] = dict(set_correct = 'reward_set', set_incorrect = 'set_error', stop=None, non_rhtouch='RH_touch')
-        self.FSM['reward_set'] = dict(end_reward_set = 'ITI', stop=None, non_rhtouch='RH_touch')
+        self.FSM['t1p_targ2_hold'] = dict(finish_targ_hold='set_complete', early_leave_target2_hold = 'hold_error_t1p',
+            targ2_drag_out = 'drag_error_t1p', stop=None, non_rhtouch='RH_touch')
+        self.FSM['t2p_targ1_hold'] = dict(finish_targ_hold='set_error', early_leave_target1_hold = 'hold_error_t2p',
+            targ1_drag_out = 'drag_error_t2p', stop=None, non_rhtouch='RH_touch')
         
-        self.FSM['timeout_error'] = dict(end_timeout_error='ITI', stop=None, non_rhtouch='RH_touch')
-        self.FSM['hold_error'] = dict(end_hold_error='set', stop=None, non_rhtouch='RH_touch')
-        self.FSM['drag_error'] = dict(end_drag_error='set', stop=None, non_rhtouch='RH_touch')
+        self.FSM['set_error'] = dict(end_set_error='IHSI', stop=None)
+        self.FSM['set_complete'] = dict(hyperset_complete = 'reward_hyperset', next_set = 'reward_set', stop=None, non_rhtouch='RH_touch')
+        self.FSM['reward_set'] = dict(end_reward_set = 'set', stop=None, non_rhtouch='RH_touch')
+        self.FSM['reward_hyperset'] = dict(end_reward_hyperset = 'IHSI', stop=None, non_rhtouch='RH_touch')
+        
+        self.FSM['timeout_error'] = dict(end_timeout_error='IHSI', stop=None, non_rhtouch='RH_touch')
+        self.FSM['hold_error_nopress'] = dict(end_hold_error_nopress='set', stop=None, non_rhtouch='RH_touch')
+        self.FSM['drag_error_nopress'] = dict(end_drag_error_nopress='set', stop=None, non_rhtouch='RH_touch')
+        
+        self.FSM['hold_error_t1p'] = dict(end_hold_error_t1p='targ1_pressed', stop=None, non_rhtouch='RH_touch')
+        self.FSM['drag_error_t1p'] = dict(end_drag_error_t1p='targ1_pressed', stop=None, non_rhtouch='RH_touch')
+        
+        self.FSM['hold_error_t2p'] = dict(end_hold_error_t2p='targ2_pressed', stop=None, non_rhtouch='RH_touch')
+        self.FSM['drag_error_t2p'] = dict(end_drag_error_t2p='targ2_pressed', stop=None, non_rhtouch='RH_touch')
         
         # self.FSM['rew_anytouch'] = dict(end_rewanytouch='target', stop=None, non_rhtouch='RH_touch')
         self.FSM['idle_exit'] = dict(stop=None)
@@ -535,12 +531,14 @@ class SequenceGame(Widget):
 
         # save parameters: 
         d = dict(animal_name=animal_name, target_rad=self.target_rad,
-            sets_selected = self.set_selected, 
-            ITI_mean=self.ITI_mean, ITI_std = self.ITI_std, 
+            sets_selected = self.sets_selected, 
+            ISetI_mean=self.ISetI_mean, ISetI_std = self.ISetI_std, 
+            IHSI_mean=self.IHSI_mean, IHSI_std = self.IHSI_std, 
             targ_hold_time = self.tht,
             ch_timeout=self.ch_timeout, 
             anytarg_rew_time=self.anytarg_rew,
             set_rew_time = self.set_rew,
+            hs_rew_time=self.hs_rew,
             timeout_error_timeout = self.timeout_error_timeout,
             hold_error_timeout = self.hold_error_timeout,
             drag_error_timeout = self.drag_error_timeout,
@@ -553,6 +551,7 @@ class SequenceGame(Widget):
 
         print(self.anytarg_rew)
         print(self.set_rew)
+        print(self.hs_rew)
 
         try:
             if self.testing:
@@ -664,8 +663,8 @@ class SequenceGame(Widget):
                     # Advance to the next state
                     self.prev_state = self.state_length
                     # if next_state is 'set_error':
+                    #     import pdb; pdb.set_trace()
                     self.state = next_state
-                    print(self.state)
                     
                     self.state_start = time.time()
 
@@ -741,7 +740,7 @@ class SequenceGame(Widget):
     
     def stop(self, **kwargs):
         # If past number of max trials then auto-quit: 
-        if np.logical_and(self.trial_counter >= self.max_trials, self.state == 'ITI'):
+        if np.logical_and(self.trial_counter >= self.max_trials, self.state == 'IHSI'):
             self.idle = True
             return True
         else:
@@ -765,8 +764,8 @@ class SequenceGame(Widget):
             else:
                 return False
     
-    # ITI State
-    def _start_ITI(self, **kwargs):
+    # IHSI State
+    def _start_IHSI(self, **kwargs):
         try:
             self.cam_trig_port.write('0'.encode())
         except:
@@ -778,14 +777,11 @@ class SequenceGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1.)
         self.exit_target2.color = (.15, .15, .15, 1.)
         
-        # Sets that come after the trigger must be the first set
-        self.first_set_attempt = True
+        # Set the set index to 1
+        self.set_ix = 1;
         
-        # Reset the tracker for buttons pressed
-        self.targets_pressed = []
-        
-        # Set ITI, CHT, THT
-        self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
+        # Set IHSI, CHT, THT
+        self.IHSI = np.random.random()*self.IHSI_std + self.IHSI_mean
 
         if type(self.cht_type) is str:
             cht_min, cht_max = self.cht_type.split('-')
@@ -798,14 +794,10 @@ class SequenceGame(Widget):
         # Make all of the targets invisible
         self.target1.color = (0., 0., 0., 0.)
         self.target2.color = (0., 0., 0., 0.)
-        if self.num_targets > 2:
-            self.target3.color = (0., 0., 0., 0.)
-            if self.num_targets > 3:
-                self.target4.color = (0., 0., 0., 0.)
         # self.indicator_targ.color = (0., 0., 0., 0.)
     
-    def end_ITI(self, **kwargs):
-        return kwargs['ts'] > self.ITI
+    def end_IHSI(self, **kwargs):
+        return kwargs['ts'] > self.IHSI
     
     # Video Trigger State
     def _start_vid_trig(self, **kwargs):
@@ -815,6 +807,9 @@ class SequenceGame(Widget):
             self.cam_trig_port.write('1'.encode())
         except:
             pass
+        
+        # Sets that come after the trigger must be the first set
+        self.first_set_attempt = True
 
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
             self.target1.color = (1., 0., 0., 1.)
@@ -916,33 +911,26 @@ class SequenceGame(Widget):
         self.button16_in.color = (0., 0., 0., 1.)
         
         # Update the progress bar
-        self.percent_done = 100*(len(self.targets_pressed)/self.num_targets)
+        self.percent_done = 100*(self.set_ix/self.nsets_per_hyperset)
         
-        # Make sure the targets that have been pressed disappear, and make the other
-        # targets that have not been pressed light up
-        if 1 in self.targets_pressed:
-            self.target1.color = (0., 0., 0., 1.)
-        else:
-            self.target1.color = (1., 1., 0., 1.)
-            
-        if 2 in self.targets_pressed:
-            self.target2.color = (0., 0., 0., 1.)
-        else:
-            self.target2.color = (1., 1., 0., 1.)
+        # Determine which targets to show for this set
+        self.target_index = np.array([2*(self.sets_selected[self.set_ix-1]), 2*(self.sets_selected[self.set_ix-1])+1])
         
-        if self.num_targets > 2:
-            if 3 in self.targets_pressed:
-                self.target3.color = (0., 0., 0., 1.)
-            else:
-                self.target3.color = (1., 1., 0., 1.)
-                
-            if self.num_targets > 3:
-                if 3 in self.targets_pressed:
-                    self.target4.color = (0., 0., 0., 1.)
-                else:
-                    self.target4.color = (1., 1., 0., 1.)
-
         self.targtouch_rew_given = False
+        
+        # Change the position of the targets
+        if self.repeat is False:
+            self.target1_position = np.array([self.possible_target_pos_x[self.target_list[self.target_HS_index, self.target_index[0]]], self.possible_target_pos_y[self.target_list[self.target_HS_index, self.target_index[0]]]])
+            self.target2_position = np.array([self.possible_target_pos_x[self.target_list[self.target_HS_index, self.target_index[1]]], self.possible_target_pos_y[self.target_list[self.target_HS_index, self.target_index[1]]]])
+            
+            # self.target_set_index += 2
+            print(self.target1_position)
+            print(self.target2_position)
+        
+        self.target1.move(self.target1_position)
+        self.target2.move(self.target2_position)
+        self.target1.color = (1., 1., 0., 1.)
+        self.target2.color = (1., 1., 0., 1.)
         self.repeat = False
         
         # Turn exit buttons gray
@@ -955,176 +943,99 @@ class SequenceGame(Widget):
             self.first_set_attempt = False
     
     # Touch Targets
-    def touch_target(self, **kwargs):
+    def touch_target1(self, **kwargs):
         if self.drag_ok:
-            if (self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
-                and 1 not in self.targets_pressed):
-                self.target_touched = 1
-                return True
-            elif (self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
-                and 2 not in self.targets_pressed):
-                self.target_touched = 2
-                return True
-            elif self.num_targets > 2:
-                if (self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
-                    and 3 not in self.targets_pressed):
-                    self.target_touched = 3
-                    return True
-                elif self.num_targets > 3:
-                    if (self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
-                        and 4 not in self.targets_pressed):
-                        self.target_touched = 4
-                        return True
-                    else:
-                        return False
-                else:
-                    return False
-            else:
-                return False
+            return self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
         else:
-            if (np.logical_and(self.check_if_cursors_in_targ(self.target1_position, self.target_rad),
+            return np.logical_and(self.check_if_cursors_in_targ(self.target1_position, self.target_rad),
                 self.check_if_started_in_targ(self.target1_position, self.target_rad))
-                and 1 not in self.targets_pressed):
-                self.target_touched = 1
-                return True
-            elif (np.logical_and(self.check_if_cursors_in_targ(self.target2_position, self.target_rad),
+    
+    def touch_target2(self, **kwargs):
+        if self.drag_ok:
+            return self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
+        else:
+            return np.logical_and(self.check_if_cursors_in_targ(self.target2_position, self.target_rad),
                 self.check_if_started_in_targ(self.target2_position, self.target_rad))
-                and 2 not in self.targets_pressed):
-                self.target_touched = 2
-                return True
-            elif self.num_targets > 2:
-                if (np.logical_and(self.check_if_cursors_in_targ(self.target3_position, self.target_rad),
-                    self.check_if_started_in_targ(self.target3_position, self.target_rad))
-                    and 3 not in self.targets_pressed):
-                    self.target_touched = 3
-                    return True
-                elif self.num_targets > 3:
-                    if (np.logical_and(self.check_if_cursors_in_targ(self.target4_position, self.target_rad),
-                        self.check_if_started_in_targ(self.target4_position, self.target_rad))
-                        and 14not in self.targets_pressed):
-                        self.target_touched = 4
-                        return True
-                    else:
-                        return False
-                else:
-                    return False
-            else:
-                return False
         
     def touch_nontarg(self, **kwargs):
         nontarg_error = False
         if np.logical_and(self.nontarget_error_tolerance < 100, self.touch):
-            if self.check_if_cursors_in_targ(self.target1_position, self.nontarget_error_tolerance*self.target_rad):
-                nontarg_error = False
-            elif self.check_if_cursors_in_targ(self.target2_position, self.nontarget_error_tolerance*self.target_rad):
-                nontarg_error = False
-            elif self.num_targets > 3:
-                if self.check_if_cursors_in_targ(self.target3_position, self.nontarget_error_tolerance*self.target_rad):
-                    nontarg_error = False
-                elif self.num_targets > 4:
-                    if self.check_if_cursors_in_targ(self.target4_position, self.nontarget_error_tolerance*self.target_rad):
-                        nontarg_error = False
-                    else:
-                        nontarg_error = True
-                else: 
-                    nontarg_error = True
-            else:
-                nontarg_error = True
+            nontarg_error = not np.logical_or(self.check_if_cursors_in_targ(self.target1_position, self.nontarget_error_tolerance*self.target_rad), 
+                                           self.check_if_cursors_in_targ(self.target2_position, self.nontarget_error_tolerance*self.target_rad))
 
         return nontarg_error
     
     # Starting with target 2 gives an error
-    def incorrect_immediate_error(self, **kwargs):
-        return self.immediate_error
+    def t2p_first_error(self, **kwargs):
+        return self.t2p_first_is_error
     
     # Start Target Holds --> Change the Color of the target to yellow?
-    def _start_targ_hold(self, **kwargs):
-        if self.target_touched is 1:
-            self.target1.color = (0., 1., 0., 1.)
-        elif self.target_touched is 2:
-            self.target2.color = (0., 1., 0., 1.)   
-        elif self.target_touched is 3:
-            self.target3.color = (0., 1., 0., 1.)   
-        elif self.target_touched is 4:
-            self.target4.color = (0., 1., 0., 1.)   
+    def _start_targ1_hold(self, **kwargs):
+        self.target1.color = (0., 1., 0., 1.)
         # self.indicator_targ.color = (0.75, .75, .75, 1.)
+    
+    def _start_targ2_hold(self, **kwargs):
+        self.target2.color = (0., 1., 0., 1.)
+        # self.indicator_targ.color = (0.75, .75, .75, 1.)
+        
+    def _start_t2p_targ1_hold(self, **kwargs):
+        self.target1.color = (0., 1., 0., 1.)
+        # self.indicator_targ.color = (0.75, .75, .75, 1.)
+    
+    def _start_t1p_targ2_hold(self, **kwargs):
+        self.target2.color = (0., 1., 0., 1.)
+        # self.indicator_targ.color = (0.75, .75, .75, 1.)
+        
+    # End Target Holds --> Change the color of the target to same as background
+    def _end_targ1_hold(self, **kwargs):
+        self.target1.color = (0., 0., 0., 1.)
+        
+    def _end_targ2_hold(self, **kwargs):
+        self.target2.color = (0., 0., 0., 1.)
     
     # Finish target hold?
     def finish_targ_hold(self, **kwargs):
         return self.tht <= kwargs['ts']
     
-    # Start Target Pressed
-    def _start_targ_pressed(self, **kwargs):
-        # Add the target that was touched to the list of targets that were pressed
-        self.targets_pressed.append(self.target_touched)
-        
-        # Change the color of the target to same as background
-        if self.target_touched is 1:
-            self.target1.color = (0., 0., 0., 1.)
-        elif self.target_touched is 2:
-            self.target2.color = (0., 0., 0., 1.)   
-        elif self.target_touched is 3:
-            self.target3.color = (0., 0., 0., 1.)   
-        elif self.target_touched is 4:
-            self.target4.color = (0., 0., 0., 1.)  
+    # One target has been pressed --> make it invisible
+    def _start_targ1_pressed(self, **kwargs):
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (1., 1., 0., 1.)
         # self.indicator_targ.color = (0.75, .75, .75, 1.)
-            
-        # if this is not the last target, then we might have to deal with handing out some rewards here
-        if not list(np.sort(np.unique(self.targets_pressed))) == list(range(1, self.num_targets+1)):
-            # Are we supposed to reward every correct touch with a tone?
-            if self.rew_tone_every:
-                n_targ_pressed = len(self.targets_pressed)
-                if list(self.targets_pressed) == list(range(1, n_targ_pressed+1)): 
-                    # if the list of targets pressed is in the correct order
-                    print('reward tone for correct target touch')
-                    if platform == 'win32':
-                        sound = SoundLoader.load('reward2.wav')
-                        sound.play()
-            
-            # Are we supposed to reward any target touch with juice?
-            if self.reward_for_targtouch[0] and not self.targtouch_rew_given:
-                self.run_anytarg_rew()
-                self.targtouch_rew_given = True
-            
-    
-    # Have all targets been pressed?
-    def all_targs_pressed(self, **kwargs):
-        if self.num_targets is 2 and 1 in self.targets_pressed and 2 in self.targets_pressed:
-            return True
-        elif self.num_targets is 3 and 1 in self.targets_pressed and 2 in self.targets_pressed and 3 in self.targets_pressed:
-            return True
-        elif self.num_targets is 4 and 1 in self.targets_pressed and 2 in self.targets_pressed and 3 in self.targets_pressed and 4 in self.targets_pressed:
-            return True
-        else:
-            return False
-    
-    # Or do some targets remain?
-    def targets_remain(self, **kwargs):
-        if self.num_targets is 2 and (1 not in self.targets_pressed or 2 not in self.targets_pressed):
-            return True
-        elif self.num_targets is 3 and (1 not in self.targets_pressed or 2 not in self.targets_pressed or 3 not in self.targets_pressed):
-            return True
-        elif self.num_targets is 4 and (1 not in self.targets_pressed or 2 not in self.targets_pressed or 3 not in self.targets_pressed or 4 not in self.targets_pressed):
-            return True
-        else:
-            return False
+        
+        if self.rew_tone_every:
+            print('rew every correct')
+            sound = SoundLoader.load('reward2.wav')
+            sound.play()
+        
+        if self.reward_for_targtouch[0] and not self.targtouch_rew_given:
+            self.run_anytarg_rew()
+            self.targtouch_rew_given = True
+        
+    def _start_targ2_pressed(self, **kwargs):
+        self.target1.color = (1., 1., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
+        # self.indicator_targ.color = (0.75, .75, .75, 1.)
+        
+        if self.reward_for_targtouch[0] and not self.targtouch_rew_given:
+            self.run_anytarg_rew()
+            self.targtouch_rew_given = True
 
     
-    # Once a set is complete, determine if it was correct or incorrect
-    def set_correct(self, **kwargs):
-        return list(self.targets_pressed) == list(range(1, self.num_targets+1))
+    # Once a set is complete, determine whether to restart or move to the next set
+    def hyperset_complete(self, **kwargs):
+        return self.set_ix == self.nsets_per_hyperset
     
-    def set_incorrect(self, **kwargs):
-        return not list(self.targets_pressed) == list(range(1, self.num_targets+1))
+    def next_set(self, **kwargs):
+        return self.set_ix < self.nsets_per_hyperset
     
     
     ################################### REWARD STATES ################################
     def _start_reward_set(self, **kwargs):
         self.trial_counter += 1
-        self.trial_correct_counter += 1
-        # Make the screen green
-        Window.clearcolor = (0., 1., 0., 1.)
-        self.change_allbutton_color(0, 1, 0, 1)
+        Window.clearcolor = (1., 1., 1., 1.)
+        self.target1.color = (1., 1., 1., 1.)
+        self.target2.color = (1., 1., 1., 1.)
         
         # # Turn exit targets white
         # self.exit_target1.color = (1., 1., 1., 1.)
@@ -1140,19 +1051,41 @@ class SequenceGame(Widget):
             self.rew_cnt += 1
             
     def end_reward_set(self, **kwargs):
+        # Advance to the next set
+        self.set_ix += 1
+        
+        # The next set will be the first attempt of that set
+        self.first_set_attempt = True
+        
+        return True
+    
+    def _start_reward_hyperset(self, **kwargs):
+        self.trial_counter += 1
+        
+        # Turn the screen green
+        Window.clearcolor = (0., 1., 0., 1.)
+        self.change_allbutton_color(0, 1, 0, 1)
+        
+        self.rew_cnt = 0
+        self.cnts_in_rew = 0
+        # self.indicator_targ.color = (1., 1., 1., 1.)
+        self.repeat = False
+        
+    def _while_reward_hyperset(self, **kwargs):
+        if self.rew_cnt == 0:
+            self.run_HS_rew()
+            self.rew_cnt += 1
+            
+    def end_reward_hyperset(self, **kwargs):
         return True
     
     ################################### ERROR STATES ################################
     # Set Error
     def _start_set_error(self, **kwargs):
-        self.trial_counter += 1
-        
         # Play an error tone
         if self.anytarg_rew == 0:
-            print('Set Error')
-            if platform == 'win32':
-                sound = SoundLoader.load('error1.wav')
-                sound.play()
+            sound = SoundLoader.load('error1.wav')
+            sound.play()
         
             # Make the screen red
             self.percent_done = 0
@@ -1165,46 +1098,76 @@ class SequenceGame(Widget):
         return kwargs['ts'] > self.error_timeout_time
     
     # Early leave from target --> hold error (buttons turn invisible)
-    def early_leave_target_hold(self, **kwargs):
-        if self.target_touched is 1:
-            return not self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
-        elif self.target_touched is 2:
-            return not self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
-        elif self.num_targets > 2 and self.target_touched is 3:
-            return not self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
-        elif self.num_targets > 3 and self.target_touched is 4:
-            return not self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
+    def early_leave_target1_hold(self, **kwargs):
+        return not self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
     
-    def _start_hold_error(self, **kwargs):
-        # self.target1.color = (0., 0., 0., 1.)
-        # self.target2.color = (0., 0., 0., 1.)
+    def early_leave_target2_hold(self, **kwargs):
+        return not self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
+    
+    def _start_hold_error_nopress(self, **kwargs):
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
         self.repeat = True
         
-    def end_hold_error(self, **kwargs):
+    def end_hold_error_nopress(self, **kwargs):
         return kwargs['ts'] >= self.hold_error_timeout     
     
+    def _start_hold_error_t1p(self, **kwargs):
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
+        self.repeat = True
+        
+    def end_hold_error_t1p(self, **kwargs):
+        return kwargs['ts'] >= self.hold_error_timeout  
+    
+    def _start_hold_error_t2p(self, **kwargs):
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
+        self.repeat = True
+        
+    def end_hold_error_t2p(self, **kwargs):
+        return kwargs['ts'] >= self.hold_error_timeout 
+    
+    
     # Drag outside of target --> drag error (buttons turn invisible)
-    def targ_drag_out(self, **kwargs):
+    def targ1_drag_out(self, **kwargs):
         touch = self.touch
         self.touch = True
-        if self.target_touched is 1:
-            stay_in = self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
-        elif self.target_touched is 2:
-            stay_in = self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
-        elif self.num_targets > 2 and self.target_touched is 3:
-            stay_in = self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
-        elif self.num_targets > 3 and self.target_touched is 4:
-            stay_in = self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
+        stay_in = self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
         self.touch = touch
         return not stay_in
     
-    def _start_drag_error(self, **kwargs):
-        # self.target1.color = (0., 0., 0., 1.)
-        # self.target2.color = (0., 0., 0., 1.)
+    def targ2_drag_out(self, **kwargs):
+        touch = self.touch
+        self.touch = True
+        stay_in = self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
+        self.touch = touch
+        return not stay_in
+    
+    def _start_drag_error_nopress(self, **kwargs):
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
         self.repeat = True
     
-    def end_drag_error(self, **kwargs):
-        return kwargs['ts'] >= self.drag_error_timeout    
+    def end_drag_error_nopress(self, **kwargs):
+        return kwargs['ts'] >= self.drag_error_timeout
+    
+    def _start_drag_error_t1p(self, **kwargs):
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
+        self.repeat = True
+        
+    def end_drag_error_t1p(self, **kwargs):
+        return kwargs['ts'] >= self.hold_error_timeout  
+    
+    def _start_drag_error_t2p(self, **kwargs):
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
+        self.repeat = True
+        
+    def end_drag_error_t2p(self, **kwargs):
+        return kwargs['ts'] >= self.hold_error_timeout 
+    
     
     # Timeout error
     def set_timeout(self, **kwargs):
@@ -1216,10 +1179,7 @@ class SequenceGame(Widget):
     def _start_timeout_error(self, **kwargs):
         self.target1.color = (0., 0., 0., 1.)
         self.target2.color = (0., 0., 0., 1.)
-        if self.num_targets > 2:
-            self.target3.color = (0., 0., 0., 1.)
-            if self.num_targets > 3:
-                self.target4.color = (0., 0., 0., 1.)
+        #self.repeat = True
         
     def end_timeout_error(self, **kwargs):
         return kwargs['ts'] >= self.timeout_error_timeout
@@ -1287,12 +1247,9 @@ class SequenceGame(Widget):
     
     def run_set_rew(self, **kwargs):
         try:
-            print('Set Reward')
-            self.repeat = False
-            if platform == 'win32': 
-                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                sound = SoundLoader.load('reward2.wav')
-                sound.play()
+            #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+            sound = SoundLoader.load('reward2.wav')
+            sound.play()
 
             ### To trigger reward make sure reward is > 0:
             if self.set_rew > 0:
@@ -1306,6 +1263,35 @@ class SequenceGame(Widget):
         except:
             pass
 
+        #self.repeat = True
+    
+    def run_HS_rew(self, **kwargs):
+        try:
+            #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+            sound = SoundLoader.load('reward1.wav')
+            sound.play()
+            
+            print('in big reward:')
+            self.repeat = False
+            #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+            #sound = SoundLoader.load('reward1.wav')
+            #print(str(self.reward_generator[self.trial_counter]))
+            #print(self.trial_counter)
+            #print(self.reward_generator[:100])
+            # self.reward1.play()
+
+            # if not self.skip_juice:
+                # if self.reward_generator[self.trial_counter] > 0:
+            self.reward_port.open()
+            #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.hs_rew)+' sec\n']
+            self.reward_port.write(rew_str)
+            time.sleep(.25 + self.reward_delay_time)
+            run_str = [ord(r) for r in 'run\n']
+            self.reward_port.write(run_str)
+            self.reward_port.close()
+        except:
+            pass
     
     # Other utilities
     def change_allbutton_color(self, r, g, b, a):
