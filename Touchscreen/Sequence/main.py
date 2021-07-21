@@ -623,7 +623,7 @@ class SequenceGame(Widget):
             self.targ_size_text = 'Target Radius: '
             self.big_rew_text = 'Big Reward Time: '
             
-            self.percent_correct = str(round(100*self.trial_correct_counter/self.trial_counter)) + '%'
+            self.percent_correct = '(' + str(round(100*self.trial_correct_counter/self.trial_counter)) + '% correct)'
             
             if type(self.cht_type) is str:
                 self.cht_param = self.cht_type
@@ -1138,7 +1138,7 @@ class SequenceGame(Widget):
     def _start_reward_set(self, **kwargs):
         self.trial_counter += 1
         self.trial_correct_counter += 1
-        self.percent_correct = str(round(100*self.trial_correct_counter/self.trial_counter)) + '%'
+        self.percent_correct = '(' + str(round(100*self.trial_correct_counter/self.trial_counter)) + '% correct)'
         # Make the screen green
         Window.clearcolor = (0., 1., 0., 1.)
         self.change_allbutton_color(0, 1, 0, 1)
@@ -1163,7 +1163,7 @@ class SequenceGame(Widget):
     # Set Error
     def _start_set_error(self, **kwargs):
         self.trial_counter += 1
-        self.percent_correct = str(round(100*self.trial_correct_counter/self.trial_counter)) + '%'
+        self.percent_correct = '(' + str(round(100*self.trial_correct_counter/self.trial_counter)) + '% correct)'
         
         # Play an error tone
         print('Run set error')
