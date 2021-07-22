@@ -76,7 +76,8 @@ class R2Game(Widget):
             if val:
                 self.use_cap_not_button = cap[i]
 
-        button_holdz = ['.12-.2', '.15-.25', '.2-.3', '.25-.45', '.2-.5']
+        #button_holdz = ['.12-.2', '.15-.25', '.2-.3', '.25-.45', '.2-.5']
+        button_holdz = [0., 0.1, 0.2, 0.3, 0.4]
         grasp_holdz = [0., .15, .25, .35, .50]
 
         for i, val in enumerate(hold['start_hold']):
@@ -264,6 +265,12 @@ class R2Game(Widget):
         # Open task arduino -- IR sensor 
         self.task_ard = serial.Serial(port='COM3')
         self.button_ard = serial.Serial(port='COM4', baudrate=9600)
+        
+
+        ## Close the door if its open ###
+        time.sleep(1.)
+        self.button_ard.flushInput()
+        self.button_ard.write('n'.encode())
 
         if self.testing:
             self.baseline_done = False
