@@ -146,7 +146,7 @@ class COGame(Widget):
             if val:
                 small_rew = small_rew_opts[i]
 
-        big_rew_opts = [.3, .5, .7]
+        big_rew_opts = [0., .3, .5, .7]
         for i, val in enumerate(rew_in['big_rew']):
             if val:
                 big_rew = big_rew_opts[i]
@@ -191,7 +191,7 @@ class COGame(Widget):
                 if 'co' in nm:
                     self.use_center = True
 
-        holdz = [0.0, 0.1, .375, .5, .575, .6, '.4-.6']
+        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
         
         self.cht_type = None
         self.tht_type = None
@@ -246,8 +246,15 @@ class COGame(Widget):
         for i, val in enumerate(test['test']):
             if val:
                 self.testing = test_vals[i]
-                self.in_cage = in_cage_vals[i]
+                #self.in_cage = in_cage_vals[i]
         
+        import os 
+        path = os.getcwd()
+        if 'BasalGangulia' in path:
+            self.in_cage = True
+        else:
+            self.in_cage = False
+
         autoquit_trls = [10, 25, 50, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
@@ -280,7 +287,11 @@ class COGame(Widget):
 
         # Initialize targets: 
         self.center_target.set_size(2*self.center_target_rad)
-        self.center_target.move(np.array([0., 0.]))
+
+        if self.in_cage:
+            self.center_target.move(np.array([-4., 0.]))
+        else:
+            self.center_target.move(np.array([0., 0.]))
         self.periph_target.set_size(2*self.periph_target_rad)
 
         self.exit_target1.set_size(2*self.exit_rad)
@@ -298,7 +309,10 @@ class COGame(Widget):
         self.target_list = generatorz(self.target_distance, self.nudge_dist, self.generator_kwarg)
         self.target_index = 0
         self.repeat = False
-        self.center_target_position = np.array([0., 0.])
+        if self.in_cage:
+            self.center_target_position = np.array([-4., 0.])
+        else:
+            self.center_target_position = np.array([0., 0.])
         self.periph_target_position = self.target_list[self.target_index, :]
 
         self.FSM = dict()
@@ -379,51 +393,52 @@ class COGame(Widget):
         print(self.reward_for_targtouch)
         print(self.reward_for_anytouch)
 
-        try:
-            if self.testing:
+        #try:
+        if self.testing:
+            pass
+
+        else:
+            import os
+            path = os.getcwd()
+            path = path.split('\\')
+            path_data = [p for p in path if np.logical_and('Touch' not in p, 'Targ' not in p)]
+            path_root = ''
+            for ip in path_data:
+                path_root += ip+'/'
+            p = path_root + 'data/'
+            print('Auto path : %s'%p)
+            # Check if this directory exists: 
+            if os.path.exists(p):
                 pass
-
             else:
-                import os
-                path = os.getcwd()
-                path = path.split('\\')
-                path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-                path_root = ''
-                for ip in path_data:
-                    path_root += ip+'/'
-                p = path_root + 'data/'
-
-                # Check if this directory exists: 
+                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
                 if os.path.exists(p):
                     pass
                 else:
-                    p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
-                    if os.path.exists(p):
-                        pass
-                    else:
-                        os.mkdir(p)
-                        print('Making temp directory: ', p)
+                    os.mkdir(p)
+                    print('Making temp directory: ', p)
 
-                print ('')
-                print ('')
-                print('Data saving PATH: ', p)
-                print ('')
-                print ('')
-                self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-                if self.in_cage:
-                    self.filename = self.filename+'_cage'
+            print ('')
+            print ('')
+            print('Data saving PATH: ', p)
+            print ('')
+            print ('')
+            self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+            
+            if self.in_cage:
+                self.filename = self.filename+'_cage'
 
-                pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
-                self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-                self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-                self.h5_table_row = self.h5_table.row
-                self.h5_table_row_cnt = 0
+            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+            self.h5_table_row = self.h5_table.row
+            self.h5_table_row_cnt = 0
 
-                # Note in python 3 to open pkl files: 
-                #with open('xxxx_params.pkl', 'rb') as f:
-                #    data_params = pickle.load(f)
-        except:
-            pass
+            # Note in python 3 to open pkl files: 
+            #with open('xxxx_params.pkl', 'rb') as f:
+            #    data_params = pickle.load(f)
+        # except:
+        #     pass
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
@@ -672,7 +687,7 @@ class COGame(Widget):
         self.center_target.color = (1., 1., 0., 1.)
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target.color = (0., 0., 0., 0.) ### Make peripheral target alpha = 0 so doesn't obscure 
         self.indicator_targ.color = (.25, .25, .25, 1.)
 
     def _start_center_hold(self, **kwargs):
@@ -687,7 +702,7 @@ class COGame(Widget):
         self.center_target.color = (0., 0., 0., 1.)
 
     def _end_target_hold(self, **kwargs):
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target.color = (0., 0., 0., 0.)
 
     def _start_touch_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
@@ -910,11 +925,23 @@ class COGame(Widget):
             target_distance = 6.
         else:
             angle = np.linspace(0, 2*np.pi, ntargets+1)[:-1]
+
+        if self.in_cage:
+            offset = np.array([-4., 0.])
+            nudge_targ = np.array([0, 0, 0, 0])
+            target_distance = 3.
+        else:
+            offset = np.array([0., 0.])
+            nudge_targ = np.array([0, 0, 1., 0])
     
         x = np.cos(angle)*target_distance
         y = np.sin(angle)*target_distance
         tmp = np.hstack((x[:, np.newaxis], y[:, np.newaxis]))
-        nudge_targ = np.array([0, 0, 1., 0])
+        
+
+
+        ### Add offset to the target positions 
+        tmp = tmp + offset[np.newaxis, :]
 
         tgs = []
         nudges = []
@@ -926,8 +953,8 @@ class COGame(Widget):
         tgs = np.vstack((tgs))
         nudges = np.hstack((nudges))
         nudge_ix = np.nonzero(nudges==1)[0]
-        print('Nudges: ')
-        print(len(nudge_ix))
+        #print('Nudges: ')
+        #print(len(nudge_ix))
 
         to_nudge = np.array([-1., 1.])*nudge
         tgs[nudge_ix, :] = tgs[nudge_ix, :] + to_nudge[np.newaxis, :]

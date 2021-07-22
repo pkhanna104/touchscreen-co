@@ -339,7 +339,7 @@
                     fontsize: 50
 
                 Label:
-                    text: 'Set to train:'
+                    text: 'Sets to train:'
                     color: 1, 1, 0, 1
                     fontsize: 50
                     
@@ -350,7 +350,6 @@
                 
                 CheckBox: 
                     id: set_sel_A
-                    group: 'set_select'
                     active: True 
                     
                 Label: 
@@ -360,7 +359,6 @@
                 
                 CheckBox: 
                     id: set_sel_B
-                    group: 'set_select'
                 
                 Label: 
                     text: 'C'
@@ -369,7 +367,6 @@
                                            
                 CheckBox: 
                     id: set_sel_C
-                    group: 'set_select'
                     
                 Label: 
                     text: 'D'
@@ -378,7 +375,6 @@
                                          
                 CheckBox: 
                     id: set_sel_D
-                    group: 'set_select'
 
                 Label: 
                     text: 'E'
@@ -387,7 +383,6 @@
                     
                 CheckBox: 
                     id: set_sel_E
-                    group: 'set_select'
                    
                 Label:
                     text: ''
@@ -399,7 +394,7 @@
             
             
             BoxLayout 
-                id: num_targets
+                id: num_buttons
                 orientation: 'horizontal'
                 canvas:
                     Color:
@@ -417,14 +412,14 @@
                     fontsize: 50
 
                 Label: 
-                    text: 'Number of targets'
+                    text: 'Number of buttons'
                     color: 1, 1, 0, 1
 
                 Label:
                     text: '2'
                 CheckBox:
-                    id: num_targets_2
-                    group: 'num_targets'
+                    id: num_buttons_2
+                    group: 'num_buttons'
                     active: True
                     
                 Label:
@@ -434,8 +429,8 @@
                 Label:
                     text: '3'
                 CheckBox:
-                    id: num_targets_3
-                    group: 'num_targets'
+                    id: num_buttons_3
+                    group: 'num_buttons'
                     
                 Label:
                     text: ''
@@ -444,17 +439,71 @@
                 Label:
                     text: '4'
                 CheckBox:
-                    id: num_targets_4
-                    group: 'num_targets'
+                    id: num_buttons_4
+                    group: 'num_buttons'
 
 
                 Label:
                     text: ''
                     fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+            
+            
+                    
+            BoxLayout 
+                id: rew_tone_every
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0, 0, 0, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
                 Label:
                     text: ''
                     fontsize: 50
                     
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Reward tone every correct'
+                    color: 1, 1, 0, 1
+
+                Label:
+                    text: 'Yes'
+                CheckBox:
+                    id: rew_tone_every_yes
+                    group: 'rew_tone_every'
+                    active: True
+                    
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'No'
+
+                CheckBox:
+                    id: rew_tone_every_no
+                    group: 'rew_tone_every'
+
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
             
             BoxLayout 
                 id: anytarg_rew
@@ -475,7 +524,7 @@
                     fontsize: 50
 
                 Label: 
-                    text: 'Any target reward juice'
+                    text: 'Any target reward'
                     color: 1, 1, 0, 1
 
                 Label:
@@ -512,62 +561,9 @@
                 Label:
                     text: ''
                     fontsize: 50
-            
-            BoxLayout 
-                id: rew_tone_every
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0, 0, 0, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                    
-                Label:
-                    text: ''
-                    fontsize: 50
-                    
-
-                Label: 
-                    text: 'Every correct reward tone'
-                    color: 1, 1, 0, 1
-
-                Label:
-                    text: 'Yes'
-                CheckBox:
-                    id: rew_tone_every_yes
-                    group: 'rew_tone_every'
-                    active: True
-                    
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'No'
-
-                CheckBox:
-                    id: rew_tone_every_no
-                    group: 'rew_tone_every'
-
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-            
                     
             BoxLayout 
-                id: set_rew
+                id: small_rew
                 orientation: 'horizontal'
                 canvas:
                     Color:
@@ -585,37 +581,78 @@
                     fontsize: 50
 
                 Label: 
-                    text: 'Set reward juice'
+                    text: 'Set reward'
                     color: 1, 1, 0, 1
+
+                Label:
+                    text: '0.0 sec'
+                CheckBox:
+                    id: set_rew_zero_sec
+                    group: 'small_rew'
 
                 Label: 
                     text: '0.1 sec'
 
                 CheckBox:
                     id: set_rew_pt1_sec
-                    group: 'set_rew'
+                    group: 'small_rew'
+                    active: True
 
                 Label: 
                     text: '0.3 sec'
 
                 CheckBox:
                     id: set_rew_pt3_sec
-                    group: 'set_rew'
-                    active: True
+                    group: 'small_rew'
 
                 Label: 
                     text: '0.5 sec'
 
                 CheckBox:
                     id: set_rew_pt5_sec
-                    group: 'set_rew'
-                    
+                    group: 'small_rew'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            BoxLayout 
+                id: big_rew
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label: 
+                    text: 'Hyperset reward'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0.3 sec'
+
+                CheckBox:
+                    id: hs_rew_pt3_sec
+                    group: 'big_rew'
+
+                Label: 
+                    text: '0.5 sec'
+
+                CheckBox:
+                    id: hs_rew_pt5_sec
+                    group: 'big_rew'
+
                 Label: 
                     text: '0.7 sec'
 
                 CheckBox:
-                    id: set_rew_pt7_sec
-                    group: 'set_rew'
+                    id: hs_rew_pt7_sec
+                    group: 'big_rew'
+                    active: True
 
                 Label:
                     text: ''
@@ -725,7 +762,7 @@
                     fontsize: 50
             
             BoxLayout
-                id: immediate_error
+                id: error_types_selected
                 orientation: 'horizontal'
                 Label:
                     text: ''
@@ -736,32 +773,17 @@
                     fontsize: 50
 
                 Label:
-                    text: 'Incorrect is immediate error:'
+                    text: 'Errors include:'
                     color: 1, 1, 0, 1
                     fontsize: 50
                     
                 Label: 
-                    text: 'yes'
+                    text: 'Target 2 pressed first'
                     fontsize: 28
                     halign: 'center'                        
                 
                 CheckBox: 
-                    id: immediate_error_yes
-                    group: 'immediate_error'
-                    
-                Label:
-                    text: ''
-                    fontsize: 50
-                    
-                Label: 
-                    text: 'no'
-                    fontsize: 28
-                    halign: 'center'                        
-                
-                CheckBox: 
-                    id: immediate_error_no
-                    group: 'immediate_error'
-                    active: True
+                    id: t2p_1st_error
 
                    
                 Label:
@@ -987,13 +1009,13 @@
                     root.current = 'splash_start'
                     splash.init(dict(hari=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butt=chk_but.active), 
                     dict(rew_tone_every=[rew_tone_every_yes.active, rew_tone_every_no.active]), 
-                    dict(rew_manual=False, anytarg_rew=[anytarg_rew_zero_sec.active, anytarg_rew_pt1_sec.active, anytarg_rew_pt3_sec.active, anytarg_rew_pt5_sec.active], set_rew=[set_rew_pt1_sec.active, set_rew_pt3_sec.active, set_rew_pt5_sec.active, set_rew_pt7_sec.active]), 
+                    dict(rew_manual=False, anytarg_rew=[anytarg_rew_zero_sec.active, anytarg_rew_pt1_sec.active, anytarg_rew_pt3_sec.active, anytarg_rew_pt5_sec.active], set_rew=[set_rew_zero_sec.active, set_rew_pt1_sec.active, set_rew_pt3_sec.active, set_rew_pt5_sec.active], hs_rew=[hs_rew_pt3_sec.active, hs_rew_pt5_sec.active, hs_rew_pt7_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_125.active]), 
                     dict(set_sel=[set_sel_A.active, set_sel_B.active, set_sel_C.active, set_sel_D.active, set_sel_E.active]), 
-                    dict(num_targets=[num_targets_2.active, num_targets_3.active, num_targets_4.active]), 
+                    dict(num_buttons=[num_buttons_2.active, num_buttons_3.active, num_buttons_4.active]), 
                     dict(test=[False, True, False]), 
                     dict(chold=[c_zero_sec.active, c_hund_sec.active, c_three_sev_five_sec.active, c_half_sec.active, c_575.active, c_60.active, c_big_rand.active], hold=[zero_sec.active, hund_sec.active, three_sev_five_sec.active, half_sec.active, t_575.active, t_60.active, big_rand.active]), 
-                    dict(immediate_error=[immediate_error_yes.active, immediate_error_no.active]),
+                    dict(error_type=[t2p_1st_error.active]),
                     dict(nontarg_touch_tolerance=[nontarg_tol_inf.active, nontarg_tol_200.active, nontarg_tol_150.active, nontarg_tol_100.active, nontarg_tol_50.active, nontarg_tol_0.active]), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
@@ -1087,14 +1109,12 @@
 
 <SequenceGame>:   
     canvas:
-        # Rectangle:
-            # pos: 0, 0.2*root.height
-            # size: root.width/25, (root.percent_done/100)*0.6*root.height
+        Rectangle:
+            pos: 0, 0.2*root.height
+            size: root.width/25, (root.percent_done/100)*0.6*root.height
             
     target1: target_one
     target2: target_two
-    target3: target_three
-    target4: target_four
     button1_in: button_one_in
     button1_out: button_one_out
     button2_in: button_two_in
@@ -1233,12 +1253,6 @@
         id: target_two
         
     Target:
-        id: target_three
-        
-    Target:
-        id: target_four
-        
-    Target:
         id: target_e1
 
     Target:
@@ -1246,51 +1260,37 @@
     
     Label:
         color: .5,.5,.5,1
-        font_size: 35
-        center_x: root.width * 2/8
-        top: root.top - 70
-        text: root.trial_text
-        
-    Label:
-        color: .5,.5,.5,1
-        font_size: 35
-        center_x: root.width * 5/8
-        top: root.top - 70
-        text: str(root.trial_counter)
-    
-    Label:
-        color: .5,.5,.5,1
-        font_size: 35
+        font_size: 50
         center_x: root.width * 6/8
         top: root.top - 70
-        text: root.percent_correct
+        text: str(root.trial_counter)
 
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 2/8
-        top: root.top - 270
+        top: root.top - 170
         text: root.cht_text
     
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 5/8
-        top: root.top - 270
+        top: root.top - 170
         text: root.cht_param
 
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 2/8
-        top: root.top - 370
+        top: root.top - 270
         text: root.tht_text
         
     Label:
         color: .5,.5,.5,1
         font_size: 50
         center_x: root.width * 5/8
-        top: root.top - 370
+        top: root.top - 270
         text: root.tht_param
 
     Label:

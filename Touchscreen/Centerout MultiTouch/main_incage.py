@@ -42,13 +42,13 @@ class COGame(Widget):
     ITI_mean = 1.
     ITI_std = .2
     center_target_rad = 2.
-    periph_target_rad = 6.
+    periph_target_rad = 4.
 
     ch_timeout = 10. # ch timeout
-    cht = 0.0 # center hold time
+    cht = 0.15 # center hold time
 
     target_timeout_time = 10.
-    tht = 0.0
+    tht = 0.15
 
     cursor = {}
     cursor_ids = []
@@ -61,12 +61,15 @@ class COGame(Widget):
     hold_error_timeout = 0.
     drag_error_timeout = 0.
 
-    ntargets = 4.
-    target_distance = 2.
+    ntargets = 8.
+    target_distance = 4.
     touch = False
 
     center_target = ObjectProperty(None)
     periph_target = ObjectProperty(None)
+    
+    from sound import Sound
+    Sound.volume_max()
 
     def on_touch_down(self, touch):
         #handle many touchs:
@@ -126,10 +129,13 @@ class COGame(Widget):
         self.FSM['hold_error'] = dict(end_hold_error='target')
         self.FSM['drag_error'] = dict(end_drag_error='target')
 
-        self.reward_port = serial.Serial(port='COM3',
-            baudrate=115200)
-        self.reward_port.close()
-
+        try:
+            self.reward_port = serial.Serial(port='COM4',
+                baudrate=115200)
+            self.reward_port.close()
+            self.use_reward = True
+        except:
+            self.use_reward = False
         # Preload sounds: 
         self.reward1 = SoundLoader.load('reward1.wav')
         self.reward2 = SoundLoader.load('reward2.wav')
@@ -216,16 +222,17 @@ class COGame(Widget):
 
     def _start_reward(self, **kwargs):
         self.periph_target.color = (0., 1., 0., 1.)
-
-        self.reward_port.open()
-        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_time)+' sec\n']
-        self.reward_port.write(rew_str)
-        time.sleep(.25 + self.reward_delay_time)
-        self.reward1.play()
-        run_str = [ord(r) for r in 'run\n']
-        self.reward_port.write(run_str)
-        self.reward_port.close()
-
+        if self.use_reward:
+            self.reward_port.open()
+            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_time)+' sec\n']
+            self.reward_port.write(rew_str)
+            time.sleep(.25 + self.reward_delay_time)
+            self.reward1.play()
+            run_str = [ord(r) for r in 'run\n']
+            self.reward_port.write(run_str)
+            self.reward_port.close()
+        else:
+            self.reward1.play()
 
     def end_reward(self, **kwargs):
        return kwargs['ts'] >= self.reward_time
@@ -289,7 +296,7 @@ class COGame(Widget):
         tmp = np.hstack((x[:, np.newaxis], y[:, np.newaxis]))
 
         ### Add an offsetes
-        offset = np.array([-4., 0.])
+        offset = np.array([-6., 0.])
 
         tgs = []
         for blks in range(100):
@@ -324,7 +331,7 @@ class COApp(App):
     def build(self):
         game = COGame()
         game.init()
-        Clock.schedule_interval(game.update, 1./10.)
+        Clock.schedule_interval(game.update, 1./60.)
         return game
 
 def cm2pix(pos_cm, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):
