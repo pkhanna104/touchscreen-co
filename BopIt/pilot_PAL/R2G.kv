@@ -587,78 +587,6 @@
             BoxLayout:
                 id: test
                 orientation: 'horizontal'
-                Label:
-                    text: ''
-                    fontsize: 50
-                
-                Label: 
-                    text: 'Start Button Included? '
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: 'Yes'
-
-                CheckBox:
-                    id: start_button
-                    group: 'start'
-                    active: True
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: 'No'
-                CheckBox:
-                    id: no_start_button
-                    group: 'start'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-            BoxLayout:
-                id: test
-                orientation: 'horizontal'
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                
-                Label: 
-                    text: 'Only Start Button?'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: 'Yes'
-                CheckBox:
-                    id: only_start_button
-                    group: 'start_only'
-
-                Label:
-                    text: 'No'
-                CheckBox:
-                    id: no_only_start_button
-                    group: 'start_only'
-                    active: True
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-            BoxLayout:
-                id: test
-                orientation: 'horizontal'
                 canvas:
                     Color:
                         rgba: 0.2, 0.2, 0.5, 0.5
@@ -711,8 +639,6 @@
                     dict(test=[testing.active, monk_time.active]), 
                     dict(start_hold=[rand_12_2.active, rand_15_25.active, rand_2_3.active, rand_25_45_sec.active, rand_2_5.active], grasp_hold = [g_zero_sec.active, g_eighteen_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_half_sec.active]), 
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
-                    dict(start=[start_button.active, no_start_button.active]),
-                    dict(start=[only_start_button.active, no_only_start_button.active]),
                     dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]),
                     dict(use_cap=[False, True]), 
                     dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]))

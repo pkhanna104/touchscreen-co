@@ -64,7 +64,7 @@ class R2Game(Widget):
     n_trials_param = StringProperty('')
 
     def init(self, animal_names_dict=None, rew_in=None, rew_var=None,
-        test=None, hold=None, autoquit=None, use_start=None, only_start=None, 
+        test=None, hold=None, autoquit=None,
         grasp_to=None, use_cap=None, tsk_opt=None):
 
         self.h5_table_row_cnt = 0
@@ -157,13 +157,16 @@ class R2Game(Widget):
             if val: 
                 self.max_trials = autoquit_trls[i]
 
-        start = [True, False]
-        for i, val in enumerate(use_start['start']):
-            if val:
-                self.use_start = start[i]
-        for i, val in enumerate(only_start['start']):
-            if val:
-                self.only_start = start[i]
+        self.use_start = True
+        # start = [True, False]
+        # for i, val in enumerate(use_start['start']):
+        #     if val:
+        #         self.use_start = start[i]
+
+        self.only_start = False
+        # for i, val in enumerate(only_start['start']):
+        #     if val:
+        #         self.only_start = start[i]
 
         grasp_tos = [5., 10., 999999999.]
 
@@ -633,20 +636,23 @@ class R2Game(Widget):
 
     def _start_reward(self, **kwargs):
         try:
-            self.reward1.play()
-            if self.reward_for_grasp[0]:
+            if self.task_opt == 'button':
+                pass 
+            else:
+                self.reward1.play()
+                if self.reward_for_grasp[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
-                print('in reward: ')
-                if not self.skip_juice:
-                    if self.reward_generator[self.trial_counter] > 0:
-                        self.reward_port.open()
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                        self.reward_port.write(rew_str)
-                        time.sleep(.5 + self.reward_delay_time)
-                        run_str = [ord(r) for r in 'run\n']
-                        self.reward_port.write(run_str)
-                        self.reward_port.close()
+                    print('in reward: ')
+                    if not self.skip_juice:
+                        if self.reward_generator[self.trial_counter] > 0:
+                            self.reward_port.open()
+                            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
+                            self.reward_port.write(rew_str)
+                            time.sleep(.5 + self.reward_delay_time)
+                            run_str = [ord(r) for r in 'run\n']
+                            self.reward_port.write(run_str)
+                            self.reward_port.close()
         except:
             pass
 
