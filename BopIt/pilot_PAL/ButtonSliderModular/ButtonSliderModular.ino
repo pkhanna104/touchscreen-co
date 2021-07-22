@@ -20,6 +20,7 @@ int T = 0;
 int lastT = 0;
 int lastT_register = 0;
 int Tdiff = -1;
+int doorthresh = 950; 
 
 // motor
 int enablePin = 6;
@@ -64,7 +65,7 @@ void loop() {
     Serial.print("\t");
   }
   pos = analogRead(potPin);    // read the value from the sensor
-  if (pos < 950) {
+  if (pos < doorthresh) {
     Serial.print("door_open");
     Serial.println();
   } else {
@@ -89,15 +90,16 @@ void loop() {
   while (closedoor == true) {
 
     // Run the motor until the door is closed
-    while ((pos < 950) && (abortclose == false)) {
+    while ((pos < doorthresh) && (abortclose == false)) {
       analogWrite(enablePin, 255);
       digitalWrite(in2Pin, LOW);
       digitalWrite(in1Pin, HIGH);
 
-      if (pos < 950) {
+      if (pos < doorthresh) {
         // Track acceleration to open the door if the slider decelerates
         T = millis();
         pos = analogRead(potPin);    // read the value from the sensor
+        //Serial.println(pos);
         if (lastT != 0) {
           Tdiff = T - lastT_register;
           if (Tdiff > 5) {
@@ -108,7 +110,7 @@ void loop() {
                 if (accel < 0) {
                   abortclose = true;
 //                  Serial.print("abortclose");
-//                  Serial.println();
+                    //Serial.println(accel);
                 }
               } // end if there is a previous velo calc
               lastvelo = velo;
