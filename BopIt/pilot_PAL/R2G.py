@@ -266,12 +266,6 @@ class R2Game(Widget):
         self.task_ard = serial.Serial(port='COM3')
         self.button_ard = serial.Serial(port='COM4', baudrate=9600)
         
-
-        ## Close the door if its open ###
-        time.sleep(1.)
-        self.button_ard.flushInput()
-        self.button_ard.write('n'.encode())
-
         if self.testing:
             self.baseline_done = False
             self.baseline_force = []
@@ -322,6 +316,32 @@ class R2Game(Widget):
             self.trial_force = []
             self.baseline_done = False
 
+        self.close_door_at_start()
+
+    def close_door_at_start(self): 
+        print('starting close door at start')
+        door_ = 'door_open'
+
+        while 'door_open' in door_:
+            ### Close the door ###
+            ### Read from new button/door arduino 
+            ser = self.button_ard.flushInput()
+            _ = self.button_ard.readline()
+            port_read = self.button_ard.readline()
+            port_read = port_read.decode('ascii')
+            port_splits = port_read.split('\t')
+            while port_splits[0] == 'm' or port_splits[0] == 'n':
+                self.button_ard.flushInput()
+                port_read = self.button_ard.readline()
+                port_read = port_read.decode('ascii')
+                port_splits = port_read.split('\t')
+            print(port_splits)
+            door_ = port_splits[1]
+            if 'door_open' in port_splits[1]:
+                self.button_ard.flushInput()
+                self.button_ard.write('n'.encode())
+                print('Tried to close the door at start')
+        
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
         rew = []
@@ -350,6 +370,9 @@ class R2Game(Widget):
         # Turn off LED when cloisng : 
         self.task_ard.flushInput()
         self.task_ard.write('n'.encode()) #morn
+        
+        self.button_ard.flushInput()
+        self.button_ard.write('n'.encode()) #morn
         
         if self.idle:
             self.state = 'idle_exit'
@@ -417,7 +440,6 @@ class R2Game(Widget):
         _ = self.button_ard.readline()
         port_read = self.button_ard.readline()
         port_read = port_read.decode('ascii')
-        print('start reading')
         port_splits = port_read.split('\t')
         #print(port_splits)
         #print(self.state)
@@ -433,15 +455,15 @@ class R2Game(Widget):
         elif port_splits[0] == 'button_inactive':
             self.button = 0
         else:
-            print(port_splits)
+            #print(port_splits)
             #raise Exception('unrecognized button ')
-
+            pass
         if port_splits[1] == 'door_open':
             self.door_state = 1
         elif port_splits[1] == 'door_closed':
             self.door_state = 0
-        print('button %d'%self.button)
-        print('door %d'%self.door_state)
+        #print('button %d'%self.button)
+        #print('door %d'%self.door_state)
         if self.use_cap_not_button:
             tmp = self.cap_ard.flushInput()
             _ = self.cap_ard.readline()
@@ -545,13 +567,17 @@ class R2Game(Widget):
 
         if self.baseline_done:
             self.trial_force = np.array(self.trial_force)
-            print('thresh: ')
-            print(self.baseline_thresh)
-            print('trial: ')
-            print(self.trial_force)
+            #print('thresh: ')
+            #print(self.baseline_thresh)
+            #print('trial: ')
+            #print(self.trial_force)
             ix = np.nonzero(self.trial_force > self.baseline_thresh)[0]
             if len(ix) > 0:
                 self.tried += 1
+
+        ### close the door ###
+        self.button_ard.flushInput()
+        self.button_ard.write('n'.encode())
 
 
     def _start_grasp_trial_start(self, **kwargs):
