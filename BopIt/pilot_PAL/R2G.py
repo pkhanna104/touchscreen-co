@@ -178,6 +178,7 @@ class R2Game(Widget):
         # Preload reward buttons: 
         self.reward1 = SoundLoader.load('reward1.wav')
         self.reward2 = SoundLoader.load('reward2.wav')
+        self.reward_started = False
 
         self.state = 'ITI'
         self.state_start = time.time()
@@ -221,7 +222,7 @@ class R2Game(Widget):
             self.FSM['reward'] = dict(end_reward='ITI', stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM4',
+            self.reward_port = serial.Serial(port='COM5',
                 baudrate=115200)
             self.reward_port.close()
             reward_fcn = True
@@ -424,8 +425,8 @@ class R2Game(Widget):
         _ = self.task_ard.readline()
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('/t')
-        #print(port_splits)
-        #print(self.state)
+        print(port_splits)
+        print(self.state)
         if len(port_splits) != 4:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
@@ -579,6 +580,8 @@ class R2Game(Widget):
         self.button_ard.flushInput()
         self.button_ard.write('n'.encode())
 
+        #### flag to make sure that while reward is blocking loops, that 'drop' doesn't get triggered ###
+        self.reward_started = False
 
     def _start_grasp_trial_start(self, **kwargs):
         self.start_grasp = time.time(); 
@@ -650,10 +653,10 @@ class R2Game(Widget):
         return False
 
     def clear_LED(self, **kwargs):
-    	if self.beam == 0:
-    		return True
-    	else:
-    		return False
+        if self.beam == 0:
+            return True
+        else:
+            return False
 
     def grasp_timeout(self, **kwargs):
         return (time.time() - self.start_grasp) > self.grasp_timeout_time
@@ -662,12 +665,16 @@ class R2Game(Widget):
         return kwargs['ts'] > self.grasp_hold
 
     def drop(self, **kwargs):
-        if self.beam == 1:
-        	return True
+        if self.reward_started:
+            return False
         else:
-        	return False
+            if self.beam == 1:
+                return True
+            else:
+                return False
 
     def _start_reward(self, **kwargs):
+        self.reward_started = True
         try:
             if self.task_opt == 'button':
                 pass 
