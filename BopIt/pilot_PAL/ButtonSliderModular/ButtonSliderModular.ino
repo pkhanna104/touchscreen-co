@@ -7,7 +7,7 @@ const int FSR2_PIN = A3; // Pin connected to FSR/resistor divider
 int fsr1ADC = 0;
 int fsr2ADC = 0;
 const int FSR1_thresh = 30; // baseline seems to be 15-20
-const int FSR2_thresh = 5; // baseline seems to be 0-1
+const int FSR2_thresh = 10; // baseline seems to be 0-1
 
 // slide potentiometer
 int potPin = 1;
@@ -57,6 +57,9 @@ void loop() {
   // Determine and send the state of the button and the door
   fsr1ADC = analogRead(FSR1_PIN);
   fsr2ADC = analogRead(FSR2_PIN);
+//  Serial.print(fsr1ADC);
+//  Serial.print('/');
+//  Serial.println(fsr2ADC);
   if ((fsr1ADC > FSR1_thresh) || (fsr2ADC > FSR2_thresh)) {
     Serial.print("button_active");
     Serial.print("\t");
