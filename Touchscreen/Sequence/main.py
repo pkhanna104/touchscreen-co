@@ -806,6 +806,8 @@ class SequenceGame(Widget):
             if self.num_targets > 3:
                 self.target4.color = (0., 0., 0., 0.)
         # self.indicator_targ.color = (0., 0., 0., 0.)
+        
+        self.set_rewarded = False
     
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
@@ -1045,13 +1047,13 @@ class SequenceGame(Widget):
     
     # Start Target Holds --> Change the Color of the target to yellow?
     def _start_targ_hold(self, **kwargs):
-        if self.target_touched is 1:
+        if self.target_touched == 1:
             self.target1.color = (0., 1., 0., 1.)
-        elif self.target_touched is 2:
+        elif self.target_touched == 2:
             self.target2.color = (0., 1., 0., 1.)   
-        elif self.target_touched is 3:
+        elif self.target_touched == 3:
             self.target3.color = (0., 1., 0., 1.)   
-        elif self.target_touched is 4:
+        elif self.target_touched == 4:
             self.target4.color = (0., 1., 0., 1.)   
         # self.indicator_targ.color = (0.75, .75, .75, 1.)
     
@@ -1065,13 +1067,13 @@ class SequenceGame(Widget):
         self.targets_pressed.append(self.target_touched)
         
         # Change the color of the target to same as background
-        if self.target_touched is 1:
+        if self.target_touched == 1:
             self.target1.color = (0., 0., 0., 1.)
-        elif self.target_touched is 2:
+        elif self.target_touched == 2:
             self.target2.color = (0., 0., 0., 1.)   
-        elif self.target_touched is 3:
+        elif self.target_touched == 3:
             self.target3.color = (0., 0., 0., 1.)   
-        elif self.target_touched is 4:
+        elif self.target_touched == 4:
             self.target4.color = (0., 0., 0., 1.)  
         # self.indicator_targ.color = (0.75, .75, .75, 1.)
             
@@ -1105,22 +1107,22 @@ class SequenceGame(Widget):
     
     # Have all targets been pressed?
     def all_targs_pressed(self, **kwargs):
-        if self.num_targets is 2 and 1 in self.targets_pressed and 2 in self.targets_pressed:
+        if self.num_targets == 2 and 1 in self.targets_pressed and 2 in self.targets_pressed:
             return True
-        elif self.num_targets is 3 and 1 in self.targets_pressed and 2 in self.targets_pressed and 3 in self.targets_pressed:
+        elif self.num_targets == 3 and 1 in self.targets_pressed and 2 in self.targets_pressed and 3 in self.targets_pressed:
             return True
-        elif self.num_targets is 4 and 1 in self.targets_pressed and 2 in self.targets_pressed and 3 in self.targets_pressed and 4 in self.targets_pressed:
+        elif self.num_targets == 4 and 1 in self.targets_pressed and 2 in self.targets_pressed and 3 in self.targets_pressed and 4 in self.targets_pressed:
             return True
         else:
             return False
     
     # Or do some targets remain?
     def targets_remain(self, **kwargs):
-        if self.num_targets is 2 and (1 not in self.targets_pressed or 2 not in self.targets_pressed):
+        if self.num_targets == 2 and (1 not in self.targets_pressed or 2 not in self.targets_pressed):
             return True
-        elif self.num_targets is 3 and (1 not in self.targets_pressed or 2 not in self.targets_pressed or 3 not in self.targets_pressed):
+        elif self.num_targets == 3 and (1 not in self.targets_pressed or 2 not in self.targets_pressed or 3 not in self.targets_pressed):
             return True
-        elif self.num_targets is 4 and (1 not in self.targets_pressed or 2 not in self.targets_pressed or 3 not in self.targets_pressed or 4 not in self.targets_pressed):
+        elif self.num_targets == 4 and (1 not in self.targets_pressed or 2 not in self.targets_pressed or 3 not in self.targets_pressed or 4 not in self.targets_pressed):
             return True
         else:
             return False
@@ -1131,7 +1133,10 @@ class SequenceGame(Widget):
         return list(self.targets_pressed) == list(range(1, self.num_targets+1))
     
     def set_incorrect(self, **kwargs):
-        return not list(self.targets_pressed) == list(range(1, self.num_targets+1))
+        if self.set_rewarded:
+            return False
+        else: 
+            return not list(self.targets_pressed) == list(range(1, self.num_targets+1))
     
     
     ################################### REWARD STATES ################################
@@ -1150,6 +1155,7 @@ class SequenceGame(Widget):
         self.cnts_in_rew = 0
         # self.indicator_targ.color = (1., 1., 1., 1.)
         self.repeat = False
+        self.set_rewarded = True
         
     def _while_reward_set(self, **kwargs):
         if self.rew_cnt == 0:
@@ -1183,13 +1189,13 @@ class SequenceGame(Widget):
     
     # Early leave from target --> hold error (buttons turn invisible)
     def early_leave_target_hold(self, **kwargs):
-        if self.target_touched is 1:
+        if self.target_touched == 1:
             return not self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
-        elif self.target_touched is 2:
+        elif self.target_touched == 2:
             return not self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
-        elif self.num_targets > 2 and self.target_touched is 3:
+        elif self.num_targets > 2 and self.target_touched == 3:
             return not self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
-        elif self.num_targets > 3 and self.target_touched is 4:
+        elif self.num_targets > 3 and self.target_touched == 4:
             return not self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
     
     def _start_hold_error(self, **kwargs):
@@ -1204,13 +1210,13 @@ class SequenceGame(Widget):
     def targ_drag_out(self, **kwargs):
         touch = self.touch
         self.touch = True
-        if self.target_touched is 1:
+        if self.target_touched == 1:
             stay_in = self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
-        elif self.target_touched is 2:
+        elif self.target_touched == 2:
             stay_in = self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
-        elif self.num_targets > 2 and self.target_touched is 3:
+        elif self.num_targets > 2 and self.target_touched == 3:
             stay_in = self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
-        elif self.num_targets > 3 and self.target_touched is 4:
+        elif self.num_targets > 3 and self.target_touched == 4:
             stay_in = self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
         self.touch = touch
         return not stay_in
