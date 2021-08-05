@@ -482,6 +482,7 @@ class SequenceGame(Widget):
         # Initialize What Targets Have Been Pressed
         self.targets_pressed = []
         self.set_rewarded = False
+        self.targ_completed = False
 
         # Initialize FSM Dictionary
         self.FSM = dict()
@@ -813,6 +814,7 @@ class SequenceGame(Widget):
         # self.indicator_targ.color = (0., 0., 0., 0.)
         
         self.set_rewarded = False
+        self.targ_completed = False
     
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
@@ -857,6 +859,15 @@ class SequenceGame(Widget):
     # Start a new set
     def _start_set(self, **kwargs):
         self.touch = False ## We need to start with this being false or else if non-target touch tolerance is not infinity, the previous touch will carry over and cause an error
+        
+        ### also need to clear the cursor ids otherwise touching in the wrong place can yield old cursor positions
+        ### this also has the effect of preventing a subject from holding down both keys and having it be correct
+        ### they must press each target independently
+        self.cursor_ids = []
+        self.cursor = {}
+
+        self.targ_completed = False
+
         Window.clearcolor = (0., 0., 0., 1.)
         
         # Display outlines of all of the buttons
@@ -1064,7 +1075,7 @@ class SequenceGame(Widget):
     
     # Finish target hold?
     def finish_targ_hold(self, **kwargs):
-        if self.set_rewarded:
+        if self.set_rewarded or self.targ_completed: 
             return True
         else:
             return self.tht <= kwargs['ts']
@@ -1073,6 +1084,7 @@ class SequenceGame(Widget):
     def _start_targ_pressed(self, **kwargs):
         # Add the target that was touched to the list of targets that were pressed
         self.targets_pressed.append(self.target_touched)
+        self.targ_completed = True
         
         # Change the color of the target to same as background
         if self.target_touched == 1:
@@ -1197,7 +1209,7 @@ class SequenceGame(Widget):
     
     # Early leave from target --> hold error (buttons turn invisible)
     def early_leave_target_hold(self, **kwargs):
-        if self.set_rewarded:
+        if self.set_rewarded or self.targ_completed: 
             return False
         else:
             if self.target_touched == 1:
@@ -1219,7 +1231,7 @@ class SequenceGame(Widget):
     
     # Drag outside of target --> drag error (buttons turn invisible)
     def targ_drag_out(self, **kwargs):
-        if self.set_rewarded:
+        if self.set_rewarded or self.targ_completed:
             return False
         else:
             #touch = self.touch
