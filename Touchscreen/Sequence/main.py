@@ -33,6 +33,7 @@ class Data(tables.IsDescription):
     cursor = tables.Float32Col(shape=(10, 2))
     cursor_ids = tables.Float32Col(shape = (10, ))
     set_ix = tables.Float32Col(shape=(1, ))
+    targets_pressed = tables.Float32Col(shape=(5, ))
     cap_touch = tables.Float32Col()
     time = tables.Float32Col()
 
@@ -281,8 +282,9 @@ class SequenceGame(Widget):
                 self.error_timeout_time = error_timeout_opts[i]
         
         # Is this a test session?
-        self.testing = True
-        
+        self.testing = False # changed to save data
+        self.in_cage = False
+
         # How big are the targets?
         target_rad_opts = [.5, .75, .82, .91, 1.0, 1.125]
         for i, val in enumerate(task_in['targ_rad']):
@@ -554,51 +556,51 @@ class SequenceGame(Widget):
         print(self.anytarg_rew)
         print(self.set_rew)
 
-        try:
-            if self.testing:
+        #try:
+        if self.testing:
+            pass
+
+        else:
+            import os
+            path = os.getcwd()
+            path = path.split('\\')
+            path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
+            path_root = ''
+            for ip in path_data:
+                path_root += ip+'/'
+            p = path_root + 'data/'
+
+            # Check if this directory exists: 
+            if os.path.exists(p):
                 pass
-
             else:
-                import os
-                path = os.getcwd()
-                path = path.split('\\')
-                path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-                path_root = ''
-                for ip in path_data:
-                    path_root += ip+'/'
-                p = path_root + 'data/'
-
-                # Check if this directory exists: 
+                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
                 if os.path.exists(p):
                     pass
                 else:
-                    p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
-                    if os.path.exists(p):
-                        pass
-                    else:
-                        os.mkdir(p)
-                        print('Making temp directory: ', p)
+                    os.mkdir(p)
+                    print('Making temp directory: ', p)
 
-                print ('')
-                print ('')
-                print('Data saving PATH: ', p)
-                print ('')
-                print ('')
-                self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-                if self.in_cage:
-                    self.filename = self.filename+'_cage'
+            print ('')
+            print ('')
+            print('Data saving PATH: ', p)
+            print ('')
+            print ('')
+            self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+            if self.in_cage:
+                self.filename = self.filename+'_cage'
 
-                pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
-                self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-                self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-                self.h5_table_row = self.h5_table.row
-                self.h5_table_row_cnt = 0
+            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+            self.h5_table_row = self.h5_table.row
+            self.h5_table_row_cnt = 0
 
-                # Note in python 3 to open pkl files: 
-                #with open('xxxx_params.pkl', 'rb') as f:
-                #    data_params = pickle.load(f)
-        except:
-            pass
+            # Note in python 3 to open pkl files: 
+            #with open('xxxx_params.pkl', 'rb') as f:
+            #    data_params = pickle.load(f)
+        # except:
+        #     pass
     
     # Function for Closing the App
     def close_app(self):
@@ -720,7 +722,9 @@ class SequenceGame(Widget):
         cursor_id[:len(self.cursor_ids)] = self.cursor_ids
         self.h5_table_row['cursor_ids'] = cursor_id
 
-        self.h5_table_row['set_ix'] = self.set_ix
+        tgs_press = np.zeros((5, ))
+        tgs_press[:len(self.targets_pressed)] = np.array(self.targets_pressed)
+        self.h5_table_row['targets_pressed'] = tgs_press # set_ix never set anywhere; 
         self.h5_table_row['time'] = time.time() - self.t0
         self.h5_table_row['cap_touch'] = self.rhtouch_sensor
         self.h5_table_row.append()
