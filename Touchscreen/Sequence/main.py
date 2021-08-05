@@ -481,7 +481,8 @@ class SequenceGame(Widget):
         
         # Initialize What Targets Have Been Pressed
         self.targets_pressed = []
-        
+        self.set_rewarded = False
+
         # Initialize FSM Dictionary
         self.FSM = dict()
         
@@ -493,7 +494,7 @@ class SequenceGame(Widget):
             non_rhtouch='RH_touch')#,touch_not_target='touch_error')
         
         self.FSM['targ_hold'] = dict(finish_targ_hold='targ_pressed', early_leave_target_hold = 'hold_error', 
-            targ_drag_out = 'drag_error', stop=None, non_rhtouch='RH_touch')
+            stop=None, non_rhtouch='RH_touch') # removed targ_drag_out = 'drag_error'
         
         self.FSM['targ_pressed'] = dict(all_targs_pressed = 'set_complete', targets_remain = 'set', incorrect_immediate_error = 'set_error', 
             stop=None, non_rhtouch='RH_touch')
@@ -1063,7 +1064,10 @@ class SequenceGame(Widget):
     
     # Finish target hold?
     def finish_targ_hold(self, **kwargs):
-        return self.tht <= kwargs['ts']
+        if self.set_rewarded:
+            return True
+        else:
+            return self.tht <= kwargs['ts']
     
     # Start Target Pressed
     def _start_targ_pressed(self, **kwargs):
@@ -1193,14 +1197,17 @@ class SequenceGame(Widget):
     
     # Early leave from target --> hold error (buttons turn invisible)
     def early_leave_target_hold(self, **kwargs):
-        if self.target_touched == 1:
-            return not self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
-        elif self.target_touched == 2:
-            return not self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
-        elif self.num_targets > 2 and self.target_touched == 3:
-            return not self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
-        elif self.num_targets > 3 and self.target_touched == 4:
-            return not self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
+        if self.set_rewarded:
+            return False
+        else:
+            if self.target_touched == 1:
+                return not self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
+            elif self.target_touched == 2:
+                return not self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
+            elif self.num_targets > 2 and self.target_touched == 3:
+                return not self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
+            elif self.num_targets > 3 and self.target_touched == 4:
+                return not self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
     
     def _start_hold_error(self, **kwargs):
         # self.target1.color = (0., 0., 0., 1.)
@@ -1212,19 +1219,22 @@ class SequenceGame(Widget):
     
     # Drag outside of target --> drag error (buttons turn invisible)
     def targ_drag_out(self, **kwargs):
-        touch = self.touch
-        self.touch = True
-        if self.target_touched == 1:
-            stay_in = self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
-        elif self.target_touched == 2:
-            stay_in = self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
-        elif self.num_targets > 2 and self.target_touched == 3:
-            stay_in = self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
-        elif self.num_targets > 3 and self.target_touched == 4:
-            stay_in = self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
-        self.touch = touch
-        return not stay_in
-    
+        if self.set_rewarded:
+            return False
+        else:
+            #touch = self.touch
+            #self.touch = True # This was uncommented --> meant that drag errors --> targ touch errors
+            if self.target_touched == 1:
+                stay_in = self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
+            elif self.target_touched == 2:
+                stay_in = self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
+            elif self.num_targets > 2 and self.target_touched == 3:
+                stay_in = self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
+            elif self.num_targets > 3 and self.target_touched == 4:
+                stay_in = self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
+            #self.touch = touch
+            return not stay_in
+        
     def _start_drag_error(self, **kwargs):
         # self.target1.color = (0., 0., 0., 1.)
         # self.target2.color = (0., 0., 0., 1.)
