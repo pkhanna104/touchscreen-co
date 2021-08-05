@@ -24,6 +24,26 @@ import time
 import numpy as np
 import tables
 
+import threading
+
+class RewThread(threading.Thread):
+    def __init__(self, comport, rew_time):
+        super(RewThread, self).__init__()
+        
+        self.comport = comport
+        self.rew_time = rew_time
+
+    def run(self): 
+        #self.comport.open()
+        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
+        self.comport.write(rew_str)
+        time.sleep(.25)
+        run_str = [ord(r) for r in 'run\n']
+        self.comport.write(run_str)
+        #self.comport.close()
+
+
+
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
     cursor = tables.Float32Col(shape=(10, 2))
@@ -345,7 +365,7 @@ class COGame(Widget):
         try:
             self.reward_port = serial.Serial(port='COM4',
                 baudrate=115200)
-            self.reward_port.close()
+            #self.reward_port.close()
         except:
             pass
 
@@ -783,14 +803,18 @@ class COGame(Widget):
 
                 if not self.skip_juice:
                     if self.reward_generator[self.trial_counter] > 0:
-                        self.reward_port.open()
-                        #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                        self.reward_port.write(rew_str)
-                        time.sleep(.25 + self.reward_delay_time)
-                        run_str = [ord(r) for r in 'run\n']
-                        self.reward_port.write(run_str)
-                        self.reward_port.close()
+                        #self.reward_port.open()
+
+                        thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
+                        thread1.start()
+
+                        # #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                        # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
+                        # self.reward_port.write(rew_str)
+                        # time.sleep(.25 + self.reward_delay_time)
+                        # run_str = [ord(r) for r in 'run\n']
+                        # self.reward_port.write(run_str)
+                        # self.reward_port.close()
         except:
             pass
         
@@ -805,16 +829,19 @@ class COGame(Widget):
                 if np.logical_or(np.logical_and(self.reward_for_anytouch[0], self.reward_for_anytouch[1] > 0), 
                     np.logical_and(self.reward_for_center[0], self.reward_for_center[1] > 0)):
 
-                    self.reward_port.open()
                     if self.reward_for_anytouch[0]:
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
+                        rew_tm = self.reward_for_anytouch[1]
                     elif self.reward_for_center[0]:
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_center[1])+' sec\n']
-                    self.reward_port.write(rew_str)
-                    time.sleep(.25)
-                    run_str = [ord(r) for r in 'run\n']
-                    self.reward_port.write(run_str)
-                    self.reward_port.close()
+                        rew_tm = self.reward_for_center[1]
+                        
+                    thread1 = RewThread(self.reward_port, rew_tm)
+                    thread1.start()
+                    # self.reward_port.open()
+                    # self.reward_port.write(rew_str)
+                    # time.sleep(.25)
+                    # run_str = [ord(r) for r in 'run\n']
+                    # self.reward_port.write(run_str)
+                    # self.reward_port.close()
         except:
             pass
 
