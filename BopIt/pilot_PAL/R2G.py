@@ -64,7 +64,7 @@ class R2Game(Widget):
     n_trials_param = StringProperty('')
 
     def init(self, animal_names_dict=None, rew_in=None, rew_var=None,
-        test=None, hold=None, autoquit=None, use_start=None, only_start=None, 
+        test=None, hold=None, autoquit=None,
         grasp_to=None, use_cap=None, tsk_opt=None):
 
         self.h5_table_row_cnt = 0
@@ -76,7 +76,8 @@ class R2Game(Widget):
             if val:
                 self.use_cap_not_button = cap[i]
 
-        button_holdz = ['.12-.2', '.15-.25', '.2-.3', '.25-.45', '.2-.5']
+        #button_holdz = ['.12-.2', '.15-.25', '.2-.3', '.25-.45', '.2-.5']
+        button_holdz = [0., 0.1, 0.2, 0.3, 0.4]
         grasp_holdz = [0., .15, .25, .35, .50]
 
         for i, val in enumerate(hold['start_hold']):
@@ -157,13 +158,16 @@ class R2Game(Widget):
             if val: 
                 self.max_trials = autoquit_trls[i]
 
-        start = [True, False]
-        for i, val in enumerate(use_start['start']):
-            if val:
-                self.use_start = start[i]
-        for i, val in enumerate(only_start['start']):
-            if val:
-                self.only_start = start[i]
+        self.use_start = True
+        # start = [True, False]
+        # for i, val in enumerate(use_start['start']):
+        #     if val:
+        #         self.use_start = start[i]
+
+        self.only_start = False
+        # for i, val in enumerate(only_start['start']):
+        #     if val:
+        #         self.only_start = start[i]
 
         grasp_tos = [5., 10., 999999999.]
 
@@ -174,6 +178,7 @@ class R2Game(Widget):
         # Preload reward buttons: 
         self.reward1 = SoundLoader.load('reward1.wav')
         self.reward2 = SoundLoader.load('reward2.wav')
+        self.reward_started = False
 
         self.state = 'ITI'
         self.state_start = time.time()
@@ -217,7 +222,7 @@ class R2Game(Widget):
             self.FSM['reward'] = dict(end_reward='ITI', stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM4',
+            self.reward_port = serial.Serial(port='COM5',
                 baudrate=115200)
             self.reward_port.close()
             reward_fcn = True
@@ -261,7 +266,7 @@ class R2Game(Widget):
         # Open task arduino -- IR sensor 
         self.task_ard = serial.Serial(port='COM3')
         self.button_ard = serial.Serial(port='COM4', baudrate=9600)
-
+        
         if self.testing:
             self.baseline_done = False
             self.baseline_force = []
@@ -312,6 +317,32 @@ class R2Game(Widget):
             self.trial_force = []
             self.baseline_done = False
 
+        self.close_door_at_start()
+
+    def close_door_at_start(self): 
+        print('starting close door at start')
+        door_ = 'door_open'
+
+        while 'door_open' in door_:
+            ### Close the door ###
+            ### Read from new button/door arduino 
+            ser = self.button_ard.flushInput()
+            _ = self.button_ard.readline()
+            port_read = self.button_ard.readline()
+            port_read = port_read.decode('ascii')
+            port_splits = port_read.split('\t')
+            while port_splits[0] == 'm' or port_splits[0] == 'n':
+                self.button_ard.flushInput()
+                port_read = self.button_ard.readline()
+                port_read = port_read.decode('ascii')
+                port_splits = port_read.split('\t')
+            print(port_splits)
+            door_ = port_splits[1]
+            if 'door_open' in port_splits[1]:
+                self.button_ard.flushInput()
+                self.button_ard.write('n'.encode())
+                print('Tried to close the door at start')
+        
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
         rew = []
@@ -340,6 +371,9 @@ class R2Game(Widget):
         # Turn off LED when cloisng : 
         self.task_ard.flushInput()
         self.task_ard.write('n'.encode()) #morn
+        
+        self.button_ard.flushInput()
+        self.button_ard.write('n'.encode()) #morn
         
         if self.idle:
             self.state = 'idle_exit'
@@ -391,8 +425,8 @@ class R2Game(Widget):
         _ = self.task_ard.readline()
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('/t')
-        #print(port_splits)
-        #print(self.state)
+        print(port_splits)
+        print(self.state)
         if len(port_splits) != 4:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
@@ -407,7 +441,6 @@ class R2Game(Widget):
         _ = self.button_ard.readline()
         port_read = self.button_ard.readline()
         port_read = port_read.decode('ascii')
-        print('start reading')
         port_splits = port_read.split('\t')
         #print(port_splits)
         #print(self.state)
@@ -423,15 +456,15 @@ class R2Game(Widget):
         elif port_splits[0] == 'button_inactive':
             self.button = 0
         else:
-            print(port_splits)
+            #print(port_splits)
             #raise Exception('unrecognized button ')
-
+            pass
         if port_splits[1] == 'door_open':
             self.door_state = 1
         elif port_splits[1] == 'door_closed':
             self.door_state = 0
-        print('button %d'%self.button)
-        print('door %d'%self.door_state)
+        #print('button %d'%self.button)
+        #print('door %d'%self.door_state)
         if self.use_cap_not_button:
             tmp = self.cap_ard.flushInput()
             _ = self.cap_ard.readline()
@@ -535,14 +568,20 @@ class R2Game(Widget):
 
         if self.baseline_done:
             self.trial_force = np.array(self.trial_force)
-            print('thresh: ')
-            print(self.baseline_thresh)
-            print('trial: ')
-            print(self.trial_force)
+            #print('thresh: ')
+            #print(self.baseline_thresh)
+            #print('trial: ')
+            #print(self.trial_force)
             ix = np.nonzero(self.trial_force > self.baseline_thresh)[0]
             if len(ix) > 0:
                 self.tried += 1
 
+        ### close the door ###
+        self.button_ard.flushInput()
+        self.button_ard.write('n'.encode())
+
+        #### flag to make sure that while reward is blocking loops, that 'drop' doesn't get triggered ###
+        self.reward_started = False
 
     def _start_grasp_trial_start(self, **kwargs):
         self.start_grasp = time.time(); 
@@ -614,10 +653,10 @@ class R2Game(Widget):
         return False
 
     def clear_LED(self, **kwargs):
-    	if self.beam == 0:
-    		return True
-    	else:
-    		return False
+        if self.beam == 0:
+            return True
+        else:
+            return False
 
     def grasp_timeout(self, **kwargs):
         return (time.time() - self.start_grasp) > self.grasp_timeout_time
@@ -626,27 +665,34 @@ class R2Game(Widget):
         return kwargs['ts'] > self.grasp_hold
 
     def drop(self, **kwargs):
-        if self.beam == 1:
-        	return True
+        if self.reward_started:
+            return False
         else:
-        	return False
+            if self.beam == 1:
+                return True
+            else:
+                return False
 
     def _start_reward(self, **kwargs):
+        self.reward_started = True
         try:
-            self.reward1.play()
-            if self.reward_for_grasp[0]:
+            if self.task_opt == 'button':
+                pass 
+            else:
+                self.reward1.play()
+                if self.reward_for_grasp[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
-                print('in reward: ')
-                if not self.skip_juice:
-                    if self.reward_generator[self.trial_counter] > 0:
-                        self.reward_port.open()
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                        self.reward_port.write(rew_str)
-                        time.sleep(.5 + self.reward_delay_time)
-                        run_str = [ord(r) for r in 'run\n']
-                        self.reward_port.write(run_str)
-                        self.reward_port.close()
+                    print('in reward: ')
+                    if not self.skip_juice:
+                        if self.reward_generator[self.trial_counter] > 0:
+                            self.reward_port.open()
+                            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
+                            self.reward_port.write(rew_str)
+                            time.sleep(.5 + self.reward_delay_time)
+                            run_str = [ord(r) for r in 'run\n']
+                            self.reward_port.write(run_str)
+                            self.reward_port.close()
         except:
             pass
 
