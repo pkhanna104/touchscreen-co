@@ -17,7 +17,6 @@ import time
 import numpy as np
 import tables
 
-
 Config.set('kivy', 'exit_on_escape', 1)
 Config.set('graphics', 'resizable', False)
 if platform == 'darwin':
@@ -27,6 +26,23 @@ elif platform == 'win32':
 pix_per_cm = 85.
 Config.set('graphics', 'width', str(fixed_window_size[0]))
 Config.set('graphics', 'height', str(fixed_window_size[1]))
+
+
+import threading 
+
+class RewThread(threading.Thread):
+    def __init__(self, comport, rew_time):
+        super(RewThread, self).__init__()
+        
+        self.comport = comport
+        self.rew_time = rew_time
+
+    def run(self): 
+        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
+        self.comport.write(rew_str)
+        time.sleep(.25)
+        run_str = [ord(r) for r in 'run\n']
+        self.comport.write(run_str)
 
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
@@ -516,7 +532,7 @@ class SequenceGame(Widget):
         try:
             self.reward_port = serial.Serial(port='COM4',
                 baudrate=115200)
-            self.reward_port.close()
+            #self.reward_port.close()
         except:
             pass
 
@@ -1320,13 +1336,16 @@ class SequenceGame(Widget):
     def run_small_rew(self, **kwargs):
         print('Run small reward')
         try:
-            self.reward_port.open()
-            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.anytarg_rew)+' sec\n']
-            self.reward_port.write(rew_str)
-            time.sleep(.25)
-            run_str = [ord(r) for r in 'run\n']
-            self.reward_port.write(run_str)
-            self.reward_port.close()
+            ## 8/5/21 -- testing multithreading for reward delivery 
+            thread1 = RewThread(self.reward_port, self.anytarg_rew)
+            thread1.start()
+            # self.reward_port.open()
+            # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.anytarg_rew)+' sec\n']
+            # self.reward_port.write(rew_str)
+            # time.sleep(.25)
+            # run_str = [ord(r) for r in 'run\n']
+            # self.reward_port.write(run_str)
+            # self.reward_port.close()
         except:
             pass
 
@@ -1343,13 +1362,15 @@ class SequenceGame(Widget):
 
             ### To trigger reward make sure reward is > 0:
             if self.set_rew > 0:
-                self.reward_port.open()
-                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.set_rew)+' sec\n']
-                self.reward_port.write(rew_str)
-                time.sleep(.25)
-                run_str = [ord(r) for r in 'run\n']
-                self.reward_port.write(run_str)
-                self.reward_port.close()
+                thread1 = RewThread(self.reward_port, self.set_rew)
+                thread1.start()
+                # self.reward_port.open()
+                # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.set_rew)+' sec\n']
+                # self.reward_port.write(rew_str)
+                # time.sleep(.25)
+                # run_str = [ord(r) for r in 'run\n']
+                # self.reward_port.write(run_str)
+                # self.reward_port.close()
         except:
             pass
 
