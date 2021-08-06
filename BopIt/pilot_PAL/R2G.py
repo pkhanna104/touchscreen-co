@@ -19,6 +19,23 @@ fixed_window_size = (1800, 1000)
 Config.set('graphics', 'width', str(fixed_window_size[0]))
 Config.set('graphics', 'height', str(fixed_window_size[1]))
 
+import threading
+
+class RewThread(threading.Thread):
+    def __init__(self, comport, rew_time):
+        super(RewThread, self).__init__()
+        
+        self.comport = comport
+        self.rew_time = rew_time
+
+    def run(self):
+        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
+        self.comport.write(rew_str)
+        time.sleep(.25)
+        run_str = [ord(r) for r in 'run\n']
+        self.comport.write(run_str)
+
+
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
     time = tables.Float32Col()
@@ -224,7 +241,6 @@ class R2Game(Widget):
         try:
             self.reward_port = serial.Serial(port='COM5',
                 baudrate=115200)
-            self.reward_port.close()
             reward_fcn = True
         except:
             reward_fcn = False
@@ -336,7 +352,7 @@ class R2Game(Widget):
                 port_read = self.button_ard.readline()
                 port_read = port_read.decode('ascii')
                 port_splits = port_read.split('\t')
-            print(port_splits)
+            #print(port_splits)
             door_ = port_splits[1]
             if 'door_open' in port_splits[1]:
                 self.button_ard.flushInput()
@@ -425,8 +441,8 @@ class R2Game(Widget):
         _ = self.task_ard.readline()
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('/t')
-        print(port_splits)
-        print(self.state)
+        #print(port_splits)
+        #print(self.state)
         if len(port_splits) != 4:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
@@ -552,6 +568,7 @@ class R2Game(Widget):
 
     def _start_ITI(self, **kwargs):
         # Stop video
+        t0 = time.time()
         try:
             self.cam_trig_port.write('0'.encode())
         except:
@@ -686,18 +703,21 @@ class R2Game(Widget):
                     print('in reward: ')
                     if not self.skip_juice:
                         if self.reward_generator[self.trial_counter] > 0:
-                            self.reward_port.open()
-                            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                            self.reward_port.write(rew_str)
-                            time.sleep(.5 + self.reward_delay_time)
-                            run_str = [ord(r) for r in 'run\n']
-                            self.reward_port.write(run_str)
-                            self.reward_port.close()
+                            thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
+                            thread1.start()
+
+                            # self.reward_port.open()
+                            # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
+                            # self.reward_port.write(rew_str)
+                            # time.sleep(.5 + self.reward_delay_time)
+                            # run_str = [ord(r) for r in 'run\n']
+                            # self.reward_port.write(run_str)
+                            # self.reward_port.close()
         except:
             pass
 
         ##### Close teh door ####
-        time.sleep(1.)
+        #time.sleep(1.)
         self.button_ard.flushInput()
         self.button_ard.write('n'.encode())
 
@@ -713,14 +733,15 @@ class R2Game(Widget):
                 #sound.play()
             self.reward2.play()
             if self.reward_for_start[1] > 0.:
-                
-                self.reward_port.open()
-                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
-                self.reward_port.write(rew_str)
-                time.sleep(.5)
-                run_str = [ord(r) for r in 'run\n']
-                self.reward_port.write(run_str)
-                self.reward_port.close()
+                thread1 = RewThread(self.reward_port, self.reward_for_start[1])
+                thread1.start()
+                # self.reward_port.open()
+                # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
+                # self.reward_port.write(rew_str)
+                # time.sleep(.5)
+                # run_str = [ord(r) for r in 'run\n']
+                # self.reward_port.write(run_str)
+                # self.reward_port.close()
         except:
             pass
 
