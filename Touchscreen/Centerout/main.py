@@ -39,7 +39,7 @@ class COGame(Widget):
     hold_error_timeout = 0.
     drag_error_timeout = 0.
 
-    ntargets = 4.
+    ntargets = 4
     target_distance = 8.
     touch = False
 
