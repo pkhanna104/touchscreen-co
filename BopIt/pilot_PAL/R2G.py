@@ -48,7 +48,7 @@ class Data(tables.IsDescription):
 class R2Game(Widget):
     pre_start_vid_ts = 0.1
 
-    ITI_mean = 3.
+    ITI_mean = 1.5
     ITI_std = .2
 
     start_timeout = 5000. 
@@ -94,7 +94,7 @@ class R2Game(Widget):
                 self.use_cap_not_button = cap[i]
 
         #button_holdz = ['.12-.2', '.15-.25', '.2-.3', '.25-.45', '.2-.5']
-        button_holdz = [0., 0.1, 0.2, 0.3, 0.4]
+        button_holdz = [0., 0.1, 0.2, 0.3, 0.4, '0.4-0.6']
         grasp_holdz = [0., .15, .25, .35, .50]
 
         for i, val in enumerate(hold['start_hold']):
