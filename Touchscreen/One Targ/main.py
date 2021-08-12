@@ -43,7 +43,7 @@ class COGame(Widget):
     center = ObjectProperty(None)
     target = ObjectProperty(None)
     
-    nudge_x = 5.
+    nudge_x = 0.
     # nudge_y = -2.
 
     # Time to wait after starting the video before getting to the center target display. 
