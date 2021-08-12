@@ -9,40 +9,27 @@ from kivy.vector import Vector
 from kivy.clock import Clock
 from random import randint
 from kivy.config import Config
-import serial, time, pickle, datetime, winsound
+import serial, time, pickle, datetime
 from numpy import binary_repr
 import struct
+from sys import platform
 
 
 Config.set('graphics', 'resizable', False)
-fixed_window_size = (1800, 1000)
-pix_per_cm = 85.
+if platform == 'darwin':
+    fixed_window_size = (3072, 1920)
+    pix_per_cm = 89.
+elif platform == 'win32':
+    fixed_window_size = (1800, 1000)
+    pix_per_cm = 85.
+    import winsound
+
 Config.set('graphics', 'width', str(fixed_window_size[0]))
 Config.set('graphics', 'height', str(fixed_window_size[1]))
 
 import time
 import numpy as np
 import tables
-
-import threading
-
-class RewThread(threading.Thread):
-    def __init__(self, comport, rew_time):
-        super(RewThread, self).__init__()
-        
-        self.comport = comport
-        self.rew_time = rew_time
-
-    def run(self): 
-        #self.comport.open()
-        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
-        self.comport.write(rew_str)
-        time.sleep(.25)
-        run_str = [ord(r) for r in 'run\n']
-        self.comport.write(run_str)
-        #self.comport.close()
-
-
 
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
@@ -55,6 +42,9 @@ class Data(tables.IsDescription):
 class COGame(Widget):
     center = ObjectProperty(None)
     target = ObjectProperty(None)
+    
+    nudge_x = 5.
+    # nudge_y = -2.
 
     # Time to wait after starting the video before getting to the center target display. 
     pre_start_vid_ts = 0.1
@@ -63,9 +53,13 @@ class COGame(Widget):
     ITI_std = .2
     center_target_rad = 1.5
     periph_target_rad = 1.5
-
-    exit_pos = np.array([7, 4])
-    indicator_pos = np.array([8, 5])
+    
+    if platform == 'darwin':
+        exit_pos = np.array([14, 8])
+        indicator_pos = np.array([16, 10])
+    elif platform == 'win32':
+        exit_pos = np.array([7, 4])
+        indicator_pos = np.array([8, 5])
     exit_rad = 1.
     exit_hold = 2 #seconds
 
@@ -142,7 +136,7 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         test=None, hold=None, targ_structure=None,
-        autoquit=None, rew_var=None, targ_timeout = None, targ_pos=None):
+        autoquit=None, rew_var=None, targ_timeout = None, nudge_y=None):
 
         self.rew_cnt = 0
         self.small_rew_cnt = 0
@@ -233,6 +227,14 @@ class COGame(Widget):
                     self.cht = (float(mn)+float(mx))*.5
                 else:
                     self.cht = holdz[i]
+                    
+                    
+        nudge_y_opts = [-3, -2, -1, 0, 1, 2, 3]    
+        for i, val in enumerate(nudge_y['nudge_y']):
+            if val:
+                self.nudge_y = nudge_y_opts[i]
+        
+        
         try:
             pygame.mixer.init()    
         except:
@@ -307,11 +309,14 @@ class COGame(Widget):
 
         # Initialize targets: 
         self.center_target.set_size(2*self.center_target_rad)
-
+        
+        self.center_target_position = np.array([0., 0.])
         if self.in_cage:
-            self.center_target.move(np.array([-4., 0.]))
+            self.center_target_position[0] = self.center_target_position[0] - 4
         else:
-            self.center_target.move(np.array([0., 0.]))
+            self.center_target_position[0] = self.center_target_position[0] + self.nudge_x
+            self.center_target_position[1] = self.center_target_position[1] + self.nudge_y
+        self.center_target.move(self.center_target_position)
         self.periph_target.set_size(2*self.periph_target_rad)
 
         self.exit_target1.set_size(2*self.exit_rad)
@@ -327,12 +332,11 @@ class COGame(Widget):
         self.exit_target2.color = (.15, .15, .15, 1)
 
         self.target_list = generatorz(self.target_distance, self.nudge_dist, self.generator_kwarg)
+        self.target_list[:, 0] = self.target_list[:, 0] + self.nudge_x
+        self.target_list[:, 1] = self.target_list[:, 1] + self.nudge_y
         self.target_index = 0
         self.repeat = False
-        if self.in_cage:
-            self.center_target_position = np.array([-4., 0.])
-        else:
-            self.center_target_position = np.array([0., 0.])
+
         self.periph_target_position = self.target_list[self.target_index, :]
 
         self.FSM = dict()
@@ -365,7 +369,7 @@ class COGame(Widget):
         try:
             self.reward_port = serial.Serial(port='COM4',
                 baudrate=115200)
-            #self.reward_port.close()
+            self.reward_port.close()
         except:
             pass
 
@@ -799,22 +803,19 @@ class COGame(Widget):
                 #print(str(self.reward_generator[self.trial_counter]))
                 #print(self.trial_counter)
                 #print(self.reward_generator[:100])
+                self.reward1 = SoundLoader.load('reward1.wav')
                 self.reward1.play()
 
                 if not self.skip_juice:
                     if self.reward_generator[self.trial_counter] > 0:
-                        #self.reward_port.open()
-
-                        thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
-                        thread1.start()
-
-                        # #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
-                        # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                        # self.reward_port.write(rew_str)
-                        # time.sleep(.25 + self.reward_delay_time)
-                        # run_str = [ord(r) for r in 'run\n']
-                        # self.reward_port.write(run_str)
-                        # self.reward_port.close()
+                        self.reward_port.open()
+                        #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
+                        self.reward_port.write(rew_str)
+                        time.sleep(.25 + self.reward_delay_time)
+                        run_str = [ord(r) for r in 'run\n']
+                        self.reward_port.write(run_str)
+                        self.reward_port.close()
         except:
             pass
         
@@ -829,19 +830,16 @@ class COGame(Widget):
                 if np.logical_or(np.logical_and(self.reward_for_anytouch[0], self.reward_for_anytouch[1] > 0), 
                     np.logical_and(self.reward_for_center[0], self.reward_for_center[1] > 0)):
 
+                    self.reward_port.open()
                     if self.reward_for_anytouch[0]:
-                        rew_tm = self.reward_for_anytouch[1]
+                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
                     elif self.reward_for_center[0]:
-                        rew_tm = self.reward_for_center[1]
-                        
-                    thread1 = RewThread(self.reward_port, rew_tm)
-                    thread1.start()
-                    # self.reward_port.open()
-                    # self.reward_port.write(rew_str)
-                    # time.sleep(.25)
-                    # run_str = [ord(r) for r in 'run\n']
-                    # self.reward_port.write(run_str)
-                    # self.reward_port.close()
+                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_center[1])+' sec\n']
+                    self.reward_port.write(rew_str)
+                    time.sleep(.25)
+                    run_str = [ord(r) for r in 'run\n']
+                    self.reward_port.write(run_str)
+                    self.reward_port.close()
         except:
             pass
 
@@ -1024,8 +1022,9 @@ class COGame(Widget):
 class Splash(Widget):
     def init(self, *args):
         self.args = args
-        from sound import Sound
-        Sound.volume_max()
+        if platform =='win32':
+            from sound import Sound
+            Sound.volume_max()
 
 class Target(Widget):
     
@@ -1045,9 +1044,14 @@ class Manager(ScreenManager):
 
 class COApp(App):
     def build(self, **kwargs):
-        from win32api import GetSystemMetrics
-        screenx = GetSystemMetrics(0)
-        screeny = GetSystemMetrics(1)
+        if platform == 'darwin':
+            screenx = 1800
+            screeny = 1000
+        elif platform =='win32':
+            from win32api import GetSystemMetrics
+            screenx = GetSystemMetrics(0)
+            screeny = GetSystemMetrics(1)
+
         Window.size = (1800, 1000)
         Window.left = (screenx - 1800)/2
         Window.top = (screeny - 1000)/2

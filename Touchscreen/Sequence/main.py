@@ -17,6 +17,7 @@ import time
 import numpy as np
 import tables
 
+
 Config.set('kivy', 'exit_on_escape', 1)
 Config.set('graphics', 'resizable', False)
 if platform == 'darwin':
@@ -27,29 +28,11 @@ pix_per_cm = 85.
 Config.set('graphics', 'width', str(fixed_window_size[0]))
 Config.set('graphics', 'height', str(fixed_window_size[1]))
 
-
-import threading 
-
-class RewThread(threading.Thread):
-    def __init__(self, comport, rew_time):
-        super(RewThread, self).__init__()
-        
-        self.comport = comport
-        self.rew_time = rew_time
-
-    def run(self): 
-        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
-        self.comport.write(rew_str)
-        time.sleep(.25)
-        run_str = [ord(r) for r in 'run\n']
-        self.comport.write(run_str)
-
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
     cursor = tables.Float32Col(shape=(10, 2))
     cursor_ids = tables.Float32Col(shape = (10, ))
     set_ix = tables.Float32Col(shape=(1, ))
-    targets_pressed = tables.Float32Col(shape=(5, ))
     cap_touch = tables.Float32Col()
     time = tables.Float32Col()
 
@@ -298,9 +281,8 @@ class SequenceGame(Widget):
                 self.error_timeout_time = error_timeout_opts[i]
         
         # Is this a test session?
-        self.testing = False # changed to save data
-        self.in_cage = False
-
+        self.testing = True
+        
         # How big are the targets?
         target_rad_opts = [.5, .75, .82, .91, 1.0, 1.125]
         for i, val in enumerate(task_in['targ_rad']):
@@ -497,9 +479,7 @@ class SequenceGame(Widget):
         
         # Initialize What Targets Have Been Pressed
         self.targets_pressed = []
-        self.set_rewarded = False
-        self.targ_completed = False
-
+        
         # Initialize FSM Dictionary
         self.FSM = dict()
         
@@ -511,7 +491,7 @@ class SequenceGame(Widget):
             non_rhtouch='RH_touch')#,touch_not_target='touch_error')
         
         self.FSM['targ_hold'] = dict(finish_targ_hold='targ_pressed', early_leave_target_hold = 'hold_error', 
-            stop=None, non_rhtouch='RH_touch') # removed targ_drag_out = 'drag_error'
+            targ_drag_out = 'drag_error', stop=None, non_rhtouch='RH_touch')
         
         self.FSM['targ_pressed'] = dict(all_targs_pressed = 'set_complete', targets_remain = 'set', incorrect_immediate_error = 'set_error', 
             stop=None, non_rhtouch='RH_touch')
@@ -532,7 +512,7 @@ class SequenceGame(Widget):
         try:
             self.reward_port = serial.Serial(port='COM4',
                 baudrate=115200)
-            #self.reward_port.close()
+            self.reward_port.close()
         except:
             pass
 
@@ -574,51 +554,51 @@ class SequenceGame(Widget):
         print(self.anytarg_rew)
         print(self.set_rew)
 
-        #try:
-        if self.testing:
-            pass
-
-        else:
-            import os
-            path = os.getcwd()
-            path = path.split('\\')
-            path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-            path_root = ''
-            for ip in path_data:
-                path_root += ip+'/'
-            p = path_root + 'data/'
-
-            # Check if this directory exists: 
-            if os.path.exists(p):
+        try:
+            if self.testing:
                 pass
+
             else:
-                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
+                import os
+                path = os.getcwd()
+                path = path.split('\\')
+                path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
+                path_root = ''
+                for ip in path_data:
+                    path_root += ip+'/'
+                p = path_root + 'data/'
+
+                # Check if this directory exists: 
                 if os.path.exists(p):
                     pass
                 else:
-                    os.mkdir(p)
-                    print('Making temp directory: ', p)
+                    p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
+                    if os.path.exists(p):
+                        pass
+                    else:
+                        os.mkdir(p)
+                        print('Making temp directory: ', p)
 
-            print ('')
-            print ('')
-            print('Data saving PATH: ', p)
-            print ('')
-            print ('')
-            self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-            if self.in_cage:
-                self.filename = self.filename+'_cage'
+                print ('')
+                print ('')
+                print('Data saving PATH: ', p)
+                print ('')
+                print ('')
+                self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+                if self.in_cage:
+                    self.filename = self.filename+'_cage'
 
-            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
-            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-            self.h5_table_row = self.h5_table.row
-            self.h5_table_row_cnt = 0
+                pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+                self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+                self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+                self.h5_table_row = self.h5_table.row
+                self.h5_table_row_cnt = 0
 
-            # Note in python 3 to open pkl files: 
-            #with open('xxxx_params.pkl', 'rb') as f:
-            #    data_params = pickle.load(f)
-        # except:
-        #     pass
+                # Note in python 3 to open pkl files: 
+                #with open('xxxx_params.pkl', 'rb') as f:
+                #    data_params = pickle.load(f)
+        except:
+            pass
     
     # Function for Closing the App
     def close_app(self):
@@ -740,9 +720,7 @@ class SequenceGame(Widget):
         cursor_id[:len(self.cursor_ids)] = self.cursor_ids
         self.h5_table_row['cursor_ids'] = cursor_id
 
-        tgs_press = np.zeros((5, ))
-        tgs_press[:len(self.targets_pressed)] = np.array(self.targets_pressed)
-        self.h5_table_row['targets_pressed'] = tgs_press # set_ix never set anywhere; 
+        self.h5_table_row['set_ix'] = self.set_ix
         self.h5_table_row['time'] = time.time() - self.t0
         self.h5_table_row['cap_touch'] = self.rhtouch_sensor
         self.h5_table_row.append()
@@ -830,7 +808,6 @@ class SequenceGame(Widget):
         # self.indicator_targ.color = (0., 0., 0., 0.)
         
         self.set_rewarded = False
-        self.targ_completed = False
     
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
@@ -875,15 +852,6 @@ class SequenceGame(Widget):
     # Start a new set
     def _start_set(self, **kwargs):
         self.touch = False ## We need to start with this being false or else if non-target touch tolerance is not infinity, the previous touch will carry over and cause an error
-        
-        ### also need to clear the cursor ids otherwise touching in the wrong place can yield old cursor positions
-        ### this also has the effect of preventing a subject from holding down both keys and having it be correct
-        ### they must press each target independently
-        self.cursor_ids = []
-        self.cursor = {}
-
-        self.targ_completed = False
-
         Window.clearcolor = (0., 0., 0., 1.)
         
         # Display outlines of all of the buttons
@@ -1091,16 +1059,12 @@ class SequenceGame(Widget):
     
     # Finish target hold?
     def finish_targ_hold(self, **kwargs):
-        if self.set_rewarded or self.targ_completed: 
-            return True
-        else:
-            return self.tht <= kwargs['ts']
+        return self.tht <= kwargs['ts']
     
     # Start Target Pressed
     def _start_targ_pressed(self, **kwargs):
         # Add the target that was touched to the list of targets that were pressed
         self.targets_pressed.append(self.target_touched)
-        self.targ_completed = True
         
         # Change the color of the target to same as background
         if self.target_touched == 1:
@@ -1225,17 +1189,14 @@ class SequenceGame(Widget):
     
     # Early leave from target --> hold error (buttons turn invisible)
     def early_leave_target_hold(self, **kwargs):
-        if self.set_rewarded or self.targ_completed: 
-            return False
-        else:
-            if self.target_touched == 1:
-                return not self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
-            elif self.target_touched == 2:
-                return not self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
-            elif self.num_targets > 2 and self.target_touched == 3:
-                return not self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
-            elif self.num_targets > 3 and self.target_touched == 4:
-                return not self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
+        if self.target_touched == 1:
+            return not self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
+        elif self.target_touched == 2:
+            return not self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
+        elif self.num_targets > 2 and self.target_touched == 3:
+            return not self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
+        elif self.num_targets > 3 and self.target_touched == 4:
+            return not self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
     
     def _start_hold_error(self, **kwargs):
         # self.target1.color = (0., 0., 0., 1.)
@@ -1247,22 +1208,19 @@ class SequenceGame(Widget):
     
     # Drag outside of target --> drag error (buttons turn invisible)
     def targ_drag_out(self, **kwargs):
-        if self.set_rewarded or self.targ_completed:
-            return False
-        else:
-            #touch = self.touch
-            #self.touch = True # This was uncommented --> meant that drag errors --> targ touch errors
-            if self.target_touched == 1:
-                stay_in = self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
-            elif self.target_touched == 2:
-                stay_in = self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
-            elif self.num_targets > 2 and self.target_touched == 3:
-                stay_in = self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
-            elif self.num_targets > 3 and self.target_touched == 4:
-                stay_in = self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
-            #self.touch = touch
-            return not stay_in
-        
+        touch = self.touch
+        self.touch = True
+        if self.target_touched == 1:
+            stay_in = self.check_if_cursors_in_targ(self.target1_position, self.target_rad)
+        elif self.target_touched == 2:
+            stay_in = self.check_if_cursors_in_targ(self.target2_position, self.target_rad)
+        elif self.num_targets > 2 and self.target_touched == 3:
+            stay_in = self.check_if_cursors_in_targ(self.target3_position, self.target_rad)
+        elif self.num_targets > 3 and self.target_touched == 4:
+            stay_in = self.check_if_cursors_in_targ(self.target4_position, self.target_rad)
+        self.touch = touch
+        return not stay_in
+    
     def _start_drag_error(self, **kwargs):
         # self.target1.color = (0., 0., 0., 1.)
         # self.target2.color = (0., 0., 0., 1.)
@@ -1336,16 +1294,13 @@ class SequenceGame(Widget):
     def run_small_rew(self, **kwargs):
         print('Run small reward')
         try:
-            ## 8/5/21 -- testing multithreading for reward delivery 
-            thread1 = RewThread(self.reward_port, self.anytarg_rew)
-            thread1.start()
-            # self.reward_port.open()
-            # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.anytarg_rew)+' sec\n']
-            # self.reward_port.write(rew_str)
-            # time.sleep(.25)
-            # run_str = [ord(r) for r in 'run\n']
-            # self.reward_port.write(run_str)
-            # self.reward_port.close()
+            self.reward_port.open()
+            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.anytarg_rew)+' sec\n']
+            self.reward_port.write(rew_str)
+            time.sleep(.25)
+            run_str = [ord(r) for r in 'run\n']
+            self.reward_port.write(run_str)
+            self.reward_port.close()
         except:
             pass
 
@@ -1362,15 +1317,13 @@ class SequenceGame(Widget):
 
             ### To trigger reward make sure reward is > 0:
             if self.set_rew > 0:
-                thread1 = RewThread(self.reward_port, self.set_rew)
-                thread1.start()
-                # self.reward_port.open()
-                # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.set_rew)+' sec\n']
-                # self.reward_port.write(rew_str)
-                # time.sleep(.25)
-                # run_str = [ord(r) for r in 'run\n']
-                # self.reward_port.write(run_str)
-                # self.reward_port.close()
+                self.reward_port.open()
+                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.set_rew)+' sec\n']
+                self.reward_port.write(rew_str)
+                time.sleep(.25)
+                run_str = [ord(r) for r in 'run\n']
+                self.reward_port.write(run_str)
+                self.reward_port.close()
         except:
             pass
 
