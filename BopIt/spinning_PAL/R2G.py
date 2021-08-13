@@ -43,6 +43,7 @@ class Data(tables.IsDescription):
     fsr2 = tables.Float32Col()
     wheel = tables.Float32Col()
     beam = tables.Float32Col()
+    button = tables.Float32Col()
     start_led = tables.Float32Col()
     start_button = tables.Float32Col()
     trial_type = tables.StringCol(24)
@@ -220,7 +221,7 @@ class R2Game(Widget):
 
         ### Assumes rest == 0 ###
         trials_position_list = [98, 163, 228, 33]
-        self.trial_num = -1; 
+        self.trial_num = 0; 
         self.trials_list_valid = []
         for i, val in enumerate(trials_active['trials']):
             if val: 
@@ -228,6 +229,7 @@ class R2Game(Widget):
 
         #### Generate trials list ####
         self.get_trials_order()
+        self.current_trial = self.generated_trials[0]
 
         # State transition matrix: 
         self.FSM = dict()
@@ -270,7 +272,7 @@ class R2Game(Widget):
             pass
 
         try:
-            self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
+            self.cam_trig_port = serial.Serial(port='COM', baudrate=9600)
             time.sleep(3.)
             # Say hello: 
             self.cam_trig_port.write('a'.encode())
@@ -297,7 +299,7 @@ class R2Game(Widget):
             only_start = self.only_start, reward_fcn=reward_fcn, use_cap=self.use_cap_not_button)
 
         ## Open task arduino - IR sensor, button, wheel position ### 
-        self.task_ard = serial.Serial(port='COM3')
+        self.task_ard = serial.Serial('COM6', baudrate=115200)
         
         if self.testing:
             pass
@@ -423,19 +425,20 @@ class R2Game(Widget):
         self.close_app()
 
     def update(self, ts):
+        print(self.state)
         self.state_length = time.time() - self.state_start
         
         # Read from task arduino: 
         ser = self.task_ard.flushInput()
         _ = self.task_ard.readline()
         port_read = self.task_ard.readline()
-        port_splits = port_read.decode('ascii').split('/t')
+        port_splits = port_read.decode('ascii').split('\t')
 
         if len(port_splits) != 4:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
             port_read = self.task_ard.readline()
-            port_splits = port_read.decode('ascii').split('/t')  
+            port_splits = port_read.decode('ascii').split('\t')  
 
         ### Beam / FSR 1 / FSR 2 / current count position           
         self.beam = int(port_splits[0])
@@ -546,24 +549,25 @@ class R2Game(Widget):
         self.current_trial = self.generated_trials[self.trial_num]
 
         #### close the door 
-        word = 'd'+struct.pack('<H', 0)
+        word = b'd'+struct.pack('<H', 0)
         self.task_ard.write(word)
 
     def _start_grasp_trial_start(self, **kwargs):
         self.start_grasp = time.time(); 
         
         ### Start movign the wheel to the correct slot ### 
-        word = 'd'+struct.pack('<H', self.current_trial[1])
+        word = b'd'+struct.pack('<H', self.current_trial[1])
         self.task_ard.write(word)
 
     def door_opened(self, **kwargs): 
         ### Is the wheel in the right spot ?? 
-        return self.wheel == self.current_trial[1]
+        return self.wheel_pos == self.current_trial[1]
 
     def end_ITI(self, **kwargs):
-        if self.wheel == 0: ## only start next trial if wheel is in the rest position 
+        if np.abs(self.wheel_pos) < 3: ## only start next trial if wheel is in the rest position 
             return kwargs['ts'] > self.ITI
         else:
+            print(self.wheel_pos)
             return False
 
     def _start_vid_trig(self, **kwargs):
@@ -621,7 +625,7 @@ class R2Game(Widget):
         if self.reward_started:
             return False
         else:
-            if self.beam == 1:
+            if self.beam == 0:
                 return True
             else:
                 return False
