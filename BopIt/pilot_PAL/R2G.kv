@@ -401,6 +401,18 @@
                     id: four_six_hold
                     group: 'hold_time'
 
+                Label: 
+                    text: '0.6-0.8 sec'
+                CheckBox: 
+                    id: six_eight_hold
+                    group: 'hold_time'
+
+                Label: 
+                    text: '0.4-0.8 sec'
+                CheckBox: 
+                    id: four_eight_hold
+                    group: 'hold_time'
+
 
                 Label:
                     text: ''
@@ -643,7 +655,9 @@
                     dict(rew_manual=rew_noauto_chk.active, rew_start=rew_anytouch_chk.active, rew_start_and_grasp=rew_anytouch_pls_targ_chk.active, rew_grasp=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]), 
                     dict(test=[testing.active, monk_time.active]), 
-                    dict(start_hold=[zero_hold.active, hund_hold.active, two_hund_hold.active, three_hund_hold.active, four_hund_hold.active, four_six_hold.active], grasp_hold = [g_zero_sec.active, g_eighteen_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_half_sec.active]), 
+                    dict(start_hold=[zero_hold.active, hund_hold.active, two_hund_hold.active, three_hund_hold.active, four_hund_hold.active, four_six_hold.active, six_eight_hold.active, four_eight_hold.active], 
+
+                    grasp_hold = [g_zero_sec.active, g_eighteen_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_half_sec.active]), 
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
                     dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]),
                     dict(use_cap=[False, True]), 

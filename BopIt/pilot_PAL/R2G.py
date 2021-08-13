@@ -94,7 +94,7 @@ class R2Game(Widget):
                 self.use_cap_not_button = cap[i]
 
         #button_holdz = ['.12-.2', '.15-.25', '.2-.3', '.25-.45', '.2-.5']
-        button_holdz = [0., 0.1, 0.2, 0.3, 0.4, '0.4-0.6']
+        button_holdz = [0., 0.1, 0.2, 0.3, 0.4, '0.4-0.6', '0.6-0.8', '0.4-0.8']
         grasp_holdz = [0., .15, .25, .35, .50]
 
         for i, val in enumerate(hold['start_hold']):
