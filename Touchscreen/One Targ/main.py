@@ -530,13 +530,6 @@ class COGame(Widget):
         self.rew_cnt += 1
         self.small_rew_cnt += 1
         
-        # Get the button values
-        ser = self.button_ard.flushInput()
-        _ = self.button_ard.readline()
-        port_read = self.button_ard.readline()
-        port_read = port_read.decode('ascii')
-        port_splits = port_read.split('\t')
-        
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
             kw = dict(ts=self.state_length)
