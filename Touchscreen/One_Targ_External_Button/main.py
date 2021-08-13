@@ -493,7 +493,7 @@ class COGame(Widget):
     
     
         # Open button arduino port
-        self.button_ard = serial.Serial(port='/dev/cu.usbmodem143201', baudrate=9600)
+        self.button_ard = serial.Serial(port='COM3', baudrate=9600)
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
