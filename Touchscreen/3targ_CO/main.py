@@ -186,13 +186,64 @@ class COGame(Widget):
             self.skip_juice = True
         else:
             self.skip_juice = False
-
+        
+        
+        # NUDGE TARGET X AND Y
+        nudge_x_opts = [-6, -4, -2, 0, 2, 4, 6]    
+        for i, val in enumerate(nudge_x['nudge_x']):
+            if val:
+                self.nudge_x = nudge_x_opts[i]
+        nudge_y_opts = [-3, -2, -1, 0, 1, 2, 3]    
+        for i, val in enumerate(nudge_y['nudge_y']):
+            if val:
+                self.nudge_y = nudge_y_opts[i]
+        
+        # TARGET RADIUS
         target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 2.25, 3.0]
         for i, val in enumerate(task_in['targ_rad']):
             if val:
                 self.periph_target_rad = target_rad_opts[i]
                 self.center_target_rad = target_rad_opts[i]
+                
+        # TARGET 1 POSITION
+        target1_pos_opts = ['upper_left', 'lower_left', 'upper_right', 'lower_right']
+        for i, val in enumerate(task_in['targ1_pos']):
+            if val:
+                self.periph_target_pos_str = target1_pos_opts[i]
+                
+        if self.periph_target_pos_str == 'upper_right':
+            angle = 0.25*np.pi
+        elif self.periph_target_pos_str == 'lower_right':
+            angle = 1.75*np.pi
+        elif self.periph_target_pos_str == 'lower_left':
+            angle = 1.25*np.pi
+        elif self.periph_target_pos_str == 'upper_left':
+            angle = 0.75*np.pi
 
+        target_distance = 6.
+        
+        self.target1_position = np.array([np.cos(angle)*target_distance+self.nudge_x, np.sin(angle)*target_distance+self.nudge_y])
+        
+        self.periph_target_position = self.target1_position
+        self.target_index = 1
+                
+        # TARGET 2 POSITION
+        target2_pos_opts = ['left', 'right', 'above', 'below']
+        for i, val in enumerate(task_in['targ2_pos']):
+            if val:
+                self.target2_pos_str = target2_pos_opts[i]
+        
+        self.target2_position = np.array([np.cos(angle)*target_distance+self.nudge_x, np.sin(angle)*target_distance+self.nudge_y])
+        if self.target2_pos_str == 'left':
+            self.target2_position[0] = self.target2_position[0]-2*self.periph_target_rad
+        elif self.target2_pos_str == 'right':
+            self.target2_position[0] = self.target2_position[0]+2*self.periph_target_rad
+        elif self.target2_pos_str == 'above':
+            self.target2_position[1] = self.target2_position[1]+2*self.periph_target_rad
+        elif self.target2_pos_str == 'below':
+            self.target2_position[1] = self.target2_position[1]-2*self.periph_target_rad
+        
+        # ANIMAL NAME
         for i, (nm, val) in enumerate(animal_names_dict.items()):
             if val:
                 animal_name = nm
@@ -227,18 +278,6 @@ class COGame(Widget):
                     self.cht = (float(mn)+float(mx))*.5
                 else:
                     self.cht = holdz[i]
-                    
-        
-        nudge_x_opts = [-6, -4, -2, 0, 2, 4, 6]    
-        for i, val in enumerate(nudge_x['nudge_x']):
-            if val:
-                self.nudge_x = nudge_x_opts[i]
-        
-        nudge_y_opts = [-3, -2, -1, 0, 1, 2, 3]    
-        for i, val in enumerate(nudge_y['nudge_y']):
-            if val:
-                self.nudge_y = nudge_y_opts[i]
-        
         
         try:
             pygame.mixer.init()    
@@ -336,13 +375,7 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
 
-        self.target_list = generatorz(self.target_distance, self.nudge_dist, self.generator_kwarg)
-        self.target_list[:, 0] = self.target_list[:, 0] + self.nudge_x
-        self.target_list[:, 1] = self.target_list[:, 1] + self.nudge_y
-        self.target_index = 0
         self.repeat = False
-
-        self.periph_target_position = self.target_list[self.target_index, :]
 
         self.FSM = dict()
         self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
@@ -355,7 +388,7 @@ class COGame(Widget):
 
         self.FSM['target'] = dict(touch_target = 'targ_hold', target_timeout='timeout_error', stop=None,
             anytouch='rew_anytouch', non_rhtouch='RH_touch')#,touch_not_target='touch_error')
-        self.FSM['targ_hold'] = dict(finish_targ_hold='reward', early_leave_target_hold = 'hold_error',
+        self.FSM['targ_hold'] = dict(finish_targ2_hold='reward', finish_targ1_hold='target', early_leave_target_hold = 'hold_error',
          targ_drag_out = 'drag_error', stop=None, non_rhtouch='RH_touch')
         self.FSM['reward'] = dict(end_reward = 'ITI', stop=None, non_rhtouch='RH_touch')
 
@@ -394,11 +427,12 @@ class COGame(Widget):
             self.cam_trig_port.write('1'.encode())
         except:
             pass
-
+        
         # save parameters: 
         d = dict(animal_name=animal_name, center_target_rad=self.center_target_rad,
             periph_target_rad=self.periph_target_rad, target_structure = generatorz.__name__, 
-            target_list = self.target_list, 
+            target1_position = self.target1_position, 
+            target2_position = self.target2_position, 
             ITI_mean=self.ITI_mean, ITI_std = self.ITI_std, ch_timeout=self.ch_timeout, 
             cht=self.cht, reward_time_small=self.reward_for_center[1],
             reward_time_big=self.reward_for_targtouch[1],
@@ -560,6 +594,8 @@ class COGame(Widget):
                     if hasattr(self, start_state_fn_name):
                         start_state_fn = getattr(self, start_state_fn_name)
                         start_state_fn()
+                
+                break
             else:
                 while_state_fn_name = "_while_%s" % self.state
                 if hasattr(self, while_state_fn_name):
@@ -718,6 +754,9 @@ class COGame(Widget):
         self.exit_target2.color = (.15, .15, .15, 1)
         self.periph_target.color = (0., 0., 0., 0.) ### Make peripheral target alpha = 0 so doesn't obscure 
         self.indicator_targ.color = (.25, .25, .25, 1.)
+        
+        # Reset target index back to 1
+        self.target_index = 1
 
     def _start_center_hold(self, **kwargs):
         self.center_target.color = (0., 1., 0., 1.)
@@ -756,12 +795,11 @@ class COGame(Widget):
     def _start_target(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
         self.center_target.color = (0., 0., 0., 0.)
-
-        if self.repeat is False:
-            self.periph_target_position = self.target_list[self.target_index, :]
-            self.target_index += 1
-            print(self.periph_target_position)
-            print(self.target_index)
+        
+        if self.target_index == 1:
+            self.periph_target_position = self.target1_position
+        elif self.target_index == 2:
+            self.periph_target_position = self.target2_position
 
         self.periph_target.move(self.periph_target_position)
         self.periph_target.color = (1., 1., 0., 1.)
@@ -772,6 +810,7 @@ class COGame(Widget):
         if self.first_target_attempt:
             self.first_target_attempt_t0 = time.time();
             self.first_target_attempt = False
+            
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
@@ -921,8 +960,24 @@ class COGame(Widget):
             self.repeat = False
             return True
 
-    def finish_targ_hold(self, **kwargs):
-        return self.tht <= kwargs['ts']
+    def finish_targ1_hold(self, **kwargs):
+        if self.target_index == 1:
+            if self.tht <= kwargs['ts']:
+                # Play a small reward tone
+                sound = SoundLoader.load('reward2.wav')
+                sound.play()
+                self.target_index = 2
+                return True
+            else:
+                return False
+        else:
+            return False
+        
+    def finish_targ2_hold(self, **kwargs):
+        if self.target_index == 2:
+            return self.tht <= kwargs['ts']
+        else:
+            return False
 
     def early_leave_target_hold(self, **kwargs):
         return not self.check_if_cursors_in_targ(self.periph_target_position, self.periph_target_rad)
