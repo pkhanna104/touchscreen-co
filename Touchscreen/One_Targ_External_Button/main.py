@@ -571,7 +571,7 @@ class COGame(Widget):
         fsr2 = int(port_read[i_slash+1:])
         
         # Determine if the button was pressed or not
-        if fsr1 > 10 or fsr2 > 575:
+        if fsr1 > 10 or fsr2 > 650:
             self.button_pressed = True
             # print('Button Pressed')
         else:
