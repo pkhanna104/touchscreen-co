@@ -167,8 +167,8 @@ class COGame(Widget):
             if val:
                 big_rew = big_rew_opts[i]
 
-
-        if rew_in['button_rew']:
+        import pdb; pdb.set_trace()
+        if button_rew > 0.0:
             self.reward_for_button = [True, button_rew]
         else:
             self.reward_for_button = [False, 0]
@@ -493,7 +493,11 @@ class COGame(Widget):
     
     
         # Open button arduino port
-        self.button_ard = serial.Serial(port='COM3', baudrate=9600)
+        try:
+            self.is_button_ard = True
+            self.button_ard = serial.Serial(port='COM3', baudrate=9600)
+        except:
+            self.is_button_ard = False
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
@@ -561,22 +565,25 @@ class COGame(Widget):
         self.rew_cnt += 1
         self.small_rew_cnt += 1
         
-        # Get the button values
-        ser = self.button_ard.flushInput()
-        _ = self.button_ard.readline()
-        port_read = self.button_ard.readline()
-        port_read = port_read.decode('ascii')
-        i_slash = port_read.find('/')
-        fsr1 = int(port_read[0:i_slash])
-        fsr2 = int(port_read[i_slash+1:])
+        if self.is_button_ard:
+            # Get the button values
+            ser = self.button_ard.flushInput()
+            _ = self.button_ard.readline()
+            port_read = self.button_ard.readline()
+            port_read = port_read.decode('ascii')
+            i_slash = port_read.find('/')
+            fsr1 = int(port_read[0:i_slash])
+            fsr2 = int(port_read[i_slash+1:])
         
-        # Determine if the button was pressed or not
-        if fsr1 > 10 or fsr2 > 650:
-            self.button_pressed = True
-            # print('Button Pressed')
+            # Determine if the button was pressed or not
+            if fsr1 > 10 or fsr2 > 650:
+                self.button_pressed = True
+                # print('Button Pressed')
+            else:
+                self.button_pressed = False
+                # print('Button NOT Pressed')
         else:
             self.button_pressed = False
-            # print('Button NOT Pressed')
             
         
         
@@ -720,6 +727,7 @@ class COGame(Widget):
         return kwargs['ts'] > self.ITI
 
     def _start_vid_trig(self, **kwargs):
+        import pdb; pdb.set_trace()
         if self.trial_counter == 0:
             time.sleep(1.)
         try:    
