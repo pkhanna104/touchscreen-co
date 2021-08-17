@@ -232,16 +232,21 @@ class COGame(Widget):
         for i, val in enumerate(task_in['targ2_pos']):
             if val:
                 self.target2_pos_str = target2_pos_opts[i]
+                
+        targ1_to_targ2_dist_opts = [0, 1, 2, 3, 4, 5]
+        for i, val in enumerate(task_in['targ1_to_targ2_dist']):
+            if val:
+                self.targ1_to_targ2_dist = targ1_to_targ2_dist_opts[i]
         
         self.target2_position = np.array([np.cos(angle)*target_distance+self.nudge_x, np.sin(angle)*target_distance+self.nudge_y])
         if self.target2_pos_str == 'left':
-            self.target2_position[0] = self.target2_position[0]-2*self.periph_target_rad
+            self.target2_position[0] = self.target2_position[0]-2*self.periph_target_rad-self.targ1_to_targ2_dist
         elif self.target2_pos_str == 'right':
-            self.target2_position[0] = self.target2_position[0]+2*self.periph_target_rad
+            self.target2_position[0] = self.target2_position[0]+2*self.periph_target_rad+self.targ1_to_targ2_dist
         elif self.target2_pos_str == 'above':
-            self.target2_position[1] = self.target2_position[1]+2*self.periph_target_rad
+            self.target2_position[1] = self.target2_position[1]+2*self.periph_target_rad+self.targ1_to_targ2_dist
         elif self.target2_pos_str == 'below':
-            self.target2_position[1] = self.target2_position[1]-2*self.periph_target_rad
+            self.target2_position[1] = self.target2_position[1]-2*self.periph_target_rad-self.targ1_to_targ2_dist
         
         # ANIMAL NAME
         for i, (nm, val) in enumerate(animal_names_dict.items()):
