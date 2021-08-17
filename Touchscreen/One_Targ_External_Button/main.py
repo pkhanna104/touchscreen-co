@@ -42,9 +42,6 @@ class Data(tables.IsDescription):
 class COGame(Widget):
     center = ObjectProperty(None)
     target = ObjectProperty(None)
-    
-    nudge_x = 0.
-    # nudge_y = -2.
 
     # Time to wait after starting the video before getting to the center target display. 
     pre_start_vid_ts = 0.1
@@ -155,6 +152,11 @@ class COGame(Widget):
             if val:
                 self.target_timeout_time = targ_timeout_opts[i]
 
+        button_rew_opts = [0., .1, .3, .5]
+        for i, val in enumerate(rew_in['button_rew']):
+            if val:
+                button_rew = button_rew_opts[i]
+        
         small_rew_opts = [0., .1, .3, .5]
         for i, val in enumerate(rew_in['small_rew']):
             if val:
@@ -164,6 +166,12 @@ class COGame(Widget):
         for i, val in enumerate(rew_in['big_rew']):
             if val:
                 big_rew = big_rew_opts[i]
+
+        import pdb; pdb.set_trace()
+        if button_rew > 0.0:
+            self.reward_for_button = [True, button_rew]
+        else:
+            self.reward_for_button = [False, 0]
 
 
         if rew_in['rew_anytouch']:
@@ -207,6 +215,17 @@ class COGame(Widget):
 
         holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
         
+        
+        self.button_hold_time_type = None
+        for i, val in enumerate(hold['button_hold']):
+            if val:
+                if type(holdz[i]) is str:
+                    mx, mn = holdz[i].split('-')
+                    self.button_hold_time_type = holdz[i]
+                    self.button_hold_time =  (float(mn)+float(mx))*.5
+                else:
+                    self.button_hold_time = holdz[i]
+        
         self.cht_type = None
         self.tht_type = None
 
@@ -233,7 +252,7 @@ class COGame(Widget):
         for i, val in enumerate(nudge_x['nudge_x']):
             if val:
                 self.nudge_x = nudge_x_opts[i]
-        
+                    
         nudge_y_opts = [-3, -2, -1, 0, 1, 2, 3]    
         for i, val in enumerate(nudge_y['nudge_y']):
             if val:
@@ -348,8 +367,11 @@ class COGame(Widget):
         self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
         self.FSM['vid_trig'] = dict(rhtouch='target', stop=None)
         
+        
+        
         if self.use_center:
-            self.FSM['vid_trig'] = dict(end_vid_trig='center', stop=None)
+            self.FSM['vid_trig'] = dict(end_vid_trig='button', stop=None)
+            self.FSM['button'] = dict(button_held='center', stop=None)
             self.FSM['center'] = dict(touch_center='center_hold', center_timeout='timeout_error', non_rhtouch='RH_touch',stop=None)
             self.FSM['center_hold'] = dict(finish_center_hold='target', early_leave_center_hold='hold_error', non_rhtouch='RH_touch', stop=None)
 
@@ -468,6 +490,14 @@ class COGame(Widget):
             #    data_params = pickle.load(f)
         # except:
         #     pass
+    
+    
+        # Open button arduino port
+        try:
+            self.is_button_ard = True
+            self.button_ard = serial.Serial(port='COM3', baudrate=9600)
+        except:
+            self.is_button_ard = False
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
@@ -534,6 +564,28 @@ class COGame(Widget):
         self.state_length = time.time() - self.state_start
         self.rew_cnt += 1
         self.small_rew_cnt += 1
+        
+        if self.is_button_ard:
+            # Get the button values
+            ser = self.button_ard.flushInput()
+            _ = self.button_ard.readline()
+            port_read = self.button_ard.readline()
+            port_read = port_read.decode('ascii')
+            i_slash = port_read.find('/')
+            fsr1 = int(port_read[0:i_slash])
+            fsr2 = int(port_read[i_slash+1:])
+        
+            # Determine if the button was pressed or not
+            if fsr1 > 10 or fsr2 > 650:
+                self.button_pressed = True
+                # print('Button Pressed')
+            else:
+                self.button_pressed = False
+                # print('Button NOT Pressed')
+        else:
+            self.button_pressed = False
+            
+        
         
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
@@ -675,6 +727,7 @@ class COGame(Widget):
         return kwargs['ts'] > self.ITI
 
     def _start_vid_trig(self, **kwargs):
+        import pdb; pdb.set_trace()
         if self.trial_counter == 0:
             time.sleep(1.)
         try:    
@@ -710,7 +763,36 @@ class COGame(Widget):
         # if x:
         #     self.repeat = True
         return x
-
+    
+    def _start_button(self, **kwargs):
+        Window.clearcolor = (0., 0., 0., 1.)
+        self.center_target.color = (0., 0., 0., 0.)
+        self.exit_target1.color = (.15, .15, .15, 1)
+        self.exit_target2.color = (.15, .15, .15, 1)
+        self.periph_target.color = (0., 0., 0., 0.) ### Make peripheral target alpha = 0 so doesn't obscure 
+        self.indicator_targ.color = (.25, .25, .25, 1.)
+        self.button_pressed_prev = False
+        
+    def button_held(self, **kwargs):
+        button_pressed_prev = self.button_pressed_prev
+        self.button_pressed_prev = self.button_pressed
+        if self.button_pressed:
+            if button_pressed_prev:
+                if time.time() - self.t_button_hold_start > self.button_hold_time:
+                    # if the button has been held down long enough
+                    if self.reward_for_button[0]:
+                        self.run_button_rew()
+                    return True
+                else:
+                    return False
+            else:
+                # this is the first cycle that the button has been pressed for
+                self.t_button_hold_start = time.time()
+                return False
+        else:
+            return False
+        
+        
     def _start_center(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
         self.center_target.color = (1., 1., 0., 1.)
@@ -849,7 +931,29 @@ class COGame(Widget):
             pass
 
         #self.repeat = True
+        
+    def run_button_rew(self, **kwargs):
+        try:
+            if np.logical_or(self.reward_for_anytouch[0], self.reward_for_center[0]):
+                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+                sound = SoundLoader.load('reward2.wav')
+                sound.play()
 
+                ### To trigger reward make sure reward is > 0:
+                if np.logical_or(self.reward_for_button[0], self.reward_for_button[1] > 0):
+
+                    self.reward_port.open()
+                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_button[1])+' sec\n']
+                    self.reward_port.write(rew_str)
+                    time.sleep(.25)
+                    run_str = [ord(r) for r in 'run\n']
+                    self.reward_port.write(run_str)
+                    self.reward_port.close()
+        except:
+            pass
+
+        #self.repeat = True
+        
     def end_reward(self, **kwargs):
         self.indicator_txt_color = (1.,1., 1., 1.)
         if self.use_white_screen:
