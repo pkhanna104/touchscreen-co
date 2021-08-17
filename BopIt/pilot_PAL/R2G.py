@@ -82,7 +82,7 @@ class R2Game(Widget):
 
     def init(self, animal_names_dict=None, rew_in=None, rew_var=None,
         test=None, hold=None, autoquit=None,
-        grasp_to=None, use_cap=None, tsk_opt=None):
+        grasp_to=None, use_cap=None, tsk_opt=None, jackpot_opt=None):
 
         self.h5_table_row_cnt = 0
         self.idle = False
@@ -191,6 +191,24 @@ class R2Game(Widget):
         for i, val in enumerate(grasp_to['gto']):
             if val:
                 self.grasp_timeout_time = grasp_tos[i]
+
+        self.jackpot_trials = []
+        jackpot_opts = [10**10, 7, 10, 15, '7-15']
+        for i, val in enumerate(jackpot_opt['jackpot']):
+            if val: 
+                if type(jackpot_opts[i]) is str: 
+                    low, high = jackpot_opts[i].split('-')
+                    n_trls = 0
+                    while n_trls < 10000:
+                        r_i = np.random.randint(int(low), int(high))
+                        jackpot_trials.append(n_trls + r_i)
+                        n_trls += r_i
+
+                elif type(jackpot_opts[i]) is int: 
+                    self.jackpot_trials = list(np.arange(jackpot_opts[i], 10000, jackpot_opts[i]))
+
+                self.jackpot = jackpot_opts[i]
+                self.next_jackpot = -1
 
         # Preload reward buttons: 
         self.reward1 = SoundLoader.load('reward1.wav')
@@ -703,7 +721,13 @@ class R2Game(Widget):
                     print('in reward: ')
                     if not self.skip_juice:
                         if self.reward_generator[self.trial_counter] > 0:
-                            thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
+                            if int(self.big_reward_cnt) in self.jackpot_trials:
+                                print('INSIDE JACKPOT !!!!')
+                                print('Trial %d'%self.trial_counter)
+                                print('Rew # %d'%self.big_reward_cnt)
+                                thread1 = RewThread(self.reward_port, 3.*self.reward_generator[self.trial_counter])
+                            else:
+                                thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
                             thread1.start()
 
                             # self.reward_port.open()
@@ -723,6 +747,7 @@ class R2Game(Widget):
 
         self.trial_counter += 1
         self.big_reward_cnt += 1
+
         
     def _start_rew_start(self, **kwargs):
         self.small_reward_cnt += 1

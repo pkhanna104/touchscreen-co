@@ -128,12 +128,12 @@
                 Label: 
                     text: 'Both Button and Grip'
                     fontsize: 28
-                    halign: 'center'
-                    active: True                        
+                    halign: 'center'                  
                 
                 CheckBox: 
                     group: 'tsk'
                     id: tsk_both
+                    active: True
                    
                 Label:
                     text: ''
@@ -308,34 +308,43 @@
                     fontsize: 50
 
                 Label: 
-                    text: 'Reward Variability'
+                    text: 'Jackpot Rewards'
                     color: 1, 1, 0, 1
 
                 Label: 
-                    text: 'Reward All'
+                    text: 'Never'
                 CheckBox:
-                    id: rew_all
+                    id: jackpot_never
                     group: 'rew_var'
                     active: True
 
                 Label: 
-                    text: 'Reward 50% '
+                    text: 'Every 7 rew'
 
                 CheckBox:
-                    id: rew_50
+                    id: jackpot_7
                     group: 'rew_var'
 
                 Label: 
-                    text: 'Reward 33% w/ 10% doubled'
+                    text: 'Every 10 rew'
 
                 CheckBox:
-                    id: rew_30
+                    id: jackpot_10
                     group: 'rew_var'
 
 
                 Label:
-                    text: ''
-                    fontsize: 50
+                    text: 'Every 15 rew'
+                CheckBox: 
+                    id: jackpot_15
+                    group: 'rew_var'
+
+                Label: 
+                    text: 'Rand 7-15 rew'
+                CheckBox: 
+                    id: jackpot_rand
+                    group: 'rew_var'
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -654,7 +663,7 @@
                     root.current = 'game_screen'
                     game.init(dict(haun=chk_h.active, sand=chk_sand.active,sabo=chk_sabo.active), 
                     dict(rew_manual=rew_noauto_chk.active, rew_start=rew_anytouch_chk.active, rew_start_and_grasp=rew_anytouch_pls_targ_chk.active, rew_grasp=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
-                    dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]), 
+                    dict(rew_var=[True, False, False]), 
                     dict(test=[testing.active, monk_time.active]), 
                     dict(start_hold=[zero_hold.active, hund_hold.active, two_hund_hold.active, three_hund_hold.active, four_hund_hold.active, four_six_hold.active, six_eight_hold.active, four_eight_hold.active], 
 
@@ -662,7 +671,9 @@
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
                     dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]),
                     dict(use_cap=[False, True]), 
-                    dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]))
+                    dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]), 
+                    dict(jackpot=[jackpot_never.active, jackpot_7.active, jackpot_10.active,
+                    jackpot_15.active, jackpot_rand.active]))
 
                     Clock.schedule_interval(game.update, 1.0 / 30.0)
             Label:
