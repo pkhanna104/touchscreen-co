@@ -876,7 +876,7 @@
                     fontsize: 50 
             
             BoxLayout:
-                id: nudge_y
+                id: screen_top
                 orientation: 'horizontal'
 
                 Label:
@@ -896,51 +896,51 @@
                     text: ''
                     fontsize: 50
                 Label: 
-                    text: 'Nudge Y'
+                    text: 'Lower Screen Top By'
                     color: 1, 1, 0, 1
-
-                Label: 
-                    text: '-6 cm'
-                CheckBox:
-                    id: nudge_y_neg3
-                    group: 'nudge_y'
-                    
-                Label: 
-                    text: '-5 cm'
-                CheckBox:
-                    id: nudge_y_neg2
-                    group: 'nudge_y'
-
-                Label: 
-                    text: '-4 cm'
-                CheckBox:
-                    id: nudge_y_neg1
-                    group: 'nudge_y'
-
-                Label: 
-                    text: '-3 cm'
-                CheckBox:
-                    id: nudge_y_zero
-                    group: 'nudge_y'
-                    active: True
-
-                Label: 
-                    text: '-2 cm'
-                CheckBox:
-                    id: nudge_y_pos1
-                    group: 'nudge_y'
-                    
-                Label: 
-                    text: '-1 cm'
-                CheckBox:
-                    id: nudge_y_pos2
-                    group: 'nudge_y'
 
                 Label: 
                     text: '0 cm'
                 CheckBox:
-                    id: nudge_y_pos3
-                    group: 'nudge_y'
+                    id: screen_top_zero
+                    group: 'screen_top'
+                    
+                Label: 
+                    text: '1 cm'
+                CheckBox:
+                    id: screen_top_neg1
+                    group: 'screen_top'
+                
+                Label: 
+                    text: '2 cm'
+                CheckBox:
+                    id: screen_top_neg2
+                    group: 'screen_top'
+                    
+                Label: 
+                    text: '3 cm'
+                CheckBox:
+                    id: screen_top_neg3
+                    group: 'screen_top'
+                    active: True
+                
+                Label: 
+                    text: '4 cm'
+                CheckBox:
+                    id: screen_top_neg4
+                    group: 'screen_top'
+                  
+                Label: 
+                    text: '5 cm'
+                CheckBox:
+                    id: screen_top_neg5
+                    group: 'screen_top'
+                    
+                Label: 
+                    text: '6 cm'
+                CheckBox:
+                    id: screen_top_neg6
+                    group: 'screen_top'
 
                 Label:
                     text: ''
@@ -1039,7 +1039,7 @@
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
                     dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]),
                     dict(nudge_x=[nudge_x_neg6.active, nudge_x_neg4.active, nudge_x_neg2.active, nudge_x_zero.active, nudge_x_pos2.active, nudge_x_pos4.active, nudge_x_pos6.active]),
-                    dict(nudge_y=[nudge_y_neg3.active, nudge_y_neg2.active, nudge_y_neg1.active, nudge_y_zero.active, nudge_y_pos1.active, nudge_y_pos2.active, nudge_y_pos3.active]))
+                    dict(screen_top=[screen_top_neg6.active, screen_top_neg5.active, screen_top_neg4.active, screen_top_neg3.active, screen_top_neg2.active, screen_top_neg1.active, screen_top_zero.active]))
 
             Label:
                 text: ''
