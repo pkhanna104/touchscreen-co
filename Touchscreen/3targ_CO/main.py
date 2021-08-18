@@ -16,7 +16,7 @@ from sys import platform
 
 
 Config.set('graphics', 'resizable', False)
-Config.set('graphics', 'fullscreen', 'auto')
+# Config.set('graphics', 'fullscreen', 'auto')
 if platform == 'darwin': # we are on a Mac
     # This probably means that we are testing on a personal laptop
     
@@ -41,8 +41,8 @@ elif platform == 'win32':
         pix_per_cm = 84. # we get this automatically now but here it is anyway
     import winsound
 
-# Config.set('graphics', 'width', str(fixed_window_size[0]))
-# Config.set('graphics', 'height', str(fixed_window_size[1]))
+Config.set('graphics', 'width', str(fixed_window_size[0]))
+Config.set('graphics', 'height', str(fixed_window_size[1]))
 
 import time
 import numpy as np
@@ -1159,6 +1159,8 @@ class COApp(App):
             Window.size = (1792, 1120)
             Window.left = (screenx - 1792)/2
             Window.top = (screeny - 1120)/2
+            Window.fullscreen = 'auto'
+
         elif platform =='win32':
             from win32api import GetSystemMetrics
             screenx = GetSystemMetrics(0)
@@ -1166,6 +1168,7 @@ class COApp(App):
             Window.size = (1800, 1000)
             Window.left = (screenx - 1800)/2
             Window.top = (screeny - 1000)/2
+        
         return Manager()
 
 def cm2pix(pos_cm, fixed_window_size_cm=fixed_window_size_cm):
