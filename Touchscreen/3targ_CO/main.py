@@ -231,7 +231,7 @@ class COGame(Widget):
                 self.nudge_x = nudge_x_opts[i]
         
         # WHERE TO CONSIDER THE TOP OF THE SCREEN (HOW MUCH TO SHRINK IT DOWN BY)
-        screen_top_opts = [-6, -5, -4, -3, -2, -1, 0]    
+        screen_top_opts = [-12, -10, -8, -6, -4, -2, 0]    
         for i, val in enumerate(screen_top['screen_top']):
             if val:
                 self.screen_top = screen_top_opts[i]
@@ -292,7 +292,7 @@ class COGame(Widget):
             if val:
                 self.target2_pos_str = target2_pos_opts[i]
                 
-        targ1_to_targ2_dist_opts = [0, 1, 2, 3, 4, 5]
+        targ1_to_targ2_dist_opts = [0, 3, 6, 9, 12, 15]
         for i, val in enumerate(task_in['targ1_to_targ2_dist']):
             if val:
                 self.targ1_to_targ2_dist = targ1_to_targ2_dist_opts[i]
@@ -1160,7 +1160,6 @@ class COApp(App):
         Window.top = 0
         if platform == 'darwin':
             Window.fullscreen = 'auto'
-            import pdb; pdb.set_trace()
         
         return Manager()
 
