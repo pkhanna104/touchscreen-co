@@ -16,6 +16,7 @@ from sys import platform
 
 
 Config.set('graphics', 'resizable', False)
+Config.set('graphics', 'fullscreen', 'auto')
 if platform == 'darwin': # we are on a Mac
     # This probably means that we are testing on a personal laptop
     
@@ -40,8 +41,8 @@ elif platform == 'win32':
         pix_per_cm = 84. # we get this automatically now but here it is anyway
     import winsound
 
-Config.set('graphics', 'width', str(fixed_window_size[0]))
-Config.set('graphics', 'height', str(fixed_window_size[1]))
+# Config.set('graphics', 'width', str(fixed_window_size[0]))
+# Config.set('graphics', 'height', str(fixed_window_size[1]))
 
 import time
 import numpy as np
