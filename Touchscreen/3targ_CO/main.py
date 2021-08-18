@@ -16,7 +16,7 @@ from sys import platform
 
 
 Config.set('graphics', 'resizable', False)
-# Config.set('graphics', 'fullscreen', 'auto')
+
 if platform == 'darwin': # we are on a Mac
     # This probably means that we are testing on a personal laptop
     
@@ -36,9 +36,9 @@ elif platform == 'win32':
     else:
         # must just be the Surface Pro
         # These are surface pro settings
-        fixed_window_size = (1920, 1280) # we get this automatically now but here it is anyway
+        fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
         fixed_window_size_cm = (22.8, 15.2) # this is the important part
-        pix_per_cm = 84. # we get this automatically now but here it is anyway
+        pix_per_cm = 95. # we get this automatically now but here it is anyway
     import winsound
 
 Config.set('graphics', 'width', str(fixed_window_size[0]))
@@ -1153,21 +1153,11 @@ class Manager(ScreenManager):
 
 class COApp(App):
     def build(self, **kwargs):
+        Window.size = (fixed_window_size[0], fixed_window_size[1])
+        Window.left = 0
+        Window.top = 0
         if platform == 'darwin':
-            screenx = 1792
-            screeny = 1120
-            Window.size = (1792, 1120)
-            Window.left = (screenx - 1792)/2
-            Window.top = (screeny - 1120)/2
             Window.fullscreen = 'auto'
-
-        elif platform =='win32':
-            from win32api import GetSystemMetrics
-            screenx = GetSystemMetrics(0)
-            screeny = GetSystemMetrics(1)
-            Window.size = (1800, 1000)
-            Window.left = (screenx - 1800)/2
-            Window.top = (screeny - 1000)/2
         
         return Manager()
 
