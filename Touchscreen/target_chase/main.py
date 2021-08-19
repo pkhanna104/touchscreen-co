@@ -62,7 +62,7 @@ class COGame(Widget):
     pre_start_vid_ts = 0.1
     
     # ITI LENGTH
-    ITI_mean = 0.5
+    ITI_mean = 1.0
     ITI_std = .2
     target_rad = 1.5
     
@@ -481,7 +481,10 @@ class COGame(Widget):
         # External button
         try:
             self.is_button_ard = True
-            self.button_ard = serial.Serial(port='COM3', baudrate=9600)
+            if platform == 'darwin':
+                self.button_ard = serial.Serial(port='/dev/cu.usbmodem1421301', baudrate=9600)
+            else:
+                self.button_ard = serial.Serial(port='COM3', baudrate=9600)
         except:
             self.is_button_ard = False
         

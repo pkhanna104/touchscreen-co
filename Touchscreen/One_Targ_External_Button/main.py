@@ -726,7 +726,6 @@ class COGame(Widget):
         return kwargs['ts'] > self.ITI
 
     def _start_vid_trig(self, **kwargs):
-        import pdb; pdb.set_trace()
         if self.trial_counter == 0:
             time.sleep(1.)
         try:    
