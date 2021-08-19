@@ -113,7 +113,8 @@ class COGame(Widget):
     touch = False
 
     center_target = ObjectProperty(None)
-    periph_target = ObjectProperty(None)
+    periph_target1 = ObjectProperty(None)
+    periph_target2 = ObjectProperty(None)
 
     done_init = False
     prev_exit_ts = np.array([0,0])
@@ -308,6 +309,9 @@ class COGame(Widget):
         elif self.target2_pos_str == 'below':
             self.target2_position[1] = self.target2_position[1]-2*self.periph_target_rad-self.targ1_to_targ2_dist
         
+        # HOW MUCH TIME TO WAIT UNTIL THE NEXT TARGET APPEARS
+        self.time_to_next_targ = False
+        
         # ANIMAL NAME
         for i, (nm, val) in enumerate(animal_names_dict.items()):
             if val:
@@ -412,7 +416,8 @@ class COGame(Widget):
         # Initialize targets: 
         self.center_target.set_size(2*self.center_target_rad)
         self.center_target.move(self.center_target_position)
-        self.periph_target.set_size(2*self.periph_target_rad)
+        self.periph_target1.set_size(2*self.periph_target_rad)
+        self.periph_target2.set_size(2*self.periph_target_rad)
 
         self.exit_target1.set_size(2*self.exit_rad)
         self.exit_target2.set_size(2*self.exit_rad)
@@ -755,7 +760,8 @@ class COGame(Widget):
             self.tht = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min)            
         
         self.center_target.color = (0., 0., 0., 0.)
-        self.periph_target.color = (0., 0., 0., 0.)
+        self.periph_target1.color = (0., 0., 0., 0.)
+        self.periph_target2.color = (0., 0., 0., 0.)
         self.indicator_targ.color = (0., 0., 0., 0.)
         
     def end_ITI(self, **kwargs):
@@ -769,9 +775,11 @@ class COGame(Widget):
         except:
             pass
         self.first_target_attempt = True
+        self.first_time_for_this_targ = True
 
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
-            self.periph_target.color = (1., 0., 0., 1.)
+            self.periph_target1.color = (1., 0., 0., 1.)
+            self.periph_target2.color = (1., 0., 0., 1.)
             self.center_target.color = (1., 0., 0., 1.)
             Window.clearcolor = (1., 0., 0., 1.)
 
@@ -803,44 +811,64 @@ class COGame(Widget):
         self.center_target.color = (1., 1., 0., 1.)
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.periph_target.color = (0., 0., 0., 0.) ### Make peripheral target alpha = 0 so doesn't obscure 
+        self.periph_target1.color = (0., 0., 0., 0.) ### Make peripheral target alpha = 0 so doesn't obscure 
         self.indicator_targ.color = (.25, .25, .25, 1.)
         
         # Reset target index back to 1
         self.target_index = 1
+        
+        if self.first_time_for_this_targ:
+            self.first_time_for_this_targ_t0 = time.time()
+            self.periph_target2.color = (0., 0., 0., 0.)
+            self.first_time_for_this_targ = False
+            
+    def _while_center(self, **kwargs):
+        # check and see if it is time for the next target to appear
+        if self.time_to_next_targ is not False:
+            # import pdb; pdb.set_trace()
+            if time.time() - self.first_time_for_this_targ_t0 > self.time_to_next_targ:
+                # illuminate the next target
+                self.periph_target2.move(self.target1_position)
+                self.periph_target2.color = (1., 1., 0., 1.)        
 
     def _start_center_hold(self, **kwargs):
         self.center_target.color = (0., 1., 0., 1.)
         self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _start_targ_hold(self, **kwargs):
-        self.periph_target.color = (0., 1., 0., 1.)
+        self.periph_target1.color = (0., 1., 0., 1.)
         self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _end_center_hold(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
+        self.first_time_for_this_targ = True
 
     def _end_target_hold(self, **kwargs):
-        self.periph_target.color = (0., 0., 0., 0.)
+        self.periph_target1.color = (0., 0., 0., 0.)
+        self.first_time_for_this_targ = True
 
     def _start_touch_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target1.color = (0., 0., 0., 1.)
+        self.periph_target2.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_timeout_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target1.color = (0., 0., 0., 1.)
+        self.periph_target2.color = (0., 0., 0., 1.)
         #self.repeat = True
 
     def _start_hold_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target1.color = (0., 0., 0., 1.)
+        self.periph_target2.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_drag_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target1.color = (0., 0., 0., 1.)
+        self.periph_target2.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_target(self, **kwargs):
@@ -852,8 +880,8 @@ class COGame(Widget):
         elif self.target_index == 2:
             self.periph_target_position = self.target2_position
 
-        self.periph_target.move(self.periph_target_position)
-        self.periph_target.color = (1., 1., 0., 1.)
+        self.periph_target1.move(self.periph_target_position)
+        self.periph_target1.color = (1., 1., 0., 1.)
         self.repeat = False
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
@@ -861,12 +889,26 @@ class COGame(Widget):
         if self.first_target_attempt:
             self.first_target_attempt_t0 = time.time();
             self.first_target_attempt = False
-            
+        
+        if self.first_time_for_this_targ:
+            self.first_time_for_this_targ_t0 = time.time()
+            self.periph_target2.color = (0., 0., 0., 0.)
+            self.first_time_for_this_targ = False
+    
+    def _while_target(self, **kwargs):
+        # check and see if it is time for the next target to appear
+        if self.time_to_next_targ is not False:
+            # import pdb; pdb.set_trace()
+            if time.time() - self.first_time_for_this_targ_t0 > self.time_to_next_targ and self.target_index == 1:
+                # illuminate the next target
+                self.periph_target2.move(self.target2_position)
+                self.periph_target2.color = (1., 1., 0., 1.)
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
         Window.clearcolor = (1., 1., 1., 1.)
-        self.periph_target.color = (1., 1., 1., 1.)
+        self.periph_target1.color = (1., 1., 1., 1.)
+        self.periph_target2.color = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0

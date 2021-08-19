@@ -16,12 +16,31 @@ from sys import platform
 
 
 Config.set('graphics', 'resizable', False)
-if platform == 'darwin':
-    fixed_window_size = (3072, 1920)
-    pix_per_cm = 89.
+
+if platform == 'darwin': # we are on a Mac
+    # This probably means that we are testing on a personal laptop
+    
+    # settings for MBP 16" 2021
+    fixed_window_size = (3072, 1920) # we get this automatically now but here it is anyway
+    fixed_window_size_cm = (34.5, 21.5) # this is the important part
+    pix_per_cm = 104. # we get this automatically now but here it is anyway
 elif platform == 'win32':
-    fixed_window_size = (1800, 1000)
-    pix_per_cm = 85.
+    # see if there is an external monitor plugged in
+    from screeninfo import get_monitors
+    mon = get_monitors()
+#    if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
+#        # must be an external monitor plugged in
+#        # assume that it is the ViewSonic TD2230
+#        fixed_window_size = (1920, 1080) # we get this automatically now but here it is anyway
+#        fixed_window_size_cm = (47.6, 26.8) # this is the important part
+#        pix_per_cm = 40. # we get this automatically now but here it is anyway
+#    else:
+        # must just be the Surface Pro
+        # These are surface pro settings
+    fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
+    fixed_window_size_cm = (47.6, 26.8)
+#        fixed_window_size_cm = (22.8, 15.2) # this is the important part
+    pix_per_cm = 95. # we get this automatically now but here it is anyway
     import winsound
 
 Config.set('graphics', 'width', str(fixed_window_size[0]))
@@ -36,33 +55,36 @@ class Data(tables.IsDescription):
     cursor = tables.Float32Col(shape=(10, 2))
     cursor_ids = tables.Float32Col(shape = (10, ))
     target_pos = tables.Float32Col(shape=(2, ))
-    cap_touch = tables.Float32Col()
     time = tables.Float32Col()
 
 class COGame(Widget):
-    center = ObjectProperty(None)
-    target = ObjectProperty(None)
-
-    # Time to wait after starting the video before getting to the center target display. 
+    # Time to wait after starting the video before getting to the first target display. 
     pre_start_vid_ts = 0.1
-
-    ITI_mean = 1.
-    ITI_std = .2
-    center_target_rad = 1.5
-    periph_target_rad = 1.5
     
-    if platform == 'darwin':
-        exit_pos = np.array([14, 8])
-        indicator_pos = np.array([16, 10])
-    elif platform == 'win32':
-        exit_pos = np.array([7, 4])
-        indicator_pos = np.array([8, 5])
+    # ITI LENGTH
+    ITI_mean = 0.5
+    ITI_std = .2
+    target_rad = 1.5
+    
+    # SET THE POSITION OF THE EXIT BUTTONS AND THE PHOTODIODE INDICATOR LIGHT
+    # positions are in CM measured from the center of the screen
+    # if platform == 'darwin':
+    
+    exit_pos_x = (fixed_window_size_cm[0]/2)-1.5
+    exit_pos_y = (fixed_window_size_cm[1]/2)-1.5
+                 
+    exit_pos = np.array([exit_pos_x, exit_pos_y])
+    ind_pos_x = (fixed_window_size_cm[0]/2)-0.5
+    ind_pos_y = (fixed_window_size_cm[1]/2)-0.5
+                 
+    indicator_pos = np.array([ind_pos_x, ind_pos_y])
+    # elif platform == 'win32':
+    #     exit_pos = np.array([7, 4])
+    #     indicator_pos = np.array([8, 5])
     exit_rad = 1.
     exit_hold = 2 #seconds
-
-    ch_timeout = 10. # ch timeout
-    cht = .001 # center hold time
-
+    
+    # SET THE HOLD AND TIMEOUT TIMES
     target_timeout_time = 5.
     tht = .001
 
@@ -76,35 +98,24 @@ class COGame(Widget):
     hold_error_timeout = 0.
     drag_error_timeout = 0.
 
-    ntargets = 4.
-    target_distance = 4.
     touch = False
 
-    center_target = ObjectProperty(None)
-    periph_target = ObjectProperty(None)
+    target1 = ObjectProperty(None)
+    target2 = ObjectProperty(None)
 
     done_init = False
     prev_exit_ts = np.array([0,0])
 
-    # Number of trials: 
-    trial_counter = NumericProperty(0)
-    #indicator_txt = StringProperty('o')
-    #indicator_txt_color = ListProperty([.5, .5, .5, 1.])
-
     t0 = time.time()
-
-    cht_text = StringProperty('')
+    
+    trial_counter = NumericProperty(0)
     tht_text = StringProperty('')
-    generatorz_text = StringProperty('')
     targ_size_text = StringProperty('')
     big_rew_text = StringProperty('')
-    cht_param = StringProperty('')
     tht_param = StringProperty('')
     targ_size_param = StringProperty('')
     big_rew_time_param = StringProperty('')
-    generatorz_param = StringProperty('')
-    nudge_text = StringProperty('')
-    nudge_param = StringProperty('')
+    
     def on_touch_down(self, touch):
         #handle many touchs:
         ud = touch.ud
@@ -132,89 +143,194 @@ class COGame(Widget):
             print('removing touch from pre-game screen')
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
-        test=None, hold=None, targ_structure=None,
-        autoquit=None, rew_var=None, targ_timeout = None, nudge_x=None, nudge_y=None):
-
+        hold=None, autoquit=None, rew_var=None, targ_timeout = None, 
+        nudge_x=None, screen_top=None):
+        
         self.rew_cnt = 0
-        self.small_rew_cnt = 0
 
-
-        self.use_cap_sensor = False
-
-        if self.use_cap_sensor:
-            self.serial_port_cap = serial.Serial(port='COM5')
-
-        self.rhtouch_sensor = 0.
-
-
+        # TARGET TIMEOUT
         targ_timeout_opts = [15, 30, 45, 60]
         for i, val in enumerate(targ_timeout['tt']):
             if val:
                 self.target_timeout_time = targ_timeout_opts[i]
-
+        
+        # JUICE REWARD SETTINGS
         button_rew_opts = [0., .1, .3, .5]
         for i, val in enumerate(rew_in['button_rew']):
             if val:
                 button_rew = button_rew_opts[i]
-        
-        small_rew_opts = [0., .1, .3, .5]
-        for i, val in enumerate(rew_in['small_rew']):
-            if val:
-                small_rew = small_rew_opts[i]
 
         big_rew_opts = [0., .3, .5, .7]
         for i, val in enumerate(rew_in['big_rew']):
             if val:
                 big_rew = big_rew_opts[i]
-
+                
+        if big_rew > 0.0:
+            self.last_targ_reward = [True, big_rew]
+        else:
+            self.last_targ_reward = [False, 0]
+        
         if button_rew > 0.0:
-            self.reward_for_button = [True, button_rew]
+            self.button_rew = [True, button_rew]
         else:
-            self.reward_for_button = [False, 0]
-
-
-        if rew_in['rew_anytouch']:
-            self.reward_for_anytouch = [True, small_rew]
-        else:
-            self.reward_for_anytouch = [False, 0]
-
-        if np.logical_or(rew_in['rew_targ'], rew_in['rew_center_pls_targ']):
-            self.reward_for_targtouch = [True, big_rew]
-        else:
-            self.reward_for_targtouch = [False, 0]
-
-        if rew_in['rew_center_pls_targ']:
-            self.reward_for_center = [True, small_rew]
-        else:
-            self.reward_for_center = [False, 0]
-
-        if rew_in['snd_only']:
-            self.reward_for_targtouch = [True, 0.]
-            self.skip_juice = True
-        else:
-            self.skip_juice = False
-
+            self.button_rew = [False, 0]
+        
+        
+        # NUDGE X
+        nudge_x_opts = [-6, -4, -2, 0, 2, 4, 6]    
+        for i, val in enumerate(nudge_x['nudge_x_t1']):
+            if val:
+                self.nudge_x_t1 = nudge_x_opts[i]
+                
+        for i, val in enumerate(nudge_x['nudge_x_t2']):
+            if val:
+                self.nudge_x_t2 = nudge_x_opts[i]
+                
+        for i, val in enumerate(nudge_x['nudge_x_t3']):
+            if val:
+                self.nudge_x_t3 = nudge_x_opts[i]
+                
+        for i, val in enumerate(nudge_x['nudge_x_t4']):
+            if val:
+                self.nudge_x_t4 = nudge_x_opts[i]
+        
+        # WHERE TO CONSIDER THE TOP OF THE SCREEN (HOW MUCH TO SHRINK IT DOWN BY)
+        screen_top_opts = [-12, -10, -8, -6, -4, -2, 0]    
+        for i, val in enumerate(screen_top['screen_top']):
+            if val:
+                self.screen_top = screen_top_opts[i]
+        
+        # TARGET RADIUS
         target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 2.25, 3.0]
         for i, val in enumerate(task_in['targ_rad']):
             if val:
-                self.periph_target_rad = target_rad_opts[i]
-                self.center_target_rad = target_rad_opts[i]
+                self.target_rad = target_rad_opts[i]
+                
+        # TARGET POSITIONS
+        self.center_position = np.array([0., 0.])
+        # lower the center position by half of the total amount the screen height has been shrunk by
+        self.center_position[1] = self.center_position[1] + self.screen_top/2    
+        
+        d_center2top = (fixed_window_size_cm[1]/2)+(self.screen_top/2)
+        max_y_from_center = d_center2top-self.target_rad
+        
+        # target 1
+        target_pos_opts = ['center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
+        for i, val in enumerate(task_in['targ1_pos']):
+            if val:
+                self.target1_pos_str = target_pos_opts[i]
+        
+        if self.target1_pos_str == 'center':
+            targ_x = self.center_position[0]+self.nudge_x_t1
+            targ_y = self.center_position[1]
+        elif self.target1_pos_str == 'upper_right':
+            targ_x = max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] + max_y_from_center
+        elif self.target1_pos_str == 'lower_right':
+            targ_x = max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] - max_y_from_center
+        elif self.target1_pos_str == 'lower_left':
+            targ_x = -max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] - max_y_from_center
+        elif self.target1_pos_str == 'upper_left':
+            targ_x = -max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] + max_y_from_center
+            
+        self.target1_position = np.array([targ_x, targ_y])
+        
+        # target 2
+        for i, val in enumerate(task_in['targ2_pos']):
+            if val:
+                self.target2_pos_str = target_pos_opts[i]
+        
+        if self.target2_pos_str == 'center':
+            targ_x = self.center_position[0]+self.nudge_x_t2
+            targ_y = self.center_position[1]
+        elif self.target2_pos_str == 'upper_right':
+            targ_x = max_y_from_center+self.nudge_x_t2
+            targ_y = self.center_position[1] + max_y_from_center
+        elif self.target2_pos_str == 'lower_right':
+            targ_x = max_y_from_center+self.nudge_x_t2
+            targ_y = self.center_position[1] - max_y_from_center
+        elif self.target2_pos_str == 'lower_left':
+            targ_x = -max_y_from_center+self.nudge_x_t2
+            targ_y = self.center_position[1] - max_y_from_center
+        elif self.target2_pos_str == 'upper_left':
+            targ_x = -max_y_from_center+self.nudge_x_t2
+            targ_y = self.center_position[1] + max_y_from_center
+            
+        self.target2_position = np.array([targ_x, targ_y])
+        
+        # target 3
+        for i, val in enumerate(task_in['targ3_pos']):
+            if val:
+                self.target3_pos_str = target_pos_opts[i]
+        
+        if self.target3_pos_str == 'center':
+            targ_x = self.center_position[0]+self.nudge_x_t3
+            targ_y = self.center_position[1]
+        elif self.target3_pos_str == 'upper_right':
+            targ_x = max_y_from_center+self.nudge_x_t3
+            targ_y = self.center_position[1] + max_y_from_center
+        elif self.target3_pos_str == 'lower_right':
+            targ_x = max_y_from_center+self.nudge_x_t3
+            targ_y = self.center_position[1] - max_y_from_center
+        elif self.target3_pos_str == 'lower_left':
+            targ_x = -max_y_from_center+self.nudge_x_t3
+            targ_y = self.center_position[1] - max_y_from_center
+        elif self.target3_pos_str == 'upper_left':
+            targ_x = -max_y_from_center+self.nudge_x_t3
+            targ_y = self.center_position[1] + max_y_from_center
+            
+        self.target3_position = np.array([targ_x, targ_y])
+            
+        # target 4
+        target_pos_opts = ['none', 'center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
+        for i, val in enumerate(task_in['targ4_pos']):
+            if val:
+                self.target4_pos_str = target_pos_opts[i]
+        
+        if self.target4_pos_str == 'none':
+            self.target4_position = False
+            self.num_targets = 3
+        else:
+            self.num_targets = 4
+            if self.target4_pos_str == 'center':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1]
+            elif self.target4_pos_str == 'upper_right':
+                targ_x = max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] + max_y_from_center
+            elif self.target4_pos_str == 'lower_right':
+                targ_x = max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] - max_y_from_center
+            elif self.target4_pos_str == 'lower_left':
+                targ_x = -max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] - max_y_from_center
+            elif self.target4_pos_str == 'upper_left':
+                targ_x = -max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] + max_y_from_center
+            
+            self.target4_position = np.array([targ_x, targ_y])
 
+
+        self.active_target_position = self.target1_position
+        self.target_index = 1
+        
+        # HOW MUCH TIME TO WAIT UNTIL THE NEXT TARGET APPEARS
+        time_to_next_targ_opts = [False, 0.25, 0.5, 0.75, 1.0, 1.5]
+        for i, val in enumerate(task_in['time_to_next_targ']):
+            if val:
+                self.time_to_next_targ = time_to_next_targ_opts[i]
+        
+        # ANIMAL NAME
         for i, (nm, val) in enumerate(animal_names_dict.items()):
             if val:
                 animal_name = nm
 
-        self.use_center = False
-        for i, (nm, val) in enumerate(targ_structure.items()):
-            if val:
-                generatorz = getattr(self, nm)
-                self.generatorz_param2 = nm
-                if 'co' in nm:
-                    self.use_center = True
 
-        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
-        
-        
+        # BUTTON AND TARGET HOLD TIMES
+        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
         self.button_hold_time_type = None
         for i, val in enumerate(hold['button_hold']):
             if val:
@@ -224,10 +340,14 @@ class COGame(Widget):
                     self.button_hold_time =  (float(mn)+float(mx))*.5
                 else:
                     self.button_hold_time = holdz[i]
+                    
+        if self.button_hold_time is False:
+            self.use_button = False
+        else:
+            self.use_button = True
         
-        self.cht_type = None
+        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
         self.tht_type = None
-
         for i, val in enumerate(hold['hold']):
             if val:
                 if type(holdz[i]) is str:
@@ -236,27 +356,6 @@ class COGame(Widget):
                     self.tht =  (float(mn)+float(mx))*.5
                 else:
                     self.tht = holdz[i]
-
-        for i, val in enumerate(hold['chold']):
-            if val:
-                if type(holdz[i]) is str:
-                    mx, mn = holdz[i].split('-')
-                    self.cht_type = holdz[i]
-                    self.cht = (float(mn)+float(mx))*.5
-                else:
-                    self.cht = holdz[i]
-                    
-        
-        nudge_x_opts = [-6, -4, -2, 0, 2, 4, 6]    
-        for i, val in enumerate(nudge_x['nudge_x']):
-            if val:
-                self.nudge_x = nudge_x_opts[i]
-                    
-        nudge_y_opts = [-3, -2, -1, 0, 1, 2, 3]    
-        for i, val in enumerate(nudge_y['nudge_y']):
-            if val:
-                self.nudge_y = nudge_y_opts[i]
-        
         
         try:
             pygame.mixer.init()    
@@ -278,7 +377,7 @@ class COGame(Widget):
                     self.percent_of_trials_doubled = 0.0
         
         self.reward_generator = self.gen_rewards(self.percent_of_trials_rewarded, self.percent_of_trials_doubled,
-            self.reward_for_targtouch)
+            self.last_targ_reward)
 
 
         # white_screen_opts = [True, False]
@@ -286,19 +385,7 @@ class COGame(Widget):
         #     if val:
         self.use_white_screen = False
 
-        test_vals = [True, False, False]
-        in_cage_vals = [False, False, True]
-        for i, val in enumerate(test['test']):
-            if val:
-                self.testing = test_vals[i]
-                #self.in_cage = in_cage_vals[i]
-        
-        import os 
-        path = os.getcwd()
-        if 'BasalGangulia' in path:
-            self.in_cage = True
-        else:
-            self.in_cage = False
+        self.testing = False
 
         autoquit_trls = [10, 25, 50, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
@@ -331,16 +418,10 @@ class COGame(Widget):
         self.ITI = self.ITI_std + self.ITI_mean
 
         # Initialize targets: 
-        self.center_target.set_size(2*self.center_target_rad)
-        
-        self.center_target_position = np.array([0., 0.])
-        if self.in_cage:
-            self.center_target_position[0] = self.center_target_position[0] - 4
-        else:
-            self.center_target_position[0] = self.center_target_position[0] + self.nudge_x
-            self.center_target_position[1] = self.center_target_position[1] + self.nudge_y
-        self.center_target.move(self.center_target_position)
-        self.periph_target.set_size(2*self.periph_target_rad)
+        self.target1.set_size(2*self.target_rad)
+        self.target1.move(self.target1_position)
+        self.target1.set_size(2*self.target_rad)
+        self.target2.set_size(2*self.target_rad)
 
         self.exit_target1.set_size(2*self.exit_rad)
         self.exit_target2.set_size(2*self.exit_rad)
@@ -354,44 +435,25 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
 
-        self.target_list = generatorz(self.target_distance, self.nudge_dist, self.generator_kwarg)
-        self.target_list[:, 0] = self.target_list[:, 0] + self.nudge_x
-        self.target_list[:, 1] = self.target_list[:, 1] + self.nudge_y
-        self.target_index = 0
         self.repeat = False
-
-        self.periph_target_position = self.target_list[self.target_index, :]
 
         self.FSM = dict()
         self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
-        self.FSM['vid_trig'] = dict(rhtouch='target', stop=None)
-        
-        
-        
-        if self.use_center:
-            self.FSM['vid_trig'] = dict(end_vid_trig='button', stop=None)
-            self.FSM['button'] = dict(button_held='center', stop=None)
-            self.FSM['center'] = dict(touch_center='center_hold', center_timeout='timeout_error', non_rhtouch='RH_touch',stop=None)
-            self.FSM['center_hold'] = dict(finish_center_hold='target', early_leave_center_hold='hold_error', non_rhtouch='RH_touch', stop=None)
+        self.FSM['vid_trig'] = dict(end_vid_trig='button', stop=None)
+        self.FSM['button'] = dict(button_held='target', stop=None)
 
-        self.FSM['target'] = dict(touch_target = 'targ_hold', target_timeout='timeout_error', stop=None,
-            anytouch='rew_anytouch', non_rhtouch='RH_touch')#,touch_not_target='touch_error')
-        self.FSM['targ_hold'] = dict(finish_targ_hold='reward', early_leave_target_hold = 'hold_error',
-         targ_drag_out = 'drag_error', stop=None, non_rhtouch='RH_touch')
-        self.FSM['reward'] = dict(end_reward = 'ITI', stop=None, non_rhtouch='RH_touch')
-
-        if self.use_center:
-            return_ = 'center'
-        else:
-            return_ = 'target'
-
-        self.FSM['touch_error'] = dict(end_touch_error=return_, stop=None, non_rhtouch='RH_touch')
-        self.FSM['timeout_error'] = dict(end_timeout_error='ITI', stop=None, non_rhtouch='RH_touch')
-        self.FSM['hold_error'] = dict(end_hold_error=return_, stop=None, non_rhtouch='RH_touch')
-        self.FSM['drag_error'] = dict(end_drag_error=return_, stop=None, non_rhtouch='RH_touch')
-        self.FSM['rew_anytouch'] = dict(end_rewanytouch='target', stop=None, non_rhtouch='RH_touch')
+        self.FSM['target'] = dict(touch_target = 'targ_hold', target_timeout='timeout_error', stop=None)
+        self.FSM['targ_hold'] = dict(finish_last_targ_hold='reward', finish_targ_hold='target', early_leave_target_hold = 'hold_error',
+         targ_drag_out = 'drag_error', stop=None)
+        self.FSM['reward'] = dict(end_reward = 'ITI', stop=None)
+        
+        self.FSM['touch_error'] = dict(end_touch_error='target', stop=None)
+        self.FSM['timeout_error'] = dict(end_timeout_error='ITI', stop=None)
+        self.FSM['hold_error'] = dict(end_hold_error='target', stop=None)
+        self.FSM['drag_error'] = dict(end_drag_error='target', stop=None)
         self.FSM['idle_exit'] = dict(stop=None)
-
+        
+        # OPEN PORTS
         try:
             self.reward_port = serial.Serial(port='COM4',
                 baudrate=115200)
@@ -415,36 +477,33 @@ class COGame(Widget):
             self.cam_trig_port.write('1'.encode())
         except:
             pass
-
+        
+        # External button
+        try:
+            self.is_button_ard = True
+            self.button_ard = serial.Serial(port='COM3', baudrate=9600)
+        except:
+            self.is_button_ard = False
+        
         # save parameters: 
-        d = dict(animal_name=animal_name, center_target_rad=self.center_target_rad,
-            periph_target_rad=self.periph_target_rad, target_structure = generatorz.__name__, 
-            target_list = self.target_list, 
-            ITI_mean=self.ITI_mean, ITI_std = self.ITI_std, ch_timeout=self.ch_timeout, 
-            cht=self.cht, reward_time_small=self.reward_for_center[1],
-            reward_time_big=self.reward_for_targtouch[1],
-            reward_for_anytouch=self.reward_for_anytouch[0],
-            reward_for_center = self.reward_for_center[0],
-            reward_for_targtouch=self.reward_for_targtouch[0], 
+        d = dict(animal_name=animal_name,
+            target_rad=self.target_rad,
+            target1_position = self.target1_position, 
+            target2_position = self.target2_position, 
+            ITI_mean=self.ITI_mean, ITI_std = self.ITI_std,
+            reward_time_big=self.last_targ_reward[1],
+            last_targ_reward=self.last_targ_reward[0], 
             touch_error_timeout = self.touch_error_timeout,
             timeout_error_timeout = self.timeout_error_timeout,
             hold_error_timeout = self.hold_error_timeout,
             drag_error_timeout = self.drag_error_timeout,
-            ntargets = self.ntargets,
-            target_distance = self.target_distance,
             start_time = datetime.datetime.now().strftime('%Y%m%d_%H%M'),
             testing=self.testing,
             rew_delay = self.reward_delay_time,
-            use_cap_sensor = self.use_cap_sensor,
             drag_ok = self.drag_ok,
             )
 
-        print(self.reward_for_center)
-        print(self.reward_for_targtouch)
-        print(self.reward_for_anytouch)
-
-        #try:
-        if self.testing:
+        if self.testing or platform == 'darwin':
             pass
 
         else:
@@ -474,9 +533,7 @@ class COGame(Widget):
             print ('')
             print ('')
             self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-            
-            if self.in_cage:
-                self.filename = self.filename+'_cage'
+        
 
             pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
             self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
@@ -489,14 +546,6 @@ class COGame(Widget):
             #    data_params = pickle.load(f)
         # except:
         #     pass
-    
-    
-        # Open button arduino port
-        try:
-            self.is_button_ard = True
-            self.button_ard = serial.Serial(port='COM3', baudrate=9600)
-        except:
-            self.is_button_ard = False
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
@@ -524,37 +573,24 @@ class COGame(Widget):
             self.cam_trig_port.write('0'.encode())
         except:
             pass
-
-        if self.use_cap_sensor:
-            self.serial_port_cap.close()
         
         if self.idle:
             self.state = 'idle_exit'
             self.trial_counter = -1
 
             # Set relevant params text: 
-            self.cht_text = 'Center Hold Time: '
             self.tht_text = 'Target Hold Time: '
-            self.generatorz_text = 'Target Structure: '
             self.targ_size_text = 'Target Radius: '
             self.big_rew_text = 'Big Reward Time: '
-
-            if type(self.cht_type) is str:
-                self.cht_param = self.cht_type
-            else:
-                self.cht_param = 'Constant: ' + str(self.cht)
 
             if type(self.tht_type) is str:
                 self.tht_param = self.tht_type
             else:
                 self.tht_param = 'Constant: ' + str(self.tht)
 
-            self.targ_size_param = str(self.center_target_rad)
-            self.big_rew_time_param = str(self.reward_for_targtouch[1])
-            self.generatorz_param = self.generatorz_param2
+            self.targ_size_param = str(self.target_rad)
+            self.big_rew_time_param = str(self.last_targ_reward[1])
 
-            self.nudge_text = 'Nudge 9oclock targ? '
-            self.nudge_param = str(self.nudge_dist)
         else:
             App.get_running_app().stop()
             Window.close()
@@ -562,7 +598,6 @@ class COGame(Widget):
     def update(self, ts):
         self.state_length = time.time() - self.state_start
         self.rew_cnt += 1
-        self.small_rew_cnt += 1
         
         if self.is_button_ard:
             # Get the button values
@@ -583,8 +618,6 @@ class COGame(Widget):
                 # print('Button NOT Pressed')
         else:
             self.button_pressed = False
-            
-        
         
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
@@ -611,25 +644,15 @@ class COGame(Widget):
                     if hasattr(self, start_state_fn_name):
                         start_state_fn = getattr(self, start_state_fn_name)
                         start_state_fn()
+                
+                break
             else:
                 while_state_fn_name = "_while_%s" % self.state
                 if hasattr(self, while_state_fn_name):
                     while_state_fn = getattr(self, while_state_fn_name)
                     while_state_fn()
-            
-        if self.use_cap_sensor:
-            try:
-                self.serial_port_cap.flushInput()
-                port_read = self.serial_port_cap.read(4)
-                if str(port_read[:2]) == "b'N1'":
-                    self.rhtouch_sensor = False
-                elif str(port_read[:2]) == "b'C1'":
-                    self.rhtouch_sensor = True
-                    print(self.rhtouch_sensor)
-            except:
-                print('passing state! ')
-                pass     
-        if self.testing:
+             
+        if self.testing or platform == 'darwin':
             pass
         else:
             if self.state == 'idle_exit':
@@ -651,9 +674,8 @@ class COGame(Widget):
         cursor_id[:len(self.cursor_ids)] = self.cursor_ids
         self.h5_table_row['cursor_ids'] = cursor_id
 
-        self.h5_table_row['target_pos'] = self.periph_target_position
+        self.h5_table_row['target_pos'] = self.active_target_position
         self.h5_table_row['time'] = time.time() - self.t0
-        self.h5_table_row['cap_touch'] = self.rhtouch_sensor
         self.h5_table_row.append()
 
         # Write DIO 
@@ -710,23 +732,19 @@ class COGame(Widget):
         # Set ITI, CHT, THT
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
 
-        if type(self.cht_type) is str:
-            cht_min, cht_max = self.cht_type.split('-')
-            self.cht = ((float(cht_max) - float(cht_min)) * np.random.random()) + float(cht_min)
-
         if type(self.tht_type) is str:
             tht_min, tht_max = self.tht_type.split('-')
             self.tht = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min)            
         
-        self.center_target.color = (0., 0., 0., 0.)
-        self.periph_target.color = (0., 0., 0., 0.)
+        self.target1.color = (0., 0., 0., 0.)
+        self.target1.color = (0., 0., 0., 0.)
+        self.target2.color = (0., 0., 0., 0.)
         self.indicator_targ.color = (0., 0., 0., 0.)
         
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
 
     def _start_vid_trig(self, **kwargs):
-        import pdb; pdb.set_trace()
         if self.trial_counter == 0:
             time.sleep(1.)
         try:    
@@ -734,130 +752,127 @@ class COGame(Widget):
         except:
             pass
         self.first_target_attempt = True
-
-        if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
-            self.periph_target.color = (1., 0., 0., 1.)
-            self.center_target.color = (1., 0., 0., 1.)
-            Window.clearcolor = (1., 0., 0., 1.)
-
-            # Turn exit buttons redish:
-            self.exit_target1.color = (.9, 0, 0, 1.)
-            self.exit_target2.color = (.9, 0, 0, 1.)
+        self.first_time_for_this_targ = True
+        
+        # Reset target index back to 1
+        self.target_index = 1
 
     def end_vid_trig(self, **kwargs):
         return kwargs['ts'] > self.pre_start_vid_ts
-
-
-    def rhtouch(self, **kwargs):
-        if self.use_cap_sensor:
-            if self.rhtouch_sensor:
-                return True
-            else:
-                return False
-        else:
-            return True
-
-    def non_rhtouch(self, **kwargs):
-        x = not self.rhtouch()
-        # if x:
-        #     self.repeat = True
-        return x
     
     def _start_button(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
-        self.center_target.color = (0., 0., 0., 0.)
+        self.target1.color = (0., 0., 0., 0.)
+        self.target2.color = (0., 0., 0., 0.)
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.periph_target.color = (0., 0., 0., 0.) ### Make peripheral target alpha = 0 so doesn't obscure 
         self.indicator_targ.color = (.25, .25, .25, 1.)
         self.button_pressed_prev = False
         
     def button_held(self, **kwargs):
-        button_pressed_prev = self.button_pressed_prev
-        self.button_pressed_prev = self.button_pressed
-        if self.button_pressed:
-            if button_pressed_prev:
-                if time.time() - self.t_button_hold_start > self.button_hold_time:
-                    # if the button has been held down long enough
-                    if self.reward_for_button[0]:
-                        self.run_button_rew()
-                    return True
+        if self.use_button is False:
+            return True
+        else:
+            button_pressed_prev = self.button_pressed_prev
+            self.button_pressed_prev = self.button_pressed
+            if self.button_pressed:
+                if button_pressed_prev:
+                    if time.time() - self.t_button_hold_start > self.button_hold_time:
+                        # if the button has been held down long enough
+                        if self.button_rew[0]:
+                            self.run_button_rew()
+                        return True
+                    else:
+                        return False
                 else:
+                    # this is the first cycle that the button has been pressed for
+                    self.t_button_hold_start = time.time()
                     return False
             else:
-                # this is the first cycle that the button has been pressed for
-                self.t_button_hold_start = time.time()
                 return False
-        else:
-            return False
-        
-        
-    def _start_center(self, **kwargs):
-        Window.clearcolor = (0., 0., 0., 1.)
-        self.center_target.color = (1., 1., 0., 1.)
-        self.exit_target1.color = (.15, .15, .15, 1)
-        self.exit_target2.color = (.15, .15, .15, 1)
-        self.periph_target.color = (0., 0., 0., 0.) ### Make peripheral target alpha = 0 so doesn't obscure 
-        self.indicator_targ.color = (.25, .25, .25, 1.)
-
-    def _start_center_hold(self, **kwargs):
-        self.center_target.color = (0., 1., 0., 1.)
-        self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _start_targ_hold(self, **kwargs):
-        self.periph_target.color = (0., 1., 0., 1.)
+        self.target1.color = (0., 1., 0., 1.)
         self.indicator_targ.color = (0.75, .75, .75, 1.)
 
-    def _end_center_hold(self, **kwargs):
-        self.center_target.color = (0., 0., 0., 1.)
-
-    def _end_target_hold(self, **kwargs):
-        self.periph_target.color = (0., 0., 0., 0.)
+    def _end_targ_hold(self, **kwargs):
+        self.target1.color = (0., 0., 0., 0.)
+        
+        # Need to reset this
+        self.first_time_for_this_targ = True
 
     def _start_touch_error(self, **kwargs):
-        self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_timeout_error(self, **kwargs):
-        self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
         #self.repeat = True
 
     def _start_hold_error(self, **kwargs):
-        self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_drag_error(self, **kwargs):
-        self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
         self.repeat = True
-
+                
     def _start_target(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
-        self.center_target.color = (0., 0., 0., 0.)
+        self.target1.color = (0., 0., 0., 0.)
+        
+        if self.target_index == 1:
+            self.active_target_position = self.target1_position
+            self.next_target_position = self.target2_position
+        elif self.target_index == 2:
+            self.active_target_position = self.target2_position
+            self.next_target_position = self.target3_position
+        elif self.target_index == 3:
+            self.active_target_position = self.target3_position
+            self.next_target_position = self.target4_position
+        elif self.target_index == 4:
+            self.active_target_position = self.target4_position
+            self.next_target_position = self.target2_position
 
-        if self.repeat is False:
-            self.periph_target_position = self.target_list[self.target_index, :]
-            self.target_index += 1
-            print(self.periph_target_position)
-            print(self.target_index)
-
-        self.periph_target.move(self.periph_target_position)
-        self.periph_target.color = (1., 1., 0., 1.)
-        self.repeat = False
+        self.target1.move(self.active_target_position)
+        self.target1.color = (1., 1., 0., 1.)
+        
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
         self.indicator_targ.color = (.25, .25, .25, 1.)
         if self.first_target_attempt:
             self.first_target_attempt_t0 = time.time();
             self.first_target_attempt = False
+        
+        if self.first_time_for_this_targ:
+            self.first_time_for_this_targ_t0 = time.time()
+            self.target2.color = (0., 0., 0., 0.)
+            self.first_time_for_this_targ = False
+            
+        self.repeat = False
+    
+    def _while_target(self, **kwargs):
+        # check and see if it is time for the next target to appear
+        if self.time_to_next_targ is not False:
+            # import pdb; pdb.set_trace()
+            if time.time() - self.first_time_for_this_targ_t0 > self.time_to_next_targ and self.target_index < self.num_targets:
+                # illuminate the next target
+                self.target2.move(self.next_target_position)
+                self.target2.color = (1., 1., 0., 1.)
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
         Window.clearcolor = (1., 1., 1., 1.)
-        self.periph_target.color = (1., 1., 1., 1.)
+        self.target1.color = (1., 1., 1., 1.)
+        self.target2.color = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
@@ -870,19 +885,11 @@ class COGame(Widget):
             self.run_big_rew()
             self.rew_cnt += 1
 
-    def _start_rew_anytouch(self, **kwargs):
-        #if self.small_rew_cnt == 1:
-        if self.reward_for_anytouch[0]:
-            self.run_small_rew()
-        else:
-            self.repeat = True
-            #self.small_rew_cnt += 1
-
     def run_big_rew(self, **kwargs):
         try:
             print('in big reward:')
             self.repeat = False
-            if self.reward_for_targtouch[0]:
+            if self.last_targ_reward[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
                 print('in big reward 2')
@@ -895,7 +902,7 @@ class COGame(Widget):
                 if not self.skip_juice:
                     if self.reward_generator[self.trial_counter] > 0:
                         self.reward_port.open()
-                        #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                        #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.last_targ_reward[1])+' sec\n']
                         rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
                         self.reward_port.write(rew_str)
                         time.sleep(.25 + self.reward_delay_time)
@@ -905,32 +912,6 @@ class COGame(Widget):
         except:
             pass
         
-    def run_small_rew(self, **kwargs):
-        try:
-            if np.logical_or(self.reward_for_anytouch[0], self.reward_for_center[0]):
-                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                sound = SoundLoader.load('reward2.wav')
-                sound.play()
-
-                ### To trigger reward make sure reward is > 0:
-                if np.logical_or(np.logical_and(self.reward_for_anytouch[0], self.reward_for_anytouch[1] > 0), 
-                    np.logical_and(self.reward_for_center[0], self.reward_for_center[1] > 0)):
-
-                    self.reward_port.open()
-                    if self.reward_for_anytouch[0]:
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
-                    elif self.reward_for_center[0]:
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_center[1])+' sec\n']
-                    self.reward_port.write(rew_str)
-                    time.sleep(.25)
-                    run_str = [ord(r) for r in 'run\n']
-                    self.reward_port.write(run_str)
-                    self.reward_port.close()
-        except:
-            pass
-
-        #self.repeat = True
-        
     def run_button_rew(self, **kwargs):
         try:
             #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
@@ -938,10 +919,10 @@ class COGame(Widget):
             sound.play()
 
             ### To trigger reward make sure reward is > 0:
-            if np.logical_or(self.reward_for_button[0], self.reward_for_button[1] > 0):
+            if np.logical_or(self.button_rew[0], self.button_rew[1] > 0):
 
                 self.reward_port.open()
-                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_button[1])+' sec\n']
+                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.button_rew[1])+' sec\n']
                 self.reward_port.write(rew_str)
                 time.sleep(.25)
                 run_str = [ord(r) for r in 'run\n']
@@ -951,7 +932,7 @@ class COGame(Widget):
             pass
 
         #self.repeat = True
-        
+
     def end_reward(self, **kwargs):
         self.indicator_txt_color = (1.,1., 1., 1.)
         if self.use_white_screen:
@@ -963,12 +944,6 @@ class COGame(Widget):
             else:
                 self.cnts_in_rew += 1
                 return False
-
-    def end_rewanytouch(self, **kwargs):
-        if self.small_rew_cnt > 1:
-            return True
-        else:
-            return False
 
     def end_touch_error(self, **kwargs):
         return kwargs['ts'] >= self.touch_error_timeout
@@ -982,40 +957,12 @@ class COGame(Widget):
     def end_drag_error(self, **kwargs):
         return kwargs['ts'] >= self.drag_error_timeout
 
-    def touch_center(self, **kwargs):
-        if self.drag_ok:
-            return self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad)
-        else:
-            return np.logical_and(self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad),
-                self.check_if_started_in_targ(self.center_target_position, self.center_target_rad))
-
-    def center_timeout(self, **kwargs):
-        return kwargs['ts'] > self.ch_timeout
-
-    def finish_center_hold(self, **kwargs):
-        if self.cht <= kwargs['ts']:
-            if self.reward_for_center[0]:
-                self.run_small_rew()
-            return True
-        else:
-            return False
-
-    def early_leave_center_hold(self, **kwargs):
-        return not self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad)
-        
-    def center_drag_out(self, **kwargs):
-        touch = self.touch
-        self.touch = True
-        stay_in = self.check_if_cursors_in_targ(self.center_target_position, self.center_target_rad)
-        self.touch = touch
-        return not stay_in
-
     def touch_target(self, **kwargs):
         if self.drag_ok:
-            return self.check_if_cursors_in_targ(self.periph_target_position, self.periph_target_rad)
+            return self.check_if_cursors_in_targ(self.active_target_position, self.target_rad)
         else:
-            return np.logical_and(self.check_if_cursors_in_targ(self.periph_target_position, self.periph_target_rad),
-                self.check_if_started_in_targ(self.periph_target_position, self.periph_target_rad))
+            return np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.target_rad),
+                self.check_if_started_in_targ(self.active_target_position, self.target_rad))
 
     def target_timeout(self, **kwargs):
         #return kwargs['ts'] > self.target_timeout_time
@@ -1024,86 +971,33 @@ class COGame(Widget):
             return True
 
     def finish_targ_hold(self, **kwargs):
-        return self.tht <= kwargs['ts']
+        if not self.target_index == self.num_targets:
+            if self.tht <= kwargs['ts']:
+                # Play a small reward tone
+                sound = SoundLoader.load('reward2.wav')
+                sound.play()
+                self.target_index += 1
+                return True
+            else:
+                return False
+        else:
+            return False
+        
+    def finish_last_targ_hold(self, **kwargs):
+        if self.target_index == self.num_targets:
+            return self.tht <= kwargs['ts']
+        else:
+            return False
 
     def early_leave_target_hold(self, **kwargs):
-        return not self.check_if_cursors_in_targ(self.periph_target_position, self.periph_target_rad)
+        return not self.check_if_cursors_in_targ(self.active_target_position, self.target_rad)
 
     def targ_drag_out(self, **kwargs):
         touch = self.touch
         self.touch = True
-        stay_in = self.check_if_cursors_in_targ(self.periph_target_position, self.periph_target_rad)
+        stay_in = self.check_if_cursors_in_targ(self.active_target_position, self.target_rad)
         self.touch = touch
         return not stay_in
-
-    def anytouch(self, **kwargs):
-        if not self.touch_target():
-            current_touch = len(self.cursor_ids) > 0
-            rew = False
-            if current_touch and not self.anytouch_prev:
-                rew = True
-            self.anytouch_prev = current_touch
-            return rew
-        else:
-            return False
-
-    def get_4targets(self, target_distance=4, nudge=0., gen_kwarg=None):
-        return self.get_targets_co(target_distance=target_distance, nudge=0.)
-
-    def get_targets_co(self, target_distance=4, nudge=0., gen_kwarg=None, ntargets=4):
-        # Targets in CM: 
-        if gen_kwarg ==  'corners':
-            angle = np.linspace(0, 2*np.pi, 5)[:-1] + (np.pi/4.)
-            target_distance = 6.
-        else:
-            angle = np.linspace(0, 2*np.pi, ntargets+1)[:-1]
-
-        if self.in_cage:
-            offset = np.array([-4., 0.])
-            nudge_targ = np.array([0, 0, 0, 0])
-            target_distance = 3.
-        else:
-            offset = np.array([0., 0.])
-            nudge_targ = np.array([0, 0, 1., 0])
-    
-        x = np.cos(angle)*target_distance
-        y = np.sin(angle)*target_distance
-        tmp = np.hstack((x[:, np.newaxis], y[:, np.newaxis]))
-        
-
-
-        ### Add offset to the target positions 
-        tmp = tmp + offset[np.newaxis, :]
-
-        tgs = []
-        nudges = []
-        for blks in range(100):
-            ix = np.random.permutation(tmp.shape[0])
-            tgs.append(tmp[ix, :])
-            nudges.append(nudge_targ[ix])
-
-        tgs = np.vstack((tgs))
-        nudges = np.hstack((nudges))
-        nudge_ix = np.nonzero(nudges==1)[0]
-        #print('Nudges: ')
-        #print(len(nudge_ix))
-
-        to_nudge = np.array([-1., 1.])*nudge
-        tgs[nudge_ix, :] = tgs[nudge_ix, :] + to_nudge[np.newaxis, :]
-
-        return tgs
-
-    def get_targets_rand(self, target_distance=4):
-        # Targets in CM: 
-        angle = np.linspace(0, 2*np.pi, 1000)
-        target_distance = np.linspace(target_distance/4., target_distance, 1000)
-
-        ix_ang = np.random.permutation(1000)
-        ix_dist = np.random.permutation(1000)
-
-        x = np.cos(angle[ix_ang])*target_distance[ix_dist]
-        y = np.sin(angle[ix_ang])*target_distance[ix_dist]
-        return np.hstack((x[:, np.newaxis], y[:, np.newaxis]))
 
     def check_if_started_in_targ(self, targ_center, targ_rad):
         startedInTarg = False
@@ -1151,34 +1045,35 @@ class Manager(ScreenManager):
 
 class COApp(App):
     def build(self, **kwargs):
+        Window.size = (fixed_window_size[0], fixed_window_size[1])
+        Window.left = 0
+        Window.top = 0
         if platform == 'darwin':
-            screenx = 1800
-            screeny = 1000
-        elif platform =='win32':
-            from win32api import GetSystemMetrics
-            screenx = GetSystemMetrics(0)
-            screeny = GetSystemMetrics(1)
-
-        Window.size = (1800, 1000)
-        Window.left = (screenx - 1800)/2
-        Window.top = (screeny - 1000)/2
+            Window.fullscreen = 'auto'
+        
         return Manager()
 
-def cm2pix(pos_cm, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):
+def cm2pix(pos_cm, fixed_window_size_cm=fixed_window_size_cm):
+    pix_per_cm = Window.width/fixed_window_size_cm[0]
+    
     # Convert from CM to pixels: 
     pix_pos = pix_per_cm*pos_cm
 
     if type(pix_pos) is np.ndarray:
         # Translate to coordinate system w/ 0, 0 at bottom left
-        pix_pos[0] = pix_pos[0] + (fixed_window_size[0]/2.)
-        pix_pos[1] = pix_pos[1] + (fixed_window_size[1]/2.)
+        pix_pos[0] = pix_pos[0] + (Window.width/2.)
+        pix_pos[1] = pix_pos[1] + (Window.height/2.)
+        # pix_pos[0] = pix_pos[0] + (fixed_window_size[0]/2.)
+        # pix_pos[1] = pix_pos[1] + (fixed_window_size[1]/2.)
 
     return pix_pos
 
-def pix2cm(pos_pix, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):
+def pix2cm(pos_pix, fixed_window_size_cm=fixed_window_size_cm):
+    pix_per_cm = Window.width/fixed_window_size_cm[0]
+    
     # First shift coordinate system: 
-    pos_pix[0] = pos_pix[0] - (fixed_window_size[0]/2.)
-    pos_pix[1] = pos_pix[1] - (fixed_window_size[1]/2.)
+    pos_pix[0] = pos_pix[0] - (Window.width/2.)
+    pos_pix[1] = pos_pix[1] - (Window.height/2.)
 
     pos_cm = pos_pix*(1./pix_per_cm)
     return pos_cm
