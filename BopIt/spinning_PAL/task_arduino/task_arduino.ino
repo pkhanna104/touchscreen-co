@@ -3,29 +3,58 @@
 // Motor params 
 const int offset = 1;
 #define STBY 0
-#define E3_IN1 37
-#define E3_IN2 38
-#define E3_PWM 5
+#define E3_IN1 8
+#define E3_IN2 9
+#define E3_PWM 4
 Motor motor_E3 = Motor(E3_IN1, E3_IN2, E3_PWM, offset, STBY);
 
 // Connect to the two encoder outputs!
-#define ENCODER_A   3
-#define ENCODER_B   2
+// https://store.arduino.cc/usa/mega-2560-r3
+// https://www.instructables.com/ATTiny-Port-Manipulation-Part-15-DigitalRead/
+
+// 
+#define ENCODER_A   3 // 3 --> PE5; 
+#define ENCODER_B   2 // 2 --> PE4; 
 
 // These let us convert ticks-to-RPM
 //#define GEARING_ENCODERMULT     260
 
-bool motordir; 
+// Encoder variables 
+byte motordir; 
 int count = 0;  
+int targ; 
+
+// velocity estimate variation
+float vel = 0.; 
+float lastVel = 0.; 
+float lastTm = 0.; 
+float now = 0.;
+int lastTarg; 
+
+// rotation estimator 
+float full_rot = 265.3; 
+
+// pause 
+int nwait=0; 
+int nwait_tot = 100; 
+bool keep_spinning; 
 
 // data reading variables 
 char dio_data[1];
 double target_count; 
 int tc; 
-int thresh=0;
-int diff; 
-int drivez = 100;
-int mdrivez = -100;
+
+// motor control variables 
+int thresh=0; // diff between true and target pos
+int nthresh_tms=20; // number fo steps true and targ pos should be < thresh (corresponds to 50ms) 
+
+int n_tms=0; // starting number of times 
+int diff;  // diff b/w true and target pos 
+int diff2; // diff b/w/ true and lastTarg 
+int drivez=100; // drive PWM 
+int tm; // lenght of PWM in ms; 
+int tm2; 
+
 char c; 
 
 // IR sensor pin
@@ -36,12 +65,25 @@ const int analog_FSR1 = A14;
 const int analog_FSR2 = A15;
 
 void interruptB() {
-  motordir = digitalRead(ENCODER_A); 
+  //motordir = digitalRead(ENCODER_A);  
+  motordir = PINE; 
+  motordir = motordir & B00100000; 
   if (motordir) {
     count += 1; 
-  } else {
+  }
+  else {
     count -= 1; 
   }
+  // update last velocity 
+  lastVel = vel; 
+
+  // re-calc current velocity 
+  now = micros(); 
+  vel = 1./(now - lastTm); // counts-per-uS
+  vel = vel*1000; // counts-per-ms; 
+  
+  // update last time for next calc
+  lastTm = now; 
 }
 
 void setup() {
@@ -54,6 +96,7 @@ void setup() {
   pinMode(ENCODER_B, INPUT_PULLUP);
   pinMode(ENCODER_A, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(ENCODER_B), interruptB, RISING);
+  //attachInterrupt(digitalPinToInterrupt(ENCODER_A), interruptA, RISING);
   delay(100);
 
   // IR sensor setup // 
@@ -69,6 +112,9 @@ void loop() {
       tc = (int) target_count;
       int ct_start = count; 
       go_to_target();
+      
+      // keep this last target just in case 
+      lastTarg = targ; 
     }
   }
   print_serial();
@@ -76,57 +122,139 @@ void loop() {
 }
 
 void go_to_target() {
+  n_tms=0; 
+  nwait=0; 
+  keep_spinning = true; 
+  
+  // Make it so that targ is always less than count
   diff = abs(count - tc);
-  
-  while (diff > thresh) {
 
-    // Keep track of lastPos
-    int lastPos = count; 
-    int lastTs = micros(); 
+  float targc = (float) tc; 
+  while (targc < count) {
+    targc += full_rot; 
+  }
+  targ = (int) targc; 
   
-    if (diff > 10) {
-      drivez = 100;
-      mdrivez = -100;
-    }
-    else { 
-      drivez = 50;
-      mdrivez = -50;
-    }
-    
-    if (count > tc) {
-      motor_E3.drive(drivez, 10);
-      motor_E3.brake();
+  while ((diff >= thresh) and (n_tms < nthresh_tms)) {
+
+    // Only do this if we're supposed to keep spinning // 
+    if (keep_spinning) {
+      if ((diff - thresh) > 50 ) {
+        tm = 10;
+      }
+      else { 
+        tm = 5; 
+      }
+
+      // Forward movement (last resort)  
+      if (count > targ) {
+        motor_E3.drive(drivez, tm);
+        motor_E3.brake();
+      }
+//  
+      // Reverse movement (main thing) 
+       if (count < targ) {
+        motor_E3.drive(-1*drivez, tm);
+        motor_E3.brake();
+      }
+
+      // Check for deceleration // 
+      //check_decel(); 
     }
 
-    else if (count < tc) {
-      motor_E3.drive(mdrivez, 10);
-      motor_E3.brake();
-    }
-    diff = abs(count - tc);
+    // Wait  // 
+    delay(5);
+
+    // Re-calc diff //
+    diff = abs(count - targ);
     print_serial();
-    delay(5); 
 
-    // compute velocity 
-    float vel = (count - lastPos) / (micros() - lastTs); 
-    
+    // If diff == thresh increment // 
+    if (diff == thresh) {
+      n_tms += 1; 
+    }
+    // Re-set if ever unequal //
+    else {
+      n_tms = 0;
+    }
+
+    // Deal with this // 
+    if (!keep_spinning) {
+
+      // Drive back to last target and wait here // 
+      diff2 = abs(count - lastTarg); 
+      if (diff2 > 50) {
+        tm2 = 10; 
+      }
+      
+      else {
+        tm2 = 5;
+      }
+      
+      if (count > lastTarg) {
+        motor_E3.drive(drivez, tm2);
+        motor_E3.brake();
+      }
+      //  
+      // Reverse movement (main thing) 
+       if (count < lastTarg) {
+        motor_E3.drive(-1*drivez, tm2);
+        motor_E3.brake();
+      }
+
+      // Waiting time
+      if (count == lastTarg) {
+        nwait += 1; 
+      }
+      else {
+        nwait = 1;
+      }
+
+      // If we've waited long enough, set keep_spinning to true //
+      if (nwait == nwait_tot) {
+        nwait = 0; 
+        keep_spinning = true;
+      }
+    }
   }
 }
 
 void print_serial() {
-  // IR sensor pin //
+//  Serial.print(digitalRead(ENCODER_A)); 
+//  Serial.print("\t");
+//  Serial.println(digitalRead(ENCODER_B)); 
+  
+//   IR sensor pin //
   Serial.print(digitalRead(IR_sensor_pin)); 
-  Serial.print("\t"); 
+  Serial.print("     \t     "); 
 
   // FSR 1 // 
   Serial.print(analogRead(analog_FSR1)); 
-  Serial.print("\t"); 
+  Serial.print("     \t     "); 
 
   // FSR 2 // 
   Serial.print(analogRead(analog_FSR2)); 
-  Serial.print("\t"); 
+  Serial.print("     \t     "); 
 
   // Wheel location 
-  Serial.println(count); 
+  Serial.print(count); 
+  Serial.print  ("     \t     "); 
+
+  // Wheel location 
+  Serial.print(targ); 
+  Serial.println  ("     \t     "); 
+
+//  // Diff 
+//  Serial.print(diff); 
+//  Serial.print("     \t     "); 
+//  // Vel
+//  Serial.print(vel); 
+//  Serial.print("     \t     "); 
+//
+//  // Last vel
+//  Serial.print(lastVel); 
+//  Serial.println("     \t     "); 
+
 }
 
 void handle_word() {
@@ -139,5 +267,23 @@ void handle_word() {
       if (bitRead(data_byte, bit_idx)==1) {
         target_count += pow(2, bit_idx); 
       }
+  }
+}
+
+void check_decel() {
+  // Time since last update // 
+  float v = 1./(micros() - lastTm); // counts-per-uS
+  v = v*1000.; //  counts-per-ms; 
+
+  // Average number of counts per ms;  
+  // float avgSpd = 0.5*(abs(vel) + abs(lastVel)); 
+
+  // If dt is slower t and you're within the zone 
+  if ((v < 0.25*abs(vel)) and (abs(count - lastTarg) < 40)) {
+    keep_spinning = false;
+  }
+
+  else {
+    keep_spinning = true;
   }
 }
