@@ -28,7 +28,17 @@ class RewThread(threading.Thread):
         self.comport = comport
         self.rew_time = rew_time
 
-    def run(self):
+    def run(self, rew_num):
+        if rew_num == 1:
+            self.reward1 = SoundLoader.load('reward1.wav')
+            time.sleep(.1)
+            self.reward1.play()
+            time.sleep(.1)
+        elif rew_num == 2:
+            self.reward2 = SoundLoader.load('reward2.wav')
+            time.sleep(.1)
+            self.reward2.play()
+
         rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
         self.comport.write(rew_str)
         time.sleep(.25)
@@ -217,10 +227,12 @@ class R2Game(Widget):
 
 
         ### Trials to include ###
-        trials_active_list = ['hole', 'tripod', 'pinch', 'square']
+        trials_active_list = ['power', 'tripod', 'pinch', 'power']
+        trials_position_list = [2, 6, 10]
 
         ### Assumes rest == 0 ###
-        trials_position_list = [98, 163, 228, 33]
+        #trials_position_list = [98, 163, 228, 33]
+
         self.trial_num = 0; 
         self.trials_list_valid = []
         for i, val in enumerate(trials_active['trials']):
@@ -261,6 +273,7 @@ class R2Game(Widget):
             self.reward_port = serial.Serial(port='COM5',
                 baudrate=115200)
             reward_fcn = True
+            self.reward_port.close()
         except:
             reward_fcn = False
             pass
@@ -300,7 +313,8 @@ class R2Game(Widget):
 
         ## Open task arduino - IR sensor, button, wheel position ### 
         self.task_ard = serial.Serial('COM6', baudrate=115200)
-        
+        self.going_to_targ = False; 
+
         if self.testing:
             pass
         else:
@@ -380,7 +394,7 @@ class R2Game(Widget):
 
         # Turn off LED when cloisng : 
         self.task_ard.flushInput()
-        self.task_ard.write('n'.encode()) #morn
+        #self.task_ard.write('n'.encode()) #morn
         
         if self.idle:
             self.state = 'idle_exit'
@@ -434,7 +448,7 @@ class R2Game(Widget):
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('\t')
 
-        if len(port_splits) != 4:
+        if len(port_splits) != 5:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
             port_read = self.task_ard.readline()
@@ -445,6 +459,7 @@ class R2Game(Widget):
         self.fsr1 = int(port_splits[1])
         self.fsr2 = int(port_splits[2])
         self.wheel_pos = int(port_splits[3])
+        self.going_to_targ = int(port_splits[4])
 
         ### Buttons #####
         if self.fsr1 + self.fsr2 > 10: 
@@ -549,7 +564,7 @@ class R2Game(Widget):
         self.current_trial = self.generated_trials[self.trial_num]
 
         #### close the door 
-        word = b'd'+struct.pack('<H', 0)
+        word = b'd'+struct.pack('<H', self.current_trial[1] - 2) # rest is 2 units before 
         self.task_ard.write(word)
 
     def _start_grasp_trial_start(self, **kwargs):
@@ -561,15 +576,12 @@ class R2Game(Widget):
 
     def door_opened(self, **kwargs): 
         ### Is the wheel in the right spot ?? 
-        return self.wheel_pos == self.current_trial[1]
+        if self.going_to_targ == 0: 
+            return True
 
     def end_ITI(self, **kwargs):
-        if np.abs(self.wheel_pos) < 3: ## only start next trial if wheel is in the rest position 
-            return kwargs['ts'] > self.ITI
-        else:
-            print(self.wheel_pos)
-            return False
-
+        return kwargs['ts'] > self.ITI
+        
     def _start_vid_trig(self, **kwargs):
         try:
             self.cam_trig_port.write('1'.encode())
@@ -580,7 +592,7 @@ class R2Game(Widget):
 
     def _start_start_button(self, **kwargs):
         self.task_ard.flushInput()
-        self.task_ard.write('m'.encode()) #morning
+        #self.task_ard.write('m'.encode()) #morning
 
     def pushed_start(self, **kwargs):
         if self.use_cap_not_button:
@@ -636,23 +648,23 @@ class R2Game(Widget):
             if self.task_opt == 'button':
                 pass 
             else:
-                self.reward1.play()
+                #self.reward1.play()
                 if self.reward_for_grasp[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
                     print('in reward: ')
                     if not self.skip_juice:
                         if self.reward_generator[self.trial_counter] > 0:
-                            thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
-                            thread1.start()
+                            # thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
+                            # thread1.start(1)
 
-                            # self.reward_port.open()
-                            # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                            # self.reward_port.write(rew_str)
-                            # time.sleep(.5 + self.reward_delay_time)
-                            # run_str = [ord(r) for r in 'run\n']
-                            # self.reward_port.write(run_str)
-                            # self.reward_port.close()
+                            self.reward_port.open()
+                            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
+                            self.reward_port.write(rew_str)
+                            time.sleep(.5 + self.reward_delay_time)
+                            run_str = [ord(r) for r in 'run\n']
+                            self.reward_port.write(run_str)
+                            self.reward_port.close()
         except:
             pass
 
@@ -666,22 +678,22 @@ class R2Game(Widget):
         
     def _start_rew_start(self, **kwargs):
         self.small_reward_cnt += 1
-
         try:
             #if self.reward_for_start[0]:
                 #sound = SoundLoader.load('reward2.wav')
                 #sound.play()
             self.reward2.play()
             if self.reward_for_start[1] > 0.:
-                thread1 = RewThread(self.reward_port, self.reward_for_start[1])
-                thread1.start()
-                # self.reward_port.open()
-                # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
-                # self.reward_port.write(rew_str)
-                # time.sleep(.5)
-                # run_str = [ord(r) for r in 'run\n']
-                # self.reward_port.write(run_str)
-                # self.reward_port.close()
+                # thread1 = RewThread(self.reward_port, self.reward_for_start[1])
+                # thread1.start(2)
+                # import pdb; pdb.set_trace()
+                self.reward_port.open()
+                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
+                self.reward_port.write(rew_str)
+                time.sleep(.5)
+                run_str = [ord(r) for r in 'run\n']
+                self.reward_port.write(run_str)
+                self.reward_port.close()
         except:
             pass
 
