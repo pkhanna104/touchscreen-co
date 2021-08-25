@@ -480,7 +480,7 @@
 
 
                 Label: 
-                    text: 'Giant hole'
+                    text: 'Power grasp'
 
                 CheckBox:
                     id: giant_hole
@@ -496,12 +496,6 @@
 
                 CheckBox:
                     id: pinch
-
-                Label: 
-                    text: 'Hard square'
-                
-                CheckBox:
-                    id: hard_square
 
 
                 Label:
@@ -688,7 +682,7 @@
                     dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]),
                     dict(use_cap=[False, True]), 
                     dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]), 
-                    dict(trials=[giant_hole.active, tripod.active, pinch.active, hard_square.active]))
+                    dict(trials=[giant_hole.active, tripod.active, pinch.active]))
 
                     Clock.schedule_interval(game.update, 1.0 / 30.0)
             Label:
