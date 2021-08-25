@@ -339,11 +339,11 @@ void print_serial() {
   Serial.print(spin_ir_count);   
   Serial.print("\t");
   Serial.print(in_targ);
-  // Extra 
-  Serial.print("\t");
-  Serial.print(factor);
-  Serial.print("\t");
-  Serial.print(vel);
-  Serial.print("\t"); 
-  Serial.println(tc); 
+  // Extra for debugging; 
+//  Serial.print("\t");
+//  Serial.print(factor);
+//  Serial.print("\t");
+//  Serial.print(vel);
+//  Serial.print("\t"); 
+//  Serial.println(tc); 
 }
