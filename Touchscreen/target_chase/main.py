@@ -212,7 +212,7 @@ class COGame(Widget):
         self.center_position[1] = self.center_position[1] + self.screen_top/2    
         
         d_center2top = (fixed_window_size_cm[1]/2)+(self.screen_top/2)
-        max_y_from_center = d_center2top-self.target_rad
+        self.max_y_from_center = d_center2top-self.target_rad
         
         # target 1
         target_pos_opts = ['center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
@@ -224,21 +224,22 @@ class COGame(Widget):
             targ_x = self.center_position[0]+self.nudge_x_t1
             targ_y = self.center_position[1]
         elif self.target1_pos_str == 'upper_right':
-            targ_x = max_y_from_center+self.nudge_x_t1
-            targ_y = self.center_position[1] + max_y_from_center
+            targ_x = self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] + self.max_y_from_center
         elif self.target1_pos_str == 'lower_right':
-            targ_x = max_y_from_center+self.nudge_x_t1
-            targ_y = self.center_position[1] - max_y_from_center
+            targ_x = self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target1_pos_str == 'lower_left':
-            targ_x = -max_y_from_center+self.nudge_x_t1
-            targ_y = self.center_position[1] - max_y_from_center
+            targ_x = -self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target1_pos_str == 'upper_left':
-            targ_x = -max_y_from_center+self.nudge_x_t1
-            targ_y = self.center_position[1] + max_y_from_center
+            targ_x = -self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] + self.max_y_from_center
             
         self.target1_position = np.array([targ_x, targ_y])
         
         # target 2
+        target_pos_opts = ['random', 'center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
         for i, val in enumerate(task_in['targ2_pos']):
             if val:
                 self.target2_pos_str = target_pos_opts[i]
@@ -247,50 +248,55 @@ class COGame(Widget):
             targ_x = self.center_position[0]+self.nudge_x_t2
             targ_y = self.center_position[1]
         elif self.target2_pos_str == 'upper_right':
-            targ_x = max_y_from_center+self.nudge_x_t2
-            targ_y = self.center_position[1] + max_y_from_center
+            targ_x = self.max_y_from_center+self.nudge_x_t2
+            targ_y = self.center_position[1] + self.max_y_from_center
         elif self.target2_pos_str == 'lower_right':
-            targ_x = max_y_from_center+self.nudge_x_t2
-            targ_y = self.center_position[1] - max_y_from_center
+            targ_x = self.max_y_from_center+self.nudge_x_t2
+            targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target2_pos_str == 'lower_left':
-            targ_x = -max_y_from_center+self.nudge_x_t2
-            targ_y = self.center_position[1] - max_y_from_center
+            targ_x = -self.max_y_from_center+self.nudge_x_t2
+            targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target2_pos_str == 'upper_left':
-            targ_x = -max_y_from_center+self.nudge_x_t2
-            targ_y = self.center_position[1] + max_y_from_center
+            targ_x = -self.max_y_from_center+self.nudge_x_t2
+            targ_y = self.center_position[1] + self.max_y_from_center
             
         self.target2_position = np.array([targ_x, targ_y])
         
         # target 3
+        target_pos_opts = ['none', 'center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
         for i, val in enumerate(task_in['targ3_pos']):
             if val:
                 self.target3_pos_str = target_pos_opts[i]
         
-        if self.target3_pos_str == 'center':
-            targ_x = self.center_position[0]+self.nudge_x_t3
-            targ_y = self.center_position[1]
-        elif self.target3_pos_str == 'upper_right':
-            targ_x = max_y_from_center+self.nudge_x_t3
-            targ_y = self.center_position[1] + max_y_from_center
-        elif self.target3_pos_str == 'lower_right':
-            targ_x = max_y_from_center+self.nudge_x_t3
-            targ_y = self.center_position[1] - max_y_from_center
-        elif self.target3_pos_str == 'lower_left':
-            targ_x = -max_y_from_center+self.nudge_x_t3
-            targ_y = self.center_position[1] - max_y_from_center
-        elif self.target3_pos_str == 'upper_left':
-            targ_x = -max_y_from_center+self.nudge_x_t3
-            targ_y = self.center_position[1] + max_y_from_center
-            
-        self.target3_position = np.array([targ_x, targ_y])
+        if not self.target3_pos_str == 'none':
+            if self.target3_pos_str == 'center':
+                targ_x = self.center_position[0]+self.nudge_x_t3
+                targ_y = self.center_position[1]
+            elif self.target3_pos_str == 'upper_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t3
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target3_pos_str == 'lower_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t3
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target3_pos_str == 'lower_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t3
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target3_pos_str == 'upper_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t3
+                targ_y = self.center_position[1] + self.max_y_from_center
+                
+            self.target3_position = np.array([targ_x, targ_y])
             
         # target 4
-        target_pos_opts = ['none', 'center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
         for i, val in enumerate(task_in['targ4_pos']):
             if val:
                 self.target4_pos_str = target_pos_opts[i]
         
-        if self.target4_pos_str == 'none':
+        if self.target3_pos_str == 'none':
+            self.target3_position = False
+            self.target4_position = False
+            self.num_targets = 2
+        elif self.target4_pos_str == 'none':
             self.target4_position = False
             self.num_targets = 3
         else:
@@ -299,17 +305,17 @@ class COGame(Widget):
                 targ_x = self.center_position[0]+self.nudge_x_t4
                 targ_y = self.center_position[1]
             elif self.target4_pos_str == 'upper_right':
-                targ_x = max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] + max_y_from_center
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
             elif self.target4_pos_str == 'lower_right':
-                targ_x = max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] - max_y_from_center
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
             elif self.target4_pos_str == 'lower_left':
-                targ_x = -max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] - max_y_from_center
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
             elif self.target4_pos_str == 'upper_left':
-                targ_x = -max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] + max_y_from_center
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
             
             self.target4_position = np.array([targ_x, targ_y])
 
@@ -759,6 +765,25 @@ class COGame(Widget):
         
         # Reset target index back to 1
         self.target_index = 1
+        
+        # Get the position of target2
+        if self.target2_pos_str == 'random':
+            i_pos = np.random.randint(0, 4)
+            if i_pos == 0: # 'upper_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif i_pos == 1:# 'lower_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif i_pos == 2: # 'lower_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif i_pos == 3: # 'upper_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] + self.max_y_from_center
+                
+            self.target2_position = np.array([targ_x, targ_y])
+                
 
     def end_vid_trig(self, **kwargs):
         return kwargs['ts'] > self.pre_start_vid_ts
@@ -902,16 +927,15 @@ class COGame(Widget):
                 self.reward1 = SoundLoader.load('reward1.wav')
                 self.reward1.play()
 
-                if not self.skip_juice:
-                    if self.reward_generator[self.trial_counter] > 0:
-                        self.reward_port.open()
-                        #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.last_targ_reward[1])+' sec\n']
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                        self.reward_port.write(rew_str)
-                        time.sleep(.25 + self.reward_delay_time)
-                        run_str = [ord(r) for r in 'run\n']
-                        self.reward_port.write(run_str)
-                        self.reward_port.close()
+                if self.reward_generator[self.trial_counter] > 0:
+                    self.reward_port.open()
+                    #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.last_targ_reward[1])+' sec\n']
+                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
+                    self.reward_port.write(rew_str)
+                    time.sleep(.25 + self.reward_delay_time)
+                    run_str = [ord(r) for r in 'run\n']
+                    self.reward_port.write(run_str)
+                    self.reward_port.close()
         except:
             pass
         
