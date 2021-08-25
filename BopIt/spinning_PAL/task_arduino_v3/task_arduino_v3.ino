@@ -63,9 +63,14 @@ volatile float factor = 1;
 
 float vel = 0;
 float lastTm = micros();
+
+volatile int count_spin_tm1=0; 
+
 //////////////////////////////////////////
 //////////////////////////////////////////
 
+
+// This method is for estimating the current velocity using the hall sensor encoder // 
 void interrupt_motorencoder() {
   motordir = PINH;
   motordir = motordir & B00001000;
@@ -79,55 +84,76 @@ void interrupt_motorencoder() {
   // get velocity
   vel = (1.) / (micros() - lastTm); // counts per uS
   vel *= us2s; // counts per sec
-  vel /= (22 * 12); // r per sec
+  vel /= (22 * 12); // approximately revs per sec
 
+    // some sort  of coarse speed control // 
     if ((vel < 0.25) and (in_targ == 1)) {
+
+      // double, triple, quadruple etc. /
       if (factor >= 1) {
       factor += 1;
       }
+
+      // double factor 
       else {
         factor *= 2;
       }
     }
-  
+
+    // if velocity too high 
     else if ((vel > 0.75) and (in_targ == 1)) {
-      if (factor == 1) {
+      if (factor <= 1) {
+        // halve
         factor /= 2;
       }
       else {
         factor -= 1;
       }
     }
-  
+
+    // bound the 'factor' 
     factor = min(factor, 3);
     factor = max(factor, 0.1);
-  //
+
+  // save current time so we can use it for next time; 
   lastTm = micros();
-}
 
-void interrupt_spinIR() {
-  // Adjust count to the nearest 22?
-  int tmp = count / 22 ;
-  int tmp1 = tmp + 1;
-
-  int d = abs(count - 22 * tmp);
-  int d1 = abs(count - 22 * tmp1);
-
-  if (d < d1) {
-    count = 22 * tmp;
+  if ((in_targ == 1) and ((spin_ir_count + 1)%12 == tc)) {
+    count_spin_tm1 += 1; 
   }
   else {
-    count = 22 * tmp1;
+    count_spin_tm1 = 0; 
   }
+}
+
+// Use the spin IR sensor 
+void interrupt_spinIR() {
 
   // Keep track of own spin_ir_count
   if (abs(count - lastCnt) > 5) {
+
+    // This really counts then // 
     if (motordir) {
       spin_ir_count += 1;
     }
     else {
       spin_ir_count -= 1;
     }
+
+    // Now use this update to make the other count more accurate // 
+    // Adjust count to the nearest 22 --> use the spin IR sensor to keep the encoder more accurate / stable // 
+    int tmp = count / 22 ;
+    int tmp1 = tmp + 1;
+    int d = abs(count - 22 * tmp);
+    int d1 = abs(count - 22 * tmp1);
+
+    if (d < d1) {
+      count = 22 * tmp;
+    }
+    else {
+      count = 22 * tmp1;
+    }
+        
     // Mod 12 //
     spin_ir_count = spin_ir_count % 12;
 
@@ -163,20 +189,21 @@ void loop() {
     c = Serial.read();
     if (c == 'd') {
       handle_word();
+
+      // add 0.1 so that when we convert this from char --> int it rounds correclty 
       target_count = target_count + 0.1;
 
       // Integer from 0-11 of target to hit //
       tc = (int) target_count;
 
-      // Activate solenoid //
+      // Activate solenoid to get outta the way //
       act_solenoid();
 
       // Go to target method //
       go_to_target();
-      in_targ = 0;
 
-      // De-activate solenoid //
-      deact_solenoid();
+      // no longer in "go to target" mode 
+      in_targ = 0;
 
     }
   }
@@ -186,7 +213,7 @@ void loop() {
 
 // activate solenoid
 void act_solenoid() {
-  forward(motor_sol, motor_sol, 150);
+  forward(motor_sol, motor_sol, 200);
   delay(30);
   forward(motor_sol, motor_sol, 50);
 }
@@ -211,68 +238,80 @@ void handle_word() {
 
 // go to the target, based on knowing where we are right now;
 void go_to_target() {
+  
+  // these are variables needed to say whether we've successfully reached the target 
   n_tms = 0;
   n_tms2 = 0;
-  in_targ = 1;
-  factor = 1;
 
+  // set in-targ equal to "1" 
+  in_targ = 1;
+
+  // set factor equal to "1" 
+  factor = 1;
+    
+  // eventually this will be used to make sure spinning stops // 
   keep_spinning = true;
 
-  // Make it so that targ is always greater than the count
-  diff = (tc - spin_ir_count) % 12;
+  // Compute the difference, mod 12 so its always between 0 and 11; 
+  if (tc < spin_ir_count) {
+    diff = (tc + 12 - spin_ir_count); 
+  }
+  else {
+    diff = tc - spin_ir_count; 
+  }
 
   // Criteria based on IR sensor encoder //
-  while ((abs(diff) > 0) or (n_tms < nthresh_tms) or (n_tms2 < nthresh_tms)) {
+  while (( diff > 0) or (n_tms < nthresh_tms) or (n_tms2 < nthresh_tms)) {
 
     // Only do this if we're supposed to keep spinning //
     if (keep_spinning) {
 
-      // number of steps
-      if (tc > spin_ir_count) {
-        nsteps = tc - spin_ir_count;
-      }
-      else {
-        nsteps = tc + 12 - spin_ir_count;
-      }
-
-      if (nsteps > 2 ) {
-        tm = nsteps;
+      // Set factor equal to 1; 
+      if (diff > 2 ) {
+        tm = diff;
         drivez = 50;
-        factor = 1; 
       }
-      else if (nsteps > 0) {
-        tm = 2;
-        drivez = 50;
-        factor = 1; 
+      else if (diff > 0) {
+        tm = 1;
+        drivez = 50; 
       }
       else {
         tm = 0;
         drivez = 50;
       }
 
+      // Drive the motor forward, factor adjusts time; 
       motor_spin.drive(-1 * drivez, factor * tm);
+
+      // stop the motor 
       motor_spin.brake();
-      //}
     }
 
     // Wait  //
     delay(5);
 
     // Re-calc diff //
-    diff = abs(tc - spin_ir_count);
+    if (tc < spin_ir_count) {
+      diff = (tc + 12 - spin_ir_count); 
+    }
+    else {
+      diff = tc - spin_ir_count; 
+    }
 
     // Print serial //
     print_serial();
 
     // If diff == thresh increment //
-    if (abs(diff) == 0 ) {
+    if ( diff == 0 ) {
       n_tms += 1;
     }
+    
     // Re-set if ever unequal //
     else {
       n_tms = 0;
     }
 
+    // Make IR criteria 
     if (digitalRead(spin_IR) == 1) {
       n_tms2 += 1;
     }
@@ -280,52 +319,31 @@ void go_to_target() {
       n_tms2 = 0;
     }
 
-    if ((n_tms > 0) and (n_tms2 > 0)) {
-      deact_solenoid();
-    }
+    // Trigger solenoid 
+//    if ((n_tms > 0) and (n_tms2 > 0)) {
+//      deact_solenoid();
+//    }
+      if (count_spin_tm1 == 21) {
+          deact_solenoid(); 
+        }
+      }
   }
-}
 
 void print_serial() {
   Serial.print(digitalRead(Lift_IR)); 
   Serial.print("\t");
-  Serial.print(digitalRead(analog_FSR1)); 
+  Serial.print(analogRead(analog_FSR1)); 
   Serial.print("\t");
-  Serial.print(digitalRead(analog_FSR2)); 
+  Serial.print(analogRead(analog_FSR2)); 
   Serial.print("\t");
   Serial.print(spin_ir_count);   
   Serial.print("\t");
-  Serial.println(in_targ);
-
-  
-  // Count
-//  Serial.print(spin_ir_count);
-//  Serial.print  ("     \t     ");
-
-  // Target
-//  Serial.print(tc);
-//  Serial.print("     \t     ");
-
-//  Serial.print(n_tms);
-//  Serial.print("     \t     ");
-//
-//  Serial.print(n_tms2);
-//  Serial.print("     \t     ");
-
-//  Serial.print(vel);
-//  Serial.print  ("     \t     ");
-
-//  Serial.print(factor);
-//  Serial.print  ("     \t     ");
-
-//  // Digital read
-//  Serial.println(digitalRead(spin_IR));
-
+  Serial.print(in_targ);
+  // Extra 
+  Serial.print("\t");
+  Serial.print(factor);
+  Serial.print("\t");
+  Serial.print(vel);
+  Serial.print("\t"); 
+  Serial.println(tc); 
 }
-//  // Vel
-//  Serial.print(vel);
-//  Serial.print("     \t     ");
-//
-//  // Last vel
-//  Serial.print(lastVel);
-//  Serial.println("     \t     ");
