@@ -16,12 +16,31 @@ from sys import platform
 
 
 Config.set('graphics', 'resizable', False)
-if platform == 'darwin':
-    fixed_window_size = (3072, 1920)
-    pix_per_cm = 89.
+
+if platform == 'darwin': # we are on a Mac
+    # This probably means that we are testing on a personal laptop
+    
+    # settings for MBP 16" 2021
+    fixed_window_size = (3072, 1920) # we get this automatically now but here it is anyway
+    fixed_window_size_cm = (34.5, 21.5) # this is the important part
+    pix_per_cm = 104. # we get this automatically now but here it is anyway
 elif platform == 'win32':
-    fixed_window_size = (1800, 1000)
-    pix_per_cm = 85.
+    # see if there is an external monitor plugged in
+    from screeninfo import get_monitors
+    mon = get_monitors()
+#    if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
+#        # must be an external monitor plugged in
+#        # assume that it is the ViewSonic TD2230
+#        fixed_window_size = (1920, 1080) # we get this automatically now but here it is anyway
+#        fixed_window_size_cm = (47.6, 26.8) # this is the important part
+#        pix_per_cm = 40. # we get this automatically now but here it is anyway
+#    else:
+        # must just be the Surface Pro
+        # These are surface pro settings
+    fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
+    fixed_window_size_cm = (47.6, 26.8)
+#        fixed_window_size_cm = (22.8, 15.2) # this is the important part
+    pix_per_cm = 95. # we get this automatically now but here it is anyway
     import winsound
 
 Config.set('graphics', 'width', str(fixed_window_size[0]))
@@ -54,15 +73,25 @@ class COGame(Widget):
     center_target_rad = 1.5
     periph_target_rad = 1.5
     
-    if platform == 'darwin':
-        exit_pos = np.array([14, 8])
-        indicator_pos = np.array([16, 10])
-    elif platform == 'win32':
-        exit_pos = np.array([7, 4])
-        indicator_pos = np.array([8, 5])
+    # SET THE POSITION OF THE EXIT BUTTONS AND THE PHOTODIODE INDICATOR LIGHT
+    # positions are in CM measured from the center of the screen
+    # if platform == 'darwin':
+    
+    exit_pos_x = (fixed_window_size_cm[0]/2)-1.5
+    exit_pos_y = (fixed_window_size_cm[1]/2)-1.5
+                 
+    exit_pos = np.array([exit_pos_x, exit_pos_y])
+    ind_pos_x = (fixed_window_size_cm[0]/2)-0.5
+    ind_pos_y = (fixed_window_size_cm[1]/2)-0.5
+                 
+    indicator_pos = np.array([ind_pos_x, ind_pos_y])
+    # elif platform == 'win32':
+    #     exit_pos = np.array([7, 4])
+    #     indicator_pos = np.array([8, 5])
     exit_rad = 1.
     exit_hold = 2 #seconds
-
+    
+    # SET THE HOLD AND TIMEOUT TIMES
     ch_timeout = 10. # ch timeout
     cht = .001 # center hold time
 
@@ -84,7 +113,8 @@ class COGame(Widget):
     touch = False
 
     center_target = ObjectProperty(None)
-    periph_target = ObjectProperty(None)
+    periph_target1 = ObjectProperty(None)
+    periph_target2 = ObjectProperty(None)
 
     done_init = False
     prev_exit_ts = np.array([0,0])
@@ -136,8 +166,15 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         test=None, hold=None, targ_structure=None,
-        autoquit=None, rew_var=None, targ_timeout = None, nudge_x=None, nudge_y=None):
-
+        autoquit=None, rew_var=None, targ_timeout = None, nudge_x=None, screen_top=None):
+        
+        import os 
+        path = os.getcwd()
+        if 'BasalGangulia' in path:
+            self.in_cage = True
+        else:
+            self.in_cage = False
+        
         self.rew_cnt = 0
         self.small_rew_cnt = 0
 
@@ -188,15 +225,26 @@ class COGame(Widget):
             self.skip_juice = False
         
         
-        # NUDGE TARGET X AND Y
+        # NUDGE X
         nudge_x_opts = [-6, -4, -2, 0, 2, 4, 6]    
         for i, val in enumerate(nudge_x['nudge_x']):
             if val:
                 self.nudge_x = nudge_x_opts[i]
-        nudge_y_opts = [-3, -2, -1, 0, 1, 2, 3]    
-        for i, val in enumerate(nudge_y['nudge_y']):
+        
+        # WHERE TO CONSIDER THE TOP OF THE SCREEN (HOW MUCH TO SHRINK IT DOWN BY)
+        screen_top_opts = [-12, -10, -8, -6, -4, -2, 0]    
+        for i, val in enumerate(screen_top['screen_top']):
             if val:
-                self.nudge_y = nudge_y_opts[i]
+                self.screen_top = screen_top_opts[i]
+                
+        self.center_target_position = np.array([0., 0.])
+        if self.in_cage:
+            self.center_target_position[0] = self.center_target_position[0] - 4
+        else:
+            self.center_target_position[0] = self.center_target_position[0] + self.nudge_x
+            
+            # lower the center target by half of the total amount the screen height has been shrunk by
+            self.center_target_position[1] = self.center_target_position[1] + self.screen_top/2
         
         # TARGET RADIUS
         target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 2.25, 3.0]
@@ -210,19 +258,31 @@ class COGame(Widget):
         for i, val in enumerate(task_in['targ1_pos']):
             if val:
                 self.periph_target_pos_str = target1_pos_opts[i]
-                
-        if self.periph_target_pos_str == 'upper_right':
-            angle = 0.25*np.pi
-        elif self.periph_target_pos_str == 'lower_right':
-            angle = 1.75*np.pi
-        elif self.periph_target_pos_str == 'lower_left':
-            angle = 1.25*np.pi
-        elif self.periph_target_pos_str == 'upper_left':
-            angle = 0.75*np.pi
-
-        target_distance = 6.
         
-        self.target1_position = np.array([np.cos(angle)*target_distance+self.nudge_x, np.sin(angle)*target_distance+self.nudge_y])
+        d_center2top = (fixed_window_size_cm[1]/2)+(self.screen_top/2)
+        max_y_from_center = d_center2top-self.periph_target_rad
+        
+        if self.periph_target_pos_str == 'upper_right':
+            # angle = 0.25*np.pi
+            targ1_x = max_y_from_center+self.nudge_x
+            targ1_y = self.center_target_position[1] + max_y_from_center
+        elif self.periph_target_pos_str == 'lower_right':
+            # angle = 1.75*np.pi
+            targ1_x = max_y_from_center+self.nudge_x
+            targ1_y = self.center_target_position[1] - max_y_from_center
+        elif self.periph_target_pos_str == 'lower_left':
+            # angle = 1.25*np.pi
+            targ1_x = -max_y_from_center+self.nudge_x
+            targ1_y = self.center_target_position[1] - max_y_from_center
+        elif self.periph_target_pos_str == 'upper_left':
+            # angle = 0.75*np.pi
+            targ1_x = -max_y_from_center+self.nudge_x
+            targ1_y = self.center_target_position[1] + max_y_from_center
+
+        # target_distance = 6. # distance from center of screen to target
+        
+        # self.target1_position = np.array([np.cos(angle)*target_distance+self.nudge_x, np.sin(angle)*target_distance+self.nudge_y])
+        self.target1_position = np.array([targ1_x, targ1_y])
         
         self.periph_target_position = self.target1_position
         self.target_index = 1
@@ -232,16 +292,25 @@ class COGame(Widget):
         for i, val in enumerate(task_in['targ2_pos']):
             if val:
                 self.target2_pos_str = target2_pos_opts[i]
+                
+        targ1_to_targ2_dist_opts = [0, 3, 6, 9, 12, 15]
+        for i, val in enumerate(task_in['targ1_to_targ2_dist']):
+            if val:
+                self.targ1_to_targ2_dist = targ1_to_targ2_dist_opts[i]
         
-        self.target2_position = np.array([np.cos(angle)*target_distance+self.nudge_x, np.sin(angle)*target_distance+self.nudge_y])
+        # self.target2_position = np.array([np.cos(angle)*target_distance+self.nudge_x, np.sin(angle)*target_distance+self.nudge_y])
+        self.target2_position = np.array([targ1_x, targ1_y])
         if self.target2_pos_str == 'left':
-            self.target2_position[0] = self.target2_position[0]-2*self.periph_target_rad
+            self.target2_position[0] = self.target2_position[0]-2*self.periph_target_rad-self.targ1_to_targ2_dist
         elif self.target2_pos_str == 'right':
-            self.target2_position[0] = self.target2_position[0]+2*self.periph_target_rad
+            self.target2_position[0] = self.target2_position[0]+2*self.periph_target_rad+self.targ1_to_targ2_dist
         elif self.target2_pos_str == 'above':
-            self.target2_position[1] = self.target2_position[1]+2*self.periph_target_rad
+            self.target2_position[1] = self.target2_position[1]+2*self.periph_target_rad+self.targ1_to_targ2_dist
         elif self.target2_pos_str == 'below':
-            self.target2_position[1] = self.target2_position[1]-2*self.periph_target_rad
+            self.target2_position[1] = self.target2_position[1]-2*self.periph_target_rad-self.targ1_to_targ2_dist
+        
+        # HOW MUCH TIME TO WAIT UNTIL THE NEXT TARGET APPEARS
+        self.time_to_next_targ = False
         
         # ANIMAL NAME
         for i, (nm, val) in enumerate(animal_names_dict.items()):
@@ -313,13 +382,6 @@ class COGame(Widget):
             if val:
                 self.testing = test_vals[i]
                 #self.in_cage = in_cage_vals[i]
-        
-        import os 
-        path = os.getcwd()
-        if 'BasalGangulia' in path:
-            self.in_cage = True
-        else:
-            self.in_cage = False
 
         autoquit_trls = [10, 25, 50, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
@@ -353,15 +415,9 @@ class COGame(Widget):
 
         # Initialize targets: 
         self.center_target.set_size(2*self.center_target_rad)
-        
-        self.center_target_position = np.array([0., 0.])
-        if self.in_cage:
-            self.center_target_position[0] = self.center_target_position[0] - 4
-        else:
-            self.center_target_position[0] = self.center_target_position[0] + self.nudge_x
-            self.center_target_position[1] = self.center_target_position[1] + self.nudge_y
         self.center_target.move(self.center_target_position)
-        self.periph_target.set_size(2*self.periph_target_rad)
+        self.periph_target1.set_size(2*self.periph_target_rad)
+        self.periph_target2.set_size(2*self.periph_target_rad)
 
         self.exit_target1.set_size(2*self.exit_rad)
         self.exit_target2.set_size(2*self.exit_rad)
@@ -457,7 +513,7 @@ class COGame(Widget):
         print(self.reward_for_anytouch)
 
         #try:
-        if self.testing:
+        if self.testing or platform == 'darwin':
             pass
 
         else:
@@ -614,7 +670,7 @@ class COGame(Widget):
             except:
                 print('passing state! ')
                 pass     
-        if self.testing:
+        if self.testing or platform == 'darwin':
             pass
         else:
             if self.state == 'idle_exit':
@@ -704,7 +760,8 @@ class COGame(Widget):
             self.tht = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min)            
         
         self.center_target.color = (0., 0., 0., 0.)
-        self.periph_target.color = (0., 0., 0., 0.)
+        self.periph_target1.color = (0., 0., 0., 0.)
+        self.periph_target2.color = (0., 0., 0., 0.)
         self.indicator_targ.color = (0., 0., 0., 0.)
         
     def end_ITI(self, **kwargs):
@@ -718,9 +775,11 @@ class COGame(Widget):
         except:
             pass
         self.first_target_attempt = True
+        self.first_time_for_this_targ = True
 
         if np.logical_and(self.use_cap_sensor, not self.rhtouch_sensor):
-            self.periph_target.color = (1., 0., 0., 1.)
+            self.periph_target1.color = (1., 0., 0., 1.)
+            self.periph_target2.color = (1., 0., 0., 1.)
             self.center_target.color = (1., 0., 0., 1.)
             Window.clearcolor = (1., 0., 0., 1.)
 
@@ -752,44 +811,64 @@ class COGame(Widget):
         self.center_target.color = (1., 1., 0., 1.)
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.periph_target.color = (0., 0., 0., 0.) ### Make peripheral target alpha = 0 so doesn't obscure 
+        self.periph_target1.color = (0., 0., 0., 0.) ### Make peripheral target alpha = 0 so doesn't obscure 
         self.indicator_targ.color = (.25, .25, .25, 1.)
         
         # Reset target index back to 1
         self.target_index = 1
+        
+        if self.first_time_for_this_targ:
+            self.first_time_for_this_targ_t0 = time.time()
+            self.periph_target2.color = (0., 0., 0., 0.)
+            self.first_time_for_this_targ = False
+            
+    def _while_center(self, **kwargs):
+        # check and see if it is time for the next target to appear
+        if self.time_to_next_targ is not False:
+            # import pdb; pdb.set_trace()
+            if time.time() - self.first_time_for_this_targ_t0 > self.time_to_next_targ:
+                # illuminate the next target
+                self.periph_target2.move(self.target1_position)
+                self.periph_target2.color = (1., 1., 0., 1.)        
 
     def _start_center_hold(self, **kwargs):
         self.center_target.color = (0., 1., 0., 1.)
         self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _start_targ_hold(self, **kwargs):
-        self.periph_target.color = (0., 1., 0., 1.)
+        self.periph_target1.color = (0., 1., 0., 1.)
         self.indicator_targ.color = (0.75, .75, .75, 1.)
 
     def _end_center_hold(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
+        self.first_time_for_this_targ = True
 
     def _end_target_hold(self, **kwargs):
-        self.periph_target.color = (0., 0., 0., 0.)
+        self.periph_target1.color = (0., 0., 0., 0.)
+        self.first_time_for_this_targ = True
 
     def _start_touch_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target1.color = (0., 0., 0., 1.)
+        self.periph_target2.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_timeout_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target1.color = (0., 0., 0., 1.)
+        self.periph_target2.color = (0., 0., 0., 1.)
         #self.repeat = True
 
     def _start_hold_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target1.color = (0., 0., 0., 1.)
+        self.periph_target2.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_drag_error(self, **kwargs):
         self.center_target.color = (0., 0., 0., 1.)
-        self.periph_target.color = (0., 0., 0., 1.)
+        self.periph_target1.color = (0., 0., 0., 1.)
+        self.periph_target2.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_target(self, **kwargs):
@@ -801,8 +880,8 @@ class COGame(Widget):
         elif self.target_index == 2:
             self.periph_target_position = self.target2_position
 
-        self.periph_target.move(self.periph_target_position)
-        self.periph_target.color = (1., 1., 0., 1.)
+        self.periph_target1.move(self.periph_target_position)
+        self.periph_target1.color = (1., 1., 0., 1.)
         self.repeat = False
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
@@ -810,12 +889,26 @@ class COGame(Widget):
         if self.first_target_attempt:
             self.first_target_attempt_t0 = time.time();
             self.first_target_attempt = False
-            
+        
+        if self.first_time_for_this_targ:
+            self.first_time_for_this_targ_t0 = time.time()
+            self.periph_target2.color = (0., 0., 0., 0.)
+            self.first_time_for_this_targ = False
+    
+    def _while_target(self, **kwargs):
+        # check and see if it is time for the next target to appear
+        if self.time_to_next_targ is not False:
+            # import pdb; pdb.set_trace()
+            if time.time() - self.first_time_for_this_targ_t0 > self.time_to_next_targ and self.target_index == 1:
+                # illuminate the next target
+                self.periph_target2.move(self.target2_position)
+                self.periph_target2.color = (1., 1., 0., 1.)
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
         Window.clearcolor = (1., 1., 1., 1.)
-        self.periph_target.color = (1., 1., 1., 1.)
+        self.periph_target1.color = (1., 1., 1., 1.)
+        self.periph_target2.color = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
@@ -1104,34 +1197,35 @@ class Manager(ScreenManager):
 
 class COApp(App):
     def build(self, **kwargs):
+        Window.size = (fixed_window_size[0], fixed_window_size[1])
+        Window.left = 0
+        Window.top = 0
         if platform == 'darwin':
-            screenx = 1800
-            screeny = 1000
-        elif platform =='win32':
-            from win32api import GetSystemMetrics
-            screenx = GetSystemMetrics(0)
-            screeny = GetSystemMetrics(1)
-
-        Window.size = (1800, 1000)
-        Window.left = (screenx - 1800)/2
-        Window.top = (screeny - 1000)/2
+            Window.fullscreen = 'auto'
+        
         return Manager()
 
-def cm2pix(pos_cm, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):
+def cm2pix(pos_cm, fixed_window_size_cm=fixed_window_size_cm):
+    pix_per_cm = Window.width/fixed_window_size_cm[0]
+    
     # Convert from CM to pixels: 
     pix_pos = pix_per_cm*pos_cm
 
     if type(pix_pos) is np.ndarray:
         # Translate to coordinate system w/ 0, 0 at bottom left
-        pix_pos[0] = pix_pos[0] + (fixed_window_size[0]/2.)
-        pix_pos[1] = pix_pos[1] + (fixed_window_size[1]/2.)
+        pix_pos[0] = pix_pos[0] + (Window.width/2.)
+        pix_pos[1] = pix_pos[1] + (Window.height/2.)
+        # pix_pos[0] = pix_pos[0] + (fixed_window_size[0]/2.)
+        # pix_pos[1] = pix_pos[1] + (fixed_window_size[1]/2.)
 
     return pix_pos
 
-def pix2cm(pos_pix, fixed_window_size=fixed_window_size, pix_per_cm=pix_per_cm):
+def pix2cm(pos_pix, fixed_window_size_cm=fixed_window_size_cm):
+    pix_per_cm = Window.width/fixed_window_size_cm[0]
+    
     # First shift coordinate system: 
-    pos_pix[0] = pos_pix[0] - (fixed_window_size[0]/2.)
-    pos_pix[1] = pos_pix[1] - (fixed_window_size[1]/2.)
+    pos_pix[0] = pos_pix[0] - (Window.width/2.)
+    pos_pix[1] = pos_pix[1] - (Window.height/2.)
 
     pos_cm = pos_pix*(1./pix_per_cm)
     return pos_cm

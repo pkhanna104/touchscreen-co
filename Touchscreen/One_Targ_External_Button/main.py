@@ -167,7 +167,6 @@ class COGame(Widget):
             if val:
                 big_rew = big_rew_opts[i]
 
-        import pdb; pdb.set_trace()
         if button_rew > 0.0:
             self.reward_for_button = [True, button_rew]
         else:
@@ -727,7 +726,6 @@ class COGame(Widget):
         return kwargs['ts'] > self.ITI
 
     def _start_vid_trig(self, **kwargs):
-        import pdb; pdb.set_trace()
         if self.trial_counter == 0:
             time.sleep(1.)
         try:    
@@ -934,21 +932,20 @@ class COGame(Widget):
         
     def run_button_rew(self, **kwargs):
         try:
-            if np.logical_or(self.reward_for_anytouch[0], self.reward_for_center[0]):
-                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                sound = SoundLoader.load('reward2.wav')
-                sound.play()
+            #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
+            sound = SoundLoader.load('reward2.wav')
+            sound.play()
 
-                ### To trigger reward make sure reward is > 0:
-                if np.logical_or(self.reward_for_button[0], self.reward_for_button[1] > 0):
+            ### To trigger reward make sure reward is > 0:
+            if np.logical_or(self.reward_for_button[0], self.reward_for_button[1] > 0):
 
-                    self.reward_port.open()
-                    rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_button[1])+' sec\n']
-                    self.reward_port.write(rew_str)
-                    time.sleep(.25)
-                    run_str = [ord(r) for r in 'run\n']
-                    self.reward_port.write(run_str)
-                    self.reward_port.close()
+                self.reward_port.open()
+                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_button[1])+' sec\n']
+                self.reward_port.write(rew_str)
+                time.sleep(.25)
+                run_str = [ord(r) for r in 'run\n']
+                self.reward_port.write(run_str)
+                self.reward_port.close()
         except:
             pass
 
