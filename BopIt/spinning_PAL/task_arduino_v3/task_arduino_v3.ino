@@ -338,7 +338,7 @@ void print_serial() {
   Serial.print("\t");
   Serial.print(spin_ir_count);   
   Serial.print("\t");
-  Serial.print(in_targ);
+  Serial.println(in_targ);
   // Extra for debugging; 
 //  Serial.print("\t");
 //  Serial.print(factor);

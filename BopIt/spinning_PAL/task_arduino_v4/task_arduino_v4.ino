@@ -87,21 +87,21 @@ void interrupt_motorencoder() {
   vel /= (22 * 12); // approximately revs per sec
 
     // some sort  of coarse speed control // 
-    if ((vel < 0.25) and (in_targ == 1)) {
+    if ((vel < 0.35) and (in_targ == 1)) {
 
       // double, triple, quadruple etc. /
       if (factor >= 1) {
-      factor += 1;
+      factor += .5;
       }
 
       // double factor 
       else {
-        factor *= 2;
+        factor *= 1.5;
       }
     }
 
     // if velocity too high 
-    else if ((vel > 0.75) and (in_targ == 1)) {
+    else if ((vel > 0.65) and (in_targ == 1)) {
       if (factor <= 1) {
         // halve
         factor /= 2;
@@ -276,11 +276,11 @@ void go_to_target() {
       }
       else if (diff > 0) {
         tm = 1;
-        drivez = 80; 
+        drivez = 70; 
       }
       else {
         tm = 0;
-        drivez = 80;
+        drivez = 60;
       }
 
       // Drive the motor forward, factor adjusts time; 
