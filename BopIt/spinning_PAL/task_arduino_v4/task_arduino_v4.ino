@@ -365,7 +365,7 @@ void print_serial() {
   Serial.print("\t");
   Serial.print(spin_ir_count);   
   Serial.print("\t");
-  Serial.print(in_targ);
-  Serial.print("\t"); 
-  Serial.print(keep_spinning); 
+  Serial.println(in_targ);
+//  Serial.print("\t"); 
+//  Serial.print(keep_spinning); 
 }
