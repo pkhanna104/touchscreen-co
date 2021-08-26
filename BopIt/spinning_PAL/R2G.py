@@ -28,23 +28,16 @@ class RewThread(threading.Thread):
         self.comport = comport
         self.rew_time = rew_time
 
-    def run(self, rew_num):
-        if rew_num == 1:
-            self.reward1 = SoundLoader.load('reward1.wav')
-            time.sleep(.1)
-            self.reward1.play()
-            time.sleep(.1)
-        elif rew_num == 2:
-            self.reward2 = SoundLoader.load('reward2.wav')
-            time.sleep(.1)
-            self.reward2.play()
-
+    def run(self):
         rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
-        self.comport.write(rew_str)
-        time.sleep(.25)
-        run_str = [ord(r) for r in 'run\n']
-        self.comport.write(run_str)
-
+        try:
+            self.comport.write(rew_str)
+            time.sleep(.25)
+            run_str = [ord(r) for r in 'run\n']
+            self.comport.write(run_str)
+        except:
+            pass
+            
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
     time = tables.Float32Col()
@@ -156,6 +149,10 @@ class R2Game(Widget):
         else:
             self.skip_juice = False
 
+        print('reward for start')
+        print(self.reward_for_start)
+        print('reward for grasp')
+        print(self.reward_for_grasp)
         for i, (nm, val) in enumerate(animal_names_dict.items()):
             if val:
                 animal_name = nm
@@ -250,9 +247,10 @@ class R2Game(Widget):
         self.FSM['start_button'] = dict(pushed_start='start_hold', start_button_timeout='ITI', stop=None)
         self.FSM['start_hold'] = dict(end_start_hold='grasp_trial_start', start_early_release = 'start_button', stop=None)
         self.FSM['grasp_trial_start'] = dict(door_opened='grasp', stop=None)
-        self.FSM['grasp_hold'] = dict(end_grasp_hold='reward', drop='grasp', grasp_timeout='ITI', stop=None)
-        self.FSM['grasp'] = dict(clear_LED='grasp_hold', grasp_timeout='ITI', stop=None) # state to indictate 'grasp' w/o resetting timer
-        self.FSM['reward'] = dict(end_reward='ITI', stop=None)
+        self.FSM['grasp_hold'] = dict(end_grasp_hold='reward', drop='grasp', grasp_timeout='prep_next_trial', stop=None)
+        self.FSM['grasp'] = dict(clear_LED='grasp_hold', grasp_timeout='prep_next_trial', stop=None) # state to indictate 'grasp' w/o resetting timer
+        self.FSM['reward'] = dict(end_reward='prep_next_trial', stop=None)
+        self.FSM['prep_next_trial'] = dict(start_next_trial='ITI')
         self.FSM['idle_exit'] = dict(stop=None)
         
 
@@ -275,6 +273,7 @@ class R2Game(Widget):
             reward_fcn = True
             self.reward_port.close()
         except:
+            self.reward_port = None
             reward_fcn = False
             pass
 
@@ -313,7 +312,7 @@ class R2Game(Widget):
 
         ## Open task arduino - IR sensor, button, wheel position ### 
         self.task_ard = serial.Serial('COM6', baudrate=115200)
-        self.going_to_targ = False; 
+        self.going_to_targ = 0; 
 
         if self.testing:
             pass
@@ -439,7 +438,7 @@ class R2Game(Widget):
         self.close_app()
 
     def update(self, ts):
-        print(self.state)
+        print(self.state, self.button, self.going_to_targ)
         self.state_length = time.time() - self.state_start
         
         # Read from task arduino: 
@@ -463,9 +462,9 @@ class R2Game(Widget):
 
         ### Buttons #####
         if self.fsr1 + self.fsr2 > 10: 
-            self.button = 1
+            self.button = True
         else:
-            self.button = 0
+            self.button = False
 
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
@@ -563,10 +562,6 @@ class R2Game(Widget):
         self.trial_num += 1
         self.current_trial = self.generated_trials[self.trial_num]
 
-        #### close the door 
-        word = b'd'+struct.pack('<H', self.current_trial[1] - 2) # rest is 2 units before 
-        self.task_ard.write(word)
-
     def _start_grasp_trial_start(self, **kwargs):
         self.start_grasp = time.time(); 
         
@@ -580,7 +575,11 @@ class R2Game(Widget):
             return True
 
     def end_ITI(self, **kwargs):
-        return kwargs['ts'] > self.ITI
+        ''' Only end the ITI if we've finished getting to the rest state'''
+        if self.going_to_targ == 0: 
+            return kwargs['ts'] > self.ITI
+        else:
+            return False
         
     def _start_vid_trig(self, **kwargs):
         try:
@@ -644,61 +643,46 @@ class R2Game(Widget):
 
     def _start_reward(self, **kwargs):
         self.reward_started = True
-        try:
-            if self.task_opt == 'button':
-                pass 
-            else:
-                #self.reward1.play()
-                if self.reward_for_grasp[0]:
-                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                #sound = SoundLoader.load('reward1.wav')
-                    print('in reward: ')
-                    if not self.skip_juice:
-                        if self.reward_generator[self.trial_counter] > 0:
-                            # thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
-                            # thread1.start(1)
-
-                            self.reward_port.open()
-                            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                            self.reward_port.write(rew_str)
-                            time.sleep(.5 + self.reward_delay_time)
-                            run_str = [ord(r) for r in 'run\n']
-                            self.reward_port.write(run_str)
-                            self.reward_port.close()
-        except:
-            pass
-
-        ##### Close teh door ####
-        # #time.sleep(1.)
-        # self.button_ard.flushInput()
-        # self.button_ard.write('n'.encode())
+        if self.task_opt == 'button':
+            pass 
+        else:
+            if self.reward_for_grasp[0]:
+                self.reward1.play()
+                if self.reward_for_grasp[1] > 0:
+                    thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
+                    thread1.start()
 
         self.trial_counter += 1
         self.big_reward_cnt += 1
+        self.try_to_close = False
         
     def _start_rew_start(self, **kwargs):
         self.small_reward_cnt += 1
-        try:
-            #if self.reward_for_start[0]:
-                #sound = SoundLoader.load('reward2.wav')
-                #sound.play()
+        if self.reward_for_start[0]:
             self.reward2.play()
+            
             if self.reward_for_start[1] > 0.:
-                # thread1 = RewThread(self.reward_port, self.reward_for_start[1])
-                # thread1.start(2)
-                # import pdb; pdb.set_trace()
-                self.reward_port.open()
-                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
-                self.reward_port.write(rew_str)
-                time.sleep(.5)
-                run_str = [ord(r) for r in 'run\n']
-                self.reward_port.write(run_str)
-                self.reward_port.close()
-        except:
-            pass
+                thread1 = RewThread(self.reward_port, self.reward_for_start[1])
+                thread1.start()
 
     def end_reward(self, **kwargs):
-        return True
+        return True 
+
+    def start_next_trial(self, **kwargs):
+        if self.try_to_close: 
+            if self.going_to_targ == 0: # still closing 
+                return False 
+            else:
+                return True # closed  
+        else:         
+            if self.beam == 0:
+
+                # Move to 2 units before the next trial 
+                next_trl_rest_pos = self.generated_trials[self.trial_num+1][1] - 2
+                word = b'd'+struct.pack('<H', next_trl_rest_pos) 
+                self.task_ard.write(word)
+                self.try_to_close = True 
+            return False
 
 class Manager(ScreenManager):
     pass
