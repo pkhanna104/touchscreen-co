@@ -627,7 +627,11 @@ class R2Game(Widget):
         return self.beam
 
     def grasp_timeout(self, **kwargs):
-        return (time.time() - self.start_grasp) > self.grasp_timeout_time
+        if (time.time() - self.start_grasp) > self.grasp_timeout_time: 
+            self.try_to_close = False 
+            return True 
+        else: 
+            return False
 
     def end_grasp_hold(self, **kwargs):
         return kwargs['ts'] > self.grasp_hold
