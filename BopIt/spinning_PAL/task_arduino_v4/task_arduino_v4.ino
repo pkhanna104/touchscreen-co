@@ -61,8 +61,9 @@ int nsteps;
 float us2s = pow(10, 6);
 volatile float factor = 1;
 
-float vel = 0;
+float vel = 0.02;
 float lastTm = micros();
+int last_tc = 0; 
 
 volatile int count_spin_tm1=0; 
 
@@ -85,6 +86,7 @@ void interrupt_motorencoder() {
   vel = (1.) / (micros() - lastTm); // counts per uS
   vel *= us2s; // counts per sec
   vel /= (22 * 12); // approximately revs per sec
+
 
     // some sort  of coarse speed control // 
     if ((vel < 0.35) and (in_targ == 1)) {
@@ -117,8 +119,8 @@ void interrupt_motorencoder() {
 
   // save current time so we can use it for next time; 
   lastTm = micros();
-
-  if ((in_targ == 1) and ((spin_ir_count + 1)%12 == tc)) {
+ 
+  if ((in_targ == 1) and ((spin_ir_count + 1) %12 == tc)) {
     count_spin_tm1 += 1; 
   }
   else {
@@ -208,6 +210,9 @@ void loop() {
       // deactive solenoid if we haven't already 
       deact_solenoid(); 
 
+      // set last tc 
+      last_tc = tc; 
+
     }
   }
   print_serial();
@@ -290,6 +295,15 @@ void go_to_target() {
       motor_spin.brake();
     }
 
+    else {
+      // back drive and try again // 
+      motor_spin.drive(80, 5); 
+      motor_spin.brake(); 
+      delay(500); 
+      keep_spinning = true;  
+      lastTm = micros(); 
+    }
+
     // Wait  //
     delay(5);
 
@@ -323,14 +337,24 @@ void go_to_target() {
     }
 
     // Trigger solenoid 
-//    if ((n_tms > 0) and (n_tms2 > 0)) {
-//      deact_solenoid();
-//    }
-      if (count_spin_tm1 == 20) {
+      if (count_spin_tm1 == 19) {
           deact_solenoid(); 
         }
-      }
+
+    // Check if we should keep spinning 
+    check_decel(); 
   }
+}
+
+void check_decel() {
+ 
+  if ((micros() - lastTm) > 100000) {
+    keep_spinning = false; 
+  }
+  else {
+    keep_spinning = true;  
+  }
+}
 
 void print_serial() {
   Serial.print(digitalRead(Lift_IR)); 
@@ -341,12 +365,7 @@ void print_serial() {
   Serial.print("\t");
   Serial.print(spin_ir_count);   
   Serial.print("\t");
-  Serial.println(in_targ);
-  // Extra for debugging; 
-//  Serial.print("\t");
-//  Serial.print(factor);
-//  Serial.print("\t");
-//  Serial.print(vel);
-//  Serial.print("\t"); 
-//  Serial.println(tc); 
+  Serial.print(in_targ);
+  Serial.print("\t"); 
+  Serial.print(keep_spinning); 
 }
