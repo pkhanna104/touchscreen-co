@@ -71,6 +71,7 @@ class R2Game(Widget):
     big_reward_cnt = NumericProperty(0)
     small_reward_cnt = NumericProperty(0)
     tried = NumericProperty(0)
+    what_notch_going_to = NumericProperty(0)
 
     # Set relevant params text: 
     grasp_rew_txt = StringProperty('')
@@ -461,7 +462,7 @@ class R2Game(Widget):
         self.going_to_targ = int(port_splits[4])
 
         ### Buttons #####
-        if self.fsr1 + self.fsr2 > 10: 
+        if self.fsr1 + self.fsr2 > 5: 
             self.button = True
         else:
             self.button = False
@@ -566,6 +567,7 @@ class R2Game(Widget):
         self.start_grasp = time.time(); 
         
         ### Start movign the wheel to the correct slot ### 
+        self.what_notch_going_to = self.current_trial[1]
         word = b'd'+struct.pack('<H', self.current_trial[1])
         self.task_ard.write(word)
 
@@ -683,6 +685,7 @@ class R2Game(Widget):
 
                 # Move to 2 units before the next trial 
                 next_trl_rest_pos = self.generated_trials[self.trial_num+1][1] - 2
+                self.what_notch_going_to = next_trl_rest_pos
                 word = b'd'+struct.pack('<H', next_trl_rest_pos) 
                 self.task_ard.write(word)
                 self.try_to_close = True 

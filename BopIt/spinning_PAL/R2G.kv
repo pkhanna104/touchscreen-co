@@ -773,6 +773,13 @@
             orientation: 'horizontal'
             size_hint: (1., .25)
 
+            BoxLayout:
+                id: test3
+                orientation: 'vertical'
+                Label:
+                    text: ''
+                    fontsize: 50
+
             BoxLayout 
                 id: top
                 orientation: 'vertical'
@@ -808,9 +815,17 @@
                 orientation: 'vertical'
 
                 Label:
-                    text: 'TRIALS tried count:'
+                    text: 'Notch:'
                     font_size: 30
 
                 Label:
-                    text: str(game.tried)
+                    text: str(game.what_notch_going_to)
                     font_size: 30
+
+
+            BoxLayout:
+                id: test3
+                orientation: 'vertical'
+                Label:
+                    text: ''
+                    fontsize: 50
