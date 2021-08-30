@@ -493,6 +493,24 @@ class COGame(Widget):
                 self.button_ard = serial.Serial(port='COM3', baudrate=9600)
         except:
             self.is_button_ard = False
+
+        if self.is_button_ard: 
+            baseline_data = []
+            for _ in range(100): 
+                ser = self.button_ard.flushInput()
+                _ = self.button_ard.readline()
+                port_read = self.button_ard.readline()
+                port_read = port_read.decode('ascii')
+                i_slash = port_read.find('/')
+                fsr1 = int(port_read[0:i_slash])
+                fsr2 = int(port_read[i_slash+1:])
+                baseline_data.append([fsr1, fsr2])
+                time.sleep(.005)
+            baseline_data = np.vstack((baseline_data))
+            self.fsr_baseline = 1.5*np.max(baseline_data, axis=0)
+        else: 
+            self.fsr_baseline = np.array([200, 200])
+
         
         # save parameters: 
         d = dict(animal_name=animal_name,
@@ -509,7 +527,7 @@ class COGame(Widget):
             start_time = datetime.datetime.now().strftime('%Y%m%d_%H%M'),
             testing=self.testing,
             rew_delay = self.reward_delay_time,
-            drag_ok = self.drag_ok,
+            drag_ok = self.drag_ok, fsr_baseline = self.fsr_baseline
             )
 
         if self.testing or platform == 'darwin':
@@ -619,7 +637,7 @@ class COGame(Widget):
             fsr2 = int(port_read[i_slash+1:])
         
             # Determine if the button was pressed or not
-            if fsr1 > 10 or fsr2 > 650:
+            if fsr1 > self.fsr_baseline[0] or fsr2 > self.fsr_baseline[1]:
                 self.button_pressed = True
                 # print('Button Pressed')
             else:
