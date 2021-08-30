@@ -268,7 +268,9 @@ class COGame(Widget):
         #     if val:
         self.reward_delay_time = 0.0
 
-        reward_var_opt = [1.0, .5, .33]
+        reward_var_opt = [1.0, 1.0, 1.0, 1.0, .5, .33]
+        jackpot_opt =    [-1.,  7., 10., 15.,-1., -1.]
+
         for i, val in enumerate(rew_var['rew_var']):
             if val:
                 self.percent_of_trials_rewarded = reward_var_opt[i]
@@ -276,9 +278,13 @@ class COGame(Widget):
                     self.percent_of_trials_doubled = 0.1
                 else:
                     self.percent_of_trials_doubled = 0.0
+
+                self.jackpotnum = jackpot_opt[i]
         
-        self.reward_generator = self.gen_rewards(self.percent_of_trials_rewarded, self.percent_of_trials_doubled,
-            self.reward_for_targtouch)
+        self.reward_generator = self.gen_rewards(self.percent_of_trials_rewarded, 
+            self.percent_of_trials_doubled,
+            self.reward_for_targtouch,
+            self.jackpotnum)
 
 
         # white_screen_opts = [True, False]
@@ -522,7 +528,9 @@ class COGame(Widget):
 
 
 
-    def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
+    def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp, 
+        jackpotnum):
+
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))
         rew = []
         trial_cnt_bonus = 0
@@ -539,6 +547,13 @@ class COGame(Widget):
                     trial_cnt_bonus = 0
 
             rew.append(mini_block_array)
+        rew = np.hstack((rew))
+
+        ### Go through and find jackpot trials -- 3x reward for these 
+        jackpot_trials = np.arange(jackpotnum, len(rew), jackpotnum)
+        jackpot_trials = jackpot_trials.astype(int)
+        rew[jackpot_trials] *= 3
+
         return np.hstack((rew))
 
     def close_app(self):
@@ -909,9 +924,8 @@ class COGame(Widget):
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
                 print('in big reward 2')
-                #print(str(self.reward_generator[self.trial_counter]))
-                #print(self.trial_counter)
-                #print(self.reward_generator[:100])
+                print(str(self.reward_generator[self.trial_counter]))
+                print(self.trial_counter)
                 self.reward1 = SoundLoader.load('reward1.wav')
                 self.reward1.play()
 
