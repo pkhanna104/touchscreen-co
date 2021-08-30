@@ -1,3 +1,5 @@
 *.m
 data/*.pkl
 data/*.hdf
+*.hdf
+*.pkl

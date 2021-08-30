@@ -30,11 +30,14 @@ class RewThread(threading.Thread):
 
     def run(self):
         rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
-        self.comport.write(rew_str)
-        time.sleep(.25)
-        run_str = [ord(r) for r in 'run\n']
-        self.comport.write(run_str)
-
+        try:
+            self.comport.write(rew_str)
+            time.sleep(.25)
+            run_str = [ord(r) for r in 'run\n']
+            self.comport.write(run_str)
+        except:
+            pass
+            
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
     time = tables.Float32Col()
@@ -61,6 +64,8 @@ class R2Game(Widget):
     grasp_timeout_time = 5000.
     grasp_holdtime = .001
 
+    fsr_threshold = -1
+
     # Number of trials: 
     trial_counter = NumericProperty(0)
     t0 = time.time()
@@ -68,6 +73,7 @@ class R2Game(Widget):
     big_reward_cnt = NumericProperty(0)
     small_reward_cnt = NumericProperty(0)
     tried = NumericProperty(0)
+    what_notch_going_to = NumericProperty(0)
 
     # Set relevant params text: 
     grasp_rew_txt = StringProperty('')
@@ -146,6 +152,10 @@ class R2Game(Widget):
         else:
             self.skip_juice = False
 
+        print('reward for start')
+        print(self.reward_for_start)
+        print('reward for grasp')
+        print(self.reward_for_grasp)
         for i, (nm, val) in enumerate(animal_names_dict.items()):
             if val:
                 animal_name = nm
@@ -217,10 +227,12 @@ class R2Game(Widget):
 
 
         ### Trials to include ###
-        trials_active_list = ['hole', 'tripod', 'pinch', 'square']
+        trials_active_list = ['power', 'tripod', 'pinch', 'power']
+        trials_position_list = [2, 6, 10]
 
         ### Assumes rest == 0 ###
-        trials_position_list = [98, 163, 228, 33]
+        #trials_position_list = [98, 163, 228, 33]
+
         self.trial_num = 0; 
         self.trials_list_valid = []
         for i, val in enumerate(trials_active['trials']):
@@ -238,9 +250,10 @@ class R2Game(Widget):
         self.FSM['start_button'] = dict(pushed_start='start_hold', start_button_timeout='ITI', stop=None)
         self.FSM['start_hold'] = dict(end_start_hold='grasp_trial_start', start_early_release = 'start_button', stop=None)
         self.FSM['grasp_trial_start'] = dict(door_opened='grasp', stop=None)
-        self.FSM['grasp_hold'] = dict(end_grasp_hold='reward', drop='grasp', grasp_timeout='ITI', stop=None)
-        self.FSM['grasp'] = dict(clear_LED='grasp_hold', grasp_timeout='ITI', stop=None) # state to indictate 'grasp' w/o resetting timer
-        self.FSM['reward'] = dict(end_reward='ITI', stop=None)
+        self.FSM['grasp_hold'] = dict(end_grasp_hold='reward', drop='grasp', grasp_timeout='prep_next_trial', stop=None)
+        self.FSM['grasp'] = dict(clear_LED='grasp_hold', grasp_timeout='prep_next_trial', stop=None) # state to indictate 'grasp' w/o resetting timer
+        self.FSM['reward'] = dict(end_reward='prep_next_trial', stop=None)
+        self.FSM['prep_next_trial'] = dict(start_next_trial='ITI')
         self.FSM['idle_exit'] = dict(stop=None)
         
 
@@ -261,7 +274,9 @@ class R2Game(Widget):
             self.reward_port = serial.Serial(port='COM5',
                 baudrate=115200)
             reward_fcn = True
+            self.reward_port.close()
         except:
+            self.reward_port = None
             reward_fcn = False
             pass
 
@@ -300,7 +315,36 @@ class R2Game(Widget):
 
         ## Open task arduino - IR sensor, button, wheel position ### 
         self.task_ard = serial.Serial('COM6', baudrate=115200)
+        self.going_to_targ = 0; 
+
+        baseline_values = []
         
+        ### Get baseline FSR data 
+        for _ in range(1000): 
+            
+            ### read data from FSR 
+            # Read from task arduino: 
+            ser = self.task_ard.flushInput()
+            _ = self.task_ard.readline()
+            port_read = self.task_ard.readline()
+            port_splits = port_read.decode('ascii').split('\t')
+
+            if len(port_splits) != 5:
+                ser = self.task_ard.flushInput()
+                _ = self.task_ard.readline()
+                port_read = self.task_ard.readline()
+                port_splits = port_read.decode('ascii').split('\t')  
+
+        ### Beam / FSR 1 / FSR 2 / current count position           
+        fsr1 = int(port_splits[1])
+        fsr2 = int(port_splits[2])
+        baseline_values.append(fsr1 + fsr2)
+        time.sleep(.005)
+
+        ### FSR threshold 
+        self.fsr_threshold = 1.5*np.max(np.hstack((baseline_values)))
+
+
         if self.testing:
             pass
         else:
@@ -380,7 +424,7 @@ class R2Game(Widget):
 
         # Turn off LED when cloisng : 
         self.task_ard.flushInput()
-        self.task_ard.write('n'.encode()) #morn
+        #self.task_ard.write('n'.encode()) #morn
         
         if self.idle:
             self.state = 'idle_exit'
@@ -425,7 +469,7 @@ class R2Game(Widget):
         self.close_app()
 
     def update(self, ts):
-        print(self.state)
+        print(self.state, self.button, self.going_to_targ)
         self.state_length = time.time() - self.state_start
         
         # Read from task arduino: 
@@ -434,7 +478,7 @@ class R2Game(Widget):
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('\t')
 
-        if len(port_splits) != 4:
+        if len(port_splits) != 5:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
             port_read = self.task_ard.readline()
@@ -445,12 +489,13 @@ class R2Game(Widget):
         self.fsr1 = int(port_splits[1])
         self.fsr2 = int(port_splits[2])
         self.wheel_pos = int(port_splits[3])
+        self.going_to_targ = int(port_splits[4])
 
         ### Buttons #####
-        if self.fsr1 + self.fsr2 > 10: 
-            self.button = 1
+        if self.fsr1 + self.fsr2 > self.fsr_threshold: 
+            self.button = True
         else:
-            self.button = 0
+            self.button = False
 
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
@@ -548,28 +593,26 @@ class R2Game(Widget):
         self.trial_num += 1
         self.current_trial = self.generated_trials[self.trial_num]
 
-        #### close the door 
-        word = b'd'+struct.pack('<H', 0)
-        self.task_ard.write(word)
-
     def _start_grasp_trial_start(self, **kwargs):
         self.start_grasp = time.time(); 
         
         ### Start movign the wheel to the correct slot ### 
+        self.what_notch_going_to = self.current_trial[1]
         word = b'd'+struct.pack('<H', self.current_trial[1])
         self.task_ard.write(word)
 
     def door_opened(self, **kwargs): 
         ### Is the wheel in the right spot ?? 
-        return self.wheel_pos == self.current_trial[1]
+        if self.going_to_targ == 0: 
+            return True
 
     def end_ITI(self, **kwargs):
-        if np.abs(self.wheel_pos) < 3: ## only start next trial if wheel is in the rest position 
+        ''' Only end the ITI if we've finished getting to the rest state'''
+        if self.going_to_targ == 0: 
             return kwargs['ts'] > self.ITI
         else:
-            print(self.wheel_pos)
             return False
-
+        
     def _start_vid_trig(self, **kwargs):
         try:
             self.cam_trig_port.write('1'.encode())
@@ -580,7 +623,7 @@ class R2Game(Widget):
 
     def _start_start_button(self, **kwargs):
         self.task_ard.flushInput()
-        self.task_ard.write('m'.encode()) #morning
+        #self.task_ard.write('m'.encode()) #morning
 
     def pushed_start(self, **kwargs):
         if self.use_cap_not_button:
@@ -616,7 +659,11 @@ class R2Game(Widget):
         return self.beam
 
     def grasp_timeout(self, **kwargs):
-        return (time.time() - self.start_grasp) > self.grasp_timeout_time
+        if (time.time() - self.start_grasp) > self.grasp_timeout_time: 
+            self.try_to_close = False 
+            return True 
+        else: 
+            return False
 
     def end_grasp_hold(self, **kwargs):
         return kwargs['ts'] > self.grasp_hold
@@ -632,61 +679,47 @@ class R2Game(Widget):
 
     def _start_reward(self, **kwargs):
         self.reward_started = True
-        try:
-            if self.task_opt == 'button':
-                pass 
-            else:
+        if self.task_opt == 'button':
+            pass 
+        else:
+            if self.reward_for_grasp[0]:
                 self.reward1.play()
-                if self.reward_for_grasp[0]:
-                #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-                #sound = SoundLoader.load('reward1.wav')
-                    print('in reward: ')
-                    if not self.skip_juice:
-                        if self.reward_generator[self.trial_counter] > 0:
-                            thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
-                            thread1.start()
-
-                            # self.reward_port.open()
-                            # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                            # self.reward_port.write(rew_str)
-                            # time.sleep(.5 + self.reward_delay_time)
-                            # run_str = [ord(r) for r in 'run\n']
-                            # self.reward_port.write(run_str)
-                            # self.reward_port.close()
-        except:
-            pass
-
-        ##### Close teh door ####
-        # #time.sleep(1.)
-        # self.button_ard.flushInput()
-        # self.button_ard.write('n'.encode())
+                if self.reward_for_grasp[1] > 0:
+                    thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
+                    thread1.start()
 
         self.trial_counter += 1
         self.big_reward_cnt += 1
+        self.try_to_close = False
         
     def _start_rew_start(self, **kwargs):
         self.small_reward_cnt += 1
-
-        try:
-            #if self.reward_for_start[0]:
-                #sound = SoundLoader.load('reward2.wav')
-                #sound.play()
+        if self.reward_for_start[0]:
             self.reward2.play()
+            
             if self.reward_for_start[1] > 0.:
                 thread1 = RewThread(self.reward_port, self.reward_for_start[1])
                 thread1.start()
-                # self.reward_port.open()
-                # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_start[1])+' sec\n']
-                # self.reward_port.write(rew_str)
-                # time.sleep(.5)
-                # run_str = [ord(r) for r in 'run\n']
-                # self.reward_port.write(run_str)
-                # self.reward_port.close()
-        except:
-            pass
 
     def end_reward(self, **kwargs):
-        return True
+        return True 
+
+    def start_next_trial(self, **kwargs):
+        if self.try_to_close: 
+            if self.going_to_targ == 0: # still closing 
+                return False 
+            else:
+                return True # closed  
+        else:         
+            if self.beam == 0:
+
+                # Move to 2 units before the next trial 
+                next_trl_rest_pos = self.generated_trials[self.trial_num+1][1] - 2
+                self.what_notch_going_to = next_trl_rest_pos
+                word = b'd'+struct.pack('<H', next_trl_rest_pos) 
+                self.task_ard.write(word)
+                self.try_to_close = True 
+            return False
 
 class Manager(ScreenManager):
     pass
