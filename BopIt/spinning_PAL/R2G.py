@@ -64,6 +64,8 @@ class R2Game(Widget):
     grasp_timeout_time = 5000.
     grasp_holdtime = .001
 
+    fsr_threshold = -1
+
     # Number of trials: 
     trial_counter = NumericProperty(0)
     t0 = time.time()
@@ -315,6 +317,34 @@ class R2Game(Widget):
         self.task_ard = serial.Serial('COM6', baudrate=115200)
         self.going_to_targ = 0; 
 
+        baseline_values = []
+        
+        ### Get baseline FSR data 
+        for _ in range(1000): 
+            
+            ### read data from FSR 
+            # Read from task arduino: 
+            ser = self.task_ard.flushInput()
+            _ = self.task_ard.readline()
+            port_read = self.task_ard.readline()
+            port_splits = port_read.decode('ascii').split('\t')
+
+            if len(port_splits) != 5:
+                ser = self.task_ard.flushInput()
+                _ = self.task_ard.readline()
+                port_read = self.task_ard.readline()
+                port_splits = port_read.decode('ascii').split('\t')  
+
+        ### Beam / FSR 1 / FSR 2 / current count position           
+        fsr1 = int(port_splits[1])
+        fsr2 = int(port_splits[2])
+        baseline_values.append(fsr1 + fsr2)
+        time.sleep(.005)
+
+        ### FSR threshold 
+        self.fsr_threshold = 1.5*np.max(np.hstack((baseline_values)))
+
+
         if self.testing:
             pass
         else:
@@ -462,7 +492,7 @@ class R2Game(Widget):
         self.going_to_targ = int(port_splits[4])
 
         ### Buttons #####
-        if self.fsr1 + self.fsr2 > 5: 
+        if self.fsr1 + self.fsr2 > self.fsr_threshold: 
             self.button = True
         else:
             self.button = False
