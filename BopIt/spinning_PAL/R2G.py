@@ -24,17 +24,18 @@ import threading
 class RewThread(threading.Thread):
     def __init__(self, comport, rew_time):
         super(RewThread, self).__init__()
-        
         self.comport = comport
         self.rew_time = rew_time
 
     def run(self):
         rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
         try:
+            self.comport.open()
             self.comport.write(rew_str)
             time.sleep(.25)
             run_str = [ord(r) for r in 'run\n']
             self.comport.write(run_str)
+            self.comport.close()
         except:
             pass
             
@@ -320,7 +321,7 @@ class R2Game(Widget):
         baseline_values = []
         
         ### Get baseline FSR data 
-        for _ in range(1000): 
+        for _ in range(100): 
             
             ### read data from FSR 
             # Read from task arduino: 
@@ -686,7 +687,7 @@ class R2Game(Widget):
                 self.reward1.play()
                 if self.reward_for_grasp[1] > 0:
                     thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
-                    thread1.start()
+                    thread1.run()
 
         self.trial_counter += 1
         self.big_reward_cnt += 1
@@ -699,7 +700,7 @@ class R2Game(Widget):
             
             if self.reward_for_start[1] > 0.:
                 thread1 = RewThread(self.reward_port, self.reward_for_start[1])
-                thread1.start()
+                thread1.run()
 
     def end_reward(self, **kwargs):
         return True 
