@@ -1,0 +1,468 @@
+#:kivy 1.10.0
+#:import Clock kivy.clock.Clock
+
+<Manager>:
+    id: screen_manager
+
+    Screen:
+        name: 'home'
+
+        BoxLayout
+            id: starting
+            orientation: 'vertical'
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: 'Welcome! Make a Selection in Each Row:'
+                fontsize: 80
+                color: 0,0,1,1
+                canvas.before:
+                    Color: 
+                        rgb: 1,1,0
+                        
+            BoxLayout
+                id: starting2
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: 'Animal Name:'
+                    color: 1, 1, 0, 1
+                    fontsize: 50
+                    
+                Label: 
+                    text: 'Haribo'
+                    fontsize: 28
+                    halign: 'center'                        
+                
+                CheckBox: 
+                    group: 'check'
+                    id: chk_har
+                    active: True  
+                    
+                Label: 
+                    text: 'Fifi'
+                    fontsize: 28
+                    halign: 'center'                        
+                
+                CheckBox: 
+                    group: 'check'
+                    id: chk_fifi
+                
+                Label: 
+                    text: 'Nike'
+                    fontsize: 28
+                    halign: 'center' 
+                                         
+                
+                CheckBox: 
+                    group: 'check'
+                    id: chk_nike
+                    
+                Label: 
+                    text: 'Butters'
+                    fontsize: 28
+                    halign: 'center' 
+                                         
+                
+                CheckBox: 
+                    group: 'check'
+                    id: chk_but
+                   
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                    
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+                        
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+                Label: 
+                    text: 'Button Hold Time'
+                    color: 1, 1, 0, 1
+                    
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: '0.0 sec'
+                CheckBox: 
+                    id: button_zero_sec
+                    group: 'button_hold_time'
+                    active: True
+
+                Label:  
+                    text: '0.1 sec'
+                CheckBox:
+                    id: button_hund_sec
+                    group: 'button_hold_time'
+
+                Label:  
+                    text: '0.2 sec'
+                CheckBox:
+                    id: button_twohund_sec
+                    group: 'button_hold_time'
+
+                Label:  
+                    text: '0.3 sec'
+                CheckBox:
+                    id: button_threehund_sec
+                    group: 'button_hold_time'
+
+                Label: 
+                    text: '0.4 sec'
+
+                CheckBox:
+                    id: button_fourhund_sec
+                    group: 'button_hold_time'
+
+                Label: 
+                    text: '0.5 sec'
+
+                CheckBox:
+                    id: button_half_sec
+                    group: 'button_hold_time'
+                
+
+                Label: 
+                    text: '0.6 sec'
+
+                CheckBox:
+                    id: button_60
+                    group: 'button_hold_time'
+             
+
+                Label:
+                    text: 'Rand: .4-.6'
+                    fontsize: 50
+
+                CheckBox:
+                    id: button_big_rand
+                    group: 'button_hold_time'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                    
+            BoxLayout 
+                id: button_rew
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.2, 0.2, 0.5, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Crashbar Reward'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0.1 sec'
+                CheckBox:
+                    id: button_rew_pt1_sec
+                    group: 'button_rew'
+                    active: True
+
+                Label: 
+                    text: '0.3 sec'
+                CheckBox:
+                    id: button_rew_pt3_sec
+                    group: 'button_rew'
+
+                Label: 
+                    text: '0.5 sec'
+                CheckBox:
+                    id: button_rew_pt5_sec
+                    group: 'button_rew'
+                    
+                Label: 
+                    text: '0.7 sec'
+                CheckBox:
+                    id: button_rew_pt7_sec
+                    group: 'button_rew'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            BoxLayout 
+                id: big_rew
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label: 
+                    text: 'Reward Variability'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: 'Reward All'
+                CheckBox:
+                    id: rew_all
+                    group: 'rew_var'
+                    active: True
+                    
+                Label: 
+                    text: 'Reward 50% '
+
+                CheckBox:
+                    id: rew_50
+                    group: 'rew_var'
+
+                Label: 
+                    text: 'Reward 33% w/ 10% doubled'
+
+                CheckBox:
+                    id: rew_30
+                    group: 'rew_var'
+
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+            BoxLayout:
+                id: test
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Auto-Quit After: '
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '10 trials'
+                CheckBox:
+                    id: ten_trials
+                    group: 'trials'
+                    active: True
+
+                Label: 
+                    text: '25 trials'
+                CheckBox:
+                    id: twenty_five_trials
+                    group: 'trials'
+
+                Label:
+                    text: '50 trials'
+                CheckBox:
+                    id: fifty_trials
+                    group: 'trials'
+                    
+                Label:
+                    text: '100 trials!'
+                CheckBox:
+                    id: hundred_trials
+                    group: 'trials'
+
+
+                Label:
+                    text: 'Dont AutoQuit'
+                CheckBox:
+                    id: no_trials
+                    group: 'trials'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+            Button:
+                text: 'Play Target Chase Game'
+                halign: 'center'
+                valign: 'middle'
+                font_size: 50
+                text_size: self.size
+                on_release: 
+                    root.current = 'splash_start'
+                    splash.init(dict(haribo=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butters=chk_but.active), 
+                    dict(button_rew=[button_rew_pt1_sec.active, button_rew_pt3_sec.active, button_rew_pt5_sec.active, button_rew_pt7_sec.active]), 
+                    dict(button_hold=[button_zero_sec.active, button_hund_sec.active, button_twohund_sec.active, button_threehund_sec.active, button_fourhund_sec.active, button_half_sec.active, button_60.active, button_big_rand.active]), 
+                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
+                    dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]))
+
+            Label:
+                text: ''
+                fontsize: 50
+            Label:
+                text: ''
+                fontsize: 50
+
+    Screen: 
+        name: 'splash_start'
+        Splash:
+            id: splash
+
+        BoxLayout:
+            id: test
+            orientation: 'vertical'
+         
+            Label:
+                text: 'Parameters Cached!! \n \n Prepare the Monkey! \n \n Pausing Until Start Button Pressed. '
+                halign: 'center'
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+                
+            BoxLayout:
+                id: test2
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Button: 
+                    text: 'Start'
+                    color: .25, .25, .25, 1
+                    background_color: (.2, .2, .2, 1.0)
+
+                    on_release:
+                        root.current = 'game_screen'
+                        game.init(*splash.args)
+                        Clock.schedule_interval(game.update, 1.0 / 60.0)
+                
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+                
+    Screen:
+        name: 'game_screen'
+        COGame:
+            id: game
+
+<COGame>:
+    exit_target1: target_e1
+    exit_target2: target_e2
+    indicator_targ: indicator
+
+    Target:
+        id: indicator
+
+    Target:
+        id: target_e1
+
+    Target:
+        id: target_e2
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 6/8
+        top: root.top - 70
+        text: str(root.trial_counter)
+
+
+
+<Target>:
+    canvas:
+        Color:
+            rgba:self.color
+        Ellipse: 
+            pos:self.pos
+            size:self.size
