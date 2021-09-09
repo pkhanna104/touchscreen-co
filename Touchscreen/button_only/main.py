@@ -263,7 +263,7 @@ class COGame(Widget):
                 baseline_data.append([fsr1, fsr2])
                 time.sleep(.005)
             baseline_data = np.vstack((baseline_data))
-            self.fsr_baseline = 1.5*np.max(baseline_data, axis=0)
+            self.fsr_baseline = 10+1.5*np.max(baseline_data, axis=0)
         else: 
             self.fsr_baseline = np.array([200, 200])
 
@@ -485,7 +485,7 @@ class COGame(Widget):
             self.cam_trig_port.write('0'.encode())
         except:
             pass
-        Window.clearcolor = (0., 0., 0., 1.)
+        Window.clearcolor = (0., 0., 1., 1.)
         self.exit_target1.color = (.15, .15, .15, 1.)
         self.exit_target2.color = (.15, .15, .15, 1.)
 
@@ -509,6 +509,9 @@ class COGame(Widget):
     
     def _start_button(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
+        sound = SoundLoader.load('E.wav')
+        sound.play()
+        
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
         self.indicator_targ.color = (.25, .25, .25, 1.)
@@ -532,6 +535,7 @@ class COGame(Widget):
             return False
 
     def _start_reward(self, **kwargs):
+        Window.clearcolor = (0., 0., 1., 1.)
         self.trial_counter += 1
         Window.clearcolor = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
