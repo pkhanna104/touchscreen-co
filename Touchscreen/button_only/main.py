@@ -126,7 +126,7 @@ class COGame(Widget):
         except:
             print('removing touch from pre-game screen')
             
-    def init(self, animal_names_dict=None, rew_in=None, 
+    def init(self, animal_names_dict=None, iti_in=None, rew_in=None, 
         hold=None, autoquit=None, rew_var=None):
         
         self.rew_cnt = 0
@@ -143,7 +143,13 @@ class COGame(Widget):
         for i, (nm, val) in enumerate(animal_names_dict.items()):
             if val:
                 animal_name = nm
-
+            
+        
+        # ITI DURATION
+        iti_opts = [01.0, 1.5, 2.0, 2.5, 3.0]
+        for i, val in enumerate(iti_in['iti']):
+            if val:
+                self.ITI_mean = iti_opts[i]
 
         # BUTTON HOLD TIMES
         holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
@@ -459,6 +465,10 @@ class COGame(Widget):
         # If past number of max trials then auto-quit: 
         if np.logical_and(self.trial_counter >= self.max_trials, self.state == 'ITI'):
             self.idle = True
+            
+            self.exit_target1.color = (.15, .15, .15, 1)
+            self.exit_target2.color = (.15, .15, .15, 1)
+            
             return True
         else:
             e = [0, 0]
@@ -486,8 +496,8 @@ class COGame(Widget):
         except:
             pass
         Window.clearcolor = (0., 0., 1., 1.)
-        self.exit_target1.color = (.15, .15, .15, 1.)
-        self.exit_target2.color = (.15, .15, .15, 1.)
+        self.exit_target1.color = (0., 0., 1., 1.)
+        self.exit_target2.color = (0., 0., 1., 1.)
 
         # Set ITI, CHT, THT
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
@@ -535,7 +545,6 @@ class COGame(Widget):
             return False
 
     def _start_reward(self, **kwargs):
-        Window.clearcolor = (0., 0., 1., 1.)
         self.trial_counter += 1
         Window.clearcolor = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
