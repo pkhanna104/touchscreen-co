@@ -703,129 +703,146 @@
 
             Label:
                 color: .5,.5,.5,1
-                font_size: 50
+                font_size: 20
                 center_x: root.width * 2/8
-                top: root.top - 170
+                top: root.top - 70
                 text: game.grasp_rew_txt
             Label:
                 color: .5,.5,.5,1
-                font_size: 50
+                font_size: 20
                 center_x: root.width * 5/8
-                top: root.top - 170
+                top: root.top - 70
                 text: game.grasp_rew_param
 
 
             Label:
                 color: .5,.5,.5,1
-                font_size: 50
+                font_size: 20
                 center_x: root.width * 2/8
-                top: root.top - 270
+                top: root.top - 120
                 text: game.button_rew_txt
             Label:
                 color: .5,.5,.5,1
-                font_size: 50
+                font_size: 20
                 center_x: root.width * 5/8
-                top: root.top - 270
+                top: root.top - 120
                 text: game.button_rew_param
-
 
             Label:
                 color: .5,.5,.5,1
-                font_size: 50
+                font_size: 20
                 center_x: root.width * 2/8
-                top: root.top - 370
+                top: root.top - 170
                 text: game.grasp_hold_txt
             Label:
                 color: .5,.5,.5,1
-                font_size: 50
+                font_size: 20
                 center_x: root.width * 5/8
-                top: root.top - 370
+                top: root.top - 170
                 text: game.grasp_hold_param
 
             Label:
                 color: .5,.5,.5,1
-                font_size: 50
+                font_size: 20
                 center_x: root.width * 2/8
-                top: root.top - 470
+                top: root.top - 220
                 text: game.button_hold_txt
             Label:
                 color: .5,.5,.5,1
-                font_size: 50
+                font_size: 20
                 center_x: root.width * 5/8
-                top: root.top - 470
+                top: root.top - 220
                 text: game.button_hold_param
 
             Label:
                 color: .5,.5,.5,1
-                font_size: 50
+                font_size: 20
                 center_x: root.width * 2/8
-                top: root.top - 570
+                top: root.top - 270
                 text: game.n_trials_txt
             Label:
                 color: .5,.5,.5,1
-                font_size: 50
+                font_size: 20
                 center_x: root.width * 5/8
-                top: root.top - 570
+                top: root.top - 270
                 text: game.n_trials_param
 
         BoxLayout:
             id: test3
-            orientation: 'horizontal'
-            size_hint: (1., .25)
+            orientation: 'vertical'
+            size_hint: (1., .5)
 
-            BoxLayout:
+            BoxLayout: 
                 id: test3
-                orientation: 'vertical'
-                Label:
-                    text: ''
-                    fontsize: 50
-
-            BoxLayout 
-                id: top
-                orientation: 'vertical'
-
-                Label:
-                    text: 'GRASP rew count:'
+                orientation: 'horizontal'
+                Button:
+                    text: 'Exit Gracefully'
                     font_size: 30
+                    on_release: game.quit_from_app()
+                    background_color: (.1, 0.1, 0.8, 1.0)
 
-                Label:
-                    text: str(game.big_reward_cnt)
-                    font_size: 30
+            BoxLayout: 
+                id: test4
+                orientation: 'horizontal'
 
-            Button:
-                text: 'Exit Gracefully'
-                font_size: 30
-                on_release: game.quit_from_app()
-                background_color: (.1, 0.1, 0.8, 1.0)
+                BoxLayout: 
+                    id: test3
+                    orientation: 'vertical'
+                    Label: 
+                        text: ''
+                        fontsize: 50
 
-            BoxLayout:
-                id: test3
-                orientation: 'vertical'
+                BoxLayout:
+                    id: test3
+                    orientation: 'vertical'
 
-                Label:
-                    text: 'BUTTON rew count:'
-                    font_size: 30
+                    Label:
+                        text: 'BUTTON rew count:'
+                        font_size: 30
 
-                Label:
-                    text: str(game.small_reward_cnt)
-                    font_size: 30
+                    Label:
+                        text: str(game.small_reward_cnt)
+                        font_size: 30
+                
+                BoxLayout 
+                    id: top
+                    orientation: 'vertical'
 
-            BoxLayout:
-                id: test3
-                orientation: 'vertical'
+                    Label:
+                        text: 'GRASP rew count:'
+                        font_size: 30
 
-                Label:
-                    text: 'Notch:'
-                    font_size: 30
+                    Label:
+                        text: str(game.big_reward_cnt)
+                        font_size: 30
 
-                Label:
-                    text: str(game.what_notch_going_to)
-                    font_size: 30
+                BoxLayout:
+                    id: test3
+                    orientation: 'vertical'
 
+                    Label:
+                        text: 'Go to Notch:'
+                        font_size: 30
 
-            BoxLayout:
-                id: test3
-                orientation: 'vertical'
-                Label:
-                    text: ''
-                    fontsize: 50
+                    Label:
+                        text: str(game.what_notch_going_to)
+                        font_size: 30
+
+                BoxLayout: 
+                    id: test3
+                    orientation: 'vertical'
+
+                    Label: 
+                        text: 'Current Notch:'
+                        font_size: 30 
+
+                    Label: 
+                        text: str(game.what_notch_currently_at)
+                        font_size: 30
+
+                BoxLayout:
+                    id: test3
+                    orientation: 'vertical'
+                    Label:
+                        text: ''
+                        fontsize: 50

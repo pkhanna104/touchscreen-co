@@ -75,6 +75,7 @@ class R2Game(Widget):
     small_reward_cnt = NumericProperty(0)
     tried = NumericProperty(0)
     what_notch_going_to = NumericProperty(0)
+    what_notch_currently_at = NumericProperty(0)
 
     # Set relevant params text: 
     grasp_rew_txt = StringProperty('')
@@ -423,9 +424,9 @@ class R2Game(Widget):
         # Stop the accelerometer: 
         #self.acc_process.send_signal(signal.CTRL_C_EVENT)
 
-        # Turn off LED when cloisng : 
+        # Make sure motor goes to sleep at night ;)  
         self.task_ard.flushInput()
-        #self.task_ard.write('n'.encode()) #morn
+        self.task_ard.write('n'.encode())
         
         if self.idle:
             self.state = 'idle_exit'
@@ -490,6 +491,7 @@ class R2Game(Widget):
         self.fsr1 = int(port_splits[1])
         self.fsr2 = int(port_splits[2])
         self.wheel_pos = int(port_splits[3])
+        self.what_notch_currently_at = self.wheel_pos
         self.going_to_targ = int(port_splits[4])
 
         ### Buttons #####
@@ -640,7 +642,6 @@ class R2Game(Widget):
         if kwargs['ts'] > self.start_hold:
             #if self.reward_for_start[0]:
             self.task_ard.flushInput()
-            self.task_ard.write('n'.encode()) #night
             self._start_rew_start()
 
             return True
