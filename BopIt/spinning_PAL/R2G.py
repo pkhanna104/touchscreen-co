@@ -273,7 +273,7 @@ class R2Game(Widget):
             self.FSM['reward'] = dict(end_reward='ITI', stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM5',
+            self.reward_port = serial.Serial(port='COM9',
                 baudrate=115200)
             reward_fcn = True
             self.reward_port.close()
