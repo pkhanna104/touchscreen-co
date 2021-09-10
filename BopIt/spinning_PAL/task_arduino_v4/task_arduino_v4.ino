@@ -33,6 +33,9 @@ const int Lift_IR = 52;
 const int analog_FSR1 = A14;
 const int analog_FSR2 = A15;
 
+// stop spinning variable 
+bool stop_spinning = false; 
+
 // Variables for dealing with serial inputs
 char c;
 char dio_data[1];
@@ -180,6 +183,9 @@ void setup() {
   // Lift IR:
   pinMode(Lift_IR, INPUT_PULLUP);
 
+  // Get LED setup 
+  pinMode(LED_BUILTIN, OUTPUT);
+
   // Pause to get this going//
   delay(100);
 }
@@ -190,6 +196,7 @@ void loop() {
   if (Serial.available() >= 1) {
     c = Serial.read();
     if (c == 'd') {
+      digitalWrite(LED_BUILTIN, HIGH);
       handle_word();
 
       // add 0.1 so that when we convert this from char --> int it rounds correclty 
@@ -201,22 +208,44 @@ void loop() {
       // Activate solenoid to get outta the way //
       act_solenoid();
 
-      // Go to target method //
-      go_to_target();
+      // Set in-targ
+      in_targ = 1; 
 
-      // no longer in "go to target" mode 
-      in_targ = 0;
+      // these are variables needed to say whether we've successfully reached the target 
+      n_tms = 0;
+      n_tms2 = 0;
+  
+      // set factor equal to "1" 
+      factor = 1;
+      
+      // eventually this will be used to make sure spinning stops // 
+      keep_spinning = true;
+    }
+    
+    else if (c == 'n') {
+      deact_solenoid(); 
+      in_targ = 0; 
+      stop_spinning = true; 
+      digitalWrite(LED_BUILTIN, LOW);
+    }
+  }
 
+  if (in_targ == 1) {
+    // Go to target method //
+    go_to_target();
+
+    if ((diff == 0) and (n_tms >= nthresh_tms) and (n_tms2 >= nthresh_tms)) {
+      in_targ = 0; 
       // deactive solenoid if we haven't already 
       deact_solenoid(); 
-
+      digitalWrite(LED_BUILTIN, LOW);
+  
       // set last tc 
       last_tc = tc; 
-
     }
   }
   print_serial();
-  delay(10);
+  delay(5);
 }
 
 // activate solenoid
@@ -247,19 +276,6 @@ void handle_word() {
 // go to the target, based on knowing where we are right now;
 void go_to_target() {
   
-  // these are variables needed to say whether we've successfully reached the target 
-  n_tms = 0;
-  n_tms2 = 0;
-
-  // set in-targ equal to "1" 
-  in_targ = 1;
-
-  // set factor equal to "1" 
-  factor = 1;
-    
-  // eventually this will be used to make sure spinning stops // 
-  keep_spinning = true;
-
   // Compute the difference, mod 12 so its always between 0 and 11; 
   if (tc < spin_ir_count) {
     diff = (tc + 12 - spin_ir_count); 
@@ -269,7 +285,7 @@ void go_to_target() {
   }
 
   // Criteria based on IR sensor encoder //
-  while (( diff > 0) or (n_tms < nthresh_tms) or (n_tms2 < nthresh_tms)) {
+  if (( diff > 0) or (n_tms < nthresh_tms) or (n_tms2 < nthresh_tms)) {
 
     // Only do this if we're supposed to keep spinning //
     if (keep_spinning) {
@@ -302,49 +318,47 @@ void go_to_target() {
       delay(500); 
       keep_spinning = true;  
       lastTm = micros(); 
-    }
-
-    // Wait  //
-    delay(5);
-
-    // Re-calc diff //
-    if (tc < spin_ir_count) {
-      diff = (tc + 12 - spin_ir_count); 
-    }
-    else {
-      diff = tc - spin_ir_count; 
-    }
-
-    // Print serial //
-    print_serial();
-
-    // If diff == thresh increment //
-    if ( diff == 0 ) {
-      n_tms += 1;
-    }
-    
-    // Re-set if ever unequal //
-    else {
-      n_tms = 0;
-    }
-
-    // Make IR criteria 
-    if (digitalRead(spin_IR) == 1) {
-      n_tms2 += 1;
-    }
-    else {
-      n_tms2 = 0;
-    }
-
-    // Trigger solenoid 
-      if (count_spin_tm1 == 19) {
-          deact_solenoid(); 
-        }
-
-    // Check if we should keep spinning 
-    check_decel(); 
+    } 
   }
+     
+  // Wait  //
+  delay(5);
+
+  // Re-calc diff //
+  if (tc < spin_ir_count) {
+    diff = (tc + 12 - spin_ir_count); 
+  }
+  else {
+    diff = tc - spin_ir_count; 
+  }
+
+  // If diff == thresh increment //
+  if ( diff == 0 ) {
+    n_tms += 1;
+  }
+  
+  // Re-set if ever unequal //
+  else {
+    n_tms = 0;
+  }
+
+  // Make IR criteria 
+  if (digitalRead(spin_IR) == 1) {
+    n_tms2 += 1;
+  }
+  else {
+    n_tms2 = 0;
+  }
+
+  // Trigger solenoid 
+  if (count_spin_tm1 == 19) {
+      deact_solenoid(); 
+    }
+
+  // Check if we should keep spinning 
+  check_decel();
 }
+
 
 void check_decel() {
  
