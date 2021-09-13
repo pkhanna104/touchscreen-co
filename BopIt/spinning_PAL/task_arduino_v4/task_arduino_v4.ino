@@ -144,7 +144,8 @@ void interrupt_motorencoder() {
 
 // Use the spin IR sensor 
 void interrupt_spinIR() {
-  if ((micros() - last_spin_cnt) > 100000) {
+  // Only count if > 200 ms after original 
+  if ((micros() - last_spin_cnt) > 50000) {
     // Keep track of own spin_ir_count
     // made this 10 so that you really have to be past in order to increment 
     if (abs(count - lastCnt) > 5) {
@@ -382,11 +383,9 @@ void go_to_target() {
   if ((count_spin_tm1 == 21) and (avg_vel > .2)) {
     deact_solenoid();
  }
-
  if ((count_spin_tm1 == 22) and (avg_vel > .1)) {
     deact_solenoid(); 
  }
-
  if (count_spin_tm1 == 24) {
   deact_solenoid(); 
  }
