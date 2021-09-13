@@ -76,6 +76,9 @@ class R2Game(Widget):
     tried = NumericProperty(0)
     what_notch_going_to = NumericProperty(0)
     what_notch_currently_at = NumericProperty(0)
+    speed = NumericProperty(0)
+    hall_cnt = NumericProperty(0)
+    end_cnt = NumericProperty(0)
 
     # Set relevant params text: 
     grasp_rew_txt = StringProperty('')
@@ -472,7 +475,7 @@ class R2Game(Widget):
         self.close_app()
 
     def update(self, ts):
-        print(self.state, self.button, self.going_to_targ)
+        print(self.state, self.speed)
         self.state_length = time.time() - self.state_start
         
         # Read from task arduino: 
@@ -481,7 +484,7 @@ class R2Game(Widget):
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('\t')
 
-        if len(port_splits) != 5:
+        if len(port_splits) != 8:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
             port_read = self.task_ard.readline()
@@ -494,6 +497,9 @@ class R2Game(Widget):
         self.wheel_pos = int(port_splits[3])
         self.what_notch_currently_at = self.wheel_pos
         self.going_to_targ = int(port_splits[4])
+        self.speed = float(port_splits[5])
+        self.hall_cnt = int(port_splits[6])
+        self.end_cnt = int(port_splits[7])
 
         ### Buttons #####
         if self.fsr1 + self.fsr2 > self.fsr_threshold: 
