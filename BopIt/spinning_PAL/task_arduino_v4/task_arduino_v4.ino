@@ -122,7 +122,8 @@ void interrupt_motorencoder() {
 
   // save current time so we can use it for next time; 
   lastTm = micros();
- 
+
+  // if the next spin_ir_count is correct, then start counting on this one 
   if ((in_targ == 1) and ((spin_ir_count + 1) %12 == tc)) {
     count_spin_tm1 += 1; 
   }
@@ -135,7 +136,8 @@ void interrupt_motorencoder() {
 void interrupt_spinIR() {
 
   // Keep track of own spin_ir_count
-  if (abs(count - lastCnt) > 5) {
+  // made this 10 so that you really have to be past in order to increment 
+  if (abs(count - lastCnt) > 10) {
 
     // This really counts then // 
     if (motordir) {
@@ -350,8 +352,8 @@ void go_to_target() {
     n_tms2 = 0;
   }
 
-  // Trigger solenoid 
-  if (count_spin_tm1 == 19) {
+  // Trigger solenoid -- make this speed dependent
+  if (count_spin_tm1 == 18) {
       deact_solenoid(); 
     }
 
@@ -380,6 +382,6 @@ void print_serial() {
   Serial.print(spin_ir_count);   
   Serial.print("\t");
   Serial.println(in_targ);
-//  Serial.print("\t"); 
-//  Serial.print(keep_spinning); 
+  Serial.print("\t"); 
+  Serial.print(vel); 
 }
