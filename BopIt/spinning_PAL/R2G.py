@@ -137,15 +137,16 @@ class R2Game(Widget):
             if val:
                 big_rew = big_rew_opts[i]
 
+        ### We always want sound for start reward ###
         if np.logical_or(rew_in['rew_start'], rew_in['rew_start_and_grasp']):
             self.reward_for_start = [True, small_rew]
         else:
-            self.reward_for_start = [False, 0]
+            self.reward_for_start = [True, 0]
 
         if np.logical_or(rew_in['rew_grasp'], rew_in['rew_start_and_grasp']):
             self.reward_for_grasp = [True, big_rew]
         else:
-            self.reward_for_grasp = [False, 0]
+            self.reward_for_grasp = [True, 0]
 
         if rew_in['snd_only']:
             self.reward_for_grasp = [True, 0.]
@@ -597,12 +598,16 @@ class R2Game(Widget):
         self.current_trial = self.generated_trials[self.trial_num]
 
     def _start_grasp_trial_start(self, **kwargs):
-        self.start_grasp = time.time(); 
+        ### This needs to start when "grasp" starts, after door is open
+        #self.start_grasp = time.time(); 
         
         ### Start movign the wheel to the correct slot ### 
         self.what_notch_going_to = self.current_trial[1]
         word = b'd'+struct.pack('<H', self.current_trial[1])
         self.task_ard.write(word)
+
+    def _start_grasp(self, **kwargs):
+        self.start_grasp = time.time()
 
     def door_opened(self, **kwargs): 
         ### Is the wheel in the right spot ?? 
