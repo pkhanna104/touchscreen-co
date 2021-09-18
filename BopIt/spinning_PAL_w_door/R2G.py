@@ -58,7 +58,7 @@ class Data(tables.IsDescription):
 class R2Game(Widget):
     pre_start_vid_ts = 0.1
 
-    ITI_mean = 3.
+    ITI_mean = 1.
     ITI_std = .2
 
     start_timeout = 5000. 
@@ -314,6 +314,8 @@ class R2Game(Widget):
         ## Open task arduino - IR sensor, button, wheel position ### 
         self.task_ard = serial.Serial('COM6', baudrate=115200)
         self.going_to_targ = 0; 
+        self.abortclose = 0; 
+        self.try_to_close = False; 
 
         baseline_values = []
         
@@ -482,7 +484,7 @@ class R2Game(Widget):
         self.close_app()
 
     def update(self, ts):
-        print(self.state, self.speed)
+        print(self.state, self.going_to_targ, self.door_state, self.try_to_close, self.abortclose)
         self.state_length = time.time() - self.state_start
         
         # Read from task arduino: 
@@ -491,7 +493,7 @@ class R2Game(Widget):
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('\t')
 
-        if len(port_splits) != 9:
+        if len(port_splits) != 10:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
             port_read = self.task_ard.readline()
@@ -508,6 +510,7 @@ class R2Game(Widget):
         self.hall_cnt = int(port_splits[6])
         self.end_cnt = int(port_splits[7])
         self.door_pos = int(port_splits[8])
+        self.abortclose = int(port_splits[9])
         if self.door_pos == 0: 
             self.door_state = 'open'
         elif self.door_pos > 1000: 

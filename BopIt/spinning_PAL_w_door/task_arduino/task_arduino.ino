@@ -87,7 +87,7 @@ float last_spin_cnt = 0;
 float vel = 0.02;
 float last_vel = 0.02; 
 float avg_vel = 0.02; 
-float lastTm = micros();
+float lastTm = -1;
 int last_tc = 0; 
 
 volatile int count_spin_tm1=0; 
@@ -107,6 +107,9 @@ void interrupt_motorencoder() {
   }
 
   // get velocity
+  if (lastTm == -1) {
+    lastTm = micros(); 
+  }
   vel = (1.) / (micros() - lastTm); // counts per uS
   vel *= us2s; // counts per sec
   vel /= (22 * 12); // approximately revs per sec
@@ -124,15 +127,15 @@ void interrupt_motorencoder() {
 
       // double factor 
       else {
-        factor *= 1.5;
+        factor *= 1.25;
       }
     }
 
     // if velocity too high 
-    else if ((avg_vel > 0.65) and (in_targ == 1)) {
+    else if ((avg_vel > 0.8) and (in_targ == 1)) {
       if (factor <= 1) {
         // halve
-        factor /= 2;
+        factor /= 1.25;
       }
       else {
         factor -= 1;
@@ -140,7 +143,7 @@ void interrupt_motorencoder() {
     }
 
     // bound the 'factor' 
-    factor = min(factor, 3);
+    factor = min(factor, 10);
     factor = max(factor, 0.1);
 
   // save current time so we can use it for next time; 
@@ -165,7 +168,7 @@ void interrupt_spinIR() {
   // Only count if > 200 ms after original 
     // Keep track of own spin_ir_count
     // made this 10 so that you really have to be past in order to increment 
-  if (abs(count - lastCnt) > 5) {
+  if (abs(count - lastCnt) > 10) {
   
     // This really counts then // 
     if (motordir) {
@@ -280,12 +283,16 @@ void loop() {
 
     if ((diff == 0) and (n_tms >= nthresh_tms) and (n_tms2 >= nthresh_tms)) {
       in_targ = 0; 
+      motor_spin.brake(); 
+      
       // deactive solenoid if we haven't already 
       deact_solenoid(); 
       digitalWrite(LED_BUILTIN, LOW);
   
       // set last tc 
       last_tc = tc; 
+
+      
     }
   }
   print_serial();
@@ -296,7 +303,7 @@ void open_door() {
   pot_sensorValue = analogRead(slidepot_sensor); 
     
    // Run the motor until the door is open
-   while (pot_sensorValue > 10) {
+   while (pot_sensorValue > 100) {
     motor_pot.drive(-255, 100);
     pot_sensorValue = analogRead(slidepot_sensor);
     delay(5); 
@@ -309,13 +316,13 @@ void close_door() {
     pot_sensorValue = analogRead(slidepot_sensor); 
     lastT = -1; 
     lastpos = -1; 
-    
+
     // Try closing 
-    motor_pot.drive(255, 80); 
-     
+    motor_pot.drive(150, 80); 
+
     // Run the motor until the door is closed
     while (pot_sensorValue < 1000) {
-
+      print_serial(); 
       if (abortclose == false){
         
         pot_sensorValue = analogRead(slidepot_sensor); 
@@ -345,16 +352,17 @@ void close_door() {
           }
           lastT = T;
         }
+        delay(5);
       }
 
       else if (abortclose == true) {
         // Run the motor until the door is open
-        motor_pot.drive(-255, 50); 
+        motor_pot.drive(-100, 50); 
         motor_pot.brake(); 
         abortclose = false;
         delay(500); 
         // Try closing again 
-        motor_pot.drive(255, 80); 
+        motor_pot.drive(100, 80); 
     }
   }
   motor_pot.brake(); 
@@ -406,35 +414,32 @@ void go_to_target() {
       // Set factor equal to 1; 
       if (diff > 2 ) {
         tm = diff;
-        drivez = 80;
+        drivez = 15;
       }
       else if (diff > 0) {
         if (avg_vel >= .25) {
-        tm = 1;
-        drivez = 80; 
+        tm = diff;
+        drivez = 15; 
         }
         else if (avg_vel < .25) {
-        tm = 10; 
-        drivez = 80; 
+        tm = diff; 
+        drivez = 15; 
         }
       }
       else {
         tm = 0;
-        drivez = 60;
+        drivez = 15;
       }
 
       // Drive the motor forward, factor adjusts time; 
       motor_spin.drive(-1 * drivez, factor * tm);
-
-      // stop the motor 
-      motor_spin.brake();
     }
 
     else {
       // back drive and try again // 
-      motor_spin.drive(80, 5); 
+      //motor_spin.drive(80, 5); 
       motor_spin.brake(); 
-      delay(500); 
+      delay(100); 
       keep_spinning = true;  
       lastTm = micros(); 
     } 
@@ -470,6 +475,9 @@ void go_to_target() {
   }
 
   // Trigger solenoid -- make this speed dependent
+  if ((count_spin_tm1 == 18) and (avg_vel > 0.7)) {
+    deact_solenoid(); 
+  }
   if ((count_spin_tm1 == 19) and (avg_vel > .6)) {
     deact_solenoid(); 
   }
@@ -489,7 +497,6 @@ void go_to_target() {
   // Check if we should keep spinning 
   check_decel();
 }
-
 
 void check_decel() {
  
@@ -518,5 +525,7 @@ void print_serial() {
   Serial.print("\t");
   Serial.print(count_spin_tm1); 
   Serial.print("\t"); 
-  Serial.println(analogRead(slidepot_sensor)); 
+  Serial.print(analogRead(slidepot_sensor)); 
+  Serial.print("\t");
+  Serial.println(abortclose); 
 }
