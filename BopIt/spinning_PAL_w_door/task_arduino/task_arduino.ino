@@ -33,11 +33,13 @@ Motor motor_pot = Motor(pot_in1, pot_in2, pot_pwm, offset, STBY);
 const int slidepot_sensor = A0; 
 int pot_sensorValue;
 bool abortclose = false;
+int startTrying; 
 int lastT = -1; 
 int lastpos = -1;
 int velo = 0;
 int lastvelo = -1500;
 int accel = -1500;
+float avg_accel =0; 
 int T = 0;
 int lastT_register = 0;
 int Tdiff = -1;
@@ -291,7 +293,6 @@ void loop() {
   
       // set last tc 
       last_tc = tc; 
-
       
     }
   }
@@ -316,9 +317,11 @@ void close_door() {
     pot_sensorValue = analogRead(slidepot_sensor); 
     lastT = -1; 
     lastpos = -1; 
+    avg_accel = 0; 
 
     // Try closing 
-    motor_pot.drive(150, 80); 
+    motor_pot.drive(200, 80); 
+    startTrying = millis(); // time that we tried starting to close the door 
 
     // Run the motor until the door is closed
     while (pot_sensorValue < 1000) {
@@ -340,7 +343,8 @@ void close_door() {
                 velo = (pot_sensorValue - lastpos)/(Tdiff);
                 if (lastvelo != -1500) {
                   accel = 100*(velo - lastvelo)/(Tdiff);
-                  if (accel < 0) {
+                  avg_accel = accel; 
+                  if (avg_accel < 0) {
                     abortclose = true;
                   }
                 } // end if there is a previous velo calc
@@ -351,6 +355,10 @@ void close_door() {
             }
           }
           lastT = T;
+
+          if ((!abortclose) and ((millis() - startTrying) > 750)) {
+            abortclose=true; 
+          }
         }
         delay(5);
       }
@@ -362,7 +370,8 @@ void close_door() {
         abortclose = false;
         delay(500); 
         // Try closing again 
-        motor_pot.drive(100, 80); 
+        motor_pot.drive(200, 80); 
+        startTrying = millis(); 
     }
   }
   motor_pot.brake(); 
