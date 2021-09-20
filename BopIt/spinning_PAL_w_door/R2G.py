@@ -245,7 +245,7 @@ class R2Game(Widget):
         self.FSM = dict()
         self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
         self.FSM['vid_trig'] = dict(end_vid_trig='start_button')
-        self.FSM['start_button'] = dict(pushed_start='start_hold', start_button_timeout='ITI', stop=None)
+        self.FSM['start_button'] = dict(pushed_start='start_hold', start_button_timeout='ITI', opened_door='ITI', stop=None)
         self.FSM['start_hold'] = dict(end_start_hold='grasp_trial_start', start_early_release = 'start_button', stop=None)
         self.FSM['grasp_trial_start'] = dict(door_opened='grasp', stop=None)
         self.FSM['grasp'] = dict(clear_LED='grasp_hold', grasp_timeout='prep_next_trial', stop=None) # state to indictate 'grasp' w/o resetting timer
@@ -511,7 +511,7 @@ class R2Game(Widget):
         self.end_cnt = int(port_splits[7])
         self.door_pos = int(port_splits[8])
         self.abortclose = int(port_splits[9])
-        if self.door_pos == 0: 
+        if self.door_pos < 20:
             self.door_state = 'open'
         elif self.door_pos > 1000: 
             self.door_state = 'closed'
@@ -620,6 +620,14 @@ class R2Game(Widget):
         self.trial_num += 1
         self.current_trial = self.generated_trials[self.trial_num]
 
+    def opened_door(self, **kwargs): 
+        if self.door_pos < 1000: 
+            ### close the door and return true 
+            self.task_ard.write('c'.encode())
+            return True 
+        else:
+            return False
+
     def _start_grasp_trial_start(self, **kwargs):
         ### open the door
         self.task_ard.write('o'.encode())
@@ -635,7 +643,10 @@ class R2Game(Widget):
     def end_ITI(self, **kwargs):
         ''' Only end the ITI if we've finished getting to the rest state'''
         if self.going_to_targ == 0: 
-            return kwargs['ts'] > self.ITI
+            if self.door_state == 'closed': 
+                return kwargs['ts'] > self.ITI
+            else:
+                return False 
         else:
             return False
         
