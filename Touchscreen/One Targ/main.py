@@ -278,7 +278,7 @@ class COGame(Widget):
         import os 
         path = os.getcwd()
         if 'BasalGangulia' in path:
-            self.in_cage = True
+            self.in_cage = False
         else:
             self.in_cage = False
 
@@ -372,7 +372,7 @@ class COGame(Widget):
         self.FSM['idle_exit'] = dict(stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM4',
+            self.reward_port = serial.Serial(port='COM3',
                 baudrate=115200)
             self.reward_port.close()
         except:
