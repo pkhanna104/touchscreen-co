@@ -379,13 +379,12 @@ class COGame(Widget):
 
         try:
             if self.juicer == 'yellow': 
-                self.reward_port = serial.Serial(port='COM4',
+                self.reward_port = serial.Serial(port='COM3',
                     baudrate=115200)
                 self.reward_port.close()
             
-            else: 
-                self.juicer == 'red': 
-                self.reward_port = serial.Serial(port='COM', 
+            elif self.juicer == 'red':
+                self.reward_port = serial.Serial(port='COM10', 
                     baudrate=19200)
 
                 ### setup the flow rate
@@ -823,7 +822,7 @@ class COGame(Widget):
             if self.reward_for_targtouch[0]:
                 #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
                 #sound = SoundLoader.load('reward1.wav')
-                print('in big reward 2')
+                print('in big reward 2, juicer %s'%self.juicer)
                 #print(str(self.reward_generator[self.trial_counter]))
                 #print(self.trial_counter)
                 #print(self.reward_generator[:100])
@@ -842,8 +841,9 @@ class COGame(Widget):
                             self.reward_port.write(run_str)
                             self.reward_port.close()
                         elif self.juicer == 'red': 
-                            self.reward_port.write("VOL %.1f \r"%self.reward_generator[self.trial_counter])
-                            self.reward_port.write("RUN\r")
+                            self.reward_port.write(b"VOL %.1f \r"%self.reward_generator[self.trial_counter])
+                            time.sleep(.25)
+                            self.reward_port.write(b"RUN\r")
         except:
             pass
         
@@ -871,10 +871,11 @@ class COGame(Widget):
                         self.reward_port.close()
                     elif self.juicer == 'red': 
                         if self.reward_for_anytouch[0]:
-                            self.reward_port.write("VOL %.1f \r"%self.reward_for_anytouch[1])
+                            self.reward_port.write(b"VOL %.1f \r"%self.reward_for_anytouch[1])
                         elif self.reward_for_center[0]:
-                            self.reward_port.write("VOL %.1f \r"%self.reward_for_center[1])
-                        self.reward_port.write("RUN\r")
+                            self.reward_port.write(b"VOL %.1f \r"%self.reward_for_center[1])
+                        time.sleep(.25)
+                        self.reward_port.write(b"RUN\r")
         except:
             pass
 
