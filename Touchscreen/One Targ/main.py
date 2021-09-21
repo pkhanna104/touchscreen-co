@@ -136,7 +136,8 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         test=None, hold=None, targ_structure=None,
-        autoquit=None, rew_var=None, targ_timeout = None, nudge_x=None, nudge_y=None):
+        autoquit=None, rew_var=None, targ_timeout = None, nudge_x=None, nudge_y=None, 
+        juicer=None):
 
         self.rew_cnt = 0
         self.small_rew_cnt = 0
@@ -274,7 +275,12 @@ class COGame(Widget):
             if val:
                 self.testing = test_vals[i]
                 #self.in_cage = in_cage_vals[i]
-        
+
+        juicer_opts = ['yellow', 'red']
+        for i, val in enumerate(juicer['juicer']): 
+            if val: 
+                self.juicer = juicer_opts[i]
+
         import os 
         path = os.getcwd()
         if 'BasalGangulia' in path:
@@ -372,9 +378,22 @@ class COGame(Widget):
         self.FSM['idle_exit'] = dict(stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM4',
-                baudrate=115200)
-            self.reward_port.close()
+            if self.juicer == 'yellow': 
+                self.reward_port = serial.Serial(port='COM4',
+                    baudrate=115200)
+                self.reward_port.close()
+            
+            else: 
+                self.juicer == 'red': 
+                self.reward_port = serial.Serial(port='COM', 
+                    baudrate=19200)
+
+                ### setup the flow rate
+                time.sleep(.5) 
+                ### set volume value and units and rate units
+                self.reward_port.write(b"VOL 0.5\r")
+                self.reward_port.write(b"VOL ML\r")
+                self.reward_port.write(b"RAT 50MM\r") # 50 ml / min
         except:
             pass
 
@@ -813,14 +832,18 @@ class COGame(Widget):
 
                 if not self.skip_juice:
                     if self.reward_generator[self.trial_counter] > 0:
-                        self.reward_port.open()
-                        #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                        self.reward_port.write(rew_str)
-                        time.sleep(.25 + self.reward_delay_time)
-                        run_str = [ord(r) for r in 'run\n']
-                        self.reward_port.write(run_str)
-                        self.reward_port.close()
+                        if self.juicer == 'yellow': 
+                            self.reward_port.open()
+                            #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_targtouch[1])+' sec\n']
+                            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
+                            self.reward_port.write(rew_str)
+                            time.sleep(.25 + self.reward_delay_time)
+                            run_str = [ord(r) for r in 'run\n']
+                            self.reward_port.write(run_str)
+                            self.reward_port.close()
+                        elif self.juicer == 'red': 
+                            self.reward_port.write("VOL %.1f \r"%self.reward_generator[self.trial_counter])
+                            self.reward_port.write("RUN\r")
         except:
             pass
         
@@ -835,16 +858,23 @@ class COGame(Widget):
                 if np.logical_or(np.logical_and(self.reward_for_anytouch[0], self.reward_for_anytouch[1] > 0), 
                     np.logical_and(self.reward_for_center[0], self.reward_for_center[1] > 0)):
 
-                    self.reward_port.open()
-                    if self.reward_for_anytouch[0]:
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
-                    elif self.reward_for_center[0]:
-                        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_center[1])+' sec\n']
-                    self.reward_port.write(rew_str)
-                    time.sleep(.25)
-                    run_str = [ord(r) for r in 'run\n']
-                    self.reward_port.write(run_str)
-                    self.reward_port.close()
+                    if self.juicer == 'yellow': 
+                        self.reward_port.open()
+                        if self.reward_for_anytouch[0]:
+                            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_anytouch[1])+' sec\n']
+                        elif self.reward_for_center[0]:
+                            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_for_center[1])+' sec\n']
+                        self.reward_port.write(rew_str)
+                        time.sleep(.25)
+                        run_str = [ord(r) for r in 'run\n']
+                        self.reward_port.write(run_str)
+                        self.reward_port.close()
+                    elif self.juicer == 'red': 
+                        if self.reward_for_anytouch[0]:
+                            self.reward_port.write("VOL %.1f \r"%self.reward_for_anytouch[1])
+                        elif self.reward_for_center[0]:
+                            self.reward_port.write("VOL %.1f \r"%self.reward_for_center[1])
+                        self.reward_port.write("RUN\r")
         except:
             pass
 
