@@ -64,11 +64,15 @@ int nsteps;
 float us2s = pow(10, 6);
 volatile float factor = 1;
 
+float last_spin_cnt = 0; 
 float vel = 0.02;
+float last_vel = 0.02; 
+float avg_vel = 0.02; 
 float lastTm = micros();
 int last_tc = 0; 
 
 volatile int count_spin_tm1=0; 
+
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -89,10 +93,11 @@ void interrupt_motorencoder() {
   vel = (1.) / (micros() - lastTm); // counts per uS
   vel *= us2s; // counts per sec
   vel /= (22 * 12); // approximately revs per sec
-
-
+  
+  avg_vel = vel*.5 + avg_vel*.5;
+  
     // some sort  of coarse speed control // 
-    if ((vel < 0.35) and (in_targ == 1)) {
+    if ((avg_vel < 0.35) and (in_targ == 1)) {
 
       // double, triple, quadruple etc. /
       if (factor >= 1) {
@@ -106,7 +111,7 @@ void interrupt_motorencoder() {
     }
 
     // if velocity too high 
-    else if ((vel > 0.65) and (in_targ == 1)) {
+    else if ((avg_vel > 0.65) and (in_targ == 1)) {
       if (factor <= 1) {
         // halve
         factor /= 2;
@@ -122,9 +127,15 @@ void interrupt_motorencoder() {
 
   // save current time so we can use it for next time; 
   lastTm = micros();
- 
+
+  // if the next spin_ir_count is correct, then start counting on this one 
   if ((in_targ == 1) and ((spin_ir_count + 1) %12 == tc)) {
-    count_spin_tm1 += 1; 
+    if (motordir) {
+      count_spin_tm1 += 1; 
+    }
+    else {
+      count_spin_tm1 -=1; 
+    }
   }
   else {
     count_spin_tm1 = 0; 
@@ -133,38 +144,43 @@ void interrupt_motorencoder() {
 
 // Use the spin IR sensor 
 void interrupt_spinIR() {
-
-  // Keep track of own spin_ir_count
-  if (abs(count - lastCnt) > 5) {
-
-    // This really counts then // 
-    if (motordir) {
-      spin_ir_count += 1;
+  // Only count if > 200 ms after original 
+  if ((micros() - last_spin_cnt) > 50000) {
+    // Keep track of own spin_ir_count
+    // made this 10 so that you really have to be past in order to increment 
+    if (abs(count - lastCnt) > 5) {
+  
+      // This really counts then // 
+      if (motordir) {
+        spin_ir_count += 1;
+      }
+      else {
+        spin_ir_count -= 1;
+      }
+  
+      // Now use this update to make the other count more accurate // 
+      // Adjust count to the nearest 22 --> use the spin IR sensor to keep the encoder more accurate / stable // 
+      int tmp = count / 22 ;
+      int tmp1 = tmp + 1;
+      int d = abs(count - 22 * tmp);
+      int d1 = abs(count - 22 * tmp1);
+  
+      if (d < d1) {
+        count = 22 * tmp;
+      }
+      else {
+        count = 22 * tmp1;
+      }
+          
+      // Mod 12 //
+      spin_ir_count = spin_ir_count % 12;
+  
+      // Last count where you iterated
+      lastCnt = count;
     }
-    else {
-      spin_ir_count -= 1;
-    }
-
-    // Now use this update to make the other count more accurate // 
-    // Adjust count to the nearest 22 --> use the spin IR sensor to keep the encoder more accurate / stable // 
-    int tmp = count / 22 ;
-    int tmp1 = tmp + 1;
-    int d = abs(count - 22 * tmp);
-    int d1 = abs(count - 22 * tmp1);
-
-    if (d < d1) {
-      count = 22 * tmp;
-    }
-    else {
-      count = 22 * tmp1;
-    }
-        
-    // Mod 12 //
-    spin_ir_count = spin_ir_count % 12;
-
-    // Last count where you iterated
-    lastCnt = count;
   }
+  // set this regardless -- you need to undergo a period of non activity to actually increment; 
+  last_spin_cnt = micros(); 
 }
 
 void setup() {
@@ -252,12 +268,13 @@ void loop() {
 void act_solenoid() {
   forward(motor_sol, motor_sol, 200);
   delay(30);
-  forward(motor_sol, motor_sol, 50);
+  forward(motor_sol, motor_sol, 100);
 }
 
 // deactivate solenoid
 void deact_solenoid() {
   motor_sol.brake();
+  count_spin_tm1 = 0;  
 }
 
 // read the target value into "target_count"
@@ -296,8 +313,14 @@ void go_to_target() {
         drivez = 80;
       }
       else if (diff > 0) {
+        if (avg_vel >= .25) {
         tm = 1;
-        drivez = 70; 
+        drivez = 80; 
+        }
+        else if (avg_vel < .25) {
+        tm = 10; 
+        drivez = 80; 
+        }
       }
       else {
         tm = 0;
@@ -350,10 +373,22 @@ void go_to_target() {
     n_tms2 = 0;
   }
 
-  // Trigger solenoid 
-  if (count_spin_tm1 == 19) {
+  // Trigger solenoid -- make this speed dependent
+  if ((count_spin_tm1 == 19) and (avg_vel > .6)) {
+    deact_solenoid(); 
+  }
+  if ((count_spin_tm1 == 20) and (avg_vel > .4)) {
       deact_solenoid(); 
     }
+  if ((count_spin_tm1 == 21) and (avg_vel > .2)) {
+    deact_solenoid();
+ }
+ if ((count_spin_tm1 == 22) and (avg_vel > .1)) {
+    deact_solenoid(); 
+ }
+ if (count_spin_tm1 == 24) {
+  deact_solenoid(); 
+ }
 
   // Check if we should keep spinning 
   check_decel();
@@ -379,7 +414,11 @@ void print_serial() {
   Serial.print("\t");
   Serial.print(spin_ir_count);   
   Serial.print("\t");
-  Serial.println(in_targ);
-//  Serial.print("\t"); 
-//  Serial.print(keep_spinning); 
+  Serial.print(in_targ);
+  Serial.print("\t"); 
+  Serial.print(avg_vel); 
+  Serial.print("\t"); 
+  Serial.print(count%22); 
+  Serial.print("\t");
+  Serial.println(count_spin_tm1);
 }

@@ -76,6 +76,9 @@ class R2Game(Widget):
     tried = NumericProperty(0)
     what_notch_going_to = NumericProperty(0)
     what_notch_currently_at = NumericProperty(0)
+    speed = NumericProperty(0)
+    hall_cnt = NumericProperty(0)
+    end_cnt = NumericProperty(0)
 
     # Set relevant params text: 
     grasp_rew_txt = StringProperty('')
@@ -137,15 +140,16 @@ class R2Game(Widget):
             if val:
                 big_rew = big_rew_opts[i]
 
+        ### We always want sound for start reward ###
         if np.logical_or(rew_in['rew_start'], rew_in['rew_start_and_grasp']):
             self.reward_for_start = [True, small_rew]
         else:
-            self.reward_for_start = [False, 0]
+            self.reward_for_start = [True, 0]
 
         if np.logical_or(rew_in['rew_grasp'], rew_in['rew_start_and_grasp']):
             self.reward_for_grasp = [True, big_rew]
         else:
-            self.reward_for_grasp = [False, 0]
+            self.reward_for_grasp = [True, 0]
 
         if rew_in['snd_only']:
             self.reward_for_grasp = [True, 0.]
@@ -273,7 +277,7 @@ class R2Game(Widget):
             self.FSM['reward'] = dict(end_reward='ITI', stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM5',
+            self.reward_port = serial.Serial(port='COM9',
                 baudrate=115200)
             reward_fcn = True
             self.reward_port.close()
@@ -471,7 +475,7 @@ class R2Game(Widget):
         self.close_app()
 
     def update(self, ts):
-        print(self.state, self.button, self.going_to_targ)
+        print(self.state, self.speed)
         self.state_length = time.time() - self.state_start
         
         # Read from task arduino: 
@@ -480,7 +484,7 @@ class R2Game(Widget):
         port_read = self.task_ard.readline()
         port_splits = port_read.decode('ascii').split('\t')
 
-        if len(port_splits) != 5:
+        if len(port_splits) != 8:
             ser = self.task_ard.flushInput()
             _ = self.task_ard.readline()
             port_read = self.task_ard.readline()
@@ -493,6 +497,9 @@ class R2Game(Widget):
         self.wheel_pos = int(port_splits[3])
         self.what_notch_currently_at = self.wheel_pos
         self.going_to_targ = int(port_splits[4])
+        self.speed = float(port_splits[5])
+        self.hall_cnt = int(port_splits[6])
+        self.end_cnt = int(port_splits[7])
 
         ### Buttons #####
         if self.fsr1 + self.fsr2 > self.fsr_threshold: 
@@ -597,12 +604,16 @@ class R2Game(Widget):
         self.current_trial = self.generated_trials[self.trial_num]
 
     def _start_grasp_trial_start(self, **kwargs):
-        self.start_grasp = time.time(); 
+        ### This needs to start when "grasp" starts, after door is open
+        #self.start_grasp = time.time(); 
         
         ### Start movign the wheel to the correct slot ### 
         self.what_notch_going_to = self.current_trial[1]
         word = b'd'+struct.pack('<H', self.current_trial[1])
         self.task_ard.write(word)
+
+    def _start_grasp(self, **kwargs):
+        self.start_grasp = time.time()
 
     def door_opened(self, **kwargs): 
         ### Is the wheel in the right spot ?? 
