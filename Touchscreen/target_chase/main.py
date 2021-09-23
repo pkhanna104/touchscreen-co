@@ -824,6 +824,9 @@ class COGame(Widget):
             if self.button_pressed:
                 if button_pressed_prev:
                     if time.time() - self.t_button_hold_start > self.button_hold_time:
+                        # Play the button reward sound
+                        sound = SoundLoader.load('reward2.wav')
+                        sound.play()
                         # if the button has been held down long enough
                         if self.button_rew[0]:
                             self.run_button_rew()
@@ -959,10 +962,6 @@ class COGame(Widget):
         
     def run_button_rew(self, **kwargs):
         try:
-            #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-            sound = SoundLoader.load('reward2.wav')
-            sound.play()
-
             ### To trigger reward make sure reward is > 0:
             if np.logical_or(self.button_rew[0], self.button_rew[1] > 0):
 
