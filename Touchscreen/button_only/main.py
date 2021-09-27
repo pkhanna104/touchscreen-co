@@ -100,6 +100,21 @@ class COGame(Widget):
     big_rew_text = StringProperty('')
     big_rew_time_param = StringProperty('')
     
+    path = os.getcwd()
+    if platform == 'darwin': # we are on a Mac
+        path = path.split('/')
+    elif platform == 'win32': # we are on windows
+        path = path.split('\\')
+    for p in path:
+        if p == 'BasalGangulia':
+            user_id = 'BasalGangulia'
+        elif p == 'Ganguly':
+            user_id = 'Ganguly'
+        elif p == 'stim':
+            user_id = 'stim'
+        elif p == 'Sandon':
+            user_id = 'Sandon'
+    
     def on_touch_down(self, touch):
         #handle many touchs:
         ud = touch.ud
@@ -223,8 +238,12 @@ class COGame(Widget):
         
         # OPEN PORTS
         try:
-            self.reward_port = serial.Serial(port='COM4',
-                baudrate=115200)
+            if self.user_id == 'Ganguly':
+                self.reward_port = serial.Serial(port='COM4',
+                    baudrate=115200)
+            elif self.user_id == 'BasalGangulia':
+                self.reward_port = serial.Serial(port='COM3',
+                    baudrate=115200)
             self.reward_port.close()
         except:
             pass
@@ -252,7 +271,10 @@ class COGame(Widget):
             if platform == 'darwin':
                 self.button_ard = serial.Serial(port='/dev/cu.usbmodem1421301', baudrate=9600)
             else:
-                self.button_ard = serial.Serial(port='COM3', baudrate=9600)
+                if self.user_id == 'Ganguly':
+                    self.button_ard = serial.Serial(port='COM3', baudrate=9600) 
+                elif self.user_id == 'BasalGangulia':
+                    self.button_ard = serial.Serial(port='COM9', baudrate=9600)
         except:
             self.is_button_ard = False
 
@@ -283,18 +305,28 @@ class COGame(Widget):
             fsr_baseline = self.fsr_baseline
             )
 
-        if self.testing or platform == 'darwin':
+        if self.testing:
             pass
 
         else:
-            import os
-            path = os.getcwd()
-            path = path.split('\\')
-            path_data = [p for p in path if np.logical_and('Touch' not in p, 'Targ' not in p)]
-            path_root = ''
-            for ip in path_data:
-                path_root += ip+'/'
-            p = path_root + 'data/'
+            # Try saving to Box
+            if self.user_id == 'Sandon':
+                box_path = '/Users/Sandon/Box/Data/NHP_BehavioralData/button_only/'
+            elif self.user_id == 'Ganguly':
+                box_path = 'C:/Users/Ganguly/Box/Data/NHP_BehavioralData/button_only/'
+            elif self.user_id == 'BasalGangulia':
+                box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/button_only/'
+            if os.path.exists(box_path):
+                p = box_path
+            else:
+                # if there is no path to box, then save in a data_tmp folder within the CWD
+                path = os.getcwd()
+                path = path.split('\\')
+                path_data = [p for p in path]
+                path_root = ''
+                for ip in path_data:
+                    path_root += ip+'/'
+                p = path_root + 'data/'
             print('Auto path : %s'%p)
             # Check if this directory exists: 
             if os.path.exists(p):
