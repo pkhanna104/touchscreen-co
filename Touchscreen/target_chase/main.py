@@ -126,7 +126,7 @@ class COGame(Widget):
         if p == 'BasalGangulia':
             user_id = 'BasalGangulia'
         elif p == 'Ganguly':
-            user_id == 'Ganguly'
+            user_id = 'Ganguly'
         elif p == 'stim':
             user_id = 'stim'
         elif p == 'Sandon':
