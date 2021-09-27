@@ -557,9 +557,6 @@
                 Label:
                     text: ''
                     fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
 
                 Label: 
                     text: 'Target 1 Position'
@@ -577,6 +574,12 @@
                 CheckBox:
                     id: t1upper_left
                     group: 't1_pos'
+                    
+                Label: 
+                    text: 'Middle Left'
+                CheckBox:
+                    id: t1mid_left
+                    group: 't1_pos'
 
                 Label: 
                     text: 'Lower Left'
@@ -589,6 +592,12 @@
                 CheckBox:
                     id: t1upper_right
                     group: 't1_pos'
+                    
+                Label: 
+                    text: 'Middle Right'
+                CheckBox:
+                    id: t1mid_right
+                    group: 't1_pos'
 
                 Label: 
                     text: 'Lower Right'
@@ -600,9 +609,6 @@
                     text: ''
                     fontsize: 50
 
-                Label:
-                    text: ''
-                    fontsize: 50
                 Label:
                     text: ''
                     fontsize: 50
@@ -689,9 +695,6 @@
                 Label:
                     text: ''
                     fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
 
                 Label: 
                     text: 'Target 2 Position'
@@ -714,6 +717,12 @@
                 CheckBox:
                     id: t2upper_left
                     group: 't2_pos'
+                    
+                Label: 
+                    text: 'Middle Left'
+                CheckBox:
+                    id: t2mid_left
+                    group: 't2_pos'
 
                 Label: 
                     text: 'Lower Left'
@@ -727,16 +736,19 @@
                     id: t2upper_right
                     group: 't2_pos'
                     active: True
+                    
+                Label: 
+                    text: 'Middle Right'
+                CheckBox:
+                    id: t2mid_right
+                    group: 't2_pos'
 
                 Label: 
                     text: 'Lower Right'
                 CheckBox:
                     id: t2lower_right
                     group: 't2_pos'
-                                        
-                Label:
-                    text: ''
-                    fontsize: 50
+
 
                 Label:
                     text: ''
@@ -828,9 +840,6 @@
                 Label:
                     text: ''
                     fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
 
                 Label: 
                     text: 'Target 3 Position'
@@ -854,6 +863,12 @@
                     id: t3upper_left
                     group: 't3_pos'
                     active: True
+                    
+                Label: 
+                    text: 'Middle Left'
+                CheckBox:
+                    id: t3mid_left
+                    group: 't3_pos'
 
                 Label: 
                     text: 'Lower Left'
@@ -866,16 +881,19 @@
                 CheckBox:
                     id: t3upper_right
                     group: 't3_pos'
+                    
+                Label: 
+                    text: 'Middle Right'
+                CheckBox:
+                    id: t3mid_right
+                    group: 't3_pos'
 
                 Label: 
                     text: 'Lower Right'
                 CheckBox:
                     id: t3lower_right
                     group: 't3_pos'
-                                        
-                Label:
-                    text: ''
-                    fontsize: 50
+
 
                 Label:
                     text: ''
@@ -967,9 +985,6 @@
                 Label:
                     text: ''
                     fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
 
                 Label: 
                     text: 'Target 4 Position'
@@ -993,6 +1008,12 @@
                 CheckBox:
                     id: t4upper_left
                     group: 't4_pos'
+                    
+                Label: 
+                    text: 'Middle Left'
+                CheckBox:
+                    id: t4mid_left
+                    group: 't4_pos'
 
                 Label: 
                     text: 'Lower Left'
@@ -1005,16 +1026,18 @@
                 CheckBox:
                     id: t4upper_right
                     group: 't4_pos'
+                    
+                Label: 
+                    text: 'Middle Right'
+                CheckBox:
+                    id: t4mid_right
+                    group: 't4_pos'
 
                 Label: 
                     text: 'Lower Right'
                 CheckBox:
                     id: t4lower_right
                     group: 't4_pos'
-                                        
-                Label:
-                    text: ''
-                    fontsize: 50
 
                 Label:
                     text: ''
@@ -1300,10 +1323,10 @@
                     dict(button_rew=[button_rew_zero_sec.active, button_rew_pt1_sec.active, button_rew_pt3_sec.active, button_rew_pt5_sec.active], 
                     big_rew=[big_rew_zero_sec.active, big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_22.active, targ_rad_30.active], 
-                    targ1_pos=[t1center.active, t1upper_left.active, t1lower_left.active, t1upper_right.active, t1lower_right.active],
-                    targ2_pos=[t2random.active, t2center.active, t2upper_left.active, t2lower_left.active, t2upper_right.active, t2lower_right.active],
-                    targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3lower_left.active, t3upper_right.active, t3lower_right.active],
-                    targ4_pos=[t4none.active, t4center.active, t4upper_left.active, t4lower_left.active, t4upper_right.active, t4lower_right.active],
+                    targ1_pos=[t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
+                    targ2_pos=[t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
+                    targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
+                    targ4_pos=[t4none.active, t4center.active, t4upper_left.active, t4mid_left.active, t4lower_left.active, t4upper_right.active, t4mid_right.active, t4lower_right.active],
                     time_to_next_targ=[t2next_never.active, t2next_250.active, t2next_500.active, t2next_750.active, t2next_1000.active, t2next_1500.active]),
                     dict(button_hold=[no_button.active, button_zero_sec.active, button_hund_sec.active, button_twohund_sec.active, button_threehund_sec.active, button_fourhund_sec.active, button_half_sec.active, button_60.active, button_big_rand.active],
                     hold=[zero_sec.active, hund_sec.active, twohund_sec.active, threehund_sec.active, fourhund_sec.active, half_sec.active, t_60.active, big_rand.active]), 

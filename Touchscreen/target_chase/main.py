@@ -233,7 +233,7 @@ class COGame(Widget):
         self.max_y_from_center = d_center2top-self.target_rad
         
         # target 1
-        target_pos_opts = ['center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
+        target_pos_opts = ['center', 'upper_left', 'middle_left', 'lower_left', 'upper_right', 'middle_right', 'lower_right']
         for i, val in enumerate(task_in['targ1_pos']):
             if val:
                 self.target1_pos_str = target_pos_opts[i]
@@ -244,12 +244,18 @@ class COGame(Widget):
         elif self.target1_pos_str == 'upper_right':
             targ_x = self.max_y_from_center+self.nudge_x_t1
             targ_y = self.center_position[1] + self.max_y_from_center
+        elif self.target1_pos_str == 'middle_right':
+            targ_x = self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1]
         elif self.target1_pos_str == 'lower_right':
             targ_x = self.max_y_from_center+self.nudge_x_t1
             targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target1_pos_str == 'lower_left':
             targ_x = -self.max_y_from_center+self.nudge_x_t1
             targ_y = self.center_position[1] - self.max_y_from_center
+        elif self.target1_pos_str == 'middle_left':
+            targ_x = -self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1]
         elif self.target1_pos_str == 'upper_left':
             targ_x = -self.max_y_from_center+self.nudge_x_t1
             targ_y = self.center_position[1] + self.max_y_from_center
@@ -257,23 +263,29 @@ class COGame(Widget):
         self.target1_position = np.array([targ_x, targ_y])
         
         # target 2
-        target_pos_opts = ['random', 'center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
+        target_pos_opts = ['random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_right', 'middle_right', 'lower_right']
         for i, val in enumerate(task_in['targ2_pos']):
             if val:
                 self.target2_pos_str = target_pos_opts[i]
-        
+
         if self.target2_pos_str == 'center':
             targ_x = self.center_position[0]+self.nudge_x_t2
             targ_y = self.center_position[1]
         elif self.target2_pos_str == 'upper_right':
             targ_x = self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1] + self.max_y_from_center
+        elif self.target2_pos_str == 'middle_right':
+            targ_x = self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1]
         elif self.target2_pos_str == 'lower_right':
             targ_x = self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target2_pos_str == 'lower_left':
             targ_x = -self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1] - self.max_y_from_center
+        elif self.target2_pos_str == 'middle_left':
+            targ_x = -self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1]
         elif self.target2_pos_str == 'upper_left':
             targ_x = -self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1] + self.max_y_from_center
@@ -281,7 +293,7 @@ class COGame(Widget):
         self.target2_position = np.array([targ_x, targ_y])
         
         # target 3
-        target_pos_opts = ['none', 'center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
+        target_pos_opts = ['none', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_right', 'middle_right', 'lower_right']
         for i, val in enumerate(task_in['targ3_pos']):
             if val:
                 self.target3_pos_str = target_pos_opts[i]
@@ -293,12 +305,18 @@ class COGame(Widget):
             elif self.target3_pos_str == 'upper_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target3_pos_str == 'middle_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1]
             elif self.target3_pos_str == 'lower_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1] - self.max_y_from_center
             elif self.target3_pos_str == 'lower_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target3_pos_str == 'middle_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1]
             elif self.target3_pos_str == 'upper_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1] + self.max_y_from_center
@@ -325,12 +343,18 @@ class COGame(Widget):
             elif self.target4_pos_str == 'upper_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target4_pos_str == 'middle_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1]
             elif self.target4_pos_str == 'lower_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1] - self.max_y_from_center
             elif self.target4_pos_str == 'lower_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target4_pos_str == 'middle_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1]
             elif self.target4_pos_str == 'upper_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1] + self.max_y_from_center
