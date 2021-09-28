@@ -47,16 +47,17 @@
                 CheckBox: 
                     group: 'check'
                     id: chk_har
-                    active: True  
+                    active: root.is_haribo  
                     
                 Label: 
                     text: 'Fifi'
                     fontsize: 28
-                    halign: 'center'                        
+                    halign: 'center'                      
                 
                 CheckBox: 
                     group: 'check'
                     id: chk_fifi
+                    active: root.is_fifi    
                 
                 Label: 
                     text: 'Nike'
@@ -67,6 +68,7 @@
                 CheckBox: 
                     group: 'check'
                     id: chk_nike
+                    active: root.is_nike    
                     
                 Label: 
                     text: 'Butters'
@@ -77,6 +79,7 @@
                 CheckBox: 
                     group: 'check'
                     id: chk_but
+                    active: root.is_butters    
                    
                 Label:
                     text: ''
@@ -109,6 +112,7 @@
                 CheckBox:
                     group: 'tt'
                     id: tt_15_sec
+                    active: root.is_tt15    
             
                 Label: 
                     text: '30 sec'
@@ -116,6 +120,7 @@
                 CheckBox:
                     group: 'tt'
                     id: tt_30_sec
+                    active: root.is_tt30
                     
                 Label: 
                     text: '45 sec'
@@ -123,6 +128,7 @@
                 CheckBox:
                     group: 'tt'
                     id: tt_45_sec
+                    active: root.is_tt45
 
                 Label: 
                     text: '60 sec'
@@ -130,7 +136,7 @@
                 CheckBox:
                     group: 'tt'
                     id: tt_60_sec
-                    active: True
+                    active: root.is_tt60
             
                 Label:
                     text: ''
@@ -166,62 +172,64 @@
                 CheckBox: 
                     id: no_button
                     group: 'button_hold_time'
-                    active: True
+                    active: root.is_bhtfalse
 
                 Label: 
                     text: '0.0 sec'
                 CheckBox: 
                     id: button_zero_sec
                     group: 'button_hold_time'
+                    active: root.is_bht000
 
                 Label:  
                     text: '0.1 sec'
                 CheckBox:
                     id: button_hund_sec
                     group: 'button_hold_time'
+                    active: root.is_bht100
 
                 Label:  
                     text: '0.2 sec'
                 CheckBox:
                     id: button_twohund_sec
                     group: 'button_hold_time'
+                    active: root.is_bht200
 
                 Label:  
                     text: '0.3 sec'
                 CheckBox:
                     id: button_threehund_sec
                     group: 'button_hold_time'
+                    active: root.is_bht300
 
                 Label: 
                     text: '0.4 sec'
-
                 CheckBox:
                     id: button_fourhund_sec
                     group: 'button_hold_time'
+                    active: root.is_bht400
 
                 Label: 
                     text: '0.5 sec'
-
                 CheckBox:
                     id: button_half_sec
                     group: 'button_hold_time'
-                
+                    active: root.is_bht500
 
                 Label: 
                     text: '0.6 sec'
-
                 CheckBox:
                     id: button_60
                     group: 'button_hold_time'
-             
+                    active: root.is_bht600
 
                 Label:
                     text: 'Rand: .4-.6'
                     fontsize: 50
-
                 CheckBox:
                     id: button_big_rand
                     group: 'button_hold_time'
+                    active: root.is_bhtbigrand
 
                 Label:
                     text: ''
@@ -229,6 +237,9 @@
                 Label:
                     text: ''
                     fontsize: 50
+                    
+                    
+                    
                     
             BoxLayout 
                 id: button_rew
@@ -243,7 +254,6 @@
                 Label:
                     text: ''
                     fontsize: 50
-
                 Label:
                     text: ''
                     fontsize: 50
@@ -257,28 +267,28 @@
                 CheckBox:
                     id: button_rew_zero_sec
                     group: 'button_rew'
+                    active: root.is_bhrew000
 
                 Label: 
                     text: '0.1 sec'
-
                 CheckBox:
                     id: button_rew_pt1_sec
                     group: 'button_rew'
-                    active: True
+                    active: root.is_bhrew100
 
                 Label: 
                     text: '0.3 sec'
-
                 CheckBox:
                     id: button_rew_pt3_sec
                     group: 'button_rew'
+                    active: root.is_bhrew300
 
                 Label: 
                     text: '0.5 sec'
-
                 CheckBox:
                     id: button_rew_pt5_sec
                     group: 'button_rew'
+                    active: root.is_bhrew500
 
                 Label:
                     text: ''
@@ -286,6 +296,8 @@
                 Label:
                     text: ''
                     fontsize: 50
+
+
 
 
             BoxLayout:
@@ -308,54 +320,57 @@
                 CheckBox:
                     id: zero_sec
                     group: 'hold_time'
-                    active: True
+                    active: root.is_tht000
 
                 Label: 
                     text: '0.1 sec'
                 CheckBox: 
                     id: hund_sec
                     group: 'hold_time'
+                    active: root.is_tht100
 
                 Label: 
                     text: '0.2 sec'
                 CheckBox: 
                     id: twohund_sec
                     group: 'hold_time'
+                    active: root.is_tht200
 
                 Label: 
                     text: '0.3 sec'
                 CheckBox: 
                     id: threehund_sec
                     group: 'hold_time'
+                    active: root.is_tht300
 
                 Label: 
                     text: '0.4 sec'
-
                 CheckBox:
                     id: fourhund_sec
                     group: 'hold_time'
+                    active: root.is_tht400
 
                 Label: 
                     text: '0.5 sec'
-
                 CheckBox:
                     id: half_sec
                     group: 'hold_time'
+                    active: root.is_tht500
 
                 Label: 
                     text: '0.6 sec'
-
                 CheckBox:
                     id: t_60
                     group: 'hold_time'
+                    active: root.is_tht600
 
                 Label:
                     text: 'Rand: .4-.6'
                     fontsize: 50
-
                 CheckBox:
                     id: big_rand
                     group: 'hold_time'
+                    active: root.is_thtbigrand
 
                 Label:
                     text: ''
@@ -379,32 +394,31 @@
 
                 Label: 
                     text: '0.0 sec'
-
                 CheckBox:
                     id: big_rew_zero_sec
                     group: 'big_rew'
+                    active: root.is_threw000
 
                 Label: 
                     text: '0.3 sec'
-
                 CheckBox:
                     id: big_rew_pt3_sec
                     group: 'big_rew'
+                    active: root.is_threw300
 
                 Label: 
                     text: '0.5 sec'
-
                 CheckBox:
                     id: big_rew_pt5_sec
                     group: 'big_rew'
+                    active: root.is_threw500
 
                 Label: 
                     text: '0.7 sec'
-
                 CheckBox:
                     id: big_rew_pt7_sec
                     group: 'big_rew'
-                    active: True
+                    active: root.is_threw700
 
                 Label:
                     text: ''
@@ -428,6 +442,7 @@
                 Label:
                     text: ''
                     fontsize: 50
+                    
                 Label: 
                     text: 'Reward Variability'
                     color: 1, 1, 0, 1
@@ -437,21 +452,21 @@
                 CheckBox:
                     id: rew_all
                     group: 'rew_var'
-                    active: True
+                    active: root.is_rewvarall
                     
                 Label: 
                     text: 'Reward 50% '
-
                 CheckBox:
                     id: rew_50
                     group: 'rew_var'
+                    active: root.is_rewvar50
 
                 Label: 
                     text: 'Reward 33% w/ 10% doubled'
-
                 CheckBox:
                     id: rew_30
                     group: 'rew_var'
+                    active: root.is_rewvar33
 
 
                 Label:
@@ -460,6 +475,9 @@
                 Label:
                     text: ''
                     fontsize: 50
+
+
+
 
 
             BoxLayout:
@@ -485,55 +503,60 @@
                 CheckBox:
                     id: targ_rad_5
                     group: 'targ_cm'
+                    active: root.is_trad050
 
                 Label: 
                     text: '.75 cm'
                 CheckBox:
                     id: targ_rad_75
                     group: 'targ_cm'
+                    active: root.is_trad075
                     
                 Label: 
                     text: '.82 cm'
                 CheckBox:
                     id: targ_rad_82
                     group: 'targ_cm'
+                    active: root.is_trad082
 
                 Label: 
                     text: '.91 cm'
                 CheckBox:
                     id: targ_rad_91
                     group: 'targ_cm'
+                    active: root.is_trad091
 
                 Label: 
                     text: '1.0 cm'
-
                 CheckBox:
                     id: targ_rad_10
                     group: 'targ_cm'
+                    active: root.is_trad100
+                    
                 Label: 
                     text: '1.5 cm'
-
                 CheckBox:
                     id: targ_rad_15
                     group: 'targ_cm'
+                    active: root.is_trad150
 
                 Label: 
                     text: '2.25cm'
                 CheckBox:
                     id: targ_rad_22
                     group: 'targ_cm'
-                    active: True
+                    active: root.is_trad225
 
                 Label:
                     text: '3.0 cm'
                 CheckBox:
                     id: targ_rad_30
                     group: 'targ_cm'
+                    active: root.is_trad300
                                         
                 Label:
                     text: ''
                     fontsize: 50
-
                 Label:
                     text: ''
                     fontsize: 50
@@ -567,51 +590,59 @@
                 CheckBox:
                     id: t1center
                     group: 't1_pos'
-                    active: True
+                    active: root.is_t1cent
                 
                 Label: 
                     text: 'Upper Left'
                 CheckBox:
                     id: t1upper_left
                     group: 't1_pos'
+                    active: root.is_t1ul
                     
                 Label: 
                     text: 'Middle Left'
                 CheckBox:
                     id: t1mid_left
                     group: 't1_pos'
+                    active: root.is_t1ml
 
                 Label: 
                     text: 'Lower Left'
                 CheckBox:
                     id: t1lower_left
                     group: 't1_pos'
+                    active: root.is_t1ll
                     
                 Label: 
                     text: 'Upper Right'
                 CheckBox:
                     id: t1upper_right
                     group: 't1_pos'
+                    active: root.is_t1ur
                     
                 Label: 
                     text: 'Middle Right'
                 CheckBox:
                     id: t1mid_right
                     group: 't1_pos'
+                    active: root.is_t1mr
 
                 Label: 
                     text: 'Lower Right'
                 CheckBox:
                     id: t1lower_right
                     group: 't1_pos'
+                    active: root.is_t1lr
                                         
                 Label:
                     text: ''
                     fontsize: 50
-
                 Label:
                     text: ''
                     fontsize: 50
+            
+            
+            
             
             BoxLayout:
                 id: nudge_x_t1
@@ -633,43 +664,48 @@
                 CheckBox:
                     id: nudge_x_t1_neg6
                     group: 'nudge_x_t1'
+                    active: root.is_t1nudgeneg6
                     
                 Label: 
                     text: '-4 cm'
                 CheckBox:
                     id: nudge_x_t1_neg4
                     group: 'nudge_x_t1'
+                    active: root.is_t1nudgeneg4
 
                 Label: 
                     text: '-2 cm'
                 CheckBox:
                     id: nudge_x_t1_neg2
                     group: 'nudge_x_t1'
+                    active: root.is_t1nudgeneg2
 
                 Label: 
                     text: '0 cm'
                 CheckBox:
                     id: nudge_x_t1_zero
                     group: 'nudge_x_t1'
+                    active: root.is_t1nudgezero
 
                 Label: 
                     text: '+2 cm'
                 CheckBox:
                     id: nudge_x_t1_pos2
                     group: 'nudge_x_t1'
+                    active: root.is_t1nudgepos2
                     
                 Label: 
                     text: '+4 cm'
                 CheckBox:
                     id: nudge_x_t1_pos4
                     group: 'nudge_x_t1'
-                    active: True
+                    active: root.is_t1nudgepos4
 
                 Label: 
                     text: '+6 cm'
                 CheckBox:
                     id: nudge_x_t1_pos6
-                    group: 'nudge_x_t1'
+                    active: root.is_t1nudgepos6
 
                 Label:
                     text: ''
@@ -705,49 +741,56 @@
                 CheckBox:
                     id: t2random
                     group: 't2_pos'
+                    active: root.is_t2rand
                 
                 Label: 
                     text: 'Center'
                 CheckBox:
                     id: t2center
                     group: 't2_pos'
+                    active: root.is_t2cent
                 
                 Label: 
                     text: 'Upper Left'
                 CheckBox:
                     id: t2upper_left
                     group: 't2_pos'
+                    active: root.is_t2ul
                     
                 Label: 
                     text: 'Middle Left'
                 CheckBox:
                     id: t2mid_left
                     group: 't2_pos'
+                    active: root.is_t2ml
 
                 Label: 
                     text: 'Lower Left'
                 CheckBox:
                     id: t2lower_left
                     group: 't2_pos'
+                    active: root.is_t2ll
                     
                 Label: 
                     text: 'Upper Right'
                 CheckBox:
                     id: t2upper_right
                     group: 't2_pos'
-                    active: True
+                    active: root.is_t2ur
                     
                 Label: 
                     text: 'Middle Right'
                 CheckBox:
                     id: t2mid_right
                     group: 't2_pos'
+                    active: root.is_t2mr
 
                 Label: 
                     text: 'Lower Right'
                 CheckBox:
                     id: t2lower_right
                     group: 't2_pos'
+                    active: root.is_t2lr
 
 
                 Label:
@@ -778,43 +821,49 @@
                 CheckBox:
                     id: nudge_x_t2_neg6
                     group: 'nudge_x_t2'
+                    active: root.is_t2nudgeneg6
                     
                 Label: 
                     text: '-4 cm'
                 CheckBox:
                     id: nudge_x_t2_neg4
                     group: 'nudge_x_t2'
+                    active: root.is_t2nudgeneg4
 
                 Label: 
                     text: '-2 cm'
                 CheckBox:
                     id: nudge_x_t2_neg2
                     group: 'nudge_x_t2'
+                    active: root.is_t2nudgeneg2
 
                 Label: 
                     text: '0 cm'
                 CheckBox:
                     id: nudge_x_t2_zero
                     group: 'nudge_x_t2'
-                    active: True
+                    active: root.is_t2nudgezero
 
                 Label: 
                     text: '+2 cm'
                 CheckBox:
                     id: nudge_x_t2_pos2
                     group: 'nudge_x_t2'
+                    active: root.is_t2nudgepos2
                     
                 Label: 
                     text: '+4 cm'
                 CheckBox:
                     id: nudge_x_t2_pos4
                     group: 'nudge_x_t2'
+                    active: root.is_t2nudgepos4
 
                 Label: 
                     text: '+6 cm'
                 CheckBox:
                     id: nudge_x_t2_pos6
                     group: 'nudge_x_t2'
+                    active: root.is_t2nudgepos6
 
                 Label:
                     text: ''
@@ -850,49 +899,56 @@
                 CheckBox:
                     id: t3none
                     group: 't3_pos'
+                    active: root.is_t3none
                 
                 Label: 
                     text: 'Center'
                 CheckBox:
                     id: t3center
                     group: 't3_pos'
+                    active: root.is_t3cent
                 
                 Label: 
                     text: 'Upper Left'
                 CheckBox:
                     id: t3upper_left
                     group: 't3_pos'
-                    active: True
+                    active: root.is_t3ul
                     
                 Label: 
                     text: 'Middle Left'
                 CheckBox:
                     id: t3mid_left
                     group: 't3_pos'
+                    active: root.is_t3ml
 
                 Label: 
                     text: 'Lower Left'
                 CheckBox:
                     id: t3lower_left
                     group: 't3_pos'
+                    active: root.is_t3ll
                     
                 Label: 
                     text: 'Upper Right'
                 CheckBox:
                     id: t3upper_right
                     group: 't3_pos'
+                    active: root.is_t3ur
                     
                 Label: 
                     text: 'Middle Right'
                 CheckBox:
                     id: t3mid_right
                     group: 't3_pos'
+                    active: root.is_t3mr
 
                 Label: 
                     text: 'Lower Right'
                 CheckBox:
                     id: t3lower_right
                     group: 't3_pos'
+                    active: root.is_t3lr
 
 
                 Label:
@@ -923,43 +979,49 @@
                 CheckBox:
                     id: nudge_x_t3_neg6
                     group: 'nudge_x_t3'
+                    active: root.is_t3nudgeneg6
                     
                 Label: 
                     text: '-4 cm'
                 CheckBox:
                     id: nudge_x_t3_neg4
                     group: 'nudge_x_t3'
+                    active: root.is_t3nudgeneg4
 
                 Label: 
                     text: '-2 cm'
                 CheckBox:
                     id: nudge_x_t3_neg2
                     group: 'nudge_x_t3'
+                    active: root.is_t3nudgeneg2
 
                 Label: 
                     text: '0 cm'
                 CheckBox:
                     id: nudge_x_t3_zero
                     group: 'nudge_x_t3'
-                    active: True
+                    active: root.is_t3nudgezero
 
                 Label: 
                     text: '+2 cm'
                 CheckBox:
                     id: nudge_x_t3_pos2
                     group: 'nudge_x_t3'
+                    active: root.is_t3nudgepos2
                     
                 Label: 
                     text: '+4 cm'
                 CheckBox:
                     id: nudge_x_t3_pos4
                     group: 'nudge_x_t3'
+                    active: root.is_t3nudgepos4
 
                 Label: 
                     text: '+6 cm'
                 CheckBox:
                     id: nudge_x_t3_pos6
                     group: 'nudge_x_t3'
+                    active: root.is_t3nudgepos6
 
                 Label:
                     text: ''
@@ -995,49 +1057,56 @@
                 CheckBox:
                     id: t4none
                     group: 't4_pos'
-                    active: True
+                    active: root.is_t4none
                 
                 Label: 
                     text: 'Center'
                 CheckBox:
                     id: t4center
                     group: 't4_pos'
+                    active: root.is_t4cent
                 
                 Label: 
                     text: 'Upper Left'
                 CheckBox:
                     id: t4upper_left
                     group: 't4_pos'
+                    active: root.is_t4ul
                     
                 Label: 
                     text: 'Middle Left'
                 CheckBox:
                     id: t4mid_left
                     group: 't4_pos'
+                    active: root.is_t4ml
 
                 Label: 
                     text: 'Lower Left'
                 CheckBox:
                     id: t4lower_left
                     group: 't4_pos'
+                    active: root.is_t4ll
                     
                 Label: 
                     text: 'Upper Right'
                 CheckBox:
                     id: t4upper_right
                     group: 't4_pos'
+                    active: root.is_t4ur
                     
                 Label: 
                     text: 'Middle Right'
                 CheckBox:
                     id: t4mid_right
                     group: 't4_pos'
+                    active: root.is_t4mr
 
                 Label: 
                     text: 'Lower Right'
                 CheckBox:
                     id: t4lower_right
                     group: 't4_pos'
+                    active: root.is_t4lr
 
                 Label:
                     text: ''
@@ -1067,43 +1136,49 @@
                 CheckBox:
                     id: nudge_x_t4_neg6
                     group: 'nudge_x_t4'
+                    active: root.is_t4nudgeneg6
                     
                 Label: 
                     text: '-4 cm'
                 CheckBox:
                     id: nudge_x_t4_neg4
                     group: 'nudge_x_t4'
+                    active: root.is_t4nudgeneg4
 
                 Label: 
                     text: '-2 cm'
                 CheckBox:
                     id: nudge_x_t4_neg2
                     group: 'nudge_x_t4'
+                    active: root.is_t4nudgeneg2
 
                 Label: 
                     text: '0 cm'
                 CheckBox:
                     id: nudge_x_t4_zero
                     group: 'nudge_x_t4'
-                    active: True
+                    active: root.is_t4nudgezero
 
                 Label: 
                     text: '+2 cm'
                 CheckBox:
                     id: nudge_x_t4_pos2
                     group: 'nudge_x_t4'
+                    active: root.is_t4nudgepos2
                     
                 Label: 
                     text: '+4 cm'
                 CheckBox:
                     id: nudge_x_t4_pos4
                     group: 'nudge_x_t4'
+                    active: root.is_t4nudgepos4
 
                 Label: 
                     text: '+6 cm'
                 CheckBox:
                     id: nudge_x_t4_pos6
                     group: 'nudge_x_t4'
+                    active: root.is_t4nudgepos6
 
                 Label:
                     text: ''
@@ -1139,43 +1214,49 @@
                 CheckBox:
                     id: screen_top_zero
                     group: 'screen_top'
+                    active: root.is_screentopzero
                     
                 Label: 
                     text: '2 cm'
                 CheckBox:
                     id: screen_top_neg1
                     group: 'screen_top'
+                    active: root.is_screentop2
                 
                 Label: 
                     text: '4 cm'
                 CheckBox:
                     id: screen_top_neg2
                     group: 'screen_top'
+                    active: root.is_screentop4
                     
                 Label: 
                     text: '6 cm'
                 CheckBox:
                     id: screen_top_neg3
                     group: 'screen_top'
-                    active: True
+                    active: root.is_screentop6
                 
                 Label: 
                     text: '8 cm'
                 CheckBox:
                     id: screen_top_neg4
                     group: 'screen_top'
+                    active: root.is_screentop8
                   
                 Label: 
                     text: '10 cm'
                 CheckBox:
                     id: screen_top_neg5
                     group: 'screen_top'
+                    active: root.is_screentop10
                     
                 Label: 
                     text: '12 cm'
                 CheckBox:
                     id: screen_top_neg6
                     group: 'screen_top'
+                    active: root.is_screentop12
 
                 Label:
                     text: ''
@@ -1205,37 +1286,42 @@
                 CheckBox:
                     id: t2next_never
                     group: 'time2next_targ'
-                    active: True
+                    active: root.is_ttntnever
                     
                 Label: 
                     text: '0.25 sec'
                 CheckBox:
                     id: t2next_250
                     group: 'time2next_targ'
+                    active: root.is_ttnt025
                 
                 Label: 
                     text: '0.5 sec'
                 CheckBox:
                     id: t2next_500
                     group: 'time2next_targ'
+                    active: root.is_ttnt050
                     
                 Label: 
                     text: '0.75'
                 CheckBox:
                     id: t2next_750
                     group: 'time2next_targ'
+                    active: root.is_ttnt075
                 
                 Label: 
                     text: '1.0 sec'
                 CheckBox:
                     id: t2next_1000
                     group: 'time2next_targ'
+                    active: root.is_ttnt100
                   
                 Label: 
                     text: '1.5 sec'
                 CheckBox:
                     id: t2next_1500
                     group: 'time2next_targ'
+                    active: root.is_ttnt150
 
                 Label:
                     text: ''
@@ -1273,32 +1359,35 @@
                 CheckBox:
                     id: ten_trials
                     group: 'trials'
-                    active: True
+                    active: root.is_autoqt10
 
                 Label: 
                     text: '25 trials'
                 CheckBox:
                     id: twenty_five_trials
                     group: 'trials'
+                    active: root.is_autoqt25
 
                 Label:
                     text: '50 trials'
                 CheckBox:
                     id: fifty_trials
                     group: 'trials'
+                    active: root.is_autoqt50
                     
                 Label:
                     text: '100 trials!'
                 CheckBox:
                     id: hundred_trials
                     group: 'trials'
-
+                    active: root.is_autoqt100
 
                 Label:
                     text: 'Dont AutoQuit'
                 CheckBox:
                     id: no_trials
                     group: 'trials'
+                    active: root.is_autoqtnever
 
                 Label:
                     text: ''
