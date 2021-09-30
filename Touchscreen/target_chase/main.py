@@ -3,7 +3,7 @@ from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
 from kivy.core.text import Label as CoreLabel
 from kivy.uix.widget import Widget
-from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty, StringProperty
+from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty, StringProperty, BooleanProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.vector import Vector
 from kivy.clock import Clock
@@ -13,6 +13,7 @@ import serial, time, pickle, datetime
 from numpy import binary_repr
 import struct
 from sys import platform
+import os
 
 
 Config.set('graphics', 'resizable', False)
@@ -49,6 +50,36 @@ Config.set('graphics', 'height', str(fixed_window_size[1]))
 import time
 import numpy as np
 import tables
+
+# DETERMINE WHAT COMPUTER WE ARE ON
+path = os.getcwd()
+if platform == 'darwin': # we are on a Mac
+    path = path.split('/')
+elif platform == 'win32': # we are on windows
+    path = path.split('\\')
+for p in path:
+    if p == 'BasalGangulia':
+        user_id = 'BasalGangulia'
+    elif p == 'Ganguly':
+        user_id = 'Ganguly'
+    elif p == 'stim':
+        user_id = 'stim'
+    elif p == 'Sandon':
+        user_id = 'Sandon'
+
+# LOAD THE MOST RECENT PARMS TO USE AS DEFAULTS
+if user_id == 'Sandon':
+    last_param_path = '/Users/Sandon/Documents/'
+elif user_id == 'Ganguly':
+    last_param_path = 'C:/Users/Ganguly/Documents/'
+elif user_id == 'BasalGangulia':
+    last_param_path = 'C:/Users/BasalGangulia/Documents/'
+
+last_param_path = last_param_path+'most_recent_target_chase_params.pkl'
+if os.path.exists(last_param_path):
+    with open(last_param_path, 'rb') as f:
+        data_params = pickle.load(f)
+        
 
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
@@ -115,6 +146,7 @@ class COGame(Widget):
     tht_param = StringProperty('')
     targ_size_param = StringProperty('')
     big_rew_time_param = StringProperty('')
+        
     
     def on_touch_down(self, touch):
         #handle many touchs:
@@ -215,7 +247,7 @@ class COGame(Widget):
         self.max_y_from_center = d_center2top-self.target_rad
         
         # target 1
-        target_pos_opts = ['center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
+        target_pos_opts = ['center', 'upper_left', 'middle_left', 'lower_left', 'upper_right', 'middle_right', 'lower_right']
         for i, val in enumerate(task_in['targ1_pos']):
             if val:
                 self.target1_pos_str = target_pos_opts[i]
@@ -226,12 +258,18 @@ class COGame(Widget):
         elif self.target1_pos_str == 'upper_right':
             targ_x = self.max_y_from_center+self.nudge_x_t1
             targ_y = self.center_position[1] + self.max_y_from_center
+        elif self.target1_pos_str == 'middle_right':
+            targ_x = self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1]
         elif self.target1_pos_str == 'lower_right':
             targ_x = self.max_y_from_center+self.nudge_x_t1
             targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target1_pos_str == 'lower_left':
             targ_x = -self.max_y_from_center+self.nudge_x_t1
             targ_y = self.center_position[1] - self.max_y_from_center
+        elif self.target1_pos_str == 'middle_left':
+            targ_x = -self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1]
         elif self.target1_pos_str == 'upper_left':
             targ_x = -self.max_y_from_center+self.nudge_x_t1
             targ_y = self.center_position[1] + self.max_y_from_center
@@ -239,23 +277,29 @@ class COGame(Widget):
         self.target1_position = np.array([targ_x, targ_y])
         
         # target 2
-        target_pos_opts = ['random', 'center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
+        target_pos_opts = ['random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_right', 'middle_right', 'lower_right']
         for i, val in enumerate(task_in['targ2_pos']):
             if val:
                 self.target2_pos_str = target_pos_opts[i]
-        
+
         if self.target2_pos_str == 'center':
             targ_x = self.center_position[0]+self.nudge_x_t2
             targ_y = self.center_position[1]
         elif self.target2_pos_str == 'upper_right':
             targ_x = self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1] + self.max_y_from_center
+        elif self.target2_pos_str == 'middle_right':
+            targ_x = self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1]
         elif self.target2_pos_str == 'lower_right':
             targ_x = self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target2_pos_str == 'lower_left':
             targ_x = -self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1] - self.max_y_from_center
+        elif self.target2_pos_str == 'middle_left':
+            targ_x = -self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1]
         elif self.target2_pos_str == 'upper_left':
             targ_x = -self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1] + self.max_y_from_center
@@ -263,7 +307,7 @@ class COGame(Widget):
         self.target2_position = np.array([targ_x, targ_y])
         
         # target 3
-        target_pos_opts = ['none', 'center', 'upper_left', 'lower_left', 'upper_right', 'lower_right']
+        target_pos_opts = ['none', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_right', 'middle_right', 'lower_right']
         for i, val in enumerate(task_in['targ3_pos']):
             if val:
                 self.target3_pos_str = target_pos_opts[i]
@@ -275,12 +319,18 @@ class COGame(Widget):
             elif self.target3_pos_str == 'upper_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target3_pos_str == 'middle_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1]
             elif self.target3_pos_str == 'lower_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1] - self.max_y_from_center
             elif self.target3_pos_str == 'lower_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target3_pos_str == 'middle_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1]
             elif self.target3_pos_str == 'upper_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1] + self.max_y_from_center
@@ -307,12 +357,18 @@ class COGame(Widget):
             elif self.target4_pos_str == 'upper_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target4_pos_str == 'middle_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1]
             elif self.target4_pos_str == 'lower_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1] - self.max_y_from_center
             elif self.target4_pos_str == 'lower_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target4_pos_str == 'middle_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1]
             elif self.target4_pos_str == 'upper_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1] + self.max_y_from_center
@@ -335,8 +391,8 @@ class COGame(Widget):
                 animal_name = nm
 
 
-        # BUTTON AND TARGET HOLD TIMES
-        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
+        # BUTTON HOLD TIME
+        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0]
         self.button_hold_time_type = None
         for i, val in enumerate(hold['button_hold']):
             if val:
@@ -352,6 +408,7 @@ class COGame(Widget):
         else:
             self.use_button = True
         
+        # TARGET HOLD TIME
         holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
         self.tht_type = None
         for i, val in enumerate(hold['hold']):
@@ -461,8 +518,12 @@ class COGame(Widget):
         
         # OPEN PORTS
         try:
-            self.reward_port = serial.Serial(port='COM4',
-                baudrate=115200)
+            if user_id == 'Ganguly':
+                self.reward_port = serial.Serial(port='COM4',
+                    baudrate=115200)
+            elif user_id == 'BasalGangulia':
+                self.reward_port = serial.Serial(port='COM3',
+                    baudrate=115200)
             self.reward_port.close()
         except:
             pass
@@ -490,7 +551,10 @@ class COGame(Widget):
             if platform == 'darwin':
                 self.button_ard = serial.Serial(port='/dev/cu.usbmodem1421301', baudrate=9600)
             else:
-                self.button_ard = serial.Serial(port='COM3', baudrate=9600)
+                if user_id == 'Ganguly':
+                    self.button_ard = serial.Serial(port='COM3', baudrate=9600) 
+                elif user_id == 'BasalGangulia':
+                    self.button_ard = serial.Serial(port='COM9', baudrate=9600)
         except:
             self.is_button_ard = False
 
@@ -514,45 +578,76 @@ class COGame(Widget):
         
         # save parameters: 
         d = dict(animal_name=animal_name,
+            user_id = user_id,
+            max_trials = self.max_trials,
+            target_timeout_time = self.target_timeout_time,
+            button_rew = button_rew,
+            last_targ_reward = self.last_targ_reward[1],
+            nudge_x_t1 = self.nudge_x_t1,
+            nudge_x_t2 = self.nudge_x_t2,
+            nudge_x_t3 = self.nudge_x_t3,
+            nudge_x_t4 = self.nudge_x_t4,
+            screen_top = self.screen_top,
             target_rad=self.target_rad,
+            center_position = self.center_position,
+            target1_pos_str = self.target1_pos_str,
+            target2_pos_str = self.target2_pos_str,
+            target3_pos_str = self.target3_pos_str,
+            target4_pos_str = self.target4_pos_str,
             target1_position = self.target1_position, 
             target2_position = self.target2_position, 
+            target3_position = self.target3_position, 
+            target4_position = self.target4_position, 
+            time_to_next_targ = self.time_to_next_targ,
+            button_hold_time = self.button_hold_time,
+            target_hold_time = self.tht,
+            rew_delay = self.reward_delay_time,
+            percent_of_trials_rewarded = self.percent_of_trials_rewarded,
             ITI_mean=self.ITI_mean, ITI_std = self.ITI_std,
-            reward_time_big=self.last_targ_reward[1],
-            last_targ_reward=self.last_targ_reward[0], 
             touch_error_timeout = self.touch_error_timeout,
             timeout_error_timeout = self.timeout_error_timeout,
             hold_error_timeout = self.hold_error_timeout,
             drag_error_timeout = self.drag_error_timeout,
             start_time = datetime.datetime.now().strftime('%Y%m%d_%H%M'),
             testing=self.testing,
-            rew_delay = self.reward_delay_time,
-            drag_ok = self.drag_ok, fsr_baseline = self.fsr_baseline
+            drag_ok = self.drag_ok, 
+            fsr_baseline = self.fsr_baseline
             )
 
-        if self.testing or platform == 'darwin':
+        if self.testing:
             pass
 
         else:
-            import os
-            path = os.getcwd()
-            path = path.split('\\')
-            path_data = [p for p in path if np.logical_and('Touch' not in p, 'Targ' not in p)]
-            path_root = ''
-            for ip in path_data:
-                path_root += ip+'/'
-            p = path_root + 'data/'
-            print('Auto path : %s'%p)
-            # Check if this directory exists: 
-            if os.path.exists(p):
-                pass
+            # Try saving to Box
+            if user_id == 'Sandon':
+                box_path = '/Users/Sandon/Box/Data/NHP_BehavioralData/target_chase/'
+                last_param_path = '/Users/Sandon/Documents/'
+            elif user_id == 'Ganguly':
+                box_path = 'C:/Users/Ganguly/Box/Data/NHP_BehavioralData/target_chase/'
+                last_param_path = 'C:/Users/Ganguly/Documents/'
+            elif user_id == 'BasalGangulia':
+                box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/target_chase/'
+                last_param_path = 'C:/Users/BasalGangulia/Documents/'
+            
+            # Check if the Box directory exists
+            if os.path.exists(box_path):
+                p = box_path
             else:
+                # if there is no path to box, then save in a data_tmp folder within the CWD
+                path = os.getcwd()
+                path = path.split('\\')
+                path_data = [p for p in path]
+                path_root = ''
+                for ip in path_data:
+                    path_root += ip+'/'
                 p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
                 if os.path.exists(p):
                     pass
                 else:
                     os.mkdir(p)
                     print('Making temp directory: ', p)
+                last_param_path = p
+            print('Auto path : %s'%p)
 
             print ('')
             print ('')
@@ -561,7 +656,10 @@ class COGame(Widget):
             print ('')
             self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
         
-
+            # save the params for this run in the _last_params
+            pickle.dump(d, open(last_param_path+'most_recent_target_chase_params.pkl', 'wb'))
+    
+            # save the params for this run in the same place where we're saving the data
             pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
             self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
             self.h5_table = self.h5file.create_table('/', 'task', Data, '')
@@ -569,7 +667,7 @@ class COGame(Widget):
             self.h5_table_row_cnt = 0
 
             # Note in python 3 to open pkl files: 
-            #with open('xxxx_params.pkl', 'rb') as f:
+            # with open('xxxx_params.pkl', 'rb') as f:
             #    data_params = pickle.load(f)
         # except:
         #     pass
@@ -679,7 +777,7 @@ class COGame(Widget):
                     while_state_fn = getattr(self, while_state_fn_name)
                     while_state_fn()
              
-        if self.testing or platform == 'darwin':
+        if self.testing:
             pass
         else:
             if self.state == 'idle_exit':
@@ -824,6 +922,9 @@ class COGame(Widget):
             if self.button_pressed:
                 if button_pressed_prev:
                     if time.time() - self.t_button_hold_start > self.button_hold_time:
+                        # Play the button reward sound
+                        sound = SoundLoader.load('reward2.wav')
+                        sound.play()
                         # if the button has been held down long enough
                         if self.button_rew[0]:
                             self.run_button_rew()
@@ -908,7 +1009,6 @@ class COGame(Widget):
     def _while_target(self, **kwargs):
         # check and see if it is time for the next target to appear
         if self.time_to_next_targ is not False:
-            # import pdb; pdb.set_trace()
             if time.time() - self.first_time_for_this_targ_t0 > self.time_to_next_targ and self.target_index < self.num_targets:
                 # illuminate the next target
                 self.target2.move(self.next_target_position)
@@ -959,10 +1059,6 @@ class COGame(Widget):
         
     def run_button_rew(self, **kwargs):
         try:
-            #winsound.PlaySound('beep1.wav', winsound.SND_ASYNC)
-            sound = SoundLoader.load('reward2.wav')
-            sound.play()
-
             ### To trigger reward make sure reward is > 0:
             if np.logical_or(self.button_rew[0], self.button_rew[1] > 0):
 
@@ -1086,6 +1182,418 @@ class Target(Widget):
         self.center = pos_pix_int
 
 class Manager(ScreenManager):
+    # DEFINE THE DEFAULTS AS WHATEVER THEY WERE LAST TIME
+    # animal name
+    is_haribo = BooleanProperty(False)
+    is_fifi = BooleanProperty(False)
+    is_nike = BooleanProperty(False)
+    is_butters = BooleanProperty(False)
+    if data_params['animal_name'] == 'haribo':
+        is_haribo = BooleanProperty(True)
+    elif data_params['animal_name'] == 'fifi':
+        is_fifi = BooleanProperty(True)
+    elif data_params['animal_name'] == 'nike':
+        is_nike = BooleanProperty(True)
+    elif data_params['animal_name'] == 'butters':
+        is_butters = BooleanProperty(True)
+        
+    # target timeout
+    is_tt15 = BooleanProperty(False)
+    is_tt30 = BooleanProperty(False)
+    is_tt45 = BooleanProperty(False)
+    is_tt60 = BooleanProperty(False)
+    if data_params['target_timeout_time'] == 15:
+        is_tt15 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 30:
+        is_tt30 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 45:
+        is_tt45 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 60:
+        is_tt60 = BooleanProperty(True)
+    
+    # crashbar hold time
+    is_bhtfalse = BooleanProperty(False)
+    is_bht000 = BooleanProperty(False)
+    is_bht100 = BooleanProperty(False)
+    is_bht200 = BooleanProperty(False)
+    is_bht300 = BooleanProperty(False)
+    is_bht400 = BooleanProperty(False)
+    is_bht500 = BooleanProperty(False)
+    is_bht600 = BooleanProperty(False)
+    is_bht700 = BooleanProperty(False)
+    is_bht800 = BooleanProperty(False)
+    is_bht900 = BooleanProperty(False)
+    is_bht1000 = BooleanProperty(False)
+    # is_bhtbigrand = BooleanProperty(False)
+    if data_params['button_hold_time'] == False:
+        is_bhtfalse = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.0:
+        is_bht000 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.1:
+        is_bht100 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.2:
+        is_bht200 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.3:
+        is_bht300 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.4:
+        is_bht400 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.5:
+        is_bht500 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.6:
+        is_bht600 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.7:
+        is_bht700 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.8:
+        is_bht800 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.9:
+        is_bht900 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 1.0:
+        is_bht1000 = BooleanProperty(True)
+        
+    # crashbar reward
+    is_bhrew000 = BooleanProperty(False)
+    is_bhrew100 = BooleanProperty(False)
+    is_bhrew300 = BooleanProperty(False)
+    is_bhrew500 = BooleanProperty(False)
+    if data_params['button_rew'] == 0.0:
+        is_bhrew000 = BooleanProperty(True)
+    elif data_params['button_rew'] == 0.1:
+        is_bhrew100 = BooleanProperty(True)
+    elif data_params['button_rew'] == 0.3:
+        is_bhrew300 = BooleanProperty(True)
+    elif data_params['button_rew'] == 0.5:
+        is_bhrew500 = BooleanProperty(True)
+        
+    # target hold time
+    is_tht000 = BooleanProperty(False)
+    is_tht100 = BooleanProperty(False)
+    is_tht200 = BooleanProperty(False)
+    is_tht300 = BooleanProperty(False)
+    is_tht400 = BooleanProperty(False)
+    is_tht500 = BooleanProperty(False)
+    is_tht600 = BooleanProperty(False)
+    is_thtbigrand = BooleanProperty(False)
+    if data_params['target_hold_time'] == 0.0:
+        is_tht000 = BooleanProperty(True)
+    elif data_params['target_hold_time'] == 0.1:
+        is_tht100 = BooleanProperty(True)
+    elif data_params['target_hold_time'] == 0.2:
+        is_tht200 = BooleanProperty(True)
+    elif data_params['target_hold_time'] == 0.3:
+        is_tht300 = BooleanProperty(True)
+    elif data_params['target_hold_time'] == 0.4:
+        is_tht400 = BooleanProperty(True)
+    elif data_params['target_hold_time'] == 0.5:
+        is_tht500 = BooleanProperty(True)
+    elif data_params['target_hold_time'] == 0.6:
+        is_tht600 = BooleanProperty(True)
+    elif data_params['target_hold_time'] == '.4-.6':
+        is_thtbigrand = BooleanProperty(True)
+        
+    # final target reward
+    is_threw000 = BooleanProperty(False)
+    is_threw300 = BooleanProperty(False)
+    is_threw500 = BooleanProperty(False)
+    is_threw700 = BooleanProperty(False)
+    if data_params['last_targ_reward'] == 0.0:
+        is_threw000 = BooleanProperty(True)
+    elif data_params['last_targ_reward'] == 0.3:
+        is_threw300 = BooleanProperty(True)
+    elif data_params['last_targ_reward'] == 0.5:
+        is_threw500 = BooleanProperty(True)
+    elif data_params['last_targ_reward'] == 0.7:
+        is_threw700 = BooleanProperty(True)
+        
+    # reward variability
+    is_rewvarall = BooleanProperty(False)
+    is_rewvar50 = BooleanProperty(False)
+    is_rewvar33 = BooleanProperty(False)
+    if data_params['percent_of_trials_rewarded'] == 1.0:
+        is_rewvarall = BooleanProperty(True)
+    elif data_params['percent_of_trials_rewarded'] == 0.5:
+        is_rewvar50 = BooleanProperty(True)
+    elif data_params['percent_of_trials_rewarded'] == 0.33:
+        is_rewvar33 = BooleanProperty(True)
+        
+    # target radius
+    is_trad050 = BooleanProperty(False)
+    is_trad075 = BooleanProperty(False)
+    is_trad082 = BooleanProperty(False)
+    is_trad091 = BooleanProperty(False)
+    is_trad100 = BooleanProperty(False)
+    is_trad150 = BooleanProperty(False)
+    is_trad225 = BooleanProperty(False)
+    is_trad300 = BooleanProperty(False)
+    if data_params['target_rad'] == 0.5:
+        is_trad050 = BooleanProperty(True)
+    elif data_params['target_rad'] == 0.75:
+        is_trad075 = BooleanProperty(True)
+    elif data_params['target_rad'] == 0.82:
+        is_trad082 = BooleanProperty(True)
+    elif data_params['target_rad'] == 0.91:
+        is_trad091 = BooleanProperty(True)
+    elif data_params['target_rad'] == 1.0:
+        is_trad100 = BooleanProperty(True)
+    elif data_params['target_rad'] == 1.5:
+        is_trad150 = BooleanProperty(True)
+    elif data_params['target_rad'] == 2.25:
+        is_trad225 = BooleanProperty(True)
+    elif data_params['target_rad'] == 3.0:
+        is_trad300 = BooleanProperty(True)
+        
+    # target 1 position
+    is_t1cent = BooleanProperty(False)
+    is_t1ul = BooleanProperty(False)
+    is_t1ml = BooleanProperty(False)
+    is_t1ll = BooleanProperty(False)
+    is_t1ur = BooleanProperty(False)
+    is_t1mr = BooleanProperty(False)
+    is_t1lr = BooleanProperty(False)
+    if data_params['target1_pos_str'] == 'center':
+        is_t1cent = BooleanProperty(True)
+    elif data_params['target1_pos_str'] == 'upper_left':
+        is_t1ul = BooleanProperty(True)
+    elif data_params['target1_pos_str'] == 'middle_left':
+        is_t1ml = BooleanProperty(True)
+    elif data_params['target1_pos_str'] == 'lower_left':
+        is_t1ll = BooleanProperty(True)
+    elif data_params['target1_pos_str'] == 'upper_right':
+        is_t1ur = BooleanProperty(True)
+    elif data_params['target1_pos_str'] == 'middle_right':
+        is_t1mr = BooleanProperty(True)
+    elif data_params['target1_pos_str'] == 'lower_right':
+        is_t1lr = BooleanProperty(True)
+        
+    # target 1 nudge
+    is_t1nudgeneg6 = BooleanProperty(False)
+    is_t1nudgeneg4 = BooleanProperty(False)
+    is_t1nudgeneg2 = BooleanProperty(False)
+    is_t1nudgezero = BooleanProperty(False)
+    is_t1nudgepos2 = BooleanProperty(False)
+    is_t1nudgepos4 = BooleanProperty(False)
+    is_t1nudgepos6 = BooleanProperty(False)
+    if data_params['nudge_x_t1'] == -6:
+        is_t1nudgeneg6 = BooleanProperty(True)
+    elif data_params['nudge_x_t1'] == -4:
+        is_t1nudgeneg4 = BooleanProperty(True)
+    elif data_params['nudge_x_t1'] == -2:
+        is_t1nudgeneg2 = BooleanProperty(True)
+    elif data_params['nudge_x_t1'] == 0:
+        is_t1nudgezero = BooleanProperty(True)
+    elif data_params['nudge_x_t1'] == 2:
+        is_t1nudgepos2 = BooleanProperty(True)
+    elif data_params['nudge_x_t1'] == 4:
+        is_t1nudgepos4 = BooleanProperty(True)
+    elif data_params['nudge_x_t1'] == 6:
+        is_t1nudgepos6 = BooleanProperty(True)
+        
+    # target 2 position
+    is_t2cent = BooleanProperty(False)
+    is_t2ul = BooleanProperty(False)
+    is_t2ml = BooleanProperty(False)
+    is_t2ll = BooleanProperty(False)
+    is_t2ur = BooleanProperty(False)
+    is_t2mr = BooleanProperty(False)
+    is_t2lr = BooleanProperty(False)
+    is_t2rand = BooleanProperty(False)
+    if data_params['target2_pos_str'] == 'center':
+        is_t2cent = BooleanProperty(True)
+    elif data_params['target2_pos_str'] == 'upper_left':
+        is_t2ul = BooleanProperty(True)
+    elif data_params['target2_pos_str'] == 'middle_left':
+        is_t2ml = BooleanProperty(True)
+    elif data_params['target2_pos_str'] == 'lower_left':
+        is_t2ll = BooleanProperty(True)
+    elif data_params['target2_pos_str'] == 'upper_right':
+        is_t2ur = BooleanProperty(True)
+    elif data_params['target2_pos_str'] == 'middle_right':
+        is_t2mr = BooleanProperty(True)
+    elif data_params['target2_pos_str'] == 'lower_right':
+        is_t2lr = BooleanProperty(True)
+    elif data_params['target2_pos_str'] == 'random':
+        is_t2rand = BooleanProperty(True)
+        
+    # target 2 nudge
+    is_t2nudgeneg6 = BooleanProperty(False)
+    is_t2nudgeneg4 = BooleanProperty(False)
+    is_t2nudgeneg2 = BooleanProperty(False)
+    is_t2nudgezero = BooleanProperty(False)
+    is_t2nudgepos2 = BooleanProperty(False)
+    is_t2nudgepos4 = BooleanProperty(False)
+    is_t2nudgepos6 = BooleanProperty(False)
+    if data_params['nudge_x_t2'] == -6:
+        is_t2nudgeneg6 = BooleanProperty(True)
+    elif data_params['nudge_x_t2'] == -4:
+        is_t2nudgeneg4 = BooleanProperty(True)
+    elif data_params['nudge_x_t2'] == -2:
+        is_t2nudgeneg2 = BooleanProperty(True)
+    elif data_params['nudge_x_t2'] == 0:
+        is_t2nudgezero = BooleanProperty(True)
+    elif data_params['nudge_x_t2'] == 2:
+        is_t2nudgepos2 = BooleanProperty(True)
+    elif data_params['nudge_x_t2'] == 4:
+        is_t2nudgepos4 = BooleanProperty(True)
+    elif data_params['nudge_x_t2'] == 6:
+        is_t2nudgepos6 = BooleanProperty(True)
+        
+    # target 3 position
+    is_t3cent = BooleanProperty(False)
+    is_t3ul = BooleanProperty(False)
+    is_t3ml = BooleanProperty(False)
+    is_t3ll = BooleanProperty(False)
+    is_t3ur = BooleanProperty(False)
+    is_t3mr = BooleanProperty(False)
+    is_t3lr = BooleanProperty(False)
+    is_t3none = BooleanProperty(False)
+    if data_params['target3_pos_str'] == 'center':
+        is_t3cent = BooleanProperty(True)
+    elif data_params['target3_pos_str'] == 'upper_left':
+        is_t3ul = BooleanProperty(True)
+    elif data_params['target3_pos_str'] == 'middle_left':
+        is_t3ml = BooleanProperty(True)
+    elif data_params['target3_pos_str'] == 'lower_left':
+        is_t3ll = BooleanProperty(True)
+    elif data_params['target3_pos_str'] == 'upper_right':
+        is_t3ur = BooleanProperty(True)
+    elif data_params['target3_pos_str'] == 'middle_right':
+        is_t3mr = BooleanProperty(True)
+    elif data_params['target3_pos_str'] == 'lower_right':
+        is_t3lr = BooleanProperty(True)
+    elif data_params['target3_pos_str'] == 'none':
+        is_t3none = BooleanProperty(True)
+        
+    # target 3 nudge
+    is_t3nudgeneg6 = BooleanProperty(False)
+    is_t3nudgeneg4 = BooleanProperty(False)
+    is_t3nudgeneg2 = BooleanProperty(False)
+    is_t3nudgezero = BooleanProperty(False)
+    is_t3nudgepos2 = BooleanProperty(False)
+    is_t3nudgepos4 = BooleanProperty(False)
+    is_t3nudgepos6 = BooleanProperty(False)
+    if data_params['nudge_x_t3'] == -6:
+        is_t3nudgeneg6 = BooleanProperty(True)
+    elif data_params['nudge_x_t3'] == -4:
+        is_t3nudgeneg4 = BooleanProperty(True)
+    elif data_params['nudge_x_t3'] == -2:
+        is_t3nudgeneg2 = BooleanProperty(True)
+    elif data_params['nudge_x_t3'] == 0:
+        is_t3nudgezero = BooleanProperty(True)
+    elif data_params['nudge_x_t3'] == 2:
+        is_t3nudgepos2 = BooleanProperty(True)
+    elif data_params['nudge_x_t3'] == 4:
+        is_t3nudgepos4 = BooleanProperty(True)
+    elif data_params['nudge_x_t3'] == 6:
+        is_t3nudgepos6 = BooleanProperty(True)
+    
+    
+    # target 4 position
+    is_t4cent = BooleanProperty(False)
+    is_t4ul = BooleanProperty(False)
+    is_t4ml = BooleanProperty(False)
+    is_t4ll = BooleanProperty(False)
+    is_t4ur = BooleanProperty(False)
+    is_t4mr = BooleanProperty(False)
+    is_t4lr = BooleanProperty(False)
+    is_t4none = BooleanProperty(False)
+    if data_params['target4_pos_str'] == 'center':
+        is_t4cent = BooleanProperty(True)
+    elif data_params['target4_pos_str'] == 'upper_left':
+        is_t4ul = BooleanProperty(True)
+    elif data_params['target4_pos_str'] == 'middle_left':
+        is_t4ml = BooleanProperty(True)
+    elif data_params['target4_pos_str'] == 'lower_left':
+        is_t4ll = BooleanProperty(True)
+    elif data_params['target4_pos_str'] == 'upper_right':
+        is_t4ur = BooleanProperty(True)
+    elif data_params['target4_pos_str'] == 'middle_right':
+        is_t4mr = BooleanProperty(True)
+    elif data_params['target4_pos_str'] == 'lower_right':
+        is_t4lr = BooleanProperty(True)
+    elif data_params['target4_pos_str'] == 'none':
+        is_t4none = BooleanProperty(True)
+        
+    # target 4 nudge
+    is_t4nudgeneg6 = BooleanProperty(False)
+    is_t4nudgeneg4 = BooleanProperty(False)
+    is_t4nudgeneg2 = BooleanProperty(False)
+    is_t4nudgezero = BooleanProperty(False)
+    is_t4nudgepos2 = BooleanProperty(False)
+    is_t4nudgepos4 = BooleanProperty(False)
+    is_t4nudgepos6 = BooleanProperty(False)
+    if data_params['nudge_x_t4'] == -6:
+        is_t4nudgeneg6 = BooleanProperty(True)
+    elif data_params['nudge_x_t4'] == -4:
+        is_t4nudgeneg4 = BooleanProperty(True)
+    elif data_params['nudge_x_t4'] == -2:
+        is_t4nudgeneg2 = BooleanProperty(True)
+    elif data_params['nudge_x_t4'] == 0:
+        is_t4nudgezero = BooleanProperty(True)
+    elif data_params['nudge_x_t4'] == 2:
+        is_t4nudgepos2 = BooleanProperty(True)
+    elif data_params['nudge_x_t4'] == 4:
+        is_t4nudgepos4 = BooleanProperty(True)
+    elif data_params['nudge_x_t4'] == 6:
+        is_t4nudgepos6 = BooleanProperty(True)
+        
+    # lower screen top by
+    is_screentopzero = BooleanProperty(False)
+    is_screentop2 = BooleanProperty(False)
+    is_screentop4 = BooleanProperty(False)
+    is_screentop6 = BooleanProperty(False)
+    is_screentop8 = BooleanProperty(False)
+    is_screentop10 = BooleanProperty(False)
+    is_screentop12 = BooleanProperty(False)
+    if data_params['screen_top'] == 0:
+        is_screentopzero = BooleanProperty(True)
+    elif data_params['screen_top'] == -2:
+        is_screentop2 = BooleanProperty(True)
+    elif data_params['screen_top'] == -4:
+        is_screentop4 = BooleanProperty(True)
+    elif data_params['screen_top'] == -6:
+        is_screentop6 = BooleanProperty(True)
+    elif data_params['screen_top'] == -8:
+        is_screentop8 = BooleanProperty(True)
+    elif data_params['screen_top'] == -10:
+        is_screentop10 = BooleanProperty(True)
+    elif data_params['screen_top'] == -12:
+        is_screentop12 = BooleanProperty(True)
+        
+    # time until next target appears
+    is_ttntnever = BooleanProperty(False)
+    is_ttnt025 = BooleanProperty(False)
+    is_ttnt050 = BooleanProperty(False)
+    is_ttnt075 = BooleanProperty(False)
+    is_ttnt100 = BooleanProperty(False)
+    is_ttnt150 = BooleanProperty(False)
+    if data_params['time_to_next_targ'] == False:
+        is_ttntnever = BooleanProperty(True)
+    elif data_params['time_to_next_targ'] == 0.25:
+        is_ttnt025 = BooleanProperty(True)
+    elif data_params['time_to_next_targ'] == 0.5:
+        is_ttnt050 = BooleanProperty(True)
+    elif data_params['time_to_next_targ'] == 0.75:
+        is_ttnt075 = BooleanProperty(True)
+    elif data_params['time_to_next_targ'] == 1.0:
+        is_ttnt100 = BooleanProperty(True)
+    elif data_params['time_to_next_targ'] == 1.5:
+        is_ttnt150 = BooleanProperty(True)
+    
+    # auto quit after
+    is_autoqt10 = BooleanProperty(False)
+    is_autoqt25 = BooleanProperty(False)
+    is_autoqt50 = BooleanProperty(False)
+    is_autoqt100 = BooleanProperty(False)
+    is_autoqtnever = BooleanProperty(False)
+    if data_params['max_trials'] == 10:
+        is_autoqt10 = BooleanProperty(True)
+    elif data_params['max_trials'] == 25:
+        is_autoqt25 = BooleanProperty(True)
+    elif data_params['max_trials'] == 50:
+        is_autoqt50 = BooleanProperty(True)
+    elif data_params['max_trials'] == 100:
+        is_autoqt100 = BooleanProperty(True)
+    elif data_params['max_trials'] == 10**10:
+        is_autoqtnever = BooleanProperty(True)
     pass
 
 class COApp(App):

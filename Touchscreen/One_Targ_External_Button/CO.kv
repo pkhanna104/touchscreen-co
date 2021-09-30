@@ -79,6 +79,47 @@
                     fontsize: 50
 
                 Label: 
+                    text: 'Which Juicer?        '
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: 'Old yellow'
+
+                CheckBox:
+                    group: 'juicer'
+                    id: yellow
+                    active: True
+            
+                Label: 
+                    text: 'New red'
+
+                CheckBox:
+                    group: 'juicer'
+                    id: red
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            BoxLayout 
+                id: top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
                     text: 'Target Timeout (from first att.)'
                     color: 1, 1, 0, 1
            
@@ -1032,7 +1073,8 @@
                     rew_50.active, rew_30.active]),
                     dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]),
                     dict(nudge_x=[nudge_x_neg6.active, nudge_x_neg4.active, nudge_x_neg2.active, nudge_x_zero.active, nudge_x_pos2.active, nudge_x_pos4.active, nudge_x_pos6.active]),
-                    dict(nudge_y=[nudge_y_neg3.active, nudge_y_neg2.active, nudge_y_neg1.active, nudge_y_zero.active, nudge_y_pos1.active, nudge_y_pos2.active, nudge_y_pos3.active]))
+                    dict(nudge_y=[nudge_y_neg3.active, nudge_y_neg2.active, nudge_y_neg1.active, nudge_y_zero.active, nudge_y_pos1.active, nudge_y_pos2.active, nudge_y_pos3.active]), 
+                    dict(juicer=[yellow.active, red.active]))
 
             Label:
                 text: ''
