@@ -391,8 +391,8 @@ class COGame(Widget):
                 animal_name = nm
 
 
-        # BUTTON AND TARGET HOLD TIMES
-        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
+        # BUTTON HOLD TIME
+        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9]
         self.button_hold_time_type = None
         for i, val in enumerate(hold['button_hold']):
             if val:
@@ -408,6 +408,7 @@ class COGame(Widget):
         else:
             self.use_button = True
         
+        # TARGET HOLD TIME
         holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
         self.tht_type = None
         for i, val in enumerate(hold['hold']):
@@ -1219,7 +1220,10 @@ class Manager(ScreenManager):
     is_bht400 = BooleanProperty(False)
     is_bht500 = BooleanProperty(False)
     is_bht600 = BooleanProperty(False)
-    is_bhtbigrand = BooleanProperty(False)
+    is_bht700 = BooleanProperty(False)
+    is_bht800 = BooleanProperty(False)
+    is_bht900 = BooleanProperty(False)
+    # is_bhtbigrand = BooleanProperty(False)
     if data_params['button_hold_time'] == False:
         is_bhtfalse = BooleanProperty(True)
     elif data_params['button_hold_time'] == 0.0:
@@ -1236,8 +1240,12 @@ class Manager(ScreenManager):
         is_bht500 = BooleanProperty(True)
     elif data_params['button_hold_time'] == 0.6:
         is_bht600 = BooleanProperty(True)
-    elif data_params['button_hold_time'] == '.4-.6':
-        is_bhtbigrand = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.7:
+        is_bht700 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.8:
+        is_bht800 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 0.9:
+        is_bht900 = BooleanProperty(True)
         
     # crashbar reward
     is_bhrew000 = BooleanProperty(False)
