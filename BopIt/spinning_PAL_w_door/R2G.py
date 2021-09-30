@@ -268,7 +268,7 @@ class R2Game(Widget):
             self.FSM['reward'] = dict(end_reward='ITI', stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM9',
+            self.reward_port = serial.Serial(port='COM5',
                 baudrate=115200)
             reward_fcn = True
             self.reward_port.close()
@@ -511,9 +511,9 @@ class R2Game(Widget):
         self.end_cnt = int(port_splits[7])
         self.door_pos = int(port_splits[8])
         self.abortclose = int(port_splits[9])
-        if self.door_pos < 20:
+        if self.door_pos < 100:
             self.door_state = 'open'
-        elif self.door_pos > 1000: 
+        elif self.door_pos > 950: 
             self.door_state = 'closed'
 
         ### Buttons #####
@@ -621,7 +621,7 @@ class R2Game(Widget):
         self.current_trial = self.generated_trials[self.trial_num]
 
     def opened_door(self, **kwargs): 
-        if self.door_pos < 1000: 
+        if self.door_pos < 950: 
             ### close the door and return true 
             self.task_ard.write('c'.encode())
             return True 
