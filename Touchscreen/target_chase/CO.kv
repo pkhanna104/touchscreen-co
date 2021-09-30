@@ -243,6 +243,13 @@
                     id: button_90
                     group: 'button_hold_time'
                     active: root.is_bht900
+                    
+                Label:
+                    text: '1.0 sec'
+                CheckBox:
+                    id: button_100
+                    group: 'button_hold_time'
+                    active: root.is_bht1000
 
                 Label:
                     text: ''
@@ -1430,7 +1437,7 @@
                     targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
                     targ4_pos=[t4none.active, t4center.active, t4upper_left.active, t4mid_left.active, t4lower_left.active, t4upper_right.active, t4mid_right.active, t4lower_right.active],
                     time_to_next_targ=[t2next_never.active, t2next_250.active, t2next_500.active, t2next_750.active, t2next_1000.active, t2next_1500.active]),
-                    dict(button_hold=[no_button.active, button_zero_sec.active, button_hund_sec.active, button_twohund_sec.active, button_threehund_sec.active, button_fourhund_sec.active, button_half_sec.active, button_60.active, button_70.active, button_80.active, button_90.active],
+                    dict(button_hold=[no_button.active, button_zero_sec.active, button_hund_sec.active, button_twohund_sec.active, button_threehund_sec.active, button_fourhund_sec.active, button_half_sec.active, button_60.active, button_70.active, button_80.active, button_90.active, button_100.active],
                     hold=[zero_sec.active, hund_sec.active, twohund_sec.active, threehund_sec.active, fourhund_sec.active, half_sec.active, t_60.active, big_rand.active]), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),

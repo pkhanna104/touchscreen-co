@@ -392,7 +392,7 @@ class COGame(Widget):
 
 
         # BUTTON HOLD TIME
-        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9]
+        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0]
         self.button_hold_time_type = None
         for i, val in enumerate(hold['button_hold']):
             if val:
@@ -1223,6 +1223,7 @@ class Manager(ScreenManager):
     is_bht700 = BooleanProperty(False)
     is_bht800 = BooleanProperty(False)
     is_bht900 = BooleanProperty(False)
+    is_bht1000 = BooleanProperty(False)
     # is_bhtbigrand = BooleanProperty(False)
     if data_params['button_hold_time'] == False:
         is_bhtfalse = BooleanProperty(True)
@@ -1246,6 +1247,8 @@ class Manager(ScreenManager):
         is_bht800 = BooleanProperty(True)
     elif data_params['button_hold_time'] == 0.9:
         is_bht900 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == 1.0:
+        is_bht1000 = BooleanProperty(True)
         
     # crashbar reward
     is_bhrew000 = BooleanProperty(False)
