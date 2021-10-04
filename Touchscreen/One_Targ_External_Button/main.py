@@ -961,7 +961,8 @@ class COGame(Widget):
                             self.reward_port.close()
                         
                         elif self.juicer == 'red': 
-                            self.reward_port.write(b"VOL %.1f \r"%self.reward_generator[self.trial_counter])
+                            volume2dispense = self.reward_generator[self.trial_counter] * 50 / 60 #mL/min x 1 min / 60 sec --> sec x mL/sec 
+                            self.reward_port.write(b"VOL %.1f \r"%volume2dispense)
                             time.sleep(.25)
                             self.reward_port.write(b"RUN\r")
         except:
@@ -992,12 +993,12 @@ class COGame(Widget):
 
                     elif self.juicer == 'red': 
                         if self.reward_for_anytouch[0]:
-                            self.reward_port.write(b"VOL %.1f \r"%self.reward_for_anytouch[1])
+                            volume2dispense = self.reward_for_anytouch[1] * 50 / 60 #mL/min x 1 min / 60 sec --> sec x mL/sec 
                         elif self.reward_for_center[0]: 
-                            self.reward_port.write(b"VOL %.1f \r"%self.reward_for_center[1])
+                            volume2dispense = self.reward_for_center[1] * 50 / 60 #mL/min x 1 min / 60 sec --> sec x mL/sec
+                        self.reward_port.write(b"VOL %.1f \r"%volume2dispense)
                         time.sleep(.25)
                         self.reward_port.write(b"RUN\r")
-
         except:
             pass
 
