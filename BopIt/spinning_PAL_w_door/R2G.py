@@ -438,9 +438,32 @@ class R2Game(Widget):
 
         # Make sure motor goes to sleep at night ;)  
         self.task_ard.flushInput()
-        self.task_ard.write('n'.encode())
-        self.task_ard.write('c'.encode())
+
+        # move to position zero 
+        word = b'd'+struct.pack('<H', 0) 
+        self.task_ard.write(word)
+        going_to_targ = 1 
+        while going_to_targ: 
+            _ = self.task_ard.readline()
+            port_read = self.task_ard.readline()
+            port_splits = port_read.decode('ascii').split('\t')
+
+            if len(port_splits) != 10:
+                ser = self.task_ard.flushInput()
+                _ = self.task_ard.readline()
+                port_read = self.task_ard.readline()
+                port_splits = port_read.decode('ascii').split('\t')  
+            
+            going_to_targ = int(port_splits[4])
+            time.sleep(.01) # wait 10 ms; 
+
+        ### turn off solenoid 
+        self.task_ard.write('n'.encode()) 
+
+        ### close teh door 
+        self.task_ard.write('c'.encode()) 
         
+
         if self.idle:
             self.state = 'idle_exit'
             self.trial_counter = -1
