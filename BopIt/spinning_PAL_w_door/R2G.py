@@ -225,8 +225,8 @@ class R2Game(Widget):
                 self.task_opt = task_opt[i]
 
         ### Trials to include ###
-        trials_active_list = ['power', 'tripod', 'pinch', 'tiny']
-        trials_position_list = [2, 6, 10, 8]
+        trials_active_list = ['power_1', 'tripod_1', 'pinch_1', 'tiny_1', 'pinch_3']
+        trials_position_list = [2, 6, 10, 8, 10]
 
         ### Assumes rest == 0 ###
         #trials_position_list = [98, 163, 228, 33]
@@ -235,7 +235,11 @@ class R2Game(Widget):
         self.trials_list_valid = []
         for i, val in enumerate(trials_active['trials']):
             if val: 
-                self.trials_list_valid.append([trials_active_list[i], trials_position_list[i]])
+                ### how many of this trial type should we add? 
+                trial_type, num = trials_active_list[i].split('_')
+                num = int(num)
+                for _ in range(num): 
+                    self.trials_list_valid.append([trial_type, trials_position_list[i]])
 
         #### Generate trials list ####
         self.get_trials_order()
@@ -410,6 +414,7 @@ class R2Game(Widget):
             ix = np.random.permutation(len(self.trials_list_valid))
             for j in ix: 
                 self.generated_trials.append(self.trials_list_valid[j])
+        ### Now expand out 
 
     def gen_rewards(self, perc_trials_rew, perc_trials_2x, reward_for_grasp):
         mini_block = int(2*(np.round(1./self.percent_of_trials_rewarded)))

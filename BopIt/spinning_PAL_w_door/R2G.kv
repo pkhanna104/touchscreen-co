@@ -518,6 +518,12 @@
                     text: 'Tiny'
                 CheckBox: 
                     id: tiny
+
+                Label:
+                    text: 'pinch x 3'
+                CheckBox:
+                    id: pinch3
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -703,7 +709,8 @@
                     dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]),
                     dict(use_cap=[False, True]), 
                     dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]), 
-                    dict(trials=[giant_hole.active, tripod.active, pinch.active, tiny.active]))
+                    dict(trials=[giant_hole.active, tripod.active, pinch.active, tiny.active,
+                    pinch3.active]))
 
                     Clock.schedule_interval(game.update, 1.0 / 30.0)
             Label:
