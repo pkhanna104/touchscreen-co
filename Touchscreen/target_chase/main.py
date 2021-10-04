@@ -247,7 +247,7 @@ class COGame(Widget):
         self.max_y_from_center = d_center2top-self.target_rad
         
         # target 1
-        target_pos_opts = ['center', 'upper_left', 'middle_left', 'lower_left', 'upper_right', 'middle_right', 'lower_right']
+        target_pos_opts = ['center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
         for i, val in enumerate(task_in['targ1_pos']):
             if val:
                 self.target1_pos_str = target_pos_opts[i]
@@ -255,6 +255,12 @@ class COGame(Widget):
         if self.target1_pos_str == 'center':
             targ_x = self.center_position[0]+self.nudge_x_t1
             targ_y = self.center_position[1]
+        elif self.target1_pos_str == 'upper_middle':
+            targ_x = self.center_position[0]+self.nudge_x_t1
+            targ_y = self.center_position[1] + self.max_y_from_center
+        elif self.target1_pos_str == 'lower_middle':
+            targ_x = self.center_position[0]+self.nudge_x_t1
+            targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target1_pos_str == 'upper_right':
             targ_x = self.max_y_from_center+self.nudge_x_t1
             targ_y = self.center_position[1] + self.max_y_from_center
@@ -277,7 +283,7 @@ class COGame(Widget):
         self.target1_position = np.array([targ_x, targ_y])
         
         # target 2
-        target_pos_opts = ['random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_right', 'middle_right', 'lower_right']
+        target_pos_opts = ['random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
         for i, val in enumerate(task_in['targ2_pos']):
             if val:
                 self.target2_pos_str = target_pos_opts[i]
@@ -285,11 +291,17 @@ class COGame(Widget):
         if self.target2_pos_str == 'center':
             targ_x = self.center_position[0]+self.nudge_x_t2
             targ_y = self.center_position[1]
+        elif self.target2_pos_str == 'upper_middle':
+            targ_x = self.center_position[0]+self.nudge_x_t2
+            targ_y = self.center_position[1] + self.max_y_from_center
+        elif self.target2_pos_str == 'lower_middle':
+            targ_x = self.center_position[0]+self.nudge_x_t2
+            targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target2_pos_str == 'upper_right':
             targ_x = self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1] + self.max_y_from_center
         elif self.target2_pos_str == 'middle_right':
-            targ_x = self.max_y_from_center+self.nudge_x_t1
+            targ_x = self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1]
         elif self.target2_pos_str == 'lower_right':
             targ_x = self.max_y_from_center+self.nudge_x_t2
@@ -298,7 +310,7 @@ class COGame(Widget):
             targ_x = -self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1] - self.max_y_from_center
         elif self.target2_pos_str == 'middle_left':
-            targ_x = -self.max_y_from_center+self.nudge_x_t1
+            targ_x = -self.max_y_from_center+self.nudge_x_t2
             targ_y = self.center_position[1]
         elif self.target2_pos_str == 'upper_left':
             targ_x = -self.max_y_from_center+self.nudge_x_t2
@@ -307,7 +319,7 @@ class COGame(Widget):
         self.target2_position = np.array([targ_x, targ_y])
         
         # target 3
-        target_pos_opts = ['none', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_right', 'middle_right', 'lower_right']
+        target_pos_opts = ['none', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
         for i, val in enumerate(task_in['targ3_pos']):
             if val:
                 self.target3_pos_str = target_pos_opts[i]
@@ -316,11 +328,17 @@ class COGame(Widget):
             if self.target3_pos_str == 'center':
                 targ_x = self.center_position[0]+self.nudge_x_t3
                 targ_y = self.center_position[1]
+            elif self.target3_pos_str == 'upper_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t3
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target3_pos_str == 'lower_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t3
+                targ_y = self.center_position[1] - self.max_y_from_center
             elif self.target3_pos_str == 'upper_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1] + self.max_y_from_center
             elif self.target3_pos_str == 'middle_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t1
+                targ_x = self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1]
             elif self.target3_pos_str == 'lower_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t3
@@ -329,7 +347,7 @@ class COGame(Widget):
                 targ_x = -self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1] - self.max_y_from_center
             elif self.target3_pos_str == 'middle_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t1
+                targ_x = -self.max_y_from_center+self.nudge_x_t3
                 targ_y = self.center_position[1]
             elif self.target3_pos_str == 'upper_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t3
@@ -354,11 +372,17 @@ class COGame(Widget):
             if self.target4_pos_str == 'center':
                 targ_x = self.center_position[0]+self.nudge_x_t4
                 targ_y = self.center_position[1]
+            elif self.target4_pos_str == 'upper_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target4_pos_str == 'lower_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
             elif self.target4_pos_str == 'upper_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1] + self.max_y_from_center
             elif self.target4_pos_str == 'middle_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t1
+                targ_x = self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1]
             elif self.target4_pos_str == 'lower_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t4
@@ -367,7 +391,7 @@ class COGame(Widget):
                 targ_x = -self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1] - self.max_y_from_center
             elif self.target4_pos_str == 'middle_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t1
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
                 targ_y = self.center_position[1]
             elif self.target4_pos_str == 'upper_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t4
@@ -392,7 +416,7 @@ class COGame(Widget):
 
 
         # BUTTON HOLD TIME
-        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0]
+        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0, '.6-.8', '.8-1.0']
         self.button_hold_time_type = None
         for i, val in enumerate(hold['button_hold']):
             if val:
@@ -409,7 +433,7 @@ class COGame(Widget):
             self.use_button = True
         
         # TARGET HOLD TIME
-        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.4-.6']
+        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.1-.3', '.4-.6']
         self.tht_type = None
         for i, val in enumerate(hold['hold']):
             if val:
@@ -859,7 +883,11 @@ class COGame(Widget):
 
         if type(self.tht_type) is str:
             tht_min, tht_max = self.tht_type.split('-')
-            self.tht = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min)            
+            self.tht = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min)      
+        
+        if type(self.button_hold_time_type) is str:
+            bht_min, bht_max = self.button_hold_time_type.split('-')
+            self.button_hold_time = ((float(bht_max) - float(bht_min)) * np.random.random()) + float(bht_min)     
         
         self.target1.color = (0., 0., 0., 0.)
         self.target1.color = (0., 0., 0., 0.)
@@ -940,7 +968,7 @@ class COGame(Widget):
 
     def _start_targ_hold(self, **kwargs):
         self.target1.color = (0., 1., 0., 1.)
-        self.indicator_targ.color = (0.75, .75, .75, 1.)
+        self.indicator_targ.color = (0.25, .25, .25, 1.)
 
     def _end_targ_hold(self, **kwargs):
         self.target1.color = (0., 0., 0., 0.)
@@ -994,7 +1022,7 @@ class COGame(Widget):
         
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.indicator_targ.color = (.25, .25, .25, 1.)
+        self.indicator_targ.color = (.75, .75, .75, 1.)
         if self.first_target_attempt:
             self.first_target_attempt_t0 = time.time();
             self.first_target_attempt = False
@@ -1224,6 +1252,8 @@ class Manager(ScreenManager):
     is_bht800 = BooleanProperty(False)
     is_bht900 = BooleanProperty(False)
     is_bht1000 = BooleanProperty(False)
+    is_bht600to800 = BooleanProperty(False)
+    is_bht800to1000 = BooleanProperty(False)
     # is_bhtbigrand = BooleanProperty(False)
     if data_params['button_hold_time'] == False:
         is_bhtfalse = BooleanProperty(True)
@@ -1249,6 +1279,10 @@ class Manager(ScreenManager):
         is_bht900 = BooleanProperty(True)
     elif data_params['button_hold_time'] == 1.0:
         is_bht1000 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == '.6-.8':
+        is_bht600to800 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == '.8-1.0':
+        is_bht800to1000 = BooleanProperty(True)
         
     # crashbar reward
     is_bhrew000 = BooleanProperty(False)
@@ -1272,7 +1306,8 @@ class Manager(ScreenManager):
     is_tht400 = BooleanProperty(False)
     is_tht500 = BooleanProperty(False)
     is_tht600 = BooleanProperty(False)
-    is_thtbigrand = BooleanProperty(False)
+    is_tht100to300 = BooleanProperty(False)
+    is_tht400to600 = BooleanProperty(False)
     if data_params['target_hold_time'] == 0.0:
         is_tht000 = BooleanProperty(True)
     elif data_params['target_hold_time'] == 0.1:
@@ -1287,8 +1322,10 @@ class Manager(ScreenManager):
         is_tht500 = BooleanProperty(True)
     elif data_params['target_hold_time'] == 0.6:
         is_tht600 = BooleanProperty(True)
+    elif data_params['target_hold_time'] == '.1-.3':
+        is_tht100to300 = BooleanProperty(True)
     elif data_params['target_hold_time'] == '.4-.6':
-        is_thtbigrand = BooleanProperty(True)
+        is_tht400to600 = BooleanProperty(True)
         
     # final target reward
     is_threw000 = BooleanProperty(False)
@@ -1343,6 +1380,8 @@ class Manager(ScreenManager):
         
     # target 1 position
     is_t1cent = BooleanProperty(False)
+    is_t1um = BooleanProperty(False)
+    is_t1lm = BooleanProperty(False)
     is_t1ul = BooleanProperty(False)
     is_t1ml = BooleanProperty(False)
     is_t1ll = BooleanProperty(False)
@@ -1351,6 +1390,10 @@ class Manager(ScreenManager):
     is_t1lr = BooleanProperty(False)
     if data_params['target1_pos_str'] == 'center':
         is_t1cent = BooleanProperty(True)
+    elif data_params['target1_pos_str'] == 'upper_middle':
+        is_t1um = BooleanProperty(True)
+    elif data_params['target1_pos_str'] == 'lower_middle':
+        is_t1lm = BooleanProperty(True) 
     elif data_params['target1_pos_str'] == 'upper_left':
         is_t1ul = BooleanProperty(True)
     elif data_params['target1_pos_str'] == 'middle_left':
@@ -1389,6 +1432,8 @@ class Manager(ScreenManager):
         
     # target 2 position
     is_t2cent = BooleanProperty(False)
+    is_t2um = BooleanProperty(False)
+    is_t2lm = BooleanProperty(False)
     is_t2ul = BooleanProperty(False)
     is_t2ml = BooleanProperty(False)
     is_t2ll = BooleanProperty(False)
@@ -1398,6 +1443,10 @@ class Manager(ScreenManager):
     is_t2rand = BooleanProperty(False)
     if data_params['target2_pos_str'] == 'center':
         is_t2cent = BooleanProperty(True)
+    elif data_params['target2_pos_str'] == 'upper_middle':
+        is_t2um = BooleanProperty(True)
+    elif data_params['target2_pos_str'] == 'lower_middle':
+        is_t2lm = BooleanProperty(True) 
     elif data_params['target2_pos_str'] == 'upper_left':
         is_t2ul = BooleanProperty(True)
     elif data_params['target2_pos_str'] == 'middle_left':
@@ -1438,6 +1487,8 @@ class Manager(ScreenManager):
         
     # target 3 position
     is_t3cent = BooleanProperty(False)
+    is_t3um = BooleanProperty(False)
+    is_t3lm = BooleanProperty(False)
     is_t3ul = BooleanProperty(False)
     is_t3ml = BooleanProperty(False)
     is_t3ll = BooleanProperty(False)
@@ -1447,6 +1498,10 @@ class Manager(ScreenManager):
     is_t3none = BooleanProperty(False)
     if data_params['target3_pos_str'] == 'center':
         is_t3cent = BooleanProperty(True)
+    elif data_params['target3_pos_str'] == 'upper_middle':
+        is_t3um = BooleanProperty(True)
+    elif data_params['target3_pos_str'] == 'lower_middle':
+        is_t3lm = BooleanProperty(True) 
     elif data_params['target3_pos_str'] == 'upper_left':
         is_t3ul = BooleanProperty(True)
     elif data_params['target3_pos_str'] == 'middle_left':
@@ -1488,6 +1543,8 @@ class Manager(ScreenManager):
     
     # target 4 position
     is_t4cent = BooleanProperty(False)
+    is_t4um = BooleanProperty(False)
+    is_t4lm = BooleanProperty(False)
     is_t4ul = BooleanProperty(False)
     is_t4ml = BooleanProperty(False)
     is_t4ll = BooleanProperty(False)
@@ -1497,6 +1554,10 @@ class Manager(ScreenManager):
     is_t4none = BooleanProperty(False)
     if data_params['target4_pos_str'] == 'center':
         is_t4cent = BooleanProperty(True)
+    elif data_params['target4_pos_str'] == 'upper_middle':
+        is_t4um = BooleanProperty(True)
+    elif data_params['target4_pos_str'] == 'lower_middle':
+        is_t4lm = BooleanProperty(True) 
     elif data_params['target4_pos_str'] == 'upper_left':
         is_t4ul = BooleanProperty(True)
     elif data_params['target4_pos_str'] == 'middle_left':
