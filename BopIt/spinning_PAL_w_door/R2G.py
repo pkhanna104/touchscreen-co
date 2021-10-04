@@ -111,7 +111,7 @@ class R2Game(Widget):
                 self.use_cap_not_button = cap[i]
 
         button_holdz = [0., 0.1, 0.2, 0.3, 0.4]
-        grasp_holdz = [0., .15, .25, .35, .50]
+        grasp_holdz = [0., .15, .2, .25, .35, .50]
 
         for i, val in enumerate(hold['start_hold']):
             if val:
@@ -312,7 +312,7 @@ class R2Game(Widget):
             only_start = self.only_start, reward_fcn=reward_fcn, use_cap=self.use_cap_not_button)
 
         ## Open task arduino - IR sensor, button, wheel position ### 
-        self.task_ard = serial.Serial('COM6', baudrate=115200)
+        self.task_ard = serial.Serial('COM10', baudrate=115200)
         self.going_to_targ = 0; 
         self.abortclose = 0; 
         self.try_to_close = False; 
@@ -343,7 +343,7 @@ class R2Game(Widget):
 
         ### FSR threshold 
         self.fsr_threshold = 1.5*np.max(np.hstack((baseline_values)))
-        if self.fsr_threshold == 0: 
+        if self.fsr_threshold < 30: 
             self.fsr_threshold += 50
 
         ### Close door 
