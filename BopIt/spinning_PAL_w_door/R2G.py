@@ -22,22 +22,32 @@ Config.set('graphics', 'height', str(fixed_window_size[1]))
 import threading
 
 class RewThread(threading.Thread):
-    def __init__(self, comport, rew_time):
+    def __init__(self, comport, rew_time, juicer):
         super(RewThread, self).__init__()
+
         self.comport = comport
         self.rew_time = rew_time
+        self.juicer = juicer
 
     def run(self):
-        rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
-        try:
-            self.comport.open()
-            self.comport.write(rew_str)
+
+        if self.juicer == 'yellow': 
+            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
+            try:
+                self.comport.open()
+                self.comport.write(rew_str)
+                time.sleep(.25)
+                run_str = [ord(r) for r in 'run\n']
+                self.comport.write(run_str)
+                self.comport.close()
+            except:
+                pass
+
+        elif self.juicer == 'red':
+            volume2dispense = self.rew_time * 50 / 60 #mL/min x 1 min / 60 sec --> sec x mL/sec 
+            self.comport.write(b"VOL %.1f \r"%volume2dispense)
             time.sleep(.25)
-            run_str = [ord(r) for r in 'run\n']
-            self.comport.write(run_str)
-            self.comport.close()
-        except:
-            pass
+            self.reward_port.write(b"RUN\r")
             
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
@@ -99,7 +109,8 @@ class R2Game(Widget):
 
     def init(self, animal_names_dict=None, rew_in=None, rew_var=None,
         test=None, hold=None, autoquit=None,
-        grasp_to=None, use_cap=None, tsk_opt=None, trials_active=None):
+        grasp_to=None, use_cap=None, tsk_opt=None, trials_active=None,
+        juicer=None):
 
         self.h5_table_row_cnt = 0
         self.idle = False
@@ -228,8 +239,13 @@ class R2Game(Widget):
         trials_active_list = ['power_1', 'tripod_1', 'pinch_1', 'tiny_1', 'pinch_3']
         trials_position_list = [2, 6, 10, 8, 10]
 
-        ### Assumes rest == 0 ###
-        #trials_position_list = [98, 163, 228, 33]
+
+        ###  juicer option ### 
+        juicer_opts = ['yellow', 'red']
+        for i, val in enumerate(juicer['juicer']): 
+            if val: 
+                self.juicer = juicer_opts[i]
+
 
         self.trial_num = 0; 
         self.trials_list_valid = []
@@ -272,11 +288,23 @@ class R2Game(Widget):
             self.FSM['reward'] = dict(end_reward='ITI', stop=None)
 
         try:
-            self.reward_port = serial.Serial(port='COM5',
-                baudrate=115200)
-            reward_fcn = True
-            self.reward_port.close()
-        
+            if self.juicer == 'yellow':
+                self.reward_port = serial.Serial(port='COM5',
+                    baudrate=115200)
+                reward_fcn = True
+                self.reward_port.close()
+            
+            elif self.juicer == 'red': 
+                self.reward_port = serial.Serial(port='COM9', 
+                    baudrate=19200)
+
+                ### setup the flow rate
+                time.sleep(.5) 
+                ### set volume value and units and rate units
+                self.reward_port.write(b"VOL 0.5\r")
+                self.reward_port.write(b"VOL ML\r")
+                self.reward_port.write(b"RAT 50MM\r") # 50 ml / min
+
         except:
             self.reward_port = None
             reward_fcn = False
@@ -745,7 +773,8 @@ class R2Game(Widget):
             if self.reward_for_grasp[0]:
                 self.reward1.play()
                 if self.reward_for_grasp[1] > 0:
-                    thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter])
+                    thread1 = RewThread(self.reward_port, self.reward_generator[self.trial_counter],
+                        self.juicer)
                     thread1.run()
 
         self.trial_counter += 1
@@ -758,7 +787,7 @@ class R2Game(Widget):
             self.reward2.play()
             
             if self.reward_for_start[1] > 0.:
-                thread1 = RewThread(self.reward_port, self.reward_for_start[1])
+                thread1 = RewThread(self.reward_port, self.reward_for_start[1], self.juicer)
                 thread1.run()
 
     def end_reward(self, **kwargs):

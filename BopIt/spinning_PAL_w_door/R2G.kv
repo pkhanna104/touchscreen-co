@@ -290,6 +290,47 @@
                     text: ''
                     fontsize: 50
             
+            BoxLayout 
+                id: top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Which Juicer?        '
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: 'Old yellow'
+
+                CheckBox:
+                    group: 'juicer'
+                    id: yellow
+                    active: True
+            
+                Label: 
+                    text: 'New red'
+
+                CheckBox:
+                    group: 'juicer'
+                    id: red
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
@@ -710,7 +751,7 @@
                     dict(use_cap=[False, True]), 
                     dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]), 
                     dict(trials=[giant_hole.active, tripod.active, pinch.active, tiny.active,
-                    pinch3.active]))
+                    pinch3.active]), dict(juicer=[yellow.active, red.active]))
 
                     Clock.schedule_interval(game.update, 1.0 / 30.0)
             Label:
