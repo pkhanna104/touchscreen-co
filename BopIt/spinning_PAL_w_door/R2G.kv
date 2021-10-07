@@ -51,6 +51,7 @@
                 CheckBox:
                     group: 'rew'
                     id: rew_noauto_chk
+                    active: root.rew_manual
             
                 Label: 
                     text: 'SMALL rew for start button touch'
@@ -58,6 +59,7 @@
                 CheckBox:
                     group: 'rew'
                     id: rew_anytouch_chk
+                    active: root.rew_start
            
                 Label: 
                     text: 'SMALL rew for start button touch\n pls BIG rew for grasp'
@@ -65,7 +67,7 @@
                 CheckBox:
                     group: 'rew'
                     id: rew_anytouch_pls_targ_chk
-                    active: True
+                    active: root.rew_start_and_grasp
             
                 Label: 
                     text: 'BIG rew for grasp pls sound for both'
@@ -73,6 +75,7 @@
                 CheckBox:
                     group: 'rew'
                     id: rew_targ_chk
+                    active: root.rew_grasp
                     
 
                 Label: 
@@ -81,7 +84,7 @@
                 CheckBox:
                     group: 'rew'
                     id: sound_only_chk
-                    
+                    active: root.rew_snd
 
                 Label:
                     text: ''
@@ -115,6 +118,7 @@
                 CheckBox: 
                     group: 'tsk'
                     id: tsk_grip
+                    active: root.only_gripper
                     
 
                 Label: 
@@ -125,6 +129,7 @@
                 CheckBox: 
                     group: 'tsk'
                     id: tsk_button
+                    active: root.only_button
                 
                 Label: 
                     text: 'Both Button and Grip'
@@ -135,7 +140,8 @@
                 CheckBox: 
                     group: 'tsk'
                     id: tsk_both
-                    active: True
+                    active: root.button_grip
+
                    
                 Label:
                     text: ''
@@ -170,7 +176,7 @@
                 CheckBox: 
                     group: 'check'
                     id: chk_h
-                    active: True
+                    active: root.monk_haribo
 
                 Label: 
                     text: 'Butters'
@@ -180,11 +186,13 @@
                 CheckBox: 
                     group: 'check'
                     id: chk_b
+                    active: root.monk_butters
 
                 Label: 
                     text: 'Nike'
                     fontsize: 28
-                    halign: 'center'                        
+                    halign: 'center' 
+                    active: root.monk_nike                       
                 
                 CheckBox: 
                     group: 'check'
@@ -225,7 +233,7 @@
                 CheckBox:
                     id: small_rew_pt1_sec
                     group: 'small_rew'
-                    active: True
+                    active: root.small_rew_1
 
                 Label: 
                     text: '0.3 sec'
@@ -233,6 +241,7 @@
                 CheckBox:
                     id: small_rew_pt3_sec
                     group: 'small_rew'
+                    active: root.small_rew_3
 
                 Label: 
                     text: '0.5 sec'
@@ -240,6 +249,7 @@
                 CheckBox:
                     id: small_rew_pt5_sec
                     group: 'small_rew'
+                    active: root.small_rew_5
 
                 Label:
                     text: ''
@@ -267,7 +277,7 @@
                 CheckBox:
                     id: big_rew_pt3_sec
                     group: 'big_rew'
-                    active: True
+                    active: active: root.big_rew_3
 
                 Label: 
                     text: '0.5 sec'
@@ -275,6 +285,7 @@
                 CheckBox:
                     id: big_rew_pt5_sec
                     group: 'big_rew'
+                    active: root.big_rew_5
 
                 Label: 
                     text: '0.7 sec'
@@ -282,6 +293,7 @@
                 CheckBox:
                     id: big_rew_pt7_sec
                     group: 'big_rew'
+                    active: root.big_rew_7
 
                 Label:
                     text: ''
@@ -314,7 +326,7 @@
                 CheckBox:
                     group: 'juicer'
                     id: yellow
-                    active: True
+                    active: root.juicer_y
             
                 Label: 
                     text: 'New red'
@@ -322,6 +334,7 @@
                 CheckBox:
                     group: 'juicer'
                     id: red
+                    active: root.juicer_r
 
                 Label:
                     text: ''
@@ -357,7 +370,7 @@
                 CheckBox:
                     id: rew_all
                     group: 'rew_var'
-                    active: True
+                    active: root.rew_all
 
                 Label: 
                     text: 'Reward 50% '
@@ -365,6 +378,7 @@
                 CheckBox:
                     id: rew_50
                     group: 'rew_var'
+                    active: root.rew_50
 
                 Label: 
                     text: 'Reward 33% w/ 10% doubled'
@@ -372,6 +386,7 @@
                 CheckBox:
                     id: rew_30
                     group: 'rew_var'
+                    active: root.rew_30
 
 
                 Label:
@@ -405,6 +420,7 @@
                 CheckBox:
                     id: zero_hold
                     group: 'hold_time'
+                    active: root.button_0
 
                 Label: 
                     text: '0.1 sec'
@@ -412,6 +428,7 @@
                 CheckBox:
                     id: hund_hold
                     group: 'hold_time'
+                    active: root.button_1
 
                 Label: 
                     text: '0.2 sec'
@@ -419,6 +436,7 @@
                 CheckBox:
                     id: two_hund_hold
                     group: 'hold_time'
+                    active: root.button_2
 
 
                 Label: 
@@ -427,6 +445,7 @@
                 CheckBox:
                     id: three_hund_hold
                     group: 'hold_time'
+                    active: root.button_3
 
 
                 Label: 
@@ -435,7 +454,7 @@
                 CheckBox:
                     id: four_hund_hold
                     group: 'hold_time'
-                    active: True
+                    active: root.button_4
 
 
                 Label:
@@ -477,25 +496,28 @@
                 CheckBox:
                     id: g_zero_sec
                     group: 'ghold_time'
+                    active: root.grasp_0
 
                 Label: 
                     text: '0.15 sec'
                 CheckBox:
                     id: g_eighteen_sec
                     group: 'ghold_time'
+                    active: root.grasp_15
                     
                 Label: 
                     text: '0.20 sec'
                 CheckBox: 
                     id: g_twenty_sec
                     group: 'ghold_time'
+                    active: root.grasp_20
 
                 Label: 
                     text: '0.25 sec'
                 CheckBox:
                     id: g_quarter_sec
                     group: 'ghold_time'
-                    active: True
+                    active: root.grasp_25
 
                 Label: 
                     text: '0.35 sec'
@@ -503,12 +525,14 @@
                 CheckBox:
                     id: g_thirty_five_sec
                     group: 'hold_time'
+                    active: root.grasp_35
 
                 Label: 
                     text: '0.5 sec'
                 CheckBox:
                     id: g_half_sec
                     group: 'ghold_time'
+                    active: root.grasp_50
 
                 Label:
                     text: ''
@@ -542,28 +566,33 @@
 
                 CheckBox:
                     id: giant_hole
+                    active: root.power
 
                 Label: 
                     text: 'Tripod'
 
                 CheckBox:
                     id: tripod
+                    active: root.tripod
 
                 Label: 
                     text: 'Pinch'
 
                 CheckBox:
                     id: pinch
+                    active: root.pinch
 
                 Label: 
                     text: 'Tiny'
                 CheckBox: 
                     id: tiny
+                    active: root.tiny
 
                 Label:
                     text: 'pinch x 3'
                 CheckBox:
                     id: pinch3
+                    active: root.pinch3
 
                 Label:
                     text: ''
@@ -605,6 +634,7 @@
                 CheckBox:
                     id: gto_five_sec
                     group: 'gto'
+                    active: root.grasp_to5
                     
 
                 Label: 
@@ -612,13 +642,14 @@
                 CheckBox:
                     id: gto_ten_sec
                     group: 'gto'
+                    active: root.grasp_to10
 
                 Label: 
                     text: 'Infinity'
                 CheckBox:
                     id: gto_inf
                     group: 'gto'
-                    active: True
+                    active: root.grasp_toinf
                     
                 Label:
                     text: ''
@@ -663,13 +694,14 @@
                 CheckBox:
                     id: twenty_five_trials
                     group: 'trials'
-                    active: True
+                    active: root.trls_25
 
                 Label:
                     text: '50 trials'
                 CheckBox:
                     id: fifty_trials
                     group: 'trials'
+                    active: root.trls_50
                     
 
                 Label:
@@ -677,6 +709,7 @@
                 CheckBox:
                     id: no_trials
                     group: 'trials'
+                    active: root.trls_inf
 
                 Label:
                     text: ''
