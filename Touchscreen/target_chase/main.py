@@ -240,6 +240,33 @@ class COGame(Widget):
                 self.target_rad = target_rad_opts[i]
                 
         # TARGET POSITIONS
+        seq_opts = ['A', 'B', 'C']
+        self.seq = False
+        for i, val in enumerate(task_in['seq']):
+            if val:
+                self.seq = seq_opts[i]
+        
+        if self.seq == 'A':
+            seq_preselect = True
+            self.target1_pos_str = 'lower_right'
+            self.target2_pos_str = 'upper_right'
+            self.target3_pos_str = 'upper_left'
+            self.target4_pos_str = 'lower_left'
+        elif self.seq == 'B':
+            seq_preselect = True
+            self.target1_pos_str = 'center'
+            self.target2_pos_str = 'middle_left'
+            self.target3_pos_str = 'middle_right'
+            self.target4_pos_str = 'upper_left'
+        elif self.seq == 'C':
+            seq_preselect = True
+            self.target1_pos_str = 'upper_middle'
+            self.target2_pos_str = 'lower_left'
+            self.target3_pos_str = 'middle_right'
+            self.target4_pos_str = 'upper_left'
+        else:
+            seq_preselect = False
+        
         self.center_position = np.array([0., 0.])
         # lower the center position by half of the total amount the screen height has been shrunk by
         self.center_position[1] = self.center_position[1] + self.screen_top/2    
@@ -248,10 +275,11 @@ class COGame(Widget):
         self.max_y_from_center = d_center2top-self.target_rad
         
         # target 1
-        target_pos_opts = ['center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
-        for i, val in enumerate(task_in['targ1_pos']):
-            if val:
-                self.target1_pos_str = target_pos_opts[i]
+        if not seq_preselect:
+            target_pos_opts = ['center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
+            for i, val in enumerate(task_in['targ1_pos']):
+                if val:
+                    self.target1_pos_str = target_pos_opts[i]
         
         if self.target1_pos_str == 'center':
             targ_x = self.center_position[0]+self.nudge_x_t1
@@ -284,10 +312,11 @@ class COGame(Widget):
         self.target1_position = np.array([targ_x, targ_y])
         
         # target 2
-        target_pos_opts = ['random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
-        for i, val in enumerate(task_in['targ2_pos']):
-            if val:
-                self.target2_pos_str = target_pos_opts[i]
+        if not seq_preselect:
+            target_pos_opts = ['random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
+            for i, val in enumerate(task_in['targ2_pos']):
+                if val:
+                    self.target2_pos_str = target_pos_opts[i]
 
         if self.target2_pos_str == 'center':
             targ_x = self.center_position[0]+self.nudge_x_t2
@@ -320,10 +349,11 @@ class COGame(Widget):
         self.target2_position = np.array([targ_x, targ_y])
         
         # target 3
-        target_pos_opts = ['none', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
-        for i, val in enumerate(task_in['targ3_pos']):
-            if val:
-                self.target3_pos_str = target_pos_opts[i]
+        if not seq_preselect:
+            target_pos_opts = ['none', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
+            for i, val in enumerate(task_in['targ3_pos']):
+                if val:
+                    self.target3_pos_str = target_pos_opts[i]
         
         if not self.target3_pos_str == 'none':
             if self.target3_pos_str == 'center':
@@ -357,9 +387,10 @@ class COGame(Widget):
             self.target3_position = np.array([targ_x, targ_y])
             
         # target 4
-        for i, val in enumerate(task_in['targ4_pos']):
-            if val:
-                self.target4_pos_str = target_pos_opts[i]
+        if not seq_preselect:
+            for i, val in enumerate(task_in['targ4_pos']):
+                if val:
+                    self.target4_pos_str = target_pos_opts[i]
         
         if self.target3_pos_str == 'none':
             self.target3_position = False
@@ -615,6 +646,7 @@ class COGame(Widget):
             screen_top = self.screen_top,
             target_rad=self.target_rad,
             center_position = self.center_position,
+            seq = self.seq,
             target1_pos_str = self.target1_pos_str,
             target2_pos_str = self.target2_pos_str,
             target3_pos_str = self.target3_pos_str,
@@ -1379,6 +1411,20 @@ class Manager(ScreenManager):
     elif data_params['target_rad'] == 3.0:
         is_trad300 = BooleanProperty(True)
         
+    # sequence preselect
+    is_seqA = BooleanProperty(False)
+    is_seqB = BooleanProperty(False)
+    is_seqC = BooleanProperty(False)
+    try:
+        if data_params['seq'] == 'A':
+            is_seqA = BooleanProperty(True)
+        elif data_params['seq'] == 'B':
+            is_seqB = BooleanProperty(True)
+        elif data_params['seq'] == 'C':
+            is_seqC = BooleanProperty(True) 
+    except: 
+        pass
+
     # target 1 position
     is_t1cent = BooleanProperty(False)
     is_t1um = BooleanProperty(False)

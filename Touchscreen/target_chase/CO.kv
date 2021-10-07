@@ -605,6 +605,57 @@
                     fontsize: 50
                     
             BoxLayout:
+                id: seq
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Sequence'
+                    color: 1, 1, 0, 1
+                
+                Label: 
+                    text: 'A: LR-UR-UL-LL'
+                CheckBox:
+                    id: seqA
+                    group: 'seq'
+                    active: root.is_seqA
+                
+                Label: 
+                    text: 'B: Cent-ML-MR-UL'
+                CheckBox:
+                    id: seqB
+                    group: 'seq'
+                    active: root.is_seqB
+                    
+                Label: 
+                    text: 'C: UM-LL-MR-UL'
+                CheckBox:
+                    id: seqC
+                    group: 'seq'
+                    active: root.is_seqC
+                    
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                    
+                    
+                    
+            BoxLayout:
                 id: t1_pos
                 orientation: 'horizontal'
                 canvas:
@@ -1508,6 +1559,7 @@
                     dict(button_rew=[button_rew_zero_sec.active, button_rew_pt1_sec.active, button_rew_pt3_sec.active, button_rew_pt5_sec.active], 
                     big_rew=[big_rew_zero_sec.active, big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_22.active, targ_rad_30.active], 
+                    seq=[seqA.active, seqB.active, seqC.active],
                     targ1_pos=[t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
                     targ2_pos=[t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
                     targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_mid.active, t3lower_mid.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
