@@ -182,6 +182,7 @@ class COGame(Widget):
 
         # TARGET TIMEOUT
         targ_timeout_opts = [15, 30, 45, 60]
+        self.target_timeout_time = 10000
         for i, val in enumerate(targ_timeout['tt']):
             if val:
                 self.target_timeout_time = targ_timeout_opts[i]
@@ -951,7 +952,7 @@ class COGame(Widget):
                 if button_pressed_prev:
                     if time.time() - self.t_button_hold_start > self.button_hold_time:
                         # Play the button reward sound
-                        sound = SoundLoader.load('reward2.wav')
+                        sound = SoundLoader.load('C.wav')
                         sound.play()
                         # if the button has been held down long enough
                         if self.button_rew[0]:
