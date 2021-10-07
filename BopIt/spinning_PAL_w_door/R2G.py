@@ -376,7 +376,7 @@ class R2Game(Widget):
         ### FSR threshold 
         self.fsr_threshold = 1.5*np.max(np.hstack((baseline_values)))
         if self.fsr_threshold < 30: 
-            self.fsr_threshold += 50
+            self.fsr_threshold += 25
 
         ### Close door 
         self.task_ard.write('c'.encode())
