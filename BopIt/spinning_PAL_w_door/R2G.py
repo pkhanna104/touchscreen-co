@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
 from kivy.uix.widget import Widget
-from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty, StringProperty
+from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty, StringProperty, BooleanProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.vector import Vector
 from kivy.clock import Clock
@@ -23,14 +23,17 @@ import threading
 
 ### Load last parameters ###
 import os 
+
 path = os.getcwd()
 path_data = path.split('\\')
 path_root = ''
 for ip in path_data: 
     path_root += ip + '/'
 if os.path.exists(path_root + 'last_params.pkl'): 
-    with open(last_param_path, 'rb') as f:
+    with open(path_root + 'last_params.pkl', 'rb') as f:
         data_params = pickle.load(f)
+else: 
+    data_params = {}
 
 class RewThread(threading.Thread):
     def __init__(self, comport, rew_time, juicer):
@@ -373,10 +376,17 @@ class R2Game(Widget):
             juicer = self.juicer,
             rew_for_start = self.reward_for_start[0], 
             reward_for_grasp = self.reward_for_grasp[0], 
-            skip_juice=self.skip_juice,
-            rew_delay = self.reward_delay_time, 
+            skip_juice=self.skip_juice, 
             use_start = self.use_start, 
             only_start = self.only_start)
+
+        ### save now 
+        import os
+        path_root = os.getcwd()
+        path_root = path_root.split('\\')
+        path_ = ''
+        for p in path_root: path_ += p+'/'
+        pickle.dump(d, open(path_ + 'last_params.pkl', 'wb'))
 
         ## Open task arduino - IR sensor, button, wheel position ### 
         self.task_ard = serial.Serial('COM10', baudrate=115200)
@@ -867,121 +877,178 @@ class R2Game(Widget):
 class Manager(ScreenManager):
     ### Reward setup ### 
 
-    rew_manual = BooleanProperty(data_params['rew_manual'])
-    rew_start = BooleanProperty(data_params['rew_start'])
-    rew_start_and_grasp = BooleanProperty(data_params['rew_start_and_grasp'])
-    rew_grasp = BooleanProperty(data_params['rew_grasp'])
-    snd_only = BooleanProperty(data_params['snd_only'])
+    if len(data_params.keys()) > 0: 
+        rew_manual = BooleanProperty(data_params['rew_manual'])
+        rew_start = BooleanProperty(data_params['rew_start'])
+        rew_start_and_grasp = BooleanProperty(data_params['rew_start_and_grasp'])
+        rew_grasp = BooleanProperty(data_params['rew_grasp'])
+        rew_snd = BooleanProperty(data_params['snd_only'])
 
-    # if data_params['rew_manual']: 
-    #     rew_manual = BooleanProperty(True)
-    # elif data_params['rew_start']: 
-    #     rew_start = BooleanProperty(True)
-    # elif data_params['rew_start_and_grasp']: 
-    #     rew_start_and_grasp = BooleanProperty(True)
-    # elif data_params['rew_grasp']: 
-    #     rew_grasp = BooleanProperty(True)
-    # elif data_params['snd_only']: 
-    #     rew_snd = BooleanProperty(True) 
+        # if data_params['rew_manual']: 
+        #     rew_manual = BooleanProperty(True)
+        # elif data_params['rew_start']: 
+        #     rew_start = BooleanProperty(True)
+        # elif data_params['rew_start_and_grasp']: 
+        #     rew_start_and_grasp = BooleanProperty(True)
+        # elif data_params['rew_grasp']: 
+        #     rew_grasp = BooleanProperty(True)
+        # elif data_params['snd_only']: 
+        #     rew_snd = BooleanProperty(True) 
 
-    only_gripper = BooleanProperty(data_params['task_opt'] == 'grip')
-    only_button = BooleanProperty(data_params['task_opt'] == 'button')
-    button_grip = BooleanProperty(data_params['task_opt'] == 'both')
+        only_gripper = BooleanProperty(data_params['task_opt'] == 'grip')
+        only_button = BooleanProperty(data_params['task_opt'] == 'button')
+        button_grip = BooleanProperty(data_params['task_opt'] == 'both')
 
-    # if data_params['task_opt'] == 'grip': 
-    #     only_gripper = BooleanProperty(True)
-    # elif data_params['task_opt'] == 'button': 
-    #     only_button = BooleanProperty(True)
-    # elif data_params['task_opt'] == 'both': 
-    #     button_grip = BooleanProperty(True)
+        # if data_params['task_opt'] == 'grip': 
+        #     only_gripper = BooleanProperty(True)
+        # elif data_params['task_opt'] == 'button': 
+        #     only_button = BooleanProperty(True)
+        # elif data_params['task_opt'] == 'both': 
+        #     button_grip = BooleanProperty(True)
 
-    monk_haribo = BooleanProperty(data_params['animal_name'] == 'haribo')
-    monk_butters = BooleanProperty(data_params['animal_name'] == 'butters')
-    monk_nike = BooleanProperty(data_params['animal_name'] == 'nike')
-
-
-    small_rew_1 = BooleanProperty(data_params['small_rew'] == 0.1)
-    small_rew_3 = BooleanProperty(data_params['small_rew'] == 0.3)
-    small_rew_5 = BooleanProperty(data_params['small_rew'] == 0.5)
-
-    # if data_params['small_rew'] == 0.1: 
-    #     small_rew_1 = BooleanProperty(True)
-    # elif data_params['small_rew'] == 0.3: 
-    #     small_rew_3 = BooleanProperty(True)
-    # elif data_params['small_rew'] == 0.5: 
-    #     small_rew_5 = BooleanProperty(True)
-
-    big_rew_3 = BooleanProperty(data_params['big_rew'] == 0.3)
-    big_rew_5 = BooleanProperty(data_params['big_rew'] == 0.5)
-    big_rew_7 = BooleanProperty(data_params['big_rew'] == 0.7)
-
-    # if data_params['big_rew'] == 0.3: 
-    #     big_rew_3 = BooleanProperty(True)
-    # elif data_params['big_rew'] == 0.5: 
-    #     big_rew_5 = BooleanProperty(True)
-    # elif data_params['big_rew'] == 0.7: 
-    #     big_rew_7 = BooleanProperty(True)
-
-    juicer_y = BooleanProperty(data_params['juicer'] ==  'yellow')
-    juicer_r = BooleanProperty(data_params['juicer'] == 'red')
-
-    # if data_params['juicer'] ==  'yellow': 
-    #     juicer_y = BooleanProperty(True)
-    # elif data_params['juicer'] == 'red': 
-    #     juicer_r = BooleanProperty(True)
-
-    rew_all = BooleanProperty(data_params['rew_all'])
-    rew_50 = BooleanProperty(data_params['rew_50'])
-    rew_30 = BooleanProperty(data_params['rew_30'])
-
-    button_0 = BooleanProperty(data_params['start_hold'] == 0.)
-    button_1 = BooleanProperty(data_params['start_hold'] == 0.1)
-    button_2 = BooleanProperty(data_params['start_hold'] == 0.2)
-    button_3 = BooleanProperty(data_params['start_hold'] == 0.3)
-    button_4 = BooleanProperty(data_params['start_hold'] == 0.4)
-
-    grasp_0 = BooleanProperty(data_params['grasp_hold'] == 0.)
-    grasp_15 = BooleanProperty(data_params['grasp_hold'] == 0.15)
-    grasp_20 = BooleanProperty(data_params['grasp_hold'] == 0.20)
-    grasp_25 = BooleanProperty(data_params['grasp_hold'] == 0.25)
-    grasp_35 = BooleanProperty(data_params['grasp_hold'] == 0.35)
-    grasp_50 = BooleanProperty(data_params['grasp_hold'] == 0.50)
+        monk_haribo = BooleanProperty(data_params['animal_name'] == 'haribo')
+        monk_butters = BooleanProperty(data_params['animal_name'] == 'butters')
+        monk_nike = BooleanProperty(data_params['animal_name'] == 'nike')
 
 
-    power = BooleanProperty(False)
-    tripod = BooleanProperty(False)
-    pinch = BooleanProperty(False)
-    tiny = BooleanProperty(False) 
-    pinch3 = BooleanProperty(False)
+        small_rew_1 = BooleanProperty(data_params['small_rew'] == 0.1)
+        small_rew_3 = BooleanProperty(data_params['small_rew'] == 0.3)
+        small_rew_5 = BooleanProperty(data_params['small_rew'] == 0.5)
 
-    for trial in data_params['trials_labels']: 
-        trl = trial[0]
+        # if data_params['small_rew'] == 0.1: 
+        #     small_rew_1 = BooleanProperty(True)
+        # elif data_params['small_rew'] == 0.3: 
+        #     small_rew_3 = BooleanProperty(True)
+        # elif data_params['small_rew'] == 0.5: 
+        #     small_rew_5 = BooleanProperty(True)
 
-        if trl == 'power_1': 
-            power = BooleanProperty(True)
-        elif trl == 'tripod_1': 
-            tripod = BooleanProperty(True)
-        elif trl == 'pinch_1': 
-            pinch = BooleanProperty(True)
-        elif trl == 'tiny_1': 
-            tiny = BooleanProperty(True)
-        elif trl == 'pinch_3': 
-            pinch3 = BooleanProperty(True)
+        big_rew_3 = BooleanProperty(data_params['big_rew'] == 0.3)
+        big_rew_5 = BooleanProperty(data_params['big_rew'] == 0.5)
+        big_rew_7 = BooleanProperty(data_params['big_rew'] == 0.7)
 
-    grasp_to5 = BooleanProperty(False)
-    grasp_to10 = BooleanProperty(False)
-    grasp_toinf = BooleanProperty(False)
+        # if data_params['big_rew'] == 0.3: 
+        #     big_rew_3 = BooleanProperty(True)
+        # elif data_params['big_rew'] == 0.5: 
+        #     big_rew_5 = BooleanProperty(True)
+        # elif data_params['big_rew'] == 0.7: 
+        #     big_rew_7 = BooleanProperty(True)
 
-    if data_params['grasp_timeout'] == 5.: 
-        grasp_to5 = BooleanProperty(True)
-    elif data_params['grasp_timeout'] == 10.: 
+        juicer_y = BooleanProperty(data_params['juicer'] ==  'yellow')
+        juicer_r = BooleanProperty(data_params['juicer'] == 'red')
+
+        # if data_params['juicer'] ==  'yellow': 
+        #     juicer_y = BooleanProperty(True)
+        # elif data_params['juicer'] == 'red': 
+        #     juicer_r = BooleanProperty(True)
+
+        rew_all = BooleanProperty(data_params['rew_all'])
+        rew_50 = BooleanProperty(data_params['rew_50'])
+        rew_30 = BooleanProperty(data_params['rew_30'])
+
+        button_0 = BooleanProperty(data_params['start_hold'] == 0.)
+        button_1 = BooleanProperty(data_params['start_hold'] == 0.1)
+        button_2 = BooleanProperty(data_params['start_hold'] == 0.2)
+        button_3 = BooleanProperty(data_params['start_hold'] == 0.3)
+        button_4 = BooleanProperty(data_params['start_hold'] == 0.4)
+
+        grasp_0 = BooleanProperty(data_params['grasp_hold'] == 0.)
+        grasp_15 = BooleanProperty(data_params['grasp_hold'] == 0.15)
+        grasp_20 = BooleanProperty(data_params['grasp_hold'] == 0.20)
+        grasp_25 = BooleanProperty(data_params['grasp_hold'] == 0.25)
+        grasp_35 = BooleanProperty(data_params['grasp_hold'] == 0.35)
+        grasp_50 = BooleanProperty(data_params['grasp_hold'] == 0.50)
+
+
+        power = BooleanProperty(False)
+        tripod = BooleanProperty(False)
+        pinch = BooleanProperty(False)
+        tiny = BooleanProperty(False) 
+        pinch3 = BooleanProperty(False)
+
+        for trl in data_params['trials_labels']: 
+            
+            if trl == 'power_1': 
+                power = BooleanProperty(True)
+            elif trl == 'tripod_1': 
+                tripod = BooleanProperty(True)
+            elif trl == 'pinch_1': 
+                pinch = BooleanProperty(True)
+            elif trl == 'tiny_1': 
+                tiny = BooleanProperty(True)
+            elif trl == 'pinch_3': 
+                pinch3 = BooleanProperty(True)
+
+        grasp_to5 = BooleanProperty(False)
+        grasp_to10 = BooleanProperty(False)
+        grasp_toinf = BooleanProperty(False)
+
+        if data_params['grasp_timeout'] == 5.: 
+            grasp_to5 = BooleanProperty(True)
+        elif data_params['grasp_timeout'] == 10.: 
+            grasp_to10 = BooleanProperty(True)
+        else:
+            grasp_toinf = BooleanProperty(True)
+
+        trls_25 = BooleanProperty(data_params['trls_25'])
+        trls_50 = BooleanProperty(data_params['trls_50'])
+        trls_inf = BooleanProperty(data_params['trls_inf'])
+    else: 
+        rew_manual = BooleanProperty(False)
+        rew_start = BooleanProperty(False)
+        rew_start_and_grasp = BooleanProperty(True)
+        rew_grasp = BooleanProperty(False)
+        rew_snd = BooleanProperty(False)
+
+        only_gripper =BooleanProperty(False)
+        only_button = BooleanProperty(False)
+        button_grip = BooleanProperty(True)
+
+        monk_haribo = BooleanProperty(True)
+        monk_butters = BooleanProperty(False)
+        monk_nike = BooleanProperty(False)
+
+        small_rew_1 = BooleanProperty(True)
+        small_rew_3 = BooleanProperty(False)
+        small_rew_5 = BooleanProperty(False)
+
+        big_rew_3 = BooleanProperty(False)
+        big_rew_5 = BooleanProperty(False)
+        big_rew_7 = BooleanProperty(True)
+
+        juicer_y = BooleanProperty(True)
+        juicer_r = BooleanProperty(False)
+
+        rew_all = BooleanProperty(True)
+        rew_50 = BooleanProperty(False)
+        rew_30 = BooleanProperty(False)
+
+        button_0 = BooleanProperty(False)
+        button_1 = BooleanProperty(False)
+        button_2 = BooleanProperty(True)
+        button_3 = BooleanProperty(False)
+        button_4 = BooleanProperty(False)
+
+        grasp_0 = BooleanProperty(False)
+        grasp_15 = BooleanProperty(False)
+        grasp_20 = BooleanProperty(False)
+        grasp_25 = BooleanProperty(True)
+        grasp_35 = BooleanProperty(False)
+        grasp_50 = BooleanProperty(False)
+
+        power = BooleanProperty(False)
+        tripod = BooleanProperty(False)
+        pinch = BooleanProperty(False)
+        tiny = BooleanProperty(False) 
+        pinch3 = BooleanProperty(False)
+
+        grasp_to5 = BooleanProperty(False)
         grasp_to10 = BooleanProperty(True)
-    else:
-        grasp_toinf = BooleanProperty(True)
+        grasp_toinf = BooleanProperty(False)
 
-    trls_25 = BooleanProperty(data_params['trls_25'])
-    trls_50 = BooleanProperty(data_params['trls_50'])
-    trls_inf = BooleanProperty(data_params['trls_inf'])
+        trls_25 = BooleanProperty(False)
+        trls_50 = BooleanProperty(True)
+        trls_inf = BooleanProperty(False)
+
 
 class R2GApp(App):
     def build(self, **kwargs):
