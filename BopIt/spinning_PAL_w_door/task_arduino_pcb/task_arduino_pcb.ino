@@ -33,6 +33,7 @@ Motor motor_pot = Motor(pot_in1, pot_in2, pot_pwm, offset, STBY);
 const int slidepot_sensor = A0; //-- slidepot
 int pot_sensorValue;
 bool abortclose = false;
+int startTrying; 
 int lastT = -1; 
 int lastpos = -1;
 int velo = 0;
@@ -318,7 +319,8 @@ void close_door() {
     lastpos = -1; 
 
     // Try closing 
-    motor_pot.drive(150, 80); 
+    motor_pot.drive(200, 80); 
+    startTrying = millis(); // time that we tried starting to close the door 
 
     // Run the motor until the door is closed
     while (pot_sensorValue < 1000) {
@@ -351,6 +353,11 @@ void close_door() {
             }
           }
           lastT = T;
+
+          if ((!abortclose) and ((millis() - startTrying) > 750)) {
+            abortclose=true; 
+          }
+
         }
         delay(5);
       }
