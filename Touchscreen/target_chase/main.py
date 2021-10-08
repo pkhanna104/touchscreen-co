@@ -1177,6 +1177,8 @@ class COGame(Widget):
         if time.time() - self.first_target_attempt_t0 > self.target_timeout_time:
             self.repeat = False
             return True
+        else:
+            return False
 
     def finish_targ_hold(self, **kwargs):
         if not self.target_index == self.num_targets:
