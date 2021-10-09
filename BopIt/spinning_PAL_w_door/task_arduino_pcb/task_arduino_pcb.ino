@@ -369,7 +369,7 @@ void close_door() {
         abortclose = false;
         delay(500); 
         // Try closing again 
-        motor_pot.drive(100, 80); 
+        motor_pot.drive(200, 80); 
     }
   }
   motor_pot.brake(); 
