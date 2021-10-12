@@ -43,17 +43,15 @@
                     text: 'Haribo'
                     fontsize: 28
                     halign: 'center'                        
-                
                 CheckBox: 
                     group: 'check'
                     id: chk_har
                     active: root.is_haribo  
-                    
+                     
                 Label: 
                     text: 'Fifi'
                     fontsize: 28
                     halign: 'center'                      
-                
                 CheckBox: 
                     group: 'check'
                     id: chk_fifi
@@ -62,9 +60,7 @@
                 Label: 
                     text: 'Nike'
                     fontsize: 28
-                    halign: 'center' 
-                                         
-                
+                    halign: 'center'                 
                 CheckBox: 
                     group: 'check'
                     id: chk_nike
@@ -74,8 +70,6 @@
                     text: 'Butters'
                     fontsize: 28
                     halign: 'center' 
-                                         
-                
                 CheckBox: 
                     group: 'check'
                     id: chk_but
@@ -101,43 +95,72 @@
                 Label:
                     text: ''
                     fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
 
                 Label: 
-                    text: 'Target Timeout (from first att.)'
+                    text: 'Target Timeout'
                     color: 1, 1, 0, 1
            
                 Label: 
-                    text: '15 sec'
-
+                    text: '1.5 sec'
                 CheckBox:
                     group: 'tt'
-                    id: tt_15_sec
-                    active: root.is_tt15    
+                    id: tt_1pt5_sec
+                    active: root.is_tt1pt5    
             
                 Label: 
-                    text: '30 sec'
-
+                    text: '2.0 sec'
                 CheckBox:
                     group: 'tt'
-                    id: tt_30_sec
-                    active: root.is_tt30
+                    id: tt_2pt0_sec
+                    active: root.is_tt2pt0
                     
                 Label: 
-                    text: '45 sec'
-
+                    text: '2.5 sec'
                 CheckBox:
                     group: 'tt'
-                    id: tt_45_sec
-                    active: root.is_tt45
+                    id: tt_2pt5_sec
+                    active: root.is_tt2pt5
 
                 Label: 
-                    text: '60 sec'
-
+                    text: '3.0 sec'
                 CheckBox:
                     group: 'tt'
-                    id: tt_60_sec
-                    active: root.is_tt60
+                    id: tt_3pt0_sec
+                    active: root.is_tt3pt0
+                    
+                Label: 
+                    text: '3.5 sec'
+                CheckBox:
+                    group: 'tt'
+                    id: tt_3pt5_sec
+                    active: root.is_tt3pt5
+                    
+                Label: 
+                    text: '4.0 sec'
+                CheckBox:
+                    group: 'tt'
+                    id: tt_4pt0_sec
+                    active: root.is_tt4pt0
             
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                    
+            BoxLayout
+                id: drag
+                orientation: 'horizontal'
                 Label:
                     text: ''
                     fontsize: 50
@@ -145,8 +168,34 @@
                 Label:
                     text: ''
                     fontsize: 50
+
+                Label:
+                    text: 'Drag OK:'
+                    color: 1, 1, 0, 1
+                    fontsize: 50
                     
-                    
+                Label: 
+                    text: 'YES'                     
+                CheckBox: 
+                    group: 'drag'
+                    id: dragok
+                    active: root.is_dragok  
+                     
+                Label: 
+                    text: 'NO'                   
+                CheckBox: 
+                    group: 'drag'
+                    id: dragnotok
+                    active: root.is_dragnotok    
+                   
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+            
             BoxLayout:
                 id: params:
                 orientation: 'horizontal'
@@ -1576,7 +1625,8 @@
                     hold=[tht000.active, tht100.active, tht200.active, tht300.active, tht400.active, tht500.active, tht600.active, tht100to300.active, tht400to600.active]), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
-                    dict(tt=[tt_15_sec.active, tt_30_sec.active, tt_45_sec.active, tt_60_sec.active]),
+                    dict(tt=[tt_1pt5_sec.active, tt_2pt0_sec.active, tt_2pt5_sec.active, tt_3pt0_sec.active, tt_3pt5_sec.active, tt_4pt0_sec.active]),
+                    dict(drag=[dragok.active, dragnotok.active]),
                     dict(nudge_x_t1=[nudge_x_t1_neg6.active, nudge_x_t1_neg4.active, nudge_x_t1_neg2.active, nudge_x_t1_zero.active, nudge_x_t1_pos2.active, nudge_x_t1_pos4.active, nudge_x_t1_pos6.active],
                     nudge_x_t2=[nudge_x_t2_neg6.active, nudge_x_t2_neg4.active, nudge_x_t2_neg2.active, nudge_x_t2_zero.active, nudge_x_t2_pos2.active, nudge_x_t2_pos4.active, nudge_x_t2_pos6.active],
                     nudge_x_t3=[nudge_x_t3_neg6.active, nudge_x_t3_neg4.active, nudge_x_t3_neg2.active, nudge_x_t3_zero.active, nudge_x_t3_pos2.active, nudge_x_t3_pos4.active, nudge_x_t3_pos6.active],

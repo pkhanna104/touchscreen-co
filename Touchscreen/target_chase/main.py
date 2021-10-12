@@ -176,12 +176,12 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         hold=None, autoquit=None, rew_var=None, targ_timeout = None, 
-        nudge_x=None, screen_top=None):
+        drag=None, nudge_x=None, screen_top=None):
         
         self.rew_cnt = 0
 
         # TARGET TIMEOUT
-        targ_timeout_opts = [15, 30, 45, 60]
+        targ_timeout_opts = [1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
         self.target_timeout_time = 10000
         for i, val in enumerate(targ_timeout['tt']):
             if val:
@@ -516,12 +516,14 @@ class COGame(Widget):
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
-
-        # drag_ok = [True, False]
-        # for i, val in enumerate(drag['drag']):
-        #     if val:
-        #         self.drag_ok = drag_ok[i]
+        
+        # OK to drag into the targets?
         self.drag_ok = False;
+        drag_opts = [True, False]
+        for i, val in enumerate(drag['drag']):
+            if val:
+                self.drag_ok = drag_opts[i]
+        
 
         # nudge_9am_dist = [0., .5, 1.]
         # for i, val in enumerate(nudge['nudge']):
@@ -1174,7 +1176,7 @@ class COGame(Widget):
 
     def target_timeout(self, **kwargs):
         #return kwargs['ts'] > self.target_timeout_time
-        if time.time() - self.first_target_attempt_t0 > self.target_timeout_time:
+        if time.time() - self.first_time_for_this_targ_t0 > self.target_timeout_time:
             self.repeat = False
             return True
         else:
@@ -1267,18 +1269,32 @@ class Manager(ScreenManager):
         is_butters = BooleanProperty(True)
         
     # target timeout
-    is_tt15 = BooleanProperty(False)
-    is_tt30 = BooleanProperty(False)
-    is_tt45 = BooleanProperty(False)
-    is_tt60 = BooleanProperty(False)
-    if data_params['target_timeout_time'] == 15:
-        is_tt15 = BooleanProperty(True)
-    elif data_params['target_timeout_time'] == 30:
-        is_tt30 = BooleanProperty(True)
-    elif data_params['target_timeout_time'] == 45:
-        is_tt45 = BooleanProperty(True)
-    elif data_params['target_timeout_time'] == 60:
-        is_tt60 = BooleanProperty(True)
+    is_tt1pt5 = BooleanProperty(False)
+    is_tt2pt0 = BooleanProperty(False)
+    is_tt2pt5 = BooleanProperty(False)
+    is_tt3pt0 = BooleanProperty(False)
+    is_tt3pt5 = BooleanProperty(False)
+    is_tt4pt0 = BooleanProperty(False)
+    if data_params['target_timeout_time'] == 1.5:
+        is_tt1pt5 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 2.0:
+        is_tt2pt0 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 2.5:
+        is_tt2pt5 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 3.0:
+        is_tt3pt0 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 3.5:
+        is_tt3pt5 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 4.0:
+        is_tt4pt0 = BooleanProperty(True)
+        
+    # dragok
+    is_dragok = BooleanProperty(False)
+    is_dragnotok = BooleanProperty(False)
+    if data_params['drag_ok'] is True:
+        is_dragok = BooleanProperty(True)
+    elif data_params['drag_ok'] is False:
+        is_dragnotok = BooleanProperty(True)
     
     # crashbar hold time
     is_bhtfalse = BooleanProperty(False)
