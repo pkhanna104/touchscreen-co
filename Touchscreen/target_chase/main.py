@@ -139,13 +139,16 @@ class COGame(Widget):
 
     t0 = time.time()
     
+    trials_started = 0
     trial_counter = NumericProperty(0)
+    percent_correct = StringProperty('')
     tht_text = StringProperty('')
     targ_size_text = StringProperty('')
     big_rew_text = StringProperty('')
     tht_param = StringProperty('')
     targ_size_param = StringProperty('')
     big_rew_time_param = StringProperty('')
+    percent_correct_text = StringProperty('')
         
     
     def on_touch_down(self, touch):
@@ -234,7 +237,7 @@ class COGame(Widget):
                 self.screen_top = screen_top_opts[i]
         
         # TARGET RADIUS
-        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 2.25, 3.0]
+        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 1.85, 2.25, 3.0]
         for i, val in enumerate(task_in['targ_rad']):
             if val:
                 self.target_rad = target_rad_opts[i]
@@ -772,9 +775,10 @@ class COGame(Widget):
         
         if self.idle:
             self.state = 'idle_exit'
-            self.trial_counter = -1
+            self.trial_counter -= 1
 
             # Set relevant params text: 
+            self.percent_correct_text = 'Percent Correct:'
             self.tht_text = 'Target Hold Time: '
             self.targ_size_text = 'Target Radius: '
             self.big_rew_text = 'Big Reward Time: '
@@ -786,6 +790,7 @@ class COGame(Widget):
 
             self.targ_size_param = str(self.target_rad)
             self.big_rew_time_param = str(self.last_targ_reward[1])
+            self.percent_correct = str(round(100*self.trial_counter/self.trials_started)) + '%'
 
         else:
             App.get_running_app().stop()
@@ -940,6 +945,7 @@ class COGame(Widget):
         self.target1.color = (0., 0., 0., 0.)
         self.target2.color = (0., 0., 0., 0.)
         self.indicator_targ.color = (0., 0., 0., 0.)
+        self.trials_started += 1
         
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
@@ -1422,6 +1428,7 @@ class Manager(ScreenManager):
     is_trad091 = BooleanProperty(False)
     is_trad100 = BooleanProperty(False)
     is_trad150 = BooleanProperty(False)
+    is_trad185 = BooleanProperty(False)
     is_trad225 = BooleanProperty(False)
     is_trad300 = BooleanProperty(False)
     if data_params['target_rad'] == 0.5:
@@ -1436,6 +1443,8 @@ class Manager(ScreenManager):
         is_trad100 = BooleanProperty(True)
     elif data_params['target_rad'] == 1.5:
         is_trad150 = BooleanProperty(True)
+    elif data_params['target_rad'] == 1.85:
+        is_trad185 = BooleanProperty(True)
     elif data_params['target_rad'] == 2.25:
         is_trad225 = BooleanProperty(True)
     elif data_params['target_rad'] == 3.0:
