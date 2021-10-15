@@ -237,7 +237,7 @@ class COGame(Widget):
                 self.screen_top = screen_top_opts[i]
         
         # TARGET RADIUS
-        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 1.85, 2.25, 3.0]
+        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 1.85, 2.25, 3.0, 4.0]
         for i, val in enumerate(task_in['targ_rad']):
             if val:
                 self.target_rad = target_rad_opts[i]
@@ -1431,6 +1431,7 @@ class Manager(ScreenManager):
     is_trad185 = BooleanProperty(False)
     is_trad225 = BooleanProperty(False)
     is_trad300 = BooleanProperty(False)
+    is_trad400 = BooleanProperty(False)
     if data_params['target_rad'] == 0.5:
         is_trad050 = BooleanProperty(True)
     elif data_params['target_rad'] == 0.75:
@@ -1449,6 +1450,8 @@ class Manager(ScreenManager):
         is_trad225 = BooleanProperty(True)
     elif data_params['target_rad'] == 3.0:
         is_trad300 = BooleanProperty(True)
+    elif data_params['target_rad'] == 4.0:
+        is_trad400 = BooleanProperty(True)
         
     # sequence preselect
     is_seqA = BooleanProperty(False)
