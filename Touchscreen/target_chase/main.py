@@ -96,6 +96,7 @@ class COGame(Widget):
     ITI_mean = 1.0
     ITI_std = .2
     target_rad = 1.5
+    eff_target_rad = 1.5
     
     # SET THE POSITION OF THE EXIT BUTTONS AND THE PHOTODIODE INDICATOR LIGHT
     # positions are in CM measured from the center of the screen
@@ -241,6 +242,15 @@ class COGame(Widget):
         for i, val in enumerate(task_in['targ_rad']):
             if val:
                 self.target_rad = target_rad_opts[i]
+                
+        eff_target_rad_opts = ['Same As Appears', 1.0, 2.0, 3.0, 4.0, 5.0]
+        for i, val in enumerate(task_in['eff_targ_rad']):
+            if val:
+                self.eff_target_rad = eff_target_rad_opts[i]
+        
+        if self.eff_target_rad == 'Same As Appears':
+            self.eff_target_rad = self.target_rad
+        
                 
         # TARGET POSITIONS
         seq_opts = ['A', 'B', 'C', 'D', 'center out']
@@ -662,6 +672,7 @@ class COGame(Widget):
             nudge_x_t4 = self.nudge_x_t4,
             screen_top = self.screen_top,
             target_rad=self.target_rad,
+            effective_target_rad=self.eff_target_rad,
             center_position = self.center_position,
             seq = self.seq,
             target1_pos_str = self.target1_pos_str,
@@ -1181,10 +1192,10 @@ class COGame(Widget):
 
     def touch_target(self, **kwargs):
         if self.drag_ok:
-            return self.check_if_cursors_in_targ(self.active_target_position, self.target_rad)
+            return self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad)
         else:
-            return np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.target_rad),
-                self.check_if_started_in_targ(self.active_target_position, self.target_rad))
+            return np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad),
+                self.check_if_started_in_targ(self.active_target_position, self.eff_target_rad))
 
     def target_timeout(self, **kwargs):
         #return kwargs['ts'] > self.target_timeout_time
@@ -1214,12 +1225,12 @@ class COGame(Widget):
             return False
 
     def early_leave_target_hold(self, **kwargs):
-        return not self.check_if_cursors_in_targ(self.active_target_position, self.target_rad)
+        return not self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad)
 
     def targ_drag_out(self, **kwargs):
         touch = self.touch
         self.touch = True
-        stay_in = self.check_if_cursors_in_targ(self.active_target_position, self.target_rad)
+        stay_in = self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad)
         self.touch = touch
         return not stay_in
 
@@ -1452,6 +1463,30 @@ class Manager(ScreenManager):
         is_trad300 = BooleanProperty(True)
     elif data_params['target_rad'] == 4.0:
         is_trad400 = BooleanProperty(True)
+        
+    # effective target radius
+    is_efftradsame = BooleanProperty(False)
+    is_efftrad10 = BooleanProperty(False)
+    is_efftrad20 = BooleanProperty(False)
+    is_efftrad30 = BooleanProperty(False)
+    is_efftrad40 = BooleanProperty(False)
+    is_efftrad50 = BooleanProperty(False)
+
+    try:
+        if data_params['effective_target_rad'] == data_params['target_rad']:
+            is_efftradsame = BooleanProperty(True)
+        elif data_params['effective_target_rad'] == 1.0:
+            is_efftrad10 = BooleanProperty(True)
+        elif data_params['effective_target_rad'] == 2.0:
+            is_efftrad20 = BooleanProperty(True)
+        elif data_params['effective_target_rad'] == 3.0:
+            is_efftrad30 = BooleanProperty(True)
+        elif data_params['effective_target_rad'] == 4.0:
+            is_efftrad40 = BooleanProperty(True)
+        elif data_params['effective_target_rad'] == 5.0:
+            is_efftrad50 = BooleanProperty(True)
+    except: 
+        pass
         
     # sequence preselect
     is_seqA = BooleanProperty(False)

@@ -584,8 +584,12 @@
                     fontsize: 50
 
                 Label: 
-                    text: 'Target Radius'
+                    text: 'Appearing Target Radius'
                     color: 1, 1, 0, 1
+                
+                Label:
+                    text: ''
+                    fontsize: 50
 
                 Label: 
                     text: '.5 cm'
@@ -656,6 +660,80 @@
                     id: targ_rad_40
                     group: 'targ_cm'
                     active: root.is_trad400
+                                        
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                    
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Effective Target Radius'
+                    color: 1, 1, 0, 1
+                
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Same as Appears'
+                CheckBox:
+                    id: eff_targ_rad_same
+                    group: 'eff_targ_cm'
+                    active: root.is_efftradsame
+
+                Label: 
+                    text: '1.0 cm'
+                CheckBox:
+                    id: eff_targ_rad_10
+                    group: 'eff_targ_cm'
+                    active: root.is_efftrad10
+                    
+                Label: 
+                    text: '2.0 cm'
+                CheckBox:
+                    id: eff_targ_rad_20
+                    group: 'eff_targ_cm'
+                    active: root.is_efftrad20
+                    
+                Label: 
+                    text: '3.0 cm'
+                CheckBox:
+                    id: eff_targ_rad_30
+                    group: 'eff_targ_cm'
+                    active: root.is_efftrad30
+                    
+                Label: 
+                    text: '4.0 cm'
+                CheckBox:
+                    id: eff_targ_rad_40
+                    group: 'eff_targ_cm'
+                    active: root.is_efftrad40
+                    
+                Label: 
+                    text: '5.0 cm'
+                CheckBox:
+                    id: eff_targ_rad_50
+                    group: 'eff_targ_cm'
+                    active: root.is_efftrad50
                                         
                 Label:
                     text: ''
@@ -1636,6 +1714,7 @@
                     dict(button_rew=[button_rew_zero_sec.active, button_rew_pt1_sec.active, button_rew_pt3_sec.active, button_rew_pt5_sec.active], 
                     big_rew=[big_rew_zero_sec.active, big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_18.active, targ_rad_22.active, targ_rad_30.active, targ_rad_40.active], 
+                    eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active],
                     seq=[seqA.active, seqB.active, seqC.active, seqD.active, centerOut.active],
                     targ1_pos=[t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
                     targ2_pos=[t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
