@@ -1567,6 +1567,83 @@
                     text: ''
                     fontsize: 50
                     
+            BoxLayout:
+                id: screen_bot
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Raise Screen Bottom By'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0 cm'
+                CheckBox:
+                    id: screen_bot_0
+                    group: 'screen_bot'
+                    active: root.is_screenbot0
+                    
+                Label: 
+                    text: '2 cm'
+                CheckBox:
+                    id: screen_bot_2
+                    group: 'screen_bot'
+                    active: root.is_screenbot2
+                
+                Label: 
+                    text: '4 cm'
+                CheckBox:
+                    id: screen_bot_4
+                    group: 'screen_bot'
+                    active: root.is_screenbot4
+                    
+                Label: 
+                    text: '6 cm'
+                CheckBox:
+                    id: screen_bot_6
+                    group: 'screen_bot'
+                    active: root.is_screenbot6
+                
+                Label: 
+                    text: '8 cm'
+                CheckBox:
+                    id: screen_bot_8
+                    group: 'screen_bot'
+                    active: root.is_screenbot8
+                  
+                Label: 
+                    text: '10 cm'
+                CheckBox:
+                    id: screen_bot_10
+                    group: 'screen_bot'
+                    active: root.is_screenbot10
+                    
+                Label: 
+                    text: '12 cm'
+                CheckBox:
+                    id: screen_bot_12
+                    group: 'screen_bot'
+                    active: root.is_screenbot12
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
             
             BoxLayout:
                 id: time2next_targ
@@ -1731,7 +1808,8 @@
                     nudge_x_t2=[nudge_x_t2_neg6.active, nudge_x_t2_neg4.active, nudge_x_t2_neg2.active, nudge_x_t2_zero.active, nudge_x_t2_pos2.active, nudge_x_t2_pos4.active, nudge_x_t2_pos6.active],
                     nudge_x_t3=[nudge_x_t3_neg6.active, nudge_x_t3_neg4.active, nudge_x_t3_neg2.active, nudge_x_t3_zero.active, nudge_x_t3_pos2.active, nudge_x_t3_pos4.active, nudge_x_t3_pos6.active],
                     nudge_x_t4=[nudge_x_t4_neg6.active, nudge_x_t4_neg4.active, nudge_x_t4_neg2.active, nudge_x_t4_zero.active, nudge_x_t4_pos2.active, nudge_x_t4_pos4.active, nudge_x_t4_pos6.active]),
-                    dict(screen_top=[screen_top_neg6.active, screen_top_neg5.active, screen_top_neg4.active, screen_top_neg3.active, screen_top_neg2.active, screen_top_neg1.active, screen_top_zero.active]))
+                    dict(screen_top=[screen_top_neg6.active, screen_top_neg5.active, screen_top_neg4.active, screen_top_neg3.active, screen_top_neg2.active, screen_top_neg1.active, screen_top_zero.active], 
+                    screen_bot=[screen_bot_0.active, screen_bot_2.active, screen_bot_4.active, screen_bot_6.active, screen_bot_8.active, screen_bot_10.active, screen_bot_12.active]))
 
             Label:
                 text: ''

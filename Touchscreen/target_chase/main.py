@@ -180,7 +180,7 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         hold=None, autoquit=None, rew_var=None, targ_timeout = None, 
-        drag=None, nudge_x=None, screen_top=None):
+        drag=None, nudge_x=None, screen_size=None):
         
         self.rew_cnt = 0
 
@@ -231,11 +231,16 @@ class COGame(Widget):
             if val:
                 self.nudge_x_t4 = nudge_x_opts[i]
         
-        # WHERE TO CONSIDER THE TOP OF THE SCREEN (HOW MUCH TO SHRINK IT DOWN BY)
+        # WHERE TO CONSIDER THE TOP AND BOTTOM OF THE SCREEN (HOW MUCH TO SHRINK IT DOWN/UP BY)
         screen_top_opts = [-12, -10, -8, -6, -4, -2, 0]    
-        for i, val in enumerate(screen_top['screen_top']):
+        for i, val in enumerate(screen_size['screen_top']):
             if val:
                 self.screen_top = screen_top_opts[i]
+                
+        screen_bot_opts = [0, 2, 4, 6, 8, 10, 12]    
+        for i, val in enumerate(screen_size['screen_bot']):
+            if val:
+                self.screen_bot = screen_bot_opts[i]
         
         # TARGET RADIUS
         target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 1.85, 2.25, 3.0, 4.0]
@@ -294,10 +299,11 @@ class COGame(Widget):
         
         self.center_position = np.array([0., 0.])
         # lower the center position by half of the total amount the screen height has been shrunk by
-        self.center_position[1] = self.center_position[1] + self.screen_top/2    
+        self.center_position[1] = self.center_position[1] + self.screen_top/2 + self.screen_bot/2
         
-        d_center2top = (fixed_window_size_cm[1]/2)+(self.screen_top/2)
-        self.max_y_from_center = d_center2top-self.target_rad
+        d_center2top = (fixed_window_size_cm[1]/2)-((self.screen_top/2)+(self.screen_bot/2))
+        d_center2bot = (fixed_window_size_cm[1]/2)+((self.screen_top/2)+(self.screen_bot/2))
+        self.max_y_from_center = (fixed_window_size_cm[1]+self.screen_top-self.screen_bot)/2-self.target_rad
         
         # target 1
         if not seq_preselect:
@@ -671,6 +677,7 @@ class COGame(Widget):
             nudge_x_t3 = self.nudge_x_t3,
             nudge_x_t4 = self.nudge_x_t4,
             screen_top = self.screen_top,
+            screen_bot = self.screen_bot,
             target_rad=self.target_rad,
             effective_target_rad=self.eff_target_rad,
             center_position = self.center_position,
@@ -1748,6 +1755,32 @@ class Manager(ScreenManager):
         is_screentop10 = BooleanProperty(True)
     elif data_params['screen_top'] == -12:
         is_screentop12 = BooleanProperty(True)
+        
+    # raise screen bottom by
+    try:
+        is_screenbot0 = BooleanProperty(False)
+        is_screenbot2 = BooleanProperty(False)
+        is_screenbot4 = BooleanProperty(False)
+        is_screenbot6 = BooleanProperty(False)
+        is_screenbot8 = BooleanProperty(False)
+        is_screenbot10 = BooleanProperty(False)
+        is_screenbot12 = BooleanProperty(False)
+        if data_params['screen_bot'] == 0:
+            is_screenbot0 = BooleanProperty(True)
+        elif data_params['screen_bot'] == 2:
+            is_screenbot2 = BooleanProperty(True)
+        elif data_params['screen_bot'] == 4:
+            is_screenbot4 = BooleanProperty(True)
+        elif data_params['screen_bot'] == 6:
+            is_screenbot6 = BooleanProperty(True)
+        elif data_params['screen_bot'] == 8:
+            is_screenbot8 = BooleanProperty(True)
+        elif data_params['screen_bot'] == 10:
+            is_screenbot10 = BooleanProperty(True)
+        elif data_params['screen_bot'] == 12:
+            is_screenbot12 = BooleanProperty(True)
+    except:
+        pass
         
     # time until next target appears
     is_ttntnever = BooleanProperty(False)
