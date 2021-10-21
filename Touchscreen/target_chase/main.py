@@ -1464,6 +1464,7 @@ class Manager(ScreenManager):
     is_bht800 = BooleanProperty(False)
     is_bht900 = BooleanProperty(False)
     is_bht1000 = BooleanProperty(False)
+    is_bht200to400 = BooleanProperty(False)
     is_bht600to800 = BooleanProperty(False)
     is_bht800to1000 = BooleanProperty(False)
     # is_bhtbigrand = BooleanProperty(False)
@@ -1491,6 +1492,8 @@ class Manager(ScreenManager):
         is_bht900 = BooleanProperty(True)
     elif data_params['button_hold_time'] == 1.0:
         is_bht1000 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == '.2-.4': 
+        is_bht200to400 = BooleanProperty(True)
     elif data_params['button_hold_time'] == '.6-.8':
         is_bht600to800 = BooleanProperty(True)
     elif data_params['button_hold_time'] == '.8-1.0':
