@@ -171,6 +171,13 @@
                     id: t1tt_4pt0_sec
                     active: root.is_t1tt4pt0
             
+                Label: 
+                    text: '30.0 sec'
+                CheckBox: 
+                    group: 't1tt'
+                    id: t1tt_30pt0_sec
+                    active: root.is_t1tt30pt0
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -422,10 +429,10 @@
                     active: root.is_bht1000
 
                 Label: 
-                    text: '0.2-0.4 sec'
-                    id: bht200to400
+                    text: '0.25-0.35 sec'
+                    id: bht250to350
                     group: 'button_hold_time'
-                    active: root.is_bht200to400
+                    active: root.is_bht250to350
                     
                 Label:
                     text: '0.6-0.8 sec'
@@ -935,6 +942,13 @@
                     group: 'seq'
                     active: root.is_CO
                     
+                Label: 
+                    text: 'Button Out'
+                CheckBox: 
+                    id: buttonOut
+                    group: 'seq'
+                    active: root.is_BO
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -965,6 +979,13 @@
                     text: 'Target 1 Position'
                     color: 1, 1, 0, 1
                 
+                Label: 
+                    text: 'Random'
+                CheckBox:
+                    id: t1random
+                    group: 't1_pos'
+                    active: root.is_t1rand
+
                 Label: 
                     text: 'Center'
                 CheckBox:
@@ -1130,6 +1151,13 @@
                     text: 'Target 2 Position'
                     color: 1, 1, 0, 1
                 
+                Label: 
+                    text: 'None'
+                CheckBox:
+                    id: t2none
+                    group: 't2_pos'
+                    active: root.is_t2none
+
                 Label: 
                     text: 'Random'
                 CheckBox:
@@ -1926,17 +1954,17 @@
                     big_rew=[big_rew_zero_sec.active, big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_18.active, targ_rad_22.active, targ_rad_30.active, targ_rad_40.active], 
                     eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active],
-                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, centerOut.active],
-                    targ1_pos=[t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
-                    targ2_pos=[t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
+                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, centerOut.active, buttonOut.active],
+                    targ1_pos=[t1random.active, t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
+                    targ2_pos=[t2none.active, t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
                     targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_mid.active, t3lower_mid.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
                     targ4_pos=[t4none.active, t4center.active, t4upper_left.active, t4mid_left.active, t4lower_left.active, t4upper_mid.active, t4lower_mid.active, t4upper_right.active, t4mid_right.active, t4lower_right.active],
                     time_to_next_targ=[t2next_never.active, t2next_250.active, t2next_500.active, t2next_750.active, t2next_1000.active, t2next_1500.active]),
-                    dict(button_hold=[bhtfalse.active, bht000.active, bht100.active, bht200.active, bht300.active, bht400.active, bht500.active, bht600.active, bht700.active, bht800.active, bht900.active, bht1000.active, bht600to800.active, bht800to1000.active],
+                    dict(button_hold=[bhtfalse.active, bht000.active, bht100.active, bht200.active, bht300.active, bht400.active, bht500.active, bht600.active, bht700.active, bht800.active, bht900.active, bht1000.active, bht250to350.active, bht600to800.active, bht800to1000.active],
                     hold=[tht000.active, tht100.active, tht200.active, tht300.active, tht400.active, tht500.active, tht600.active, tht100to300.active, tht400to600.active]), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
-                    dict(t1tt=[t1tt_0pt8_sec.active, t1tt_1pt0_sec.active, t1tt_1pt5_sec.active, t1tt_2pt0_sec.active, t1tt_2pt5_sec.active, t1tt_3pt0_sec.active, t1tt_3pt5_sec.active, t1tt_4pt0_sec.active],
+                    dict(t1tt=[t1tt_0pt8_sec.active, t1tt_1pt0_sec.active, t1tt_1pt5_sec.active, t1tt_2pt0_sec.active, t1tt_2pt5_sec.active, t1tt_3pt0_sec.active, t1tt_3pt5_sec.active, t1tt_4pt0_sec.active, t1tt_30pt0_sec.active],
                     tt=[tt_0pt7_sec.active, tt_0pt8_sec.active, tt_1pt0_sec.active, tt_1pt5_sec.active, tt_2pt0_sec.active, tt_2pt5_sec.active, tt_3pt0_sec.active, tt_3pt5_sec.active, tt_4pt0_sec.active]),
                     dict(drag=[dragok.active, dragnotok.active]),
                     dict(nudge_x_t1=[nudge_x_t1_neg6.active, nudge_x_t1_neg4.active, nudge_x_t1_neg2.active, nudge_x_t1_zero.active, nudge_x_t1_pos2.active, nudge_x_t1_pos4.active, nudge_x_t1_pos6.active],
