@@ -189,7 +189,7 @@ class COGame(Widget):
         self.rew_cnt = 0
 
         # TARGET TIMEOUT
-        targ1_timeout_opts = [0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+        targ1_timeout_opts = [0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 30.0]
         self.target1_timeout_time = 10000
         for i, val in enumerate(targ_timeout['t1tt']):
             if val:
@@ -268,7 +268,7 @@ class COGame(Widget):
         
                 
         # TARGET POSITIONS
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'center out']
+        seq_opts = ['A', 'B', 'C', 'D', 'E', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -309,6 +309,7 @@ class COGame(Widget):
             self.target3_pos_str = 'middle_right'
             self.target4_pos_str = 'lower_middle'
             self.target5_pos_str = 'upper_middle'
+        
         elif self.seq == 'center out':
             seq_preselect = True
             self.target1_pos_str = 'center'
@@ -316,6 +317,17 @@ class COGame(Widget):
             self.target3_pos_str = 'none'
             self.target4_pos_str = 'none'
             self.target5_pos_str = 'none'
+            self.trial_order = gen_trials(self.seq) 
+        
+        elif self.seq == 'button out':
+            seq_preselect = True
+            self.target1_pos_str = 'random'
+            self.target2_pos_str = 'none'
+            self.target3_pos_str = 'none'
+            self.target4_pos_str = 'none'
+            self.target5_pos_str = 'none'
+            self.trial_order = gen_trials(self.seq)
+        
         else:
             seq_preselect = False
         
@@ -329,7 +341,7 @@ class COGame(Widget):
         
         # target 1
         if not seq_preselect:
-            target_pos_opts = ['center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
+            target_pos_opts = ['random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
             for i, val in enumerate(task_in['targ1_pos']):
                 if val:
                     self.target1_pos_str = target_pos_opts[i]
@@ -366,38 +378,39 @@ class COGame(Widget):
         
         # target 2
         if not seq_preselect:
-            target_pos_opts = ['random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
+            target_pos_opts = ['none', 'random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
             for i, val in enumerate(task_in['targ2_pos']):
                 if val:
                     self.target2_pos_str = target_pos_opts[i]
 
-        if self.target2_pos_str == 'center':
-            targ_x = self.center_position[0]+self.nudge_x_t2
-            targ_y = self.center_position[1]
-        elif self.target2_pos_str == 'upper_middle':
-            targ_x = self.center_position[0]+self.nudge_x_t2
-            targ_y = self.center_position[1] + self.max_y_from_center
-        elif self.target2_pos_str == 'lower_middle':
-            targ_x = self.center_position[0]+self.nudge_x_t2
-            targ_y = self.center_position[1] - self.max_y_from_center
-        elif self.target2_pos_str == 'upper_right':
-            targ_x = self.max_y_from_center+self.nudge_x_t2
-            targ_y = self.center_position[1] + self.max_y_from_center
-        elif self.target2_pos_str == 'middle_right':
-            targ_x = self.max_y_from_center+self.nudge_x_t2
-            targ_y = self.center_position[1]
-        elif self.target2_pos_str == 'lower_right':
-            targ_x = self.max_y_from_center+self.nudge_x_t2
-            targ_y = self.center_position[1] - self.max_y_from_center
-        elif self.target2_pos_str == 'lower_left':
-            targ_x = -self.max_y_from_center+self.nudge_x_t2
-            targ_y = self.center_position[1] - self.max_y_from_center
-        elif self.target2_pos_str == 'middle_left':
-            targ_x = -self.max_y_from_center+self.nudge_x_t2
-            targ_y = self.center_position[1]
-        elif self.target2_pos_str == 'upper_left':
-            targ_x = -self.max_y_from_center+self.nudge_x_t2
-            targ_y = self.center_position[1] + self.max_y_from_center
+        if not self.target2_pos_str == 'none': 
+            if self.target2_pos_str == 'center':
+                targ_x = self.center_position[0]+self.nudge_x_t2
+                targ_y = self.center_position[1]
+            elif self.target2_pos_str == 'upper_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t2
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target2_pos_str == 'lower_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t2
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target2_pos_str == 'upper_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target2_pos_str == 'middle_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1]
+            elif self.target2_pos_str == 'lower_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target2_pos_str == 'lower_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target2_pos_str == 'middle_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1]
+            elif self.target2_pos_str == 'upper_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] + self.max_y_from_center
             
         self.target2_position = np.array([targ_x, targ_y])
         
@@ -482,6 +495,12 @@ class COGame(Widget):
                 if val:
                     self.target4_pos_str = target_pos_opts[i]
         
+        if self.target2_pos_str == 'none': 
+            self.target2_position = False 
+            self.target3_position = False
+            self.target4_position = False
+            self.target5_position = False
+            self.num_targets = 1
         if self.target3_pos_str == 'none':
             self.target3_position = False
             self.target4_position = False
@@ -543,7 +562,7 @@ class COGame(Widget):
 
 
         # BUTTON HOLD TIME
-        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0, '.6-.8', '.8-1.0']
+        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0, '.25-.35', '.6-.8', '.8-1.0']
         self.button_hold_time_type = None
         for i, val in enumerate(hold['button_hold']):
             if val:
@@ -853,6 +872,21 @@ class COGame(Widget):
             rew.append(mini_block_array)
         return np.hstack((rew))
 
+    def gen_trials(self, seq):
+
+        if seq == 'center out': 
+            num_targs = 4
+        elif seq == 'button out': 
+            num_targs = 5 
+
+        trials = np.arange(num_targs)
+        trial_order = []
+        for i in range(1000): # max 4000 targets  
+            ix = np.random.permutation(num_targs)
+            trial_order.append(trials[ix])
+        
+        return np.hstack((trial_order))
+
     def close_app(self):
         # Save Data Eventually
          #Stop the video: 
@@ -1054,10 +1088,11 @@ class COGame(Widget):
         
         # Reset target index back to 1
         self.target_index = 1
-        
+
         # Get the position of target2
-        if self.target2_pos_str == 'random':
-            i_pos = np.random.randint(0, 4)
+        if self.target2_pos_str == 'random': 
+            i_pos = self.trial_order[self.trials_started]
+        
             if i_pos == 0: # 'upper_right':
                 targ_x = self.max_y_from_center+self.nudge_x_t2
                 targ_y = self.center_position[1] + self.max_y_from_center
@@ -1070,8 +1105,31 @@ class COGame(Widget):
             elif i_pos == 3: # 'upper_left':
                 targ_x = -self.max_y_from_center+self.nudge_x_t2
                 targ_y = self.center_position[1] + self.max_y_from_center
-                
+            elif i_pos == 4: # center positon 
+                targ_x = self.center_position[0]
+                targ_y = self.center_position[1]
+
             self.target2_position = np.array([targ_x, targ_y])
+
+        if self.target1_pos_str == 'random': 
+            i_pos = self.trial_order[self.trials_started]
+            if i_pos == 0: # 'upper_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif i_pos == 1:# 'lower_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif i_pos == 2: # 'lower_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif i_pos == 3: # 'upper_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t1
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif i_pos == 4: # center positon 
+                targ_x = self.center_position[0]
+                targ_y = self.center_position[1]
+            self.target1_position = np.array([targ_x, targ_y])
+
                 
 
     def end_vid_trig(self, **kwargs):
@@ -1395,6 +1453,8 @@ class Manager(ScreenManager):
         is_t1tt3pt0 = BooleanProperty(False)
         is_t1tt3pt5 = BooleanProperty(False)
         is_t1tt4pt0 = BooleanProperty(False)
+        is_t1tt10pt0 = BooleanProperty(False)
+
         if data_params['target1_timeout_time'] == 0.8:
             is_t1tt0pt8 = BooleanProperty(True)
         elif data_params['target1_timeout_time'] == 1.0:
@@ -1411,6 +1471,8 @@ class Manager(ScreenManager):
             is_t1tt3pt5 = BooleanProperty(True)
         elif data_params['target1_timeout_time'] == 4.0:
             is_t1tt4pt0 = BooleanProperty(True)    
+        elif data_params['target1_timeout_time'] == 10.0: 
+            is_t1tt10pt0 = BooleanProperty(True)
     except:
         pass
     
@@ -1464,7 +1526,7 @@ class Manager(ScreenManager):
     is_bht800 = BooleanProperty(False)
     is_bht900 = BooleanProperty(False)
     is_bht1000 = BooleanProperty(False)
-    is_bht200to400 = BooleanProperty(False)
+    is_bht250to350 = BooleanProperty(False)
     is_bht600to800 = BooleanProperty(False)
     is_bht800to1000 = BooleanProperty(False)
     # is_bhtbigrand = BooleanProperty(False)
@@ -1492,8 +1554,8 @@ class Manager(ScreenManager):
         is_bht900 = BooleanProperty(True)
     elif data_params['button_hold_time'] == 1.0:
         is_bht1000 = BooleanProperty(True)
-    elif data_params['button_hold_time'] == '.2-.4': 
-        is_bht200to400 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == '.25-.35': 
+        is_bht250to350 = BooleanProperty(True)
     elif data_params['button_hold_time'] == '.6-.8':
         is_bht600to800 = BooleanProperty(True)
     elif data_params['button_hold_time'] == '.8-1.0':
@@ -1630,6 +1692,7 @@ class Manager(ScreenManager):
     is_seqD = BooleanProperty(False)
     is_seqE = BooleanProperty(False)
     is_CO = BooleanProperty(False)
+    is_BO = BooleanProperty(False)
     try:
         if data_params['seq'] == 'A':
             is_seqA = BooleanProperty(True)
@@ -1643,6 +1706,8 @@ class Manager(ScreenManager):
             is_seqE = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
+        elif data_params['seq'] == 'button out': 
+            is_BO = BooleanProperty(True) 
     except: 
         pass
 
@@ -1656,6 +1721,7 @@ class Manager(ScreenManager):
     is_t1ur = BooleanProperty(False)
     is_t1mr = BooleanProperty(False)
     is_t1lr = BooleanProperty(False)
+    is_t1rand = BooleanProperty(False) 
     if data_params['target1_pos_str'] == 'center':
         is_t1cent = BooleanProperty(True)
     elif data_params['target1_pos_str'] == 'upper_middle':
@@ -1674,6 +1740,8 @@ class Manager(ScreenManager):
         is_t1mr = BooleanProperty(True)
     elif data_params['target1_pos_str'] == 'lower_right':
         is_t1lr = BooleanProperty(True)
+    elif data_params['target1_pos_str'] == 'random': 
+        is_t1rand = BooleanProperty(True)
         
     # target 1 nudge
     is_t1nudgeneg6 = BooleanProperty(False)
@@ -1709,6 +1777,8 @@ class Manager(ScreenManager):
     is_t2mr = BooleanProperty(False)
     is_t2lr = BooleanProperty(False)
     is_t2rand = BooleanProperty(False)
+    is_t2none = BooleanProperty(False)
+
     if data_params['target2_pos_str'] == 'center':
         is_t2cent = BooleanProperty(True)
     elif data_params['target2_pos_str'] == 'upper_middle':
@@ -1729,6 +1799,8 @@ class Manager(ScreenManager):
         is_t2lr = BooleanProperty(True)
     elif data_params['target2_pos_str'] == 'random':
         is_t2rand = BooleanProperty(True)
+    elif data_params['target2_pos_str'] == 'none': 
+        is_t2none = BooleanProperty(True)
         
     # target 2 nudge
     is_t2nudgeneg6 = BooleanProperty(False)
