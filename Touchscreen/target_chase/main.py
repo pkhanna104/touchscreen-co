@@ -318,6 +318,7 @@ class COGame(Widget):
             self.target4_pos_str = 'none'
             self.target5_pos_str = 'none'
             self.trial_order = self.gen_trials(self.seq) 
+            self.num_targets = 1
         
         elif self.seq == 'button out':
             seq_preselect = True
@@ -327,6 +328,7 @@ class COGame(Widget):
             self.target4_pos_str = 'none'
             self.target5_pos_str = 'none'
             self.trial_order = self.gen_trials(self.seq)
+            self.num_targets = 1
         
         else:
             seq_preselect = False
@@ -504,7 +506,7 @@ class COGame(Widget):
             self.target4_position = False
             self.target5_position = False
             self.num_targets = 1
-        if self.target3_pos_str == 'none':
+        elif self.target3_pos_str == 'none':
             self.target3_position = False
             self.target4_position = False
             self.target5_position = False
@@ -753,7 +755,6 @@ class COGame(Widget):
         else: 
             self.fsr_baseline = np.array([200, 200])
 
-        
         # save parameters: 
         d = dict(animal_name=animal_name,
             user_id = user_id,
