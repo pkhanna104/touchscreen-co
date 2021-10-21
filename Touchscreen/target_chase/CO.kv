@@ -74,6 +74,15 @@
                     group: 'check'
                     id: chk_but
                     active: root.is_butters    
+                    
+                Label: 
+                    text: 'Testing'
+                    fontsize: 28
+                    halign: 'center' 
+                CheckBox: 
+                    group: 'check'
+                    id: chk_test
+                    active: root.is_testing
                    
                 Label:
                     text: ''
@@ -103,9 +112,121 @@
                     fontsize: 50
 
                 Label: 
-                    text: 'Target Timeout'
+                    text: 'Target 1 Timeout'
+                    color: 1, 1, 0, 1
+                    
+                Label: 
+                    text: '0.8 sec'
+                CheckBox:
+                    group: 't1tt'
+                    id: t1tt_0pt8_sec
+                    active: root.is_t1tt0pt8 
+                    
+                Label: 
+                    text: '1.0 sec'
+                CheckBox:
+                    group: 't1tt'
+                    id: t1tt_1pt0_sec
+                    active: root.is_t1tt1pt0  
+           
+                Label: 
+                    text: '1.5 sec'
+                CheckBox:
+                    group: 't1tt'
+                    id: t1tt_1pt5_sec
+                    active: root.is_t1tt1pt5    
+            
+                Label: 
+                    text: '2.0 sec'
+                CheckBox:
+                    group: 't1tt'
+                    id: t1tt_2pt0_sec
+                    active: root.is_t1tt2pt0
+                    
+                Label: 
+                    text: '2.5 sec'
+                CheckBox:
+                    group: 't1tt'
+                    id: t1tt_2pt5_sec
+                    active: root.is_t1tt2pt5
+
+                Label: 
+                    text: '3.0 sec'
+                CheckBox:
+                    group: 't1tt'
+                    id: t1tt_3pt0_sec
+                    active: root.is_t1tt3pt0
+                    
+                Label: 
+                    text: '3.5 sec'
+                CheckBox:
+                    group: 't1tt'
+                    id: t1tt_3pt5_sec
+                    active: root.is_t1tt3pt5
+                    
+                Label: 
+                    text: '4.0 sec'
+                CheckBox:
+                    group: 't1tt'
+                    id: t1tt_4pt0_sec
+                    active: root.is_t1tt4pt0
+            
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+            BoxLayout 
+                id: top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Target 2+ Timeout'
                     color: 1, 1, 0, 1
            
+           
+                Label: 
+                    text: '0.7 sec'
+                CheckBox:
+                    group: 'tt'
+                    id: tt_0pt7_sec
+                    active: root.is_tt0pt7  
+                    
+                Label: 
+                    text: '0.8 sec'
+                CheckBox:
+                    group: 'tt'
+                    id: tt_0pt8_sec
+                    active: root.is_tt0pt8  
+                    
+                Label: 
+                    text: '1.0 sec'
+                CheckBox:
+                    group: 'tt'
+                    id: tt_1pt0_sec
+                    active: root.is_tt1pt0
+                
                 Label: 
                     text: '1.5 sec'
                 CheckBox:
@@ -767,32 +888,39 @@
                     color: 1, 1, 0, 1
                 
                 Label: 
-                    text: 'A: LR-UR-UL-LL'
+                    text: 'A'
                 CheckBox:
                     id: seqA
                     group: 'seq'
                     active: root.is_seqA
                 
                 Label: 
-                    text: 'B: Cent-ML-MR-UL'
+                    text: 'B'
                 CheckBox:
                     id: seqB
                     group: 'seq'
                     active: root.is_seqB
                     
                 Label: 
-                    text: 'C: UM-LL-MR-UL'
+                    text: 'C'
                 CheckBox:
                     id: seqC
                     group: 'seq'
                     active: root.is_seqC
                     
                 Label: 
-                    text: 'D: ML-UR-LM-UL'
+                    text: 'D'
                 CheckBox:
                     id: seqD
                     group: 'seq'
                     active: root.is_seqD
+                    
+                Label: 
+                    text: 'E'
+                CheckBox:
+                    id: seqE
+                    group: 'seq'
+                    active: root.is_seqE
                     
                 Label: 
                     text: 'Center Out'
@@ -1787,12 +1915,12 @@
                 text_size: self.size
                 on_release: 
                     root.current = 'splash_start'
-                    splash.init(dict(haribo=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butters=chk_but.active), 
+                    splash.init(dict(haribo=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butters=chk_but.active, testing=chk_test.active), 
                     dict(button_rew=[button_rew_zero_sec.active, button_rew_pt1_sec.active, button_rew_pt3_sec.active, button_rew_pt5_sec.active], 
                     big_rew=[big_rew_zero_sec.active, big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_18.active, targ_rad_22.active, targ_rad_30.active, targ_rad_40.active], 
                     eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active],
-                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, centerOut.active],
+                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, centerOut.active],
                     targ1_pos=[t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
                     targ2_pos=[t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
                     targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_mid.active, t3lower_mid.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
@@ -1802,7 +1930,8 @@
                     hold=[tht000.active, tht100.active, tht200.active, tht300.active, tht400.active, tht500.active, tht600.active, tht100to300.active, tht400to600.active]), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
-                    dict(tt=[tt_1pt5_sec.active, tt_2pt0_sec.active, tt_2pt5_sec.active, tt_3pt0_sec.active, tt_3pt5_sec.active, tt_4pt0_sec.active]),
+                    dict(t1tt=[t1tt_0pt8_sec.active, t1tt_1pt0_sec.active, t1tt_1pt5_sec.active, t1tt_2pt0_sec.active, t1tt_2pt5_sec.active, t1tt_3pt0_sec.active, t1tt_3pt5_sec.active, t1tt_4pt0_sec.active],
+                    tt=[tt_0pt7_sec.active, tt_0pt8_sec.active, tt_1pt0_sec.active, tt_1pt5_sec.active, tt_2pt0_sec.active, tt_2pt5_sec.active, tt_3pt0_sec.active, tt_3pt5_sec.active, tt_4pt0_sec.active]),
                     dict(drag=[dragok.active, dragnotok.active]),
                     dict(nudge_x_t1=[nudge_x_t1_neg6.active, nudge_x_t1_neg4.active, nudge_x_t1_neg2.active, nudge_x_t1_zero.active, nudge_x_t1_pos2.active, nudge_x_t1_pos4.active, nudge_x_t1_pos6.active],
                     nudge_x_t2=[nudge_x_t2_neg6.active, nudge_x_t2_neg4.active, nudge_x_t2_neg2.active, nudge_x_t2_zero.active, nudge_x_t2_pos2.active, nudge_x_t2_pos4.active, nudge_x_t2_pos6.active],

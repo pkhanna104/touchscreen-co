@@ -185,7 +185,13 @@ class COGame(Widget):
         self.rew_cnt = 0
 
         # TARGET TIMEOUT
-        targ_timeout_opts = [1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+        targ1_timeout_opts = [0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+        self.target1_timeout_time = 10000
+        for i, val in enumerate(targ_timeout['t1tt']):
+            if val:
+                self.target1_timeout_time = targ1_timeout_opts[i]
+        
+        targ_timeout_opts = [0.7, 0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
         self.target_timeout_time = 10000
         for i, val in enumerate(targ_timeout['tt']):
             if val:
@@ -258,7 +264,7 @@ class COGame(Widget):
         
                 
         # TARGET POSITIONS
-        seq_opts = ['A', 'B', 'C', 'D', 'center out']
+        seq_opts = ['A', 'B', 'C', 'D', 'E', 'center out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -270,30 +276,42 @@ class COGame(Widget):
             self.target2_pos_str = 'upper_right'
             self.target3_pos_str = 'upper_left'
             self.target4_pos_str = 'lower_left'
+            self.target5_pos_str = 'none'
         elif self.seq == 'B':
             seq_preselect = True
             self.target1_pos_str = 'center'
             self.target2_pos_str = 'middle_left'
             self.target3_pos_str = 'middle_right'
             self.target4_pos_str = 'upper_left'
+            self.target5_pos_str = 'none'
         elif self.seq == 'C':
             seq_preselect = True
             self.target1_pos_str = 'upper_middle'
             self.target2_pos_str = 'lower_left'
             self.target3_pos_str = 'middle_right'
             self.target4_pos_str = 'upper_left'
+            self.target5_pos_str = 'none'
         elif self.seq == 'D':
             seq_preselect = True
             self.target1_pos_str = 'middle_left'
             self.target2_pos_str = 'upper_right'
             self.target3_pos_str = 'lower_middle'
             self.target4_pos_str = 'upper_left'
+            self.target5_pos_str = 'none'
+        elif self.seq == 'E':
+            seq_preselect = True
+            self.target1_pos_str = 'upper_middle'
+            self.target2_pos_str = 'middle_left'
+            self.target3_pos_str = 'middle_right'
+            self.target4_pos_str = 'lower_middle'
+            self.target5_pos_str = 'upper_middle'
         elif self.seq == 'center out':
             seq_preselect = True
             self.target1_pos_str = 'center'
             self.target2_pos_str = 'random'
             self.target3_pos_str = 'none'
             self.target4_pos_str = 'none'
+            self.target5_pos_str = 'none'
         else:
             seq_preselect = False
         
@@ -423,15 +441,7 @@ class COGame(Widget):
                 if val:
                     self.target4_pos_str = target_pos_opts[i]
         
-        if self.target3_pos_str == 'none':
-            self.target3_position = False
-            self.target4_position = False
-            self.num_targets = 2
-        elif self.target4_pos_str == 'none':
-            self.target4_position = False
-            self.num_targets = 3
-        else:
-            self.num_targets = 4
+        if not self.target4_pos_str == 'none':
             if self.target4_pos_str == 'center':
                 targ_x = self.center_position[0]+self.nudge_x_t4
                 targ_y = self.center_position[1]
@@ -461,6 +471,56 @@ class COGame(Widget):
                 targ_y = self.center_position[1] + self.max_y_from_center
             
             self.target4_position = np.array([targ_x, targ_y])
+            
+        # target 4
+        if not seq_preselect:
+            for i, val in enumerate(task_in['targ4_pos']):
+                if val:
+                    self.target4_pos_str = target_pos_opts[i]
+        
+        if self.target3_pos_str == 'none':
+            self.target3_position = False
+            self.target4_position = False
+            self.target5_position = False
+            self.num_targets = 2
+        elif self.target4_pos_str == 'none':
+            self.target4_position = False
+            self.target5_position = False
+            self.num_targets = 3
+        elif self.target5_pos_str == 'none':
+            self.target5_position = False
+            self.num_targets = 4
+        else:
+            self.num_targets = 5
+            if self.target5_pos_str == 'center':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1]
+            elif self.target5_pos_str == 'upper_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target5_pos_str == 'lower_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target5_pos_str == 'upper_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target5_pos_str == 'middle_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1]
+            elif self.target5_pos_str == 'lower_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target5_pos_str == 'lower_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target5_pos_str == 'middle_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1]
+            elif self.target5_pos_str == 'upper_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
+            
+            self.target5_position = np.array([targ_x, targ_y])
 
 
         self.active_target_position = self.target1_position
@@ -669,6 +729,7 @@ class COGame(Widget):
         d = dict(animal_name=animal_name,
             user_id = user_id,
             max_trials = self.max_trials,
+            target1_timeout_time = self.target1_timeout_time,
             target_timeout_time = self.target_timeout_time,
             button_rew = button_rew,
             last_targ_reward = self.last_targ_reward[1],
@@ -686,10 +747,12 @@ class COGame(Widget):
             target2_pos_str = self.target2_pos_str,
             target3_pos_str = self.target3_pos_str,
             target4_pos_str = self.target4_pos_str,
+            target5_pos_str = self.target5_pos_str,
             target1_position = self.target1_position, 
             target2_position = self.target2_position, 
             target3_position = self.target3_position, 
             target4_position = self.target4_position, 
+            target5_position = self.target5_position,
             time_to_next_targ = self.time_to_next_targ,
             button_hold_time = self.button_hold_time,
             target_hold_time = self.tht,
@@ -1086,7 +1149,10 @@ class COGame(Widget):
             self.next_target_position = self.target4_position
         elif self.target_index == 4:
             self.active_target_position = self.target4_position
-            self.next_target_position = self.target2_position
+            self.next_target_position = self.target5_position
+        elif self.target_index == 5:
+            self.active_target_position = self.target5_position
+            self.next_target_position = False
 
         self.target1.move(self.active_target_position)
         self.target1.color = (1., 1., 0., 1.)
@@ -1206,11 +1272,18 @@ class COGame(Widget):
 
     def target_timeout(self, **kwargs):
         #return kwargs['ts'] > self.target_timeout_time
-        if time.time() - self.first_time_for_this_targ_t0 > self.target_timeout_time:
-            self.repeat = False
-            return True
+        if self.target_index == 1:
+            if time.time() - self.first_time_for_this_targ_t0 > self.target1_timeout_time:
+                self.repeat = False
+                return True
+            else:
+                return False
         else:
-            return False
+            if time.time() - self.first_time_for_this_targ_t0 > self.target_timeout_time:
+                self.repeat = False
+                return True
+            else:
+                return False
 
     def finish_targ_hold(self, **kwargs):
         if not self.target_index == self.num_targets:
@@ -1289,6 +1362,7 @@ class Manager(ScreenManager):
     is_fifi = BooleanProperty(False)
     is_nike = BooleanProperty(False)
     is_butters = BooleanProperty(False)
+    is_testing = BooleanProperty(False)
     if data_params['animal_name'] == 'haribo':
         is_haribo = BooleanProperty(True)
     elif data_params['animal_name'] == 'fifi':
@@ -1297,15 +1371,55 @@ class Manager(ScreenManager):
         is_nike = BooleanProperty(True)
     elif data_params['animal_name'] == 'butters':
         is_butters = BooleanProperty(True)
-        
+    elif data_params['animal_name'] == 'testing':
+        is_testing = BooleanProperty(True)
+    
+    # target 1 timeout
+    try:
+        is_t1tt0pt8 = BooleanProperty(False)
+        is_t1tt1pt0 = BooleanProperty(False)
+        is_t1tt1pt5 = BooleanProperty(False)
+        is_t1tt2pt0 = BooleanProperty(False)
+        is_t1tt2pt5 = BooleanProperty(False)
+        is_t1tt3pt0 = BooleanProperty(False)
+        is_t1tt3pt5 = BooleanProperty(False)
+        is_t1tt4pt0 = BooleanProperty(False)
+        if data_params['target1_timeout_time'] == 0.8:
+            is_t1tt0pt8 = BooleanProperty(True)
+        elif data_params['target1_timeout_time'] == 1.0:
+            is_t1tt1pt0 = BooleanProperty(True)
+        elif data_params['target1_timeout_time'] == 1.5:
+            is_t1tt1pt5 = BooleanProperty(True)
+        elif data_params['target1_timeout_time'] == 2.0:
+            is_t1tt2pt0 = BooleanProperty(True)
+        elif data_params['target1_timeout_time'] == 2.5:
+            is_t1tt2pt5 = BooleanProperty(True)
+        elif data_params['target1_timeout_time'] == 3.0:
+            is_t1tt3pt0 = BooleanProperty(True)
+        elif data_params['target1_timeout_time'] == 3.5:
+            is_t1tt3pt5 = BooleanProperty(True)
+        elif data_params['target1_timeout_time'] == 4.0:
+            is_t1tt4pt0 = BooleanProperty(True)    
+    except:
+        pass
+    
     # target timeout
+    is_tt0pt7 = BooleanProperty(False)
+    is_tt0pt8 = BooleanProperty(False)
+    is_tt1pt0 = BooleanProperty(False)
     is_tt1pt5 = BooleanProperty(False)
     is_tt2pt0 = BooleanProperty(False)
     is_tt2pt5 = BooleanProperty(False)
     is_tt3pt0 = BooleanProperty(False)
     is_tt3pt5 = BooleanProperty(False)
     is_tt4pt0 = BooleanProperty(False)
-    if data_params['target_timeout_time'] == 1.5:
+    if data_params['target_timeout_time'] == 0.7:
+        is_tt0pt7 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 0.8:
+        is_tt0pt8 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 1.0:
+        is_tt1pt0 = BooleanProperty(True)
+    elif data_params['target_timeout_time'] == 1.5:
         is_tt1pt5 = BooleanProperty(True)
     elif data_params['target_timeout_time'] == 2.0:
         is_tt2pt0 = BooleanProperty(True)
@@ -1500,6 +1614,7 @@ class Manager(ScreenManager):
     is_seqB = BooleanProperty(False)
     is_seqC = BooleanProperty(False)
     is_seqD = BooleanProperty(False)
+    is_seqE = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     try:
         if data_params['seq'] == 'A':
@@ -1510,6 +1625,8 @@ class Manager(ScreenManager):
             is_seqC = BooleanProperty(True) 
         elif data_params['seq'] == 'D':
             is_seqD = BooleanProperty(True) 
+        elif data_params['seq'] == 'E':
+            is_seqE = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
     except: 
