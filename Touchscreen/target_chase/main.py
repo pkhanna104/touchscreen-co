@@ -106,13 +106,17 @@ class COGame(Widget):
     exit_pos_y = (fixed_window_size_cm[1]/2)-1.5
                  
     exit_pos = np.array([exit_pos_x, exit_pos_y])
-    ind_pos_x = (fixed_window_size_cm[0]/2)-0.5
-    ind_pos_y = (fixed_window_size_cm[1]/2)-0.5
+    pd_ind_pos_x = (fixed_window_size_cm[0]/2)-0.5
+    pd_ind_pos_y = (fixed_window_size_cm[1]/2)-0.5
                  
-    indicator_pos = np.array([ind_pos_x, ind_pos_y])
+    pd_indicator_pos = np.array([pd_ind_pos_x, pd_ind_pos_y])
+    
+    vid_ind_pos_x = -(fixed_window_size_cm[0]/2)+0.5
+    vid_ind_pos_y = -(fixed_window_size_cm[1]/2)+0.5
+    vid_indicator_pos = np.array([vid_ind_pos_x, vid_ind_pos_y])
     # elif platform == 'win32':
     #     exit_pos = np.array([7, 4])
-    #     indicator_pos = np.array([8, 5])
+    #     pd_indicator_pos = np.array([8, 5])
     exit_rad = 1.
     exit_hold = 2 #seconds
     
@@ -637,9 +641,12 @@ class COGame(Widget):
 
         self.exit_target1.set_size(2*self.exit_rad)
         self.exit_target2.set_size(2*self.exit_rad)
-        self.indicator_targ.set_size(self.exit_rad)
-        self.indicator_targ.move(self.indicator_pos)
-        self.indicator_targ.color = (0., 0., 0., 1.)
+        self.pd_indicator_targ.set_size(self.exit_rad)
+        self.pd_indicator_targ.move(self.pd_indicator_pos)
+        self.pd_indicator_targ.color = (0., 0., 0., 1.)
+        self.vid_indicator_targ.set_size(2*self.exit_rad)
+        self.vid_indicator_targ.move(self.vid_indicator_pos)
+        self.vid_indicator_targ.color = (0., 0., 0., 1.)
 
         self.exit_target1.move(self.exit_pos)
         self.exit_pos2 = np.array([self.exit_pos[0], -1*self.exit_pos[1]])
@@ -950,6 +957,10 @@ class COGame(Widget):
             cursor[ic, :] = self.cursor[curs_id]
 
         self.h5_table_row['cursor'] = cursor
+        if np.isnan(cursor).all():
+            self.vid_indicator_targ.color = (0., 0., 0., 0.)
+        else:
+            self.vid_indicator_targ.color = (.25, .25, .25, 1.)
 
         cursor_id = np.zeros((10, ))
         cursor_id[:] = np.nan
@@ -1025,7 +1036,7 @@ class COGame(Widget):
         self.target1.color = (0., 0., 0., 0.)
         self.target1.color = (0., 0., 0., 0.)
         self.target2.color = (0., 0., 0., 0.)
-        self.indicator_targ.color = (0., 0., 0., 0.)
+        self.pd_indicator_targ.color = (0., 0., 0., 0.)
         self.trials_started += 1
         
     def end_ITI(self, **kwargs):
@@ -1072,7 +1083,7 @@ class COGame(Widget):
         self.target2.color = (0., 0., 0., 0.)
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.indicator_targ.color = (.25, .25, .25, 1.)
+        self.pd_indicator_targ.color = (.25, .25, .25, 1.)
         self.button_pressed_prev = False
         
     def button_held(self, **kwargs):
@@ -1102,7 +1113,7 @@ class COGame(Widget):
 
     def _start_targ_hold(self, **kwargs):
         self.target1.color = (0., 1., 0., 1.)
-        self.indicator_targ.color = (0.25, .25, .25, 1.)
+        self.pd_indicator_targ.color = (0.25, .25, .25, 1.)
 
     def _end_targ_hold(self, **kwargs):
         self.target1.color = (0., 0., 0., 0.)
@@ -1159,7 +1170,7 @@ class COGame(Widget):
         
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.indicator_targ.color = (.75, .75, .75, 1.)
+        self.pd_indicator_targ.color = (.75, .75, .75, 1.)
         if self.first_target_attempt:
             self.first_target_attempt_t0 = time.time();
             self.first_target_attempt = False
@@ -1188,7 +1199,7 @@ class COGame(Widget):
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
         self.cnts_in_rew = 0
-        self.indicator_targ.color = (1., 1., 1., 1.)
+        self.pd_indicator_targ.color = (1., 1., 1., 1.)
         self.repeat = False
 
     def _while_reward(self, **kwargs):
@@ -1240,7 +1251,7 @@ class COGame(Widget):
         #self.repeat = True
 
     def end_reward(self, **kwargs):
-        self.indicator_txt_color = (1.,1., 1., 1.)
+        self.pd_indicator_txt_color = (1.,1., 1., 1.)
         if self.use_white_screen:
             if len(self.cursor_ids)== 0:
                 return True
