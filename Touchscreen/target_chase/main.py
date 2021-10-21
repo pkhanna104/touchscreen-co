@@ -317,7 +317,7 @@ class COGame(Widget):
             self.target3_pos_str = 'none'
             self.target4_pos_str = 'none'
             self.target5_pos_str = 'none'
-            self.trial_order = gen_trials(self.seq) 
+            self.trial_order = self.gen_trials(self.seq) 
         
         elif self.seq == 'button out':
             seq_preselect = True
@@ -326,7 +326,7 @@ class COGame(Widget):
             self.target3_pos_str = 'none'
             self.target4_pos_str = 'none'
             self.target5_pos_str = 'none'
-            self.trial_order = gen_trials(self.seq)
+            self.trial_order = self.gen_trials(self.seq)
         
         else:
             seq_preselect = False
@@ -346,7 +346,10 @@ class COGame(Widget):
                 if val:
                     self.target1_pos_str = target_pos_opts[i]
         
-        if self.target1_pos_str == 'center':
+        if self.target1_pos_str == 'random': # set for now, will get overriden later
+            targ_x = self.center_position[0]+self.nudge_x_t1
+            targ_y = self.center_position[1]
+        elif self.target1_pos_str == 'center':
             targ_x = self.center_position[0]+self.nudge_x_t1
             targ_y = self.center_position[1]
         elif self.target1_pos_str == 'upper_middle':
@@ -1453,7 +1456,7 @@ class Manager(ScreenManager):
         is_t1tt3pt0 = BooleanProperty(False)
         is_t1tt3pt5 = BooleanProperty(False)
         is_t1tt4pt0 = BooleanProperty(False)
-        is_t1tt10pt0 = BooleanProperty(False)
+        is_t1tt30pt0 = BooleanProperty(False)
 
         if data_params['target1_timeout_time'] == 0.8:
             is_t1tt0pt8 = BooleanProperty(True)
@@ -1471,8 +1474,8 @@ class Manager(ScreenManager):
             is_t1tt3pt5 = BooleanProperty(True)
         elif data_params['target1_timeout_time'] == 4.0:
             is_t1tt4pt0 = BooleanProperty(True)    
-        elif data_params['target1_timeout_time'] == 10.0: 
-            is_t1tt10pt0 = BooleanProperty(True)
+        elif data_params['target1_timeout_time'] == 30.0: 
+            is_t1tt30pt0 = BooleanProperty(True)
     except:
         pass
     
