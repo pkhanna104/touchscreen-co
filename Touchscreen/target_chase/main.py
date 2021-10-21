@@ -644,7 +644,7 @@ class COGame(Widget):
         self.pd_indicator_targ.set_size(self.exit_rad)
         self.pd_indicator_targ.move(self.pd_indicator_pos)
         self.pd_indicator_targ.color = (0., 0., 0., 1.)
-        self.vid_indicator_targ.set_size(2*self.exit_rad)
+        self.vid_indicator_targ.set_size(self.exit_rad)
         self.vid_indicator_targ.move(self.vid_indicator_pos)
         self.vid_indicator_targ.color = (0., 0., 0., 1.)
 
@@ -958,9 +958,9 @@ class COGame(Widget):
 
         self.h5_table_row['cursor'] = cursor
         if np.isnan(cursor).all():
-            self.vid_indicator_targ.color = (0., 0., 0., 0.)
-        else:
             self.vid_indicator_targ.color = (.25, .25, .25, 1.)
+        else:
+            self.vid_indicator_targ.color = (.5, .5, .5, 1.)
 
         cursor_id = np.zeros((10, ))
         cursor_id[:] = np.nan
