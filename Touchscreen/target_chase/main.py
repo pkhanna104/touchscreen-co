@@ -494,11 +494,12 @@ class COGame(Widget):
             
             self.target4_position = np.array([targ_x, targ_y])
             
-        # target 4
+        # target 5
         if not seq_preselect:
-            for i, val in enumerate(task_in['targ4_pos']):
-                if val:
-                    self.target4_pos_str = target_pos_opts[i]
+            self.target5_pos_str = 'none'
+            #for i, val in enumerate(task_in['targ4_pos']):
+            #    if val:
+            #        self.target4_pos_str = target_pos_opts[i]
         
         if self.target2_pos_str == 'none': 
             self.target2_position = False 
