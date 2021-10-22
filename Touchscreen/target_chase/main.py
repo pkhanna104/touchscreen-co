@@ -189,7 +189,7 @@ class COGame(Widget):
         self.rew_cnt = 0
 
         # TARGET TIMEOUT
-        targ1_timeout_opts = [0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 30.0]
+        targ1_timeout_opts = [0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 10.0]
         self.target1_timeout_time = 10000
         for i, val in enumerate(targ_timeout['t1tt']):
             if val:
@@ -568,7 +568,7 @@ class COGame(Widget):
 
 
         # BUTTON HOLD TIME
-        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0, '.25-.35', '.6-.8', '.8-1.0']
+        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0, '.2-.4', '.6-.8', '.8-1.0']
         self.button_hold_time_type = None
         for i, val in enumerate(hold['button_hold']):
             if val:
@@ -1458,7 +1458,7 @@ class Manager(ScreenManager):
         is_t1tt3pt0 = BooleanProperty(False)
         is_t1tt3pt5 = BooleanProperty(False)
         is_t1tt4pt0 = BooleanProperty(False)
-        is_t1tt30pt0 = BooleanProperty(False)
+        is_t1tt10pt0 = BooleanProperty(False)
 
         if data_params['target1_timeout_time'] == 0.8:
             is_t1tt0pt8 = BooleanProperty(True)
@@ -1476,8 +1476,8 @@ class Manager(ScreenManager):
             is_t1tt3pt5 = BooleanProperty(True)
         elif data_params['target1_timeout_time'] == 4.0:
             is_t1tt4pt0 = BooleanProperty(True)    
-        elif data_params['target1_timeout_time'] == 30.0: 
-            is_t1tt30pt0 = BooleanProperty(True)
+        elif data_params['target1_timeout_time'] == 10.0: 
+            is_t1tt10pt0 = BooleanProperty(True)
     except:
         pass
     
@@ -1531,7 +1531,7 @@ class Manager(ScreenManager):
     is_bht800 = BooleanProperty(False)
     is_bht900 = BooleanProperty(False)
     is_bht1000 = BooleanProperty(False)
-    is_bht250to350 = BooleanProperty(False)
+    is_bht200to400 = BooleanProperty(False)
     is_bht600to800 = BooleanProperty(False)
     is_bht800to1000 = BooleanProperty(False)
     # is_bhtbigrand = BooleanProperty(False)
@@ -1559,8 +1559,8 @@ class Manager(ScreenManager):
         is_bht900 = BooleanProperty(True)
     elif data_params['button_hold_time'] == 1.0:
         is_bht1000 = BooleanProperty(True)
-    elif data_params['button_hold_time'] == '.25-.35': 
-        is_bht250to350 = BooleanProperty(True)
+    elif data_params['button_hold_time'] == '.2-.4': 
+        is_bht200to400 = BooleanProperty(True)
     elif data_params['button_hold_time'] == '.6-.8':
         is_bht600to800 = BooleanProperty(True)
     elif data_params['button_hold_time'] == '.8-1.0':
