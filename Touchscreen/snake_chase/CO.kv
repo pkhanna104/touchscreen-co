@@ -603,60 +603,6 @@
                     text: ''
                     fontsize: 50
 
-            BoxLayout 
-                id: min_rew
-                orientation: 'horizontal'
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label: 
-                    text: 'Minimum Reward'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: 'No Reward Scaling'
-                CheckBox:
-                    id: min_rew_none
-                    group: 'min_rew'
-                    active: root.is_minthrewnone
-                
-                Label: 
-                    text: '0.0 sec'
-                CheckBox:
-                    id: min_rew_zero_sec
-                    group: 'min_rew'
-                    active: root.is_minthrew000
-
-                Label: 
-                    text: '0.1 sec'
-                CheckBox:
-                    id: min_rew_pt1_sec
-                    group: 'min_rew'
-                    active: root.is_minthrew100
-
-                Label: 
-                    text: '0.2 sec'
-                CheckBox:
-                    id: min_rew_pt2_sec
-                    group: 'min_rew'
-                    active: root.is_minthrew200
-
-                Label: 
-                    text: '0.3 sec'
-                CheckBox:
-                    id: min_rew_pt3_sec
-                    group: 'min_rew'
-                    active: root.is_minthrew300
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
             
             BoxLayout 
                 id: big_rew
@@ -668,8 +614,15 @@
                     text: ''
                     fontsize: 50
                 Label: 
-                    text: 'Maximum Reward'
+                    text: 'Final Target reward'
                     color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0.0 sec'
+                CheckBox:
+                    id: big_rew_zero_sec
+                    group: 'big_rew'
+                    active: root.is_threw000
 
                 Label: 
                     text: '0.3 sec'
@@ -691,20 +644,6 @@
                     id: big_rew_pt7_sec
                     group: 'big_rew'
                     active: root.is_threw700
-                    
-                Label: 
-                    text: '0.9 sec'
-                CheckBox:
-                    id: big_rew_pt9_sec
-                    group: 'big_rew'
-                    active: root.is_threw900
-                    
-                Label: 
-                    text: '1.1 sec'
-                CheckBox:
-                    id: big_rew_1pt1_sec
-                    group: 'big_rew'
-                    active: root.is_threw1100
 
                 Label:
                     text: ''
@@ -964,60 +903,18 @@
                     color: 1, 1, 0, 1
                 
                 Label: 
-                    text: 'A'
+                    text: 'Straight Right'
                 CheckBox:
-                    id: seqA
+                    id: seq_straight_r
                     group: 'seq'
-                    active: root.is_seqA
+                    active: root.is_seq_straight_r
                 
                 Label: 
-                    text: 'B'
+                    text: 'Right Up'
                 CheckBox:
-                    id: seqB
+                    id: seq_r_up
                     group: 'seq'
-                    active: root.is_seqB
-                    
-                Label: 
-                    text: 'C'
-                CheckBox:
-                    id: seqC
-                    group: 'seq'
-                    active: root.is_seqC
-                    
-                Label: 
-                    text: 'D'
-                CheckBox:
-                    id: seqD
-                    group: 'seq'
-                    active: root.is_seqD
-                    
-                Label: 
-                    text: 'E'
-                CheckBox:
-                    id: seqE
-                    group: 'seq'
-                    active: root.is_seqE
-                    
-                Label: 
-                    text: 'F'
-                CheckBox:
-                    id: seqF
-                    group: 'seq'
-                    active: root.is_seqF
-                    
-                Label: 
-                    text: 'Center Out'
-                CheckBox:
-                    id: centerOut
-                    group: 'seq'
-                    active: root.is_CO
-                    
-                Label: 
-                    text: 'Button Out'
-                CheckBox: 
-                    id: buttonOut
-                    group: 'seq'
-                    active: root.is_BO
+                    active: root.is_seq_r_up
 
                 Label:
                     text: ''
@@ -1029,7 +926,7 @@
                     
                     
             BoxLayout:
-                id: t1_pos
+                id: start_pos
                 orientation: 'horizontal'
                 canvas:
                     Color:
@@ -1052,72 +949,72 @@
                 Label: 
                     text: 'Random'
                 CheckBox:
-                    id: t1random
-                    group: 't1_pos'
-                    active: root.is_t1rand
+                    id: strandom
+                    group: 'start_pos'
+                    active: root.is_strand
 
                 Label: 
                     text: 'Center'
                 CheckBox:
-                    id: t1center
-                    group: 't1_pos'
-                    active: root.is_t1cent
+                    id: stcenter
+                    group: 'start_pos'
+                    active: root.is_stcent
                 
                 Label: 
                     text: 'Upper Left'
                 CheckBox:
-                    id: t1upper_left
-                    group: 't1_pos'
-                    active: root.is_t1ul
+                    id: stupper_left
+                    group: 'start_pos'
+                    active: root.is_stul
                     
                 Label: 
                     text: 'Middle Left'
                 CheckBox:
-                    id: t1mid_left
-                    group: 't1_pos'
-                    active: root.is_t1ml
+                    id: stmid_left
+                    group: 'start_pos'
+                    active: root.is_stml
 
                 Label: 
                     text: 'Lower Left'
                 CheckBox:
-                    id: t1lower_left
-                    group: 't1_pos'
-                    active: root.is_t1ll
+                    id: stlower_left
+                    group: 'start_pos'
+                    active: root.is_stll
                     
                 Label: 
                     text: 'Upper Middle'
                 CheckBox:
-                    id: t1upper_mid
-                    group: 't1_pos'
-                    active: root.is_t1um
+                    id: stupper_mid
+                    group: 'start_pos'
+                    active: root.is_stum
 
                 Label: 
                     text: 'Lower Middle'
                 CheckBox:
-                    id: t1lower_mid
-                    group: 't1_pos'
-                    active: root.is_t1lm
+                    id: stlower_mid
+                    group: 'start_pos'
+                    active: root.is_stlm
                     
                 Label: 
                     text: 'Upper Right'
                 CheckBox:
-                    id: t1upper_right
-                    group: 't1_pos'
-                    active: root.is_t1ur
+                    id: stupper_right
+                    group: 'start_pos'
+                    active: root.is_stur
                     
                 Label: 
                     text: 'Middle Right'
                 CheckBox:
-                    id: t1mid_right
-                    group: 't1_pos'
-                    active: root.is_t1mr
+                    id: stmid_right
+                    group: 'start_pos'
+                    active: root.is_stmr
 
                 Label: 
                     text: 'Lower Right'
                 CheckBox:
-                    id: t1lower_right
-                    group: 't1_pos'
-                    active: root.is_t1lr
+                    id: stlower_right
+                    group: 'start_pos'
+                    active: root.is_stlr
                                         
                 Label:
                     text: ''
@@ -1130,7 +1027,7 @@
             
             
             BoxLayout:
-                id: nudge_x_t1
+                id: nudge_x
                 orientation: 'horizontal'
 
                 Label:
@@ -1141,56 +1038,57 @@
                     fontsize: 50
 
                 Label: 
-                    text: 'Target 1 Nudge X'
+                    text: 'Nudge X'
                     color: 1, 1, 0, 1
 
                 Label: 
                     text: '-6 cm'
                 CheckBox:
-                    id: nudge_x_t1_neg6
-                    group: 'nudge_x_t1'
-                    active: root.is_t1nudgeneg6
+                    id: nudge_x_neg6
+                    group: 'nudge_x'
+                    active: root.is_nudgeneg6
                     
                 Label: 
                     text: '-4 cm'
                 CheckBox:
-                    id: nudge_x_t1_neg4
-                    group: 'nudge_x_t1'
-                    active: root.is_t1nudgeneg4
+                    id: nudge_x_neg4
+                    group: 'nudge_x'
+                    active: root.is_nudgeneg4
 
                 Label: 
                     text: '-2 cm'
                 CheckBox:
-                    id: nudge_x_t1_neg2
-                    group: 'nudge_x_t1'
-                    active: root.is_t1nudgeneg2
+                    id: nudge_x_neg2
+                    group: 'nudge_x'
+                    active: root.is_nudgeneg2
 
                 Label: 
                     text: '0 cm'
                 CheckBox:
-                    id: nudge_x_t1_zero
-                    group: 'nudge_x_t1'
-                    active: root.is_t1nudgezero
+                    id: nudge_x_zero
+                    group: 'nudge_x'
+                    active: root.is_nudgezero
 
                 Label: 
                     text: '+2 cm'
                 CheckBox:
-                    id: nudge_x_t1_pos2
-                    group: 'nudge_x_t1'
-                    active: root.is_t1nudgepos2
+                    id: nudge_x_pos2
+                    group: 'nudge_x'
+                    active: root.is_nudgepos2
                     
                 Label: 
                     text: '+4 cm'
                 CheckBox:
-                    id: nudge_x_t1_pos4
-                    group: 'nudge_x_t1'
-                    active: root.is_t1nudgepos4
+                    id: nudge_x_pos4
+                    group: 'nudge_x'
+                    active: root.is_nudgepos4
 
                 Label: 
                     text: '+6 cm'
                 CheckBox:
-                    id: nudge_x_t1_pos6
-                    active: root.is_t1nudgepos6
+                    id: nudge_x_pos6
+                    group: 'nudge_x'
+                    active: root.is_nudgepos6
 
                 Label:
                     text: ''
@@ -1199,528 +1097,6 @@
                     text: ''
                     fontsize: 50
 
-                    
-            BoxLayout:
-                id: t2_pos
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target 2 Position'
-                    color: 1, 1, 0, 1
-                
-                Label: 
-                    text: 'None'
-                CheckBox:
-                    id: t2none
-                    group: 't2_pos'
-                    active: root.is_t2none
-
-                Label: 
-                    text: 'Random'
-                CheckBox:
-                    id: t2random
-                    group: 't2_pos'
-                    active: root.is_t2rand
-                
-                Label: 
-                    text: 'Center'
-                CheckBox:
-                    id: t2center
-                    group: 't2_pos'
-                    active: root.is_t2cent
-                
-                Label: 
-                    text: 'Upper Left'
-                CheckBox:
-                    id: t2upper_left
-                    group: 't2_pos'
-                    active: root.is_t2ul
-                    
-                Label: 
-                    text: 'Middle Left'
-                CheckBox:
-                    id: t2mid_left
-                    group: 't2_pos'
-                    active: root.is_t2ml
-
-                Label: 
-                    text: 'Lower Left'
-                CheckBox:
-                    id: t2lower_left
-                    group: 't2_pos'
-                    active: root.is_t2ll
-                    
-                Label: 
-                    text: 'Upper Middle'
-                CheckBox:
-                    id: t2upper_mid
-                    group: 't2_pos'
-                    active: root.is_t2um
-
-                Label: 
-                    text: 'Lower Middle'
-                CheckBox:
-                    id: t2lower_mid
-                    group: 't2_pos'
-                    active: root.is_t2lm
-                    
-                Label: 
-                    text: 'Upper Right'
-                CheckBox:
-                    id: t2upper_right
-                    group: 't2_pos'
-                    active: root.is_t2ur
-                    
-                Label: 
-                    text: 'Middle Right'
-                CheckBox:
-                    id: t2mid_right
-                    group: 't2_pos'
-                    active: root.is_t2mr
-
-                Label: 
-                    text: 'Lower Right'
-                CheckBox:
-                    id: t2lower_right
-                    group: 't2_pos'
-                    active: root.is_t2lr
-
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                    
-                    
-            BoxLayout:
-                id: nudge_x_t2
-                orientation: 'horizontal'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target 2 Nudge X'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '-6 cm'
-                CheckBox:
-                    id: nudge_x_t2_neg6
-                    group: 'nudge_x_t2'
-                    active: root.is_t2nudgeneg6
-                    
-                Label: 
-                    text: '-4 cm'
-                CheckBox:
-                    id: nudge_x_t2_neg4
-                    group: 'nudge_x_t2'
-                    active: root.is_t2nudgeneg4
-
-                Label: 
-                    text: '-2 cm'
-                CheckBox:
-                    id: nudge_x_t2_neg2
-                    group: 'nudge_x_t2'
-                    active: root.is_t2nudgeneg2
-
-                Label: 
-                    text: '0 cm'
-                CheckBox:
-                    id: nudge_x_t2_zero
-                    group: 'nudge_x_t2'
-                    active: root.is_t2nudgezero
-
-                Label: 
-                    text: '+2 cm'
-                CheckBox:
-                    id: nudge_x_t2_pos2
-                    group: 'nudge_x_t2'
-                    active: root.is_t2nudgepos2
-                    
-                Label: 
-                    text: '+4 cm'
-                CheckBox:
-                    id: nudge_x_t2_pos4
-                    group: 'nudge_x_t2'
-                    active: root.is_t2nudgepos4
-
-                Label: 
-                    text: '+6 cm'
-                CheckBox:
-                    id: nudge_x_t2_pos6
-                    group: 'nudge_x_t2'
-                    active: root.is_t2nudgepos6
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-            
-            
-            BoxLayout:
-                id: t3_pos
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target 3 Position'
-                    color: 1, 1, 0, 1
-                    
-                Label: 
-                    text: 'None'
-                CheckBox:
-                    id: t3none
-                    group: 't3_pos'
-                    active: root.is_t3none
-                
-                Label: 
-                    text: 'Center'
-                CheckBox:
-                    id: t3center
-                    group: 't3_pos'
-                    active: root.is_t3cent
-                
-                Label: 
-                    text: 'Upper Left'
-                CheckBox:
-                    id: t3upper_left
-                    group: 't3_pos'
-                    active: root.is_t3ul
-                    
-                Label: 
-                    text: 'Middle Left'
-                CheckBox:
-                    id: t3mid_left
-                    group: 't3_pos'
-                    active: root.is_t3ml
-
-                Label: 
-                    text: 'Lower Left'
-                CheckBox:
-                    id: t3lower_left
-                    group: 't3_pos'
-                    active: root.is_t3ll
-                    
-                Label: 
-                    text: 'Upper Middle'
-                CheckBox:
-                    id: t3upper_mid
-                    group: 't3_pos'
-                    active: root.is_t3um
-
-                Label: 
-                    text: 'Lower Middle'
-                CheckBox:
-                    id: t3lower_mid
-                    group: 't3_pos'
-                    active: root.is_t3lm
-                    
-                Label: 
-                    text: 'Upper Right'
-                CheckBox:
-                    id: t3upper_right
-                    group: 't3_pos'
-                    active: root.is_t3ur
-                    
-                Label: 
-                    text: 'Middle Right'
-                CheckBox:
-                    id: t3mid_right
-                    group: 't3_pos'
-                    active: root.is_t3mr
-
-                Label: 
-                    text: 'Lower Right'
-                CheckBox:
-                    id: t3lower_right
-                    group: 't3_pos'
-                    active: root.is_t3lr
-
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-             
-            
-            BoxLayout:
-                id: nudge_x_t3
-                orientation: 'horizontal'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target 3 Nudge X'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '-6 cm'
-                CheckBox:
-                    id: nudge_x_t3_neg6
-                    group: 'nudge_x_t3'
-                    active: root.is_t3nudgeneg6
-                    
-                Label: 
-                    text: '-4 cm'
-                CheckBox:
-                    id: nudge_x_t3_neg4
-                    group: 'nudge_x_t3'
-                    active: root.is_t3nudgeneg4
-
-                Label: 
-                    text: '-2 cm'
-                CheckBox:
-                    id: nudge_x_t3_neg2
-                    group: 'nudge_x_t3'
-                    active: root.is_t3nudgeneg2
-
-                Label: 
-                    text: '0 cm'
-                CheckBox:
-                    id: nudge_x_t3_zero
-                    group: 'nudge_x_t3'
-                    active: root.is_t3nudgezero
-
-                Label: 
-                    text: '+2 cm'
-                CheckBox:
-                    id: nudge_x_t3_pos2
-                    group: 'nudge_x_t3'
-                    active: root.is_t3nudgepos2
-                    
-                Label: 
-                    text: '+4 cm'
-                CheckBox:
-                    id: nudge_x_t3_pos4
-                    group: 'nudge_x_t3'
-                    active: root.is_t3nudgepos4
-
-                Label: 
-                    text: '+6 cm'
-                CheckBox:
-                    id: nudge_x_t3_pos6
-                    group: 'nudge_x_t3'
-                    active: root.is_t3nudgepos6
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-    
-                    
-            BoxLayout:
-                id: t4_pos
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target 4 Position'
-                    color: 1, 1, 0, 1
-                
-                Label: 
-                    text: 'None'
-                CheckBox:
-                    id: t4none
-                    group: 't4_pos'
-                    active: root.is_t4none
-                
-                Label: 
-                    text: 'Center'
-                CheckBox:
-                    id: t4center
-                    group: 't4_pos'
-                    active: root.is_t4cent
-                
-                Label: 
-                    text: 'Upper Left'
-                CheckBox:
-                    id: t4upper_left
-                    group: 't4_pos'
-                    active: root.is_t4ul
-                    
-                Label: 
-                    text: 'Middle Left'
-                CheckBox:
-                    id: t4mid_left
-                    group: 't4_pos'
-                    active: root.is_t4ml
-
-                Label: 
-                    text: 'Lower Left'
-                CheckBox:
-                    id: t4lower_left
-                    group: 't4_pos'
-                    active: root.is_t4ll
-                    
-                Label: 
-                    text: 'Upper Middle'
-                CheckBox:
-                    id: t4upper_mid
-                    group: 't4_pos'
-                    active: root.is_t4um
-
-                Label: 
-                    text: 'Lower Middle'
-                CheckBox:
-                    id: t4lower_mid
-                    group: 't4_pos'
-                    active: root.is_t4lm
-                    
-                Label: 
-                    text: 'Upper Right'
-                CheckBox:
-                    id: t4upper_right
-                    group: 't4_pos'
-                    active: root.is_t4ur
-                    
-                Label: 
-                    text: 'Middle Right'
-                CheckBox:
-                    id: t4mid_right
-                    group: 't4_pos'
-                    active: root.is_t4mr
-
-                Label: 
-                    text: 'Lower Right'
-                CheckBox:
-                    id: t4lower_right
-                    group: 't4_pos'
-                    active: root.is_t4lr
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                    
-                    
-            BoxLayout:
-                id: nudge_x_t4
-                orientation: 'horizontal'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Target 4 Nudge X'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '-6 cm'
-                CheckBox:
-                    id: nudge_x_t4_neg6
-                    group: 'nudge_x_t4'
-                    active: root.is_t4nudgeneg6
-                    
-                Label: 
-                    text: '-4 cm'
-                CheckBox:
-                    id: nudge_x_t4_neg4
-                    group: 'nudge_x_t4'
-                    active: root.is_t4nudgeneg4
-
-                Label: 
-                    text: '-2 cm'
-                CheckBox:
-                    id: nudge_x_t4_neg2
-                    group: 'nudge_x_t4'
-                    active: root.is_t4nudgeneg2
-
-                Label: 
-                    text: '0 cm'
-                CheckBox:
-                    id: nudge_x_t4_zero
-                    group: 'nudge_x_t4'
-                    active: root.is_t4nudgezero
-
-                Label: 
-                    text: '+2 cm'
-                CheckBox:
-                    id: nudge_x_t4_pos2
-                    group: 'nudge_x_t4'
-                    active: root.is_t4nudgepos2
-                    
-                Label: 
-                    text: '+4 cm'
-                CheckBox:
-                    id: nudge_x_t4_pos4
-                    group: 'nudge_x_t4'
-                    active: root.is_t4nudgepos4
-
-                Label: 
-                    text: '+6 cm'
-                CheckBox:
-                    id: nudge_x_t4_pos6
-                    group: 'nudge_x_t4'
-                    active: root.is_t4nudgepos6
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                      
             
             BoxLayout:
                 id: screen_top
@@ -1875,71 +1251,6 @@
                 Label:
                     text: ''
                     fontsize: 50
-            
-            
-            BoxLayout:
-                id: time2next_targ
-                orientation: 'horizontal'
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Time til next targ appears'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: 'Never'
-                CheckBox:
-                    id: t2next_never
-                    group: 'time2next_targ'
-                    active: root.is_ttntnever
-                    
-                Label: 
-                    text: '0.25 sec'
-                CheckBox:
-                    id: t2next_250
-                    group: 'time2next_targ'
-                    active: root.is_ttnt025
-                
-                Label: 
-                    text: '0.5 sec'
-                CheckBox:
-                    id: t2next_500
-                    group: 'time2next_targ'
-                    active: root.is_ttnt050
-                    
-                Label: 
-                    text: '0.75'
-                CheckBox:
-                    id: t2next_750
-                    group: 'time2next_targ'
-                    active: root.is_ttnt075
-                
-                Label: 
-                    text: '1.0 sec'
-                CheckBox:
-                    id: t2next_1000
-                    group: 'time2next_targ'
-                    active: root.is_ttnt100
-                  
-                Label: 
-                    text: '1.5 sec'
-                CheckBox:
-                    id: t2next_1500
-                    group: 'time2next_targ'
-                    active: root.is_ttnt150
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
                            
             
             BoxLayout:
@@ -2021,16 +1332,11 @@
                     root.current = 'splash_start'
                     splash.init(dict(haribo=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butters=chk_but.active, testing=chk_test.active), 
                     dict(button_rew=[button_rew_zero_sec.active, button_rew_pt1_sec.active, button_rew_pt3_sec.active, button_rew_pt5_sec.active], 
-                    min_rew=[min_rew_none.active, min_rew_zero_sec.active, min_rew_pt1_sec.active, min_rew_pt2_sec.active, min_rew_pt3_sec.active],
-                    big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active, big_rew_pt9_sec.active, big_rew_1pt1_sec.active]), 
+                    big_rew=[big_rew_zero_sec.active, big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_18.active, targ_rad_22.active, targ_rad_30.active, targ_rad_40.active], 
                     eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active],
-                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, seqF.active, centerOut.active, buttonOut.active],
-                    targ1_pos=[t1random.active, t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
-                    targ2_pos=[t2none.active, t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
-                    targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_mid.active, t3lower_mid.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
-                    targ4_pos=[t4none.active, t4center.active, t4upper_left.active, t4mid_left.active, t4lower_left.active, t4upper_mid.active, t4lower_mid.active, t4upper_right.active, t4mid_right.active, t4lower_right.active],
-                    time_to_next_targ=[t2next_never.active, t2next_250.active, t2next_500.active, t2next_750.active, t2next_1000.active, t2next_1500.active]),
+                    seq=[seq_straight_r.active, seq_r_up.active],
+                    start_pos=[strandom.active, stcenter.active, stupper_left.active, stmid_left.active, stlower_left.active, stupper_mid.active, stlower_mid.active, stupper_right.active, stmid_right.active, stlower_right.active]),
                     dict(button_hold=[bhtfalse.active, bht000.active, bht100.active, bht200.active, bht300.active, bht400.active, bht500.active, bht600.active, bht700.active, bht800.active, bht900.active, bht1000.active, bht200to400.active, bht600to800.active, bht800to1000.active],
                     hold=[tht000.active, tht100.active, tht200.active, tht300.active, tht400.active, tht500.active, tht600.active, tht100to300.active, tht400to600.active]), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
@@ -2038,10 +1344,7 @@
                     dict(t1tt=[t1tt_0pt8_sec.active, t1tt_1pt0_sec.active, t1tt_1pt5_sec.active, t1tt_2pt0_sec.active, t1tt_2pt5_sec.active, t1tt_3pt0_sec.active, t1tt_3pt5_sec.active, t1tt_4pt0_sec.active, t1tt_10pt0_sec.active],
                     tt=[tt_0pt7_sec.active, tt_0pt8_sec.active, tt_1pt0_sec.active, tt_1pt5_sec.active, tt_2pt0_sec.active, tt_2pt5_sec.active, tt_3pt0_sec.active, tt_3pt5_sec.active, tt_4pt0_sec.active]),
                     dict(drag=[dragok.active, dragnotok.active]),
-                    dict(nudge_x_t1=[nudge_x_t1_neg6.active, nudge_x_t1_neg4.active, nudge_x_t1_neg2.active, nudge_x_t1_zero.active, nudge_x_t1_pos2.active, nudge_x_t1_pos4.active, nudge_x_t1_pos6.active],
-                    nudge_x_t2=[nudge_x_t2_neg6.active, nudge_x_t2_neg4.active, nudge_x_t2_neg2.active, nudge_x_t2_zero.active, nudge_x_t2_pos2.active, nudge_x_t2_pos4.active, nudge_x_t2_pos6.active],
-                    nudge_x_t3=[nudge_x_t3_neg6.active, nudge_x_t3_neg4.active, nudge_x_t3_neg2.active, nudge_x_t3_zero.active, nudge_x_t3_pos2.active, nudge_x_t3_pos4.active, nudge_x_t3_pos6.active],
-                    nudge_x_t4=[nudge_x_t4_neg6.active, nudge_x_t4_neg4.active, nudge_x_t4_neg2.active, nudge_x_t4_zero.active, nudge_x_t4_pos2.active, nudge_x_t4_pos4.active, nudge_x_t4_pos6.active]),
+                    dict(nudge_x=[nudge_x_neg6.active, nudge_x_neg4.active, nudge_x_neg2.active, nudge_x_zero.active, nudge_x_pos2.active, nudge_x_pos4.active, nudge_x_pos6.active]),
                     dict(screen_top=[screen_top_neg6.active, screen_top_neg5.active, screen_top_neg4.active, screen_top_neg3.active, screen_top_neg2.active, screen_top_neg1.active, screen_top_zero.active], 
                     screen_bot=[screen_bot_0.active, screen_bot_2.active, screen_bot_4.active, screen_bot_6.active, screen_bot_8.active, screen_bot_10.active, screen_bot_12.active]))
 
