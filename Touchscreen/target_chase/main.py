@@ -1141,18 +1141,25 @@ class COGame(Widget):
             self.target2_position = np.array([targ_x, targ_y])
 
         if self.target1_pos_str == 'random': 
+
+            ### If button out, use target 1, 2, 3, 4, nudges to individually nudge the targets 
+            if self.seq == 'button out': 
+                nudges = [self.nudge_x_t1, self.nudge_x_t2, self.nudge_x_t3, self.nudge_x_t4]
+            else: 
+                nudges = [self.nudge_x_t1, self.nudge_x_t1, self.nudge_x_t1, self.nudge_x_t1]
+
             i_pos = self.trial_order[self.trials_started]
             if i_pos == 0: # 'upper_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t1
+                targ_x = self.max_y_from_center+nudges[i_pos]
                 targ_y = self.center_position[1] + self.max_y_from_center
             elif i_pos == 1:# 'lower_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t1
+                targ_x = self.max_y_from_center+nudges[i_pos]
                 targ_y = self.center_position[1] - self.max_y_from_center
             elif i_pos == 2: # 'lower_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t1
+                targ_x = -self.max_y_from_center+nudges[i_pos]
                 targ_y = self.center_position[1] - self.max_y_from_center
             elif i_pos == 3: # 'upper_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t1
+                targ_x = -self.max_y_from_center+nudges[i_pos]
                 targ_y = self.center_position[1] + self.max_y_from_center
             elif i_pos == 4: # center positon 
                 targ_x = self.center_position[0]
