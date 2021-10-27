@@ -719,6 +719,10 @@ class COGame(Widget):
                 # print('Button NOT Pressed')
         else:
             self.button_pressed = False
+            
+        # Play the sound
+        # self.play_touch_sound()
+        
         
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
@@ -824,7 +828,14 @@ class COGame(Widget):
 
             else:
                 return False
-
+    
+    # def play_touch_sound(self, **kwargs):
+    #     if bool(self.cursor_ids): # if there is a touch
+    #         if self.state == 'target' or self.state == 'targ_hold' or self.state == 'touch_error' or self.state == 'hold_error' or self.state == 'drag_error':
+    #             # if we are in a state where we want there to be a sound
+    #             if self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad):
+                    
+    
     def _start_ITI(self, **kwargs):
         try:
             self.cam_trig_port.write('0'.encode())
