@@ -7,7 +7,7 @@ int sIn=0;
 int camTriggers = 0;
 int triggerPin1 = 4;
 int triggerPin2 = 5;
-
+int triggerPin_tdt = 6; 
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -22,6 +22,7 @@ void setup() {
 
   pinMode (triggerPin1,OUTPUT);
   pinMode (triggerPin2,OUTPUT);
+  pinMode (triggerPin_tdt,OUTPUT);
 
   // This will wait for the matlab connection before running the script
 
@@ -31,6 +32,7 @@ void setup() {
 
   digitalWrite (triggerPin1,1); // Trigger phase is low on cameras
   digitalWrite (triggerPin2,1);
+  digitalWrite (triggerPin_tdt,1); 
 
 }
 
@@ -73,10 +75,12 @@ void loop() {
     if (camTriggers == 1) { // run at 50 hz
       digitalWrite(triggerPin1,0);
       digitalWrite(triggerPin2,0);
+      digitalWrite (triggerPin_tdt, 0); 
       //Serial.println ("0");
       delay (1);
       digitalWrite(triggerPin1,1);
       digitalWrite(triggerPin2,1);
+      digitalWrite (triggerPin_tdt, 1); 
       //Serial.println ("1");
       delay (19);      
     }
@@ -84,10 +88,12 @@ void loop() {
     else if (camTriggers == 2) { // run at 2 hz
       digitalWrite(triggerPin1,0);
       digitalWrite(triggerPin2,0);
+      digitalWrite (triggerPin_tdt, 0); 
       //Serial.println ("0");
       delay (1);
       digitalWrite(triggerPin1,1);
       digitalWrite(triggerPin2,1);
+      digitalWrite (triggerPin_tdt, 1); 
       //Serial.println ("1");
       delay (499);      
     }
