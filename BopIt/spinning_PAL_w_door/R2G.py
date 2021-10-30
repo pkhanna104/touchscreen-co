@@ -49,12 +49,12 @@ class RewThread(threading.Thread):
             rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
             
             try: # commented out comport open/close -- was giving errors in spinning pal
-                #self.comport.open()
+                self.comport.open()
                 self.comport.write(rew_str)
                 time.sleep(.25)
                 run_str = [ord(r) for r in 'run\n']
                 self.comport.write(run_str)
-                #self.comport.close()
+                self.comport.close()
             except:
                 pass            
         
@@ -311,7 +311,7 @@ class R2Game(Widget):
                 self.reward_port = serial.Serial(port='COM5',
                     baudrate=115200)
                 reward_fcn = True
-                #self.reward_port.close() # commented out -- was giving errors
+                self.reward_port.close()
             
             elif self.juicer == 'red': 
                 self.reward_port = serial.Serial(port='COM9', 
