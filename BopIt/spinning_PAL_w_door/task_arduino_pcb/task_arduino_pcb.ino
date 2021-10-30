@@ -354,7 +354,7 @@ void close_door() {
           }
           lastT = T;
 
-          if ((!abortclose) and ((millis() - startTrying) > 750)) {
+          if ((!abortclose) and ((millis() - startTrying) > 1000)) {
             abortclose=true; 
           }
 
