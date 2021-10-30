@@ -330,7 +330,7 @@ class R2Game(Widget):
             pass
 
         try:
-            self.dio_port = serial.Serial(port='COM5', baudrate=115200)
+            self.dio_port = serial.Serial(port='COM6', baudrate=115200)
             time.sleep(4.)
         except:
             pass
