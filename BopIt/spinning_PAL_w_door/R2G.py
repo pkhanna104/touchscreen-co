@@ -47,15 +47,17 @@ class RewThread(threading.Thread):
 
         if self.juicer == 'yellow': 
             rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.rew_time)+' sec\n']
-            try:
-                self.comport.open()
+            
+            try: # commented out comport open/close -- was giving errors in spinning pal
+                #self.comport.open()
                 self.comport.write(rew_str)
                 time.sleep(.25)
                 run_str = [ord(r) for r in 'run\n']
                 self.comport.write(run_str)
-                self.comport.close()
+                #self.comport.close()
             except:
-                pass
+                pass            
+        
 
         elif self.juicer == 'red':
             volume2dispense = self.rew_time * 50 / 60 #mL/min x 1 min / 60 sec --> sec x mL/sec 
@@ -309,7 +311,7 @@ class R2Game(Widget):
                 self.reward_port = serial.Serial(port='COM5',
                     baudrate=115200)
                 reward_fcn = True
-                self.reward_port.close()
+                #self.reward_port.close() # commented out -- was giving errors
             
             elif self.juicer == 'red': 
                 self.reward_port = serial.Serial(port='COM9', 
@@ -328,13 +330,13 @@ class R2Game(Widget):
             pass
 
         try:
-            self.dio_port = serial.Serial(port='COM7', baudrate=115200)
+            self.dio_port = serial.Serial(port='COM5', baudrate=115200)
             time.sleep(4.)
         except:
             pass
 
         try:
-            self.cam_trig_port = serial.Serial(port='COM', baudrate=9600)
+            self.cam_trig_port = serial.Serial(port='COM11', baudrate=9600)
             time.sleep(3.)
             # Say hello: 
             self.cam_trig_port.write('a'.encode())
