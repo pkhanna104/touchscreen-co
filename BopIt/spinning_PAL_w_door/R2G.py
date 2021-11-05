@@ -63,7 +63,7 @@ class RewThread(threading.Thread):
             volume2dispense = self.rew_time * 50 / 60 #mL/min x 1 min / 60 sec --> sec x mL/sec 
             self.comport.write(b"VOL %.1f \r"%volume2dispense)
             time.sleep(.25)
-            self.reward_port.write(b"RUN\r")
+            self.comport.write(b"RUN\r")
             
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
@@ -314,9 +314,9 @@ class R2Game(Widget):
                 self.reward_port.close()
             
             elif self.juicer == 'red': 
-                self.reward_port = serial.Serial(port='COM9', 
+                self.reward_port = serial.Serial(port='COM12', 
                     baudrate=19200)
-
+                reward_fcn = True
                 ### setup the flow rate
                 time.sleep(.5) 
                 ### set volume value and units and rate units
@@ -441,18 +441,34 @@ class R2Game(Widget):
         if self.testing:
             pass
         else:
-            import os
+            # import os
+            # path = os.getcwd()
+            # path = path.split('\\')
+            # path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
+            # path_root = ''
+            # for ip in path_data:
+            #     path_root += ip+'/'
+            # p = path_root+'data/'
+
             path = os.getcwd()
             path = path.split('\\')
-            path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-            path_root = ''
-            for ip in path_data:
-                path_root += ip+'/'
-            p = path_root+'data/'
+            print(path)
+            for p in path:
+                if p == 'BasalGangulia':
+                    laptop_name = 'BasalGangulia'
+                elif p == 'Ganguly':
+                    laptop_name = 'Ganguly'
+                elif p == 'stim':
+                    laptop_name = 'stim'
+                elif p == 'cortex':
+                    laptop_name = 'cortex'
+
+            p = "C:/Users/%s/Box/Data/NHP_BehavioralData/"%laptop_name
 
             # Check if this directory exists: 
             if os.path.exists(p):
-                pass
+                p = p + "spal/"
+                print('path: %s'%p)
             else:
                 p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')+'/'
                 if os.path.exists(p):
@@ -471,7 +487,8 @@ class R2Game(Widget):
             pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
 
             ## Save as 'last params'
-            pickle.dump(d, open(path_root + 'last_params.pkl', 'wb'))
+            path_root = os.getcwd()
+            pickle.dump(d, open(os.path.join(path_root, 'last_params.pkl'), 'wb'))
 
             self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
             self.h5_table = self.h5file.create_table('/', 'task', Data, '')
