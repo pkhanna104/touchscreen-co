@@ -60,11 +60,13 @@ class RewThread(threading.Thread):
         
 
         elif self.juicer == 'red':
-            volume2dispense = self.rew_time * 50 / 60 #mL/min x 1 min / 60 sec --> sec x mL/sec 
-            self.comport.write(b"VOL %.1f \r"%volume2dispense)
-            time.sleep(.25)
-            self.comport.write(b"RUN\r")
-            
+            try:
+                volume2dispense = self.rew_time * 50 / 60 #mL/min x 1 min / 60 sec --> sec x mL/sec 
+                self.comport.write(b"VOL %.1f \r"%volume2dispense)
+                time.sleep(.25)
+                self.comport.write(b"RUN\r")
+            except:
+                pass
 class Data(tables.IsDescription):
     state = tables.StringCol(24)   # 24-character String
     time = tables.Float32Col()
@@ -314,9 +316,19 @@ class R2Game(Widget):
                 self.reward_port.close()
             
             elif self.juicer == 'red': 
-                self.reward_port = serial.Serial(port='COM12', 
+                prolific_com = None
+                import serial.tools.list_ports
+                coms = serial.tools.list_ports.comports()
+                for c in coms: 
+                    if 'Prolific USB-to-Serial' in c.description:
+                        prolific_com_end = c.description.split('(')
+                        prolific_com_beg = prolific_com_end[1].split(')')
+                        prolific_com = prolific_com_beg[0]
+                    
+                self.reward_port = serial.Serial(port=prolific_com, 
                     baudrate=19200)
                 reward_fcn = True
+                
                 ### setup the flow rate
                 time.sleep(.5) 
                 ### set volume value and units and rate units
@@ -928,7 +940,8 @@ class Manager(ScreenManager):
         monk_haribo = BooleanProperty(data_params['animal_name'] == 'haribo')
         monk_butters = BooleanProperty(data_params['animal_name'] == 'butters')
         monk_nike = BooleanProperty(data_params['animal_name'] == 'nike')
-
+        monk_fifi = BooleanProperty(data_params['animal_name'] == 'fifi')
+        monk_test = BooleanProperty(data_params['animal_name'] == 'testing')
 
         small_rew_1 = BooleanProperty(data_params['small_rew'] == 0.1)
         small_rew_3 = BooleanProperty(data_params['small_rew'] == 0.3)

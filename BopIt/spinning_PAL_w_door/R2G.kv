@@ -197,7 +197,26 @@
                 CheckBox: 
                     group: 'check'
                     id: chk_n
+                Label: 
+                    text: 'Fifi'
+                    fontsize: 28
+                    halign: 'center' 
+                    active: root.monk_fifi                       
+                
+                CheckBox: 
+                    group: 'check'
+                    id: chk_f
                    
+                Label: 
+                    text: 'Test'
+                    fontsize: 28
+                    halign: 'center' 
+                    active: root.monk_test                     
+                
+                CheckBox: 
+                    group: 'check'
+                    id: chk_t
+
                 Label:
                     text: ''
                     fontsize: 50
@@ -774,7 +793,8 @@
                 text_size: self.size
                 on_release: 
                     root.current = 'game_screen'
-                    game.init(dict(haribo=chk_h.active, butters=chk_b.active, nike=chk_n.active), 
+                    game.init(dict(haribo=chk_h.active, butters=chk_b.active, nike=chk_n.active,
+                    fifi=chk_f.active, test=chk_t.active), 
                     dict(rew_manual=rew_noauto_chk.active, rew_start=rew_anytouch_chk.active, rew_start_and_grasp=rew_anytouch_pls_targ_chk.active, rew_grasp=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]), 
                     dict(test=[testing.active, monk_time.active]), 
