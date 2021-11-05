@@ -104,6 +104,48 @@
                 Label:
                     text: ''
                     fontsize: 50
+
+                Label: 
+                    text: 'Which Juicer?        '
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: 'Old yellow'
+
+                CheckBox:
+                    group: 'juicer'
+                    id: yellow
+                    active: root.juicer_y
+            
+                Label: 
+                    text: 'New red'
+
+                CheckBox:
+                    group: 'juicer'
+                    id: red
+                    active: root.juicer_r
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            BoxLayout 
+                id: top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
                 Label:
                     text: ''
                     fontsize: 50
@@ -2050,7 +2092,8 @@
                     nudge_x_t3=[nudge_x_t3_neg6.active, nudge_x_t3_neg4.active, nudge_x_t3_neg2.active, nudge_x_t3_zero.active, nudge_x_t3_pos2.active, nudge_x_t3_pos4.active, nudge_x_t3_pos6.active],
                     nudge_x_t4=[nudge_x_t4_neg6.active, nudge_x_t4_neg4.active, nudge_x_t4_neg2.active, nudge_x_t4_zero.active, nudge_x_t4_pos2.active, nudge_x_t4_pos4.active, nudge_x_t4_pos6.active]),
                     dict(screen_top=[screen_top_neg6.active, screen_top_neg5.active, screen_top_neg4.active, screen_top_neg3.active, screen_top_neg2.active, screen_top_neg1.active, screen_top_zero.active], 
-                    screen_bot=[screen_bot_0.active, screen_bot_2.active, screen_bot_4.active, screen_bot_6.active, screen_bot_8.active, screen_bot_10.active, screen_bot_12.active]))
+                    screen_bot=[screen_bot_0.active, screen_bot_2.active, screen_bot_4.active, screen_bot_6.active, screen_bot_8.active, screen_bot_10.active, screen_bot_12.active]),
+                    dict(juicer=[yellow.active, red.active]))
 
             Label:
                 text: ''

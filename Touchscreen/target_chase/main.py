@@ -184,9 +184,17 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         hold=None, autoquit=None, rew_var=None, targ_timeout = None, 
-        drag=None, nudge_x=None, screen_size=None):
+        drag=None, nudge_x=None, screen_size=None, juicer=None):
         
         self.rew_cnt = 0
+
+        #Juicer options 
+        ###  juicer option ### 
+        juicer_opts = ['yellow', 'red']
+        for i, val in enumerate(juicer['juicer']): 
+            if val: 
+                self.juicer = juicer_opts[i]
+
 
         # TARGET TIMEOUT
         targ1_timeout_opts = [0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 10.0]
@@ -730,13 +738,28 @@ class COGame(Widget):
         
         # OPEN PORTS
         try:
-            if user_id == 'Ganguly':
-                self.reward_port = serial.Serial(port='COM4',
-                    baudrate=115200)
-            elif user_id == 'BasalGangulia':
-                self.reward_port = serial.Serial(port='COM3',
-                    baudrate=115200)
-            self.reward_port.close()
+            if self.juicer == 'yellow':
+                if user_id == 'Ganguly':
+                    self.reward_port = serial.Serial(port='COM4',
+                        baudrate=115200)
+                elif user_id == 'BasalGangulia':
+                    self.reward_port = serial.Serial(port='COM3',
+                        baudrate=115200)
+                self.reward_port.close()
+
+            elif self.juicer == 'red': 
+                if user_id == 'Ganguly':
+                    self.reward_port = serial.Serial(port='COM7', 
+                    baudrate=19200)
+
+                ### setup the flow rate
+                time.sleep(.5) 
+
+                ### set volume value and units and rate units
+                self.reward_port.write(b"VOL 0.5\r")
+                self.reward_port.write(b"VOL ML\r")
+                self.reward_port.write(b"RAT 50MM\r") # 50 ml / min
+
         except:
             pass
 
@@ -789,6 +812,7 @@ class COGame(Widget):
 
         # save parameters: 
         d = dict(animal_name=animal_name,
+            juicer = self.juicer,
             user_id = user_id,
             max_trials = self.max_trials,
             target1_timeout_time = self.target1_timeout_time,
@@ -1305,6 +1329,27 @@ class COGame(Widget):
             self.run_big_rew()
             self.rew_cnt += 1
 
+    def write_juice_reward(self, rew_time): 
+        if self.juicer == 'yellow': 
+            rew_str = [ord(r) for r in 'inf 50 ml/min '+str(rew_time)+' sec\n']
+            
+            try: # commented out comport open/close -- was giving errors in spinning pal
+                self.reward_port.open()
+                self.reward_port.write(rew_str)
+                time.sleep(.25)
+                run_str = [ord(r) for r in 'run\n']
+                self.reward_port.write(run_str)
+                self.reward_port.close()
+            except:
+                pass            
+        
+
+        elif self.juicer == 'red':
+            volume2dispense = rew_time * 50 / 60 #mL/min x 1 min / 60 sec --> sec x mL/sec 
+            self.reward_port.write(b"VOL %.1f \r"%volume2dispense)
+            time.sleep(.25)
+            self.reward_port.write(b"RUN\r")
+
     def run_big_rew(self, **kwargs):
         try:
             print('in big reward:')
@@ -1319,7 +1364,7 @@ class COGame(Widget):
                 self.reward1 = SoundLoader.load('reward1.wav')
                 self.reward1.play()
                 if self.reward_generator[self.trial_counter] > 0:
-                    self.reward_port.open()
+                    #self.reward_port.open()
                     if self.min_targ_reward[0]:
                         if self.trial_completion_time > self.time_thresh_for_min_rew:
                             this_rew = self.min_targ_reward[1]
@@ -1331,14 +1376,18 @@ class COGame(Widget):
                             this_rew = round(self.min_targ_reward[1] + rel_time*(self.last_targ_reward[1]-self.min_targ_reward[1]), 1)
                         rew_str = [ord(r) for r in 'inf 50 ml/min '+str(this_rew)+' sec\n']
                         print('Scaled reward: ' + str(this_rew) + 'sec')
+                        rew_time = this_rew; 
                     else:
                         #rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.last_targ_reward[1])+' sec\n']
                         rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.reward_generator[self.trial_counter])+' sec\n']
-                    self.reward_port.write(rew_str)
-                    time.sleep(.25 + self.reward_delay_time)
-                    run_str = [ord(r) for r in 'run\n']
-                    self.reward_port.write(run_str)
-                    self.reward_port.close()
+                        rew_time = self.reward_generator[self.trial_counter]
+
+                    self.write_juice_reward(rew_time)
+                    #self.reward_port.write(rew_str)
+                    #time.sleep(.25 + self.reward_delay_time)
+                    #run_str = [ord(r) for r in 'run\n']
+                    #self.reward_port.write(run_str)
+                    #self.reward_port.close()
         except:
             pass
         
@@ -1347,13 +1396,14 @@ class COGame(Widget):
             ### To trigger reward make sure reward is > 0:
             if np.logical_or(self.button_rew[0], self.button_rew[1] > 0):
 
-                self.reward_port.open()
-                rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.button_rew[1])+' sec\n']
-                self.reward_port.write(rew_str)
-                time.sleep(.25)
-                run_str = [ord(r) for r in 'run\n']
-                self.reward_port.write(run_str)
-                self.reward_port.close()
+                self.write_juice_reward(self.button_rew[1])
+                # self.reward_port.open()
+                # rew_str = [ord(r) for r in 'inf 50 ml/min '+str(self.button_rew[1])+' sec\n']
+                # self.reward_port.write(rew_str)
+                # time.sleep(.25)
+                # run_str = [ord(r) for r in 'run\n']
+                # self.reward_port.write(run_str)
+                # self.reward_port.close()
         except:
             pass
 
@@ -1482,6 +1532,13 @@ class Target(Widget):
 class Manager(ScreenManager):
     # DEFINE THE DEFAULTS AS WHATEVER THEY WERE LAST TIME
     # animal name
+    try:
+        juicer_r = BooleanProperty(data_params['juicer'] == 'red')
+        juicer_y = BooleanProperty(data_params['juicer'] == 'yellow')
+    except: 
+        juicer_r = BooleanProperty(False)
+        juicer_y = BooleanProperty(False)
+
     is_haribo = BooleanProperty(False)
     is_fifi = BooleanProperty(False)
     is_nike = BooleanProperty(False)
