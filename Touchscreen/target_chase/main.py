@@ -748,8 +748,21 @@ class COGame(Widget):
                 self.reward_port.close()
 
             elif self.juicer == 'red': 
-                if user_id == 'Ganguly':
-                    self.reward_port = serial.Serial(port='COM7', 
+                
+                prolific_com = None
+                import serial.tools.list_ports
+                coms = serial.tools.list_ports.comports()
+                for c in coms: 
+                    if 'Prolific USB-to-Serial' in c.description:
+                        prolific_com_end = c.description.split('(')
+                        prolific_com_beg = prolific_com_end[1].split(')')
+                        prolific_com = prolific_com_beg[0]
+                    
+                self.reward_port = serial.Serial(port=prolific_com, 
+                    baudrate=19200)
+
+
+                    self.reward_port = serial.Serial(port='COM9', 
                     baudrate=19200)
 
                 ### setup the flow rate
