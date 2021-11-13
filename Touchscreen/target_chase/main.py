@@ -1063,8 +1063,12 @@ class COGame(Widget):
         self.h5_table_row['cursor'] = cursor
         if np.isnan(cursor).all():
             self.vid_indicator_targ.color = (.25, .25, .25, 1.)
+            if self.state == 'target':
+                self.pd_indicator_targ.color = (0.25, 0.25, 0.25, 1.)
         else:
             self.vid_indicator_targ.color = (.5, .5, .5, 1.)
+            if self.state == 'target':
+                self.pd_indicator_targ.color = (0.75, 0.75, 0.75, 1.)
 
         cursor_id = np.zeros((10, ))
         cursor_id[:] = np.nan
@@ -1221,6 +1225,7 @@ class COGame(Widget):
             button_pressed_prev = self.button_pressed_prev
             self.button_pressed_prev = self.button_pressed
             if self.button_pressed:
+                self.pd_indicator_targ.color = (.75, .75, .75, 1.)
                 if button_pressed_prev:
                     if time.time() - self.t_button_hold_start > self.button_hold_time:
                         # Play the button reward sound
@@ -1241,7 +1246,7 @@ class COGame(Widget):
 
     def _start_targ_hold(self, **kwargs):
         self.target1.color = (0., 1., 0., 1.)
-        self.pd_indicator_targ.color = (0.25, .25, .25, 1.)
+        self.pd_indicator_targ.color = (1., 1., 1., 1.)
 
     def _end_targ_hold(self, **kwargs):
         self.target1.color = (0., 0., 0., 0.)
@@ -1301,7 +1306,7 @@ class COGame(Widget):
         
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.pd_indicator_targ.color = (.75, .75, .75, 1.)
+        self.pd_indicator_targ.color = (.25, .25, .25, 1.)
         if self.first_target_attempt:
             self.first_target_attempt_t0 = time.time();
             self.first_target_attempt = False
