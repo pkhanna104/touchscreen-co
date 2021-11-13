@@ -103,7 +103,7 @@ class COGame(Widget):
     # if platform == 'darwin':
     
     exit_pos_x = (fixed_window_size_cm[0]/2)-1.5
-    exit_pos_y = (fixed_window_size_cm[1]/2)-2.0
+    exit_pos_y = (fixed_window_size_cm[1]/2)-2.5
     exit_pos = np.array([exit_pos_x, exit_pos_y])
     
     
@@ -167,6 +167,7 @@ class COGame(Widget):
         curs = pix2cm(np.array([touch.x, touch.y]))
         
         # ignore touching around the photodiode
+        
         if len(curs.shape) == 1:
             if np.linalg.norm(np.array(curs) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < 2*self.exit_rad:
                 curs = np.array([np.nan, np.nan])
