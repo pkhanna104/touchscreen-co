@@ -103,12 +103,12 @@ class COGame(Widget):
     # if platform == 'darwin':
     
     exit_pos_x = (fixed_window_size_cm[0]/2)-1.5
-    exit_pos_y = (fixed_window_size_cm[1]/2)-1.5
-                 
+    exit_pos_y = (fixed_window_size_cm[1]/2)-2.0
     exit_pos = np.array([exit_pos_x, exit_pos_y])
+    
+    
     pd_ind_pos_x = (fixed_window_size_cm[0]/2)-0.5
     pd_ind_pos_y = (fixed_window_size_cm[1]/2)-0.5
-                 
     pd_indicator_pos = np.array([pd_ind_pos_x, pd_ind_pos_y])
     
     vid_ind_pos_x = (fixed_window_size_cm[0]/2)-0.5
@@ -165,6 +165,15 @@ class COGame(Widget):
 
         # Add cursor
         curs = pix2cm(np.array([touch.x, touch.y]))
+        
+        # ignore touching around the photodiode
+        if len(curs.shape) == 1:
+            if np.linalg.norm(np.array(curs) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < self.exit_rad:
+                curs = np.array([np.nan, np.nan])
+        else:
+            for i, ~ in enumerate(curs[:,0]):
+                if np.linalg.norm(np.array(curs[i,:]) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < self.exit_rad:
+                    curs[i,:] = np.array([np.nan, np.nan])
         self.cursor[touch.uid] =  curs.copy()
         self.cursor_start[touch.uid] = curs.copy()
 
@@ -1061,6 +1070,8 @@ class COGame(Widget):
             cursor[ic, :] = self.cursor[curs_id]
 
         self.h5_table_row['cursor'] = cursor
+        
+        ## Change the luminance of the photodiode indicator
         if np.isnan(cursor).all():
             self.vid_indicator_targ.color = (.25, .25, .25, 1.)
             if self.state == 'target':
