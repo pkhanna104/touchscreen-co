@@ -170,8 +170,8 @@ class COGame(Widget):
         if len(curs.shape) == 1:
             if np.linalg.norm(np.array(curs) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < self.exit_rad:
                 curs = np.array([np.nan, np.nan])
-        else:
-            for i, ~ in enumerate(curs[:,0]):
+        elif len(curs.shape) > 1:
+            for i in range(curs.shape[1]):
                 if np.linalg.norm(np.array(curs[i,:]) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < self.exit_rad:
                     curs[i,:] = np.array([np.nan, np.nan])
         self.cursor[touch.uid] =  curs.copy()
