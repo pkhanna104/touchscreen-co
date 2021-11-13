@@ -167,7 +167,6 @@ class COGame(Widget):
         curs = pix2cm(np.array([touch.x, touch.y]))
         
         # ignore touching around the photodiode
-        
         if len(curs.shape) == 1:
             if np.linalg.norm(np.array(curs) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < 2*self.exit_rad:
                 curs = np.array([np.nan, np.nan])
@@ -182,7 +181,18 @@ class COGame(Widget):
         self.touch = True
 
     def on_touch_move(self, touch):
-        self.cursor[touch.uid] = pix2cm(np.array([touch.x, touch.y]))
+        curs = pix2cm(np.array([touch.x, touch.y]))
+        # ignore touching around the photodiode
+        if len(curs.shape) == 1:
+            if np.linalg.norm(np.array(curs) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < 2*self.exit_rad:
+                curs = np.array([np.nan, np.nan])
+        elif len(curs.shape) > 1:
+            for i in range(curs.shape[1]):
+                if np.linalg.norm(np.array(curs[i,:]) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < 2*self.exit_rad:
+                    curs[i,:] = np.array([np.nan, np.nan])
+        
+        self.cursor[touch.uid] =  curs.copy()
+        
         self.touch = True
 
     def on_touch_up(self, touch):
