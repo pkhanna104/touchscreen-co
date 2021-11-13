@@ -1253,6 +1253,7 @@ class COGame(Widget):
                     self.t_button_hold_start = time.time()
                     return False
             else:
+                self.pd_indicator_targ.color = (.25, .25, .25, 1.)
                 return False
 
     def _start_targ_hold(self, **kwargs):
