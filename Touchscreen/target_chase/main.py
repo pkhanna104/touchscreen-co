@@ -793,13 +793,21 @@ class COGame(Widget):
             pass
 
         try:
-            self.dio_port = serial.Serial(port='COM5', baudrate=115200)
+            if user_id == 'Ganguly':
+                self.dio_port = serial.Serial(port='COM5', baudrate=115200)
+            elif user_id == 'BasalGangulia':
+                self.dio_port = serial.Serial(port='COM13', baudrate=115200)
+            
             time.sleep(4.)
         except:
             pass
 
         try:
-            self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
+            if user_id == 'Ganguly':
+                self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
+            elif user_id == 'BasalGangulia':
+                self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
+            
             time.sleep(3.)
             # Say hello: 
             self.cam_trig_port.write('a'.encode())
