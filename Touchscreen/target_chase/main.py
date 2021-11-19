@@ -799,7 +799,8 @@ class COGame(Widget):
 
         except:
             pass
-
+        
+        # DIO
         try:
             if user_id == 'Ganguly':
                 self.dio_port = serial.Serial(port='COM5', baudrate=115200)
@@ -809,7 +810,8 @@ class COGame(Widget):
             time.sleep(4.)
         except:
             pass
-
+        
+        # Camera Triggers
         try:
             if user_id == 'Ganguly':
                 self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
@@ -822,6 +824,23 @@ class COGame(Widget):
 
             # Start cams @ 50 Hz
             self.cam_trig_port.write('1'.encode())
+        except:
+            pass
+        
+        # Eyetracker Triggers
+        try:
+            if user_id == 'BasalGangulia':
+                self.iscan_trig_port = serial.Serial(port='COM7', baudrate=115200)
+            
+            time.sleep(4.)
+        except:
+            pass
+        
+        # Send Eyetracker Start Recording Trigger
+        try:
+            ### write to arduino: 
+            word_str = b's'
+            self.iscan_trig_port.write(word_str)
         except:
             pass
         
@@ -1001,6 +1020,14 @@ class COGame(Widget):
         except:
             pass
         
+        # Send Eyetracker Stop Recording Trigger
+        try:
+            ### write to arduino: 
+            word_str = b'e'
+            self.iscan_trig_port.write(word_str)
+        except:
+            pass
+        
         if self.idle:
             self.state = 'idle_exit'
             # self.trial_counter -= 1
@@ -1122,6 +1149,12 @@ class COGame(Widget):
             self.write_row_to_dio()
         except:
             pass
+        
+        # Write Eyetracker Strobe 
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
             
         # Upgrade table row: 
         self.h5_table_row_cnt += 1
@@ -1133,6 +1166,11 @@ class COGame(Widget):
         ### write to arduino: 
         word_str = b'd' + struct.pack('<H', int(row_to_write))
         self.dio_port.write(word_str)
+        
+    def write_iscan_trig(self):
+        ### write to arduino: 
+        word_str = b't'
+        self.iscan_trig_port.write(word_str)
 
     def stop(self, **kwargs):
         # If past number of max trials then auto-quit: 
