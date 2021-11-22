@@ -1221,7 +1221,10 @@ class COGame(Widget):
         self.target1.color = (0., 0., 0., 0.)
         self.target2.color = (0., 0., 0., 0.)
         self.pd1_indicator_targ.color = (.75, .75, .75, 1.)
-        self.write_iscan_trig()
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
         self.trials_started += 1
         
     def end_ITI(self, **kwargs):
@@ -1293,7 +1296,10 @@ class COGame(Widget):
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
         self.pd1_indicator_targ.color = (0., 0., 0., 0.)
-        self.write_iscan_trig()
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
         self.button_pressed_prev = False
         
     def button_pressed(self, **kwargs):
@@ -1347,7 +1353,10 @@ class COGame(Widget):
     def _start_button_hold(self, **kwargs):
         self.t_button_hold_start = time.time()
         self.pd1_indicator_targ.color = (1., 1., 1., 1.)
-        self.write_iscan_trig()
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
         
     def finish_button_hold(self, **kwargs):
         if self.use_button is False or self.is_button_ard is False:
@@ -1438,7 +1447,10 @@ class COGame(Widget):
             self.pd1_indicator_targ.color = (0., 0., 0., 0.)
         elif np.remainder(self.target_index, 2) == 0:
             self.pd1_indicator_targ.color = (1., 1., 1., 1.)
-        self.write_iscan_trig()
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
             
             
         if self.first_target_attempt:
@@ -1473,7 +1485,10 @@ class COGame(Widget):
             self.pd1_indicator_targ.color = (1., 1., 1., 1.)
         elif np.remainder(self.num_targets, 2) == 0:
             self.pd1_indicator_targ.color = (0., 0., 0., 1.)
-        self.write_iscan_trig()
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
         self.repeat = False
 
     def _while_reward(self, **kwargs):
