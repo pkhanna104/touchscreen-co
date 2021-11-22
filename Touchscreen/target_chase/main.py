@@ -86,6 +86,7 @@ class Data(tables.IsDescription):
     cursor = tables.Float32Col(shape=(10, 2))
     cursor_ids = tables.Float32Col(shape = (10, ))
     target_pos = tables.Float32Col(shape=(2, ))
+    button_state = tables.Float32Col()
     time = tables.Float32Col()
 
 class COGame(Widget):
@@ -107,9 +108,12 @@ class COGame(Widget):
     exit_pos = np.array([exit_pos_x, exit_pos_y])
     
     
-    pd_ind_pos_x = (fixed_window_size_cm[0]/2)-0.5
-    pd_ind_pos_y = (fixed_window_size_cm[1]/2)-0.5
-    pd_indicator_pos = np.array([pd_ind_pos_x, pd_ind_pos_y])
+    pd1_ind_pos_x = (fixed_window_size_cm[0]/2)-0.5
+    pd1_ind_pos_y = (fixed_window_size_cm[1]/2)-0.5
+    pd1_indicator_pos = np.array([pd1_ind_pos_x, pd1_ind_pos_y])
+    pd2_ind_pos_x = (fixed_window_size_cm[0]/2)-2
+    pd2_ind_pos_y = (fixed_window_size_cm[1]/2)-0.5
+    pd2_indicator_pos = np.array([pd2_ind_pos_x, pd2_ind_pos_y])
     
     vid_ind_pos_x = (fixed_window_size_cm[0]/2)-0.5
     vid_ind_pos_y = -(fixed_window_size_cm[1]/2)+0.5
@@ -168,11 +172,15 @@ class COGame(Widget):
         
         # ignore touching around the photodiode
         if len(curs.shape) == 1:
-            if np.linalg.norm(np.array(curs) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < 2*self.exit_rad:
+            if np.linalg.norm(np.array(curs) - np.array([self.pd1_ind_pos_x, self.pd1_ind_pos_y])) < 2*self.exit_rad:
+                curs = np.array([np.nan, np.nan])
+            elif np.linalg.norm(np.array(curs) - np.array([self.pd2_ind_pos_x, self.pd2_ind_pos_y])) < 2*self.exit_rad:
                 curs = np.array([np.nan, np.nan])
         elif len(curs.shape) > 1:
             for i in range(curs.shape[1]):
-                if np.linalg.norm(np.array(curs[i,:]) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < 2*self.exit_rad:
+                if np.linalg.norm(np.array(curs[i,:]) - np.array([self.pd1_ind_pos_x, self.pd1_ind_pos_y])) < 2*self.exit_rad:
+                    curs[i,:] = np.array([np.nan, np.nan])
+                elif np.linalg.norm(np.array(curs[i,:]) - np.array([self.pd2_ind_pos_x, self.pd2_ind_pos_y])) < 2*self.exit_rad:
                     curs[i,:] = np.array([np.nan, np.nan])
         self.cursor[touch.uid] =  curs.copy()
         self.cursor_start[touch.uid] = curs.copy()
@@ -184,11 +192,15 @@ class COGame(Widget):
         curs = pix2cm(np.array([touch.x, touch.y]))
         # ignore touching around the photodiode
         if len(curs.shape) == 1:
-            if np.linalg.norm(np.array(curs) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < 2*self.exit_rad:
+            if np.linalg.norm(np.array(curs) - np.array([self.pd1_ind_pos_x, self.pd1_ind_pos_y])) < 2*self.exit_rad:
+                curs = np.array([np.nan, np.nan])
+            elif np.linalg.norm(np.array(curs) - np.array([self.pd2_ind_pos_x, self.pd2_ind_pos_y])) < 2*self.exit_rad:
                 curs = np.array([np.nan, np.nan])
         elif len(curs.shape) > 1:
             for i in range(curs.shape[1]):
-                if np.linalg.norm(np.array(curs[i,:]) - np.array([self.pd_ind_pos_x, self.pd_ind_pos_y])) < 2*self.exit_rad:
+                if np.linalg.norm(np.array(curs[i,:]) - np.array([self.pd1_ind_pos_x, self.pd1_ind_pos_y])) < 2*self.exit_rad:
+                    curs[i,:] = np.array([np.nan, np.nan])
+                elif np.linalg.norm(np.array(curs[i,:]) - np.array([self.pd2_ind_pos_x, self.pd2_ind_pos_y])) < 2*self.exit_rad:
                     curs[i,:] = np.array([np.nan, np.nan])
         
         self.cursor[touch.uid] =  curs.copy()
@@ -733,9 +745,12 @@ class COGame(Widget):
 
         self.exit_target1.set_size(2*self.exit_rad)
         self.exit_target2.set_size(2*self.exit_rad)
-        self.pd_indicator_targ.set_size(self.exit_rad)
-        self.pd_indicator_targ.move(self.pd_indicator_pos)
-        self.pd_indicator_targ.color = (0., 0., 0., 1.)
+        self.pd1_indicator_targ.set_size(self.exit_rad)
+        self.pd1_indicator_targ.move(self.pd1_indicator_pos)
+        self.pd1_indicator_targ.color = (0., 0., 0., 1.)
+        self.pd2_indicator_targ.set_size(self.exit_rad)
+        self.pd2_indicator_targ.move(self.pd2_indicator_pos)
+        self.pd2_indicator_targ.color = (0., 0., 0., 1.)
         self.vid_indicator_targ.set_size(self.exit_rad)
         self.vid_indicator_targ.move(self.vid_indicator_pos)
         self.vid_indicator_targ.color = (0., 0., 0., 1.)
@@ -751,7 +766,8 @@ class COGame(Widget):
         self.FSM = dict()
         self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
         self.FSM['vid_trig'] = dict(end_vid_trig='button', stop=None)
-        self.FSM['button'] = dict(button_held='target', stop=None)
+        self.FSM['button'] = dict(button_pressed='button_hold', stop=None)
+        self.FSM['button_hold'] = dict(finish_button_hold='target', early_leave_button_hold='button', stop=None)
 
         self.FSM['target'] = dict(touch_target = 'targ_hold', target_timeout='timeout_error', stop=None)
         self.FSM['targ_hold'] = dict(finish_last_targ_hold='reward', finish_targ_hold='target', early_leave_target_hold = 'hold_error',
@@ -873,6 +889,7 @@ class COGame(Widget):
             self.fsr_baseline = 100+1.5*np.max(baseline_data, axis=0)
         else: 
             self.fsr_baseline = np.array([200, 200])
+            
 
         # save parameters: 
         d = dict(animal_name=animal_name,
@@ -1055,26 +1072,6 @@ class COGame(Widget):
         self.state_length = time.time() - self.state_start
         self.rew_cnt += 1
         
-        if self.is_button_ard:
-            # Get the button values
-            ser = self.button_ard.flushInput()
-            _ = self.button_ard.readline()
-            port_read = self.button_ard.readline()
-            port_read = port_read.decode('ascii')
-            i_slash = port_read.find('/')
-            fsr1 = int(port_read[0:i_slash])
-            fsr2 = int(port_read[i_slash+1:])
-        
-            # Determine if the button was pressed or not
-            if fsr1 > self.fsr_baseline[0] or fsr2 > self.fsr_baseline[1]:
-                self.button_pressed = True
-                # print('Button Pressed')
-            else:
-                self.button_pressed = False
-                # print('Button NOT Pressed')
-        else:
-            self.button_pressed = False
-        
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
             kw = dict(ts=self.state_length)
@@ -1107,6 +1104,21 @@ class COGame(Widget):
                 if hasattr(self, while_state_fn_name):
                     while_state_fn = getattr(self, while_state_fn_name)
                     while_state_fn()
+                    
+            ## Change the luminance of the photodiode indicator
+            cursor = np.zeros((10, 2))
+            cursor[:] = np.nan
+            for ic, curs_id in enumerate(self.cursor_ids):
+                cursor[ic, :] = self.cursor[curs_id]
+            if np.isnan(cursor).all():
+                self.vid_indicator_targ.color = (.25, .25, .25, 1.)
+                self.pd2_indicator_targ.color = (0., 0., 0., 1.)
+            else:
+                self.vid_indicator_targ.color = (.5, .5, .5, 1.)
+                if self.state == 'target' and self.touch_target():
+                    self.pd2_indicator_targ.color = (1., 1., 1., 1.)
+                else:
+                    self.pd2_indicator_targ.color = (.75, .75, .75, 1.)
              
         if self.testing:
             pass
@@ -1124,16 +1136,6 @@ class COGame(Widget):
             cursor[ic, :] = self.cursor[curs_id]
 
         self.h5_table_row['cursor'] = cursor
-        
-        ## Change the luminance of the photodiode indicator
-        if np.isnan(cursor).all():
-            self.vid_indicator_targ.color = (.25, .25, .25, 1.)
-            if self.state == 'target':
-                self.pd_indicator_targ.color = (0.25, 0.25, 0.25, 1.)
-        else:
-            self.vid_indicator_targ.color = (.5, .5, .5, 1.)
-            if self.state == 'target':
-                self.pd_indicator_targ.color = (0.75, 0.75, 0.75, 1.)
 
         cursor_id = np.zeros((10, ))
         cursor_id[:] = np.nan
@@ -1141,18 +1143,16 @@ class COGame(Widget):
         self.h5_table_row['cursor_ids'] = cursor_id
 
         self.h5_table_row['target_pos'] = self.active_target_position
+        if self.is_button_ard and self.button_pressed:
+            self.h5_table_row['button_state'] = 1
+        else:
+            self.h5_table_row['button_state'] = 0
         self.h5_table_row['time'] = time.time() - self.t0
         self.h5_table_row.append()
 
         # Write DIO 
         try:
             self.write_row_to_dio()
-        except:
-            pass
-        
-        # Write Eyetracker Strobe 
-        try:
-            self.write_iscan_trig()
         except:
             pass
             
@@ -1220,7 +1220,8 @@ class COGame(Widget):
         self.target1.color = (0., 0., 0., 0.)
         self.target1.color = (0., 0., 0., 0.)
         self.target2.color = (0., 0., 0., 0.)
-        self.pd_indicator_targ.color = (0., 0., 0., 0.)
+        self.pd1_indicator_targ.color = (.75, .75, .75, 1.)
+        self.write_iscan_trig()
         self.trials_started += 1
         
     def end_ITI(self, **kwargs):
@@ -1291,39 +1292,89 @@ class COGame(Widget):
         self.target2.color = (0., 0., 0., 0.)
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.pd_indicator_targ.color = (.25, .25, .25, 1.)
+        self.pd1_indicator_targ.color = (0., 0., 0., 0.)
+        self.write_iscan_trig()
         self.button_pressed_prev = False
         
-    def button_held(self, **kwargs):
-        if self.use_button is False:
+    def button_pressed(self, **kwargs):
+        if self.use_button is False or self.is_button_ard is False:
             return True
         else:
-            button_pressed_prev = self.button_pressed_prev
-            self.button_pressed_prev = self.button_pressed
-            if self.button_pressed:
-                self.pd_indicator_targ.color = (.75, .75, .75, 1.)
-                if button_pressed_prev:
-                    if time.time() - self.t_button_hold_start > self.button_hold_time:
-                        # Play the button reward sound
-                        sound = SoundLoader.load('C.wav')
-                        sound.play()
-                        # if the button has been held down long enough
-                        if self.button_rew[0]:
-                            self.run_button_rew()
-                        return True
-                    else:
-                        return False
-                else:
-                    # this is the first cycle that the button has been pressed for
-                    self.t_button_hold_start = time.time()
-                    return False
+            # Get the button values
+            ser = self.button_ard.flushInput()
+            _ = self.button_ard.readline()
+            port_read = self.button_ard.readline()
+            port_read = port_read.decode('ascii')
+            i_slash = port_read.find('/')
+            fsr1 = int(port_read[0:i_slash])
+            fsr2 = int(port_read[i_slash+1:])
+        
+            # Determine if the button was pressed or not
+            if fsr1 > self.fsr_baseline[0] or fsr2 > self.fsr_baseline[1]:
+                return True
+                # print('Button Pressed')
             else:
-                self.pd_indicator_targ.color = (.25, .25, .25, 1.)
+                return False
+                # print('Button NOT Pressed')
+    
+    # def button_pressed(self, **kwargs):
+    #     if self.use_button is False:
+    #         return True
+    #     else:
+    #         button_pressed_prev = self.button_pressed_prev
+    #         self.button_pressed_prev = self.button_pressed
+    #         if self.button_pressed:
+    #             self.pd1_indicator_targ.color = (.75, .75, .75, 1.)
+    #             if button_pressed_prev:
+    #                 if time.time() - self.t_button_hold_start > self.button_hold_time:
+    #                     # Play the button reward sound
+    #                     sound = SoundLoader.load('C.wav')
+    #                     sound.play()
+    #                     # if the button has been held down long enough
+    #                     if self.button_rew[0]:
+    #                         self.run_button_rew()
+    #                     return True
+    #                 else:
+    #                     return False
+    #             else:
+    #                 # this is the first cycle that the button has been pressed for
+    #                 self.t_button_hold_start = time.time()
+    #                 return False
+    #         else:
+    #             self.pd1_indicator_targ.color = (.25, .25, .25, 1.)
+    #             return False
+    
+    def _start_button_hold(self, **kwargs):
+        self.t_button_hold_start = time.time()
+        self.pd1_indicator_targ.color = (1., 1., 1., 1.)
+        self.write_iscan_trig()
+        
+    def finish_button_hold(self, **kwargs):
+        if self.use_button is False or self.is_button_ard is False:
+            return True
+        else:
+            if time.time() - self.t_button_hold_start > self.button_hold_time:
+                # Play the button reward sound
+                sound = SoundLoader.load('C.wav')
+                sound.play()
+                # if the button has been held down long enough
+                if self.button_rew[0]:
+                    self.run_button_rew()
+                return True
+            else:
                 return False
 
+    def early_leave_button_hold(self, **kwargs):
+        if self.use_button is False or self.is_button_ard is False:
+            return False
+        else:
+            if self.button_pressed():
+                return False
+            else:
+                return True
+    
     def _start_targ_hold(self, **kwargs):
         self.target1.color = (0., 1., 0., 1.)
-        self.pd_indicator_targ.color = (1., 1., 1., 1.)
 
     def _end_targ_hold(self, **kwargs):
         self.target1.color = (0., 0., 0., 0.)
@@ -1383,7 +1434,13 @@ class COGame(Widget):
         
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        self.pd_indicator_targ.color = (.25, .25, .25, 1.)
+        if np.remainder(self.target_index, 2) == 1:
+            self.pd1_indicator_targ.color = (0., 0., 0., 0.)
+        elif np.remainder(self.target_index, 2) == 0:
+            self.pd1_indicator_targ.color = (1., 1., 1., 1.)
+        self.write_iscan_trig()
+            
+            
         if self.first_target_attempt:
             self.first_target_attempt_t0 = time.time();
             self.first_target_attempt = False
@@ -1412,7 +1469,11 @@ class COGame(Widget):
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
         self.cnts_in_rew = 0
-        self.pd_indicator_targ.color = (1., 1., 1., 1.)
+        if np.remainder(self.num_targets, 2) == 1:
+            self.pd1_indicator_targ.color = (1., 1., 1., 1.)
+        elif np.remainder(self.num_targets, 2) == 0:
+            self.pd1_indicator_targ.color = (0., 0., 0., 1.)
+        self.write_iscan_trig()
         self.repeat = False
 
     def _while_reward(self, **kwargs):
@@ -1501,7 +1562,6 @@ class COGame(Widget):
         #self.repeat = True
 
     def end_reward(self, **kwargs):
-        self.pd_indicator_txt_color = (1.,1., 1., 1.)
         if self.use_white_screen:
             if len(self.cursor_ids)== 0:
                 return True

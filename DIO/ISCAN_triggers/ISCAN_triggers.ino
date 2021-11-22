@@ -1,5 +1,5 @@
 char c; 
-int record_trig = 3;
+int record_trig = 2;
 int strobe = 3;
 
 void setup() {
@@ -7,6 +7,8 @@ void setup() {
   Serial.begin(115200); 
   pinMode(strobe, OUTPUT); 
   pinMode(record_trig, OUTPUT); 
+  digitalWrite(strobe, LOW); 
+  digitalWrite(record_trig, HIGH); 
 }
 
 void loop() {
@@ -18,9 +20,9 @@ void loop() {
       delay(1); 
       digitalWrite(strobe, LOW); 
     } else if (c=='s') {
-      digitalWrite(record_trig, HIGH); 
-    } else if (c=='e') {
       digitalWrite(record_trig, LOW); 
+    } else if (c=='e') {
+      digitalWrite(record_trig, HIGH); 
     }
   }
 }
