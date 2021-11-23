@@ -1,0 +1,537 @@
+#:kivy 1.10.0
+#:import Clock kivy.clock.Clock
+
+<Manager>:
+    id: screen_manager
+
+    Screen:
+        name: 'home'
+
+        BoxLayout
+            id: starting
+            orientation: 'vertical'
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: 'Welcome! Make a Selection in Each Row:'
+                fontsize: 80
+                color: 0,0,1,1
+                canvas.before:
+                    Color: 
+                        rgb: 1,1,0
+                        
+            BoxLayout
+                id: starting2
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: 'Animal Names:'
+                    color: 1, 1, 0, 1
+                    fontsize: 50
+                    
+                Label: 
+                    text: 'Haribo'
+                    fontsize: 28
+                    halign: 'center'                        
+                CheckBox: 
+                    group: 'check'
+                    id: chk_har
+                    active: root.is_haribo  
+                     
+                Label: 
+                    text: 'Testing'
+                    fontsize: 28
+                    halign: 'center' 
+                CheckBox: 
+                    group: 'check'
+                    id: chk_test
+                    active: root.is_testing
+                   
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            BoxLayout 
+                id: top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Which Juicer?        '
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: 'Old yellow'
+
+                CheckBox:
+                    group: 'juicer'
+                    id: yellow
+                    active: root.juicer_y
+            
+                Label: 
+                    text: 'New red'
+
+                CheckBox:
+                    group: 'juicer'
+                    id: red
+                    active: root.juicer_r
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            
+            BoxLayout 
+                id: big_rew
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label: 
+                    text: 'Maximum Reward'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0.3 sec'
+                CheckBox:
+                    id: big_rew_pt3_sec
+                    group: 'big_rew'
+                    active: root.is_threw300
+
+                Label: 
+                    text: '0.5 sec'
+                CheckBox:
+                    id: big_rew_pt5_sec
+                    group: 'big_rew'
+                    active: root.is_threw500
+
+                Label: 
+                    text: '0.7 sec'
+                CheckBox:
+                    id: big_rew_pt7_sec
+                    group: 'big_rew'
+                    active: root.is_threw700
+                    
+                Label: 
+                    text: '0.9 sec'
+                CheckBox:
+                    id: big_rew_pt9_sec
+                    group: 'big_rew'
+                    active: root.is_threw900
+                    
+                Label: 
+                    text: '1.1 sec'
+                CheckBox:
+                    id: big_rew_1pt1_sec
+                    group: 'big_rew'
+                    active: root.is_threw1100
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+            BoxLayout:
+                id: screen_top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Lower Screen Top By'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0 cm'
+                CheckBox:
+                    id: screen_top_zero
+                    group: 'screen_top'
+                    active: root.is_screentopzero
+                    
+                Label: 
+                    text: '2 cm'
+                CheckBox:
+                    id: screen_top_neg1
+                    group: 'screen_top'
+                    active: root.is_screentop2
+                
+                Label: 
+                    text: '4 cm'
+                CheckBox:
+                    id: screen_top_neg2
+                    group: 'screen_top'
+                    active: root.is_screentop4
+                    
+                Label: 
+                    text: '6 cm'
+                CheckBox:
+                    id: screen_top_neg3
+                    group: 'screen_top'
+                    active: root.is_screentop6
+                
+                Label: 
+                    text: '8 cm'
+                CheckBox:
+                    id: screen_top_neg4
+                    group: 'screen_top'
+                    active: root.is_screentop8
+                  
+                Label: 
+                    text: '10 cm'
+                CheckBox:
+                    id: screen_top_neg5
+                    group: 'screen_top'
+                    active: root.is_screentop10
+                    
+                Label: 
+                    text: '12 cm'
+                CheckBox:
+                    id: screen_top_neg6
+                    group: 'screen_top'
+                    active: root.is_screentop12
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+            BoxLayout:
+                id: test
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Auto-Quit After: '
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '10 trials'
+                CheckBox:
+                    id: ten_trials
+                    group: 'trials'
+                    active: root.is_autoqt10
+
+                Label: 
+                    text: '25 trials'
+                CheckBox:
+                    id: twenty_five_trials
+                    group: 'trials'
+                    active: root.is_autoqt25
+
+                Label:
+                    text: '50 trials'
+                CheckBox:
+                    id: fifty_trials
+                    group: 'trials'
+                    active: root.is_autoqt50
+                    
+                Label:
+                    text: '100 trials!'
+                CheckBox:
+                    id: hundred_trials
+                    group: 'trials'
+                    active: root.is_autoqt100
+
+                Label:
+                    text: 'Dont AutoQuit'
+                CheckBox:
+                    id: no_trials
+                    group: 'trials'
+                    active: root.is_autoqtnever
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+            Button:
+                text: 'Play Target Chase Game'
+                halign: 'center'
+                valign: 'middle'
+                font_size: 50
+                text_size: self.size
+                on_release: 
+                    root.current = 'splash_start'
+                    splash.init(
+                    dict(haribo=chk_har.active, fifi=False, nike=False, butters=False, testing=chk_test.active), 
+                    
+                    dict(button_rew=[True, False, False, False], 
+                    min_rew=[True, False, False, False, False],
+                    big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active, big_rew_pt9_sec.active, big_rew_1pt1_sec.active]), 
+                    
+                    dict(targ_rad=[False, False, False, False, False, False, False, True, False, False], 
+                    eff_targ_rad=[True, False, False, False, False, False],
+                    seq=[False, False, False, False, False, False, False, False, True],
+                    targ1_pos=[True,False, False, False, False, False, False, False, False,False],
+                    targ2_pos=[True, False,False, False, False, False, False, False ,False, False, False],
+                    targ3_pos=[True, False,False, False, False, False, False, False ,False, False],
+                    targ4_pos=[True, False,False, False, False, False, False, False ,False, False,],
+                    time_to_next_targ=[True, False, False, False, False, False]),
+                    
+                    dict(button_hold=[False, False, False, False, False, False, False, False, False, False, False, False, True, False, False],
+                    hold=[True, False, False, False, False, False, False, False, False]), 
+                    
+                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
+                    
+                    dict(rew_var=[True, False, False]),
+                    
+                    dict(t1tt=[False, False, False, False,False, False,False, False, True],
+                    tt=[False,False, False, False, False, False, False, False, True]),
+                    
+                    dict(drag=[False,True]),
+                    
+                    dict(nudge_x_t1=[False, True, False,False, False,False,False],
+                    nudge_x_t2=[False, False, False, True, False, False, False],
+                    nudge_x_t3=[False, True, False, False, False, False, False],
+                    nudge_x_t4=[False, False, False, True, False, False, False]),
+                    
+                    dict(screen_top=[screen_top_neg6.active, screen_top_neg5.active, screen_top_neg4.active, screen_top_neg3.active, screen_top_neg2.active, screen_top_neg1.active, screen_top_zero.active], 
+                    
+                    screen_bot=[True, False, False, False, False, False, False]),
+                    
+                    dict(juicer=[yellow.active, red.active]))
+
+            Label:
+                text: ''
+                fontsize: 50
+            Label:
+                text: ''
+                fontsize: 50
+
+    Screen: 
+        name: 'splash_start'
+        Splash:
+            id: splash
+
+        BoxLayout:
+            id: test
+            orientation: 'vertical'
+         
+            Label:
+                text: 'Parameters Cached!! \n \n Prepare the Monkey! \n \n Pausing Until Start Button Pressed. '
+                halign: 'center'
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+                
+            BoxLayout:
+                id: test2
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Button: 
+                    text: 'Start'
+                    color: .25, .25, .25, 1
+                    background_color: (.2, .2, .2, 1.0)
+
+                    on_release:
+                        root.current = 'game_screen'
+                        game.init(*splash.args)
+                        Clock.schedule_interval(game.update, 1.0 / 60.0)
+                
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+                
+    Screen:
+        name: 'game_screen'
+        COGame:
+            id: game
+
+<COGame>:
+    target1: target_1
+    target2: target_2
+    exit_target1: target_e1
+    exit_target2: target_e2
+    pd_indicator_targ: pd_indicator
+    vid_indicator_targ: vid_indicator
+
+    Target:
+        id: pd_indicator
+        
+    Target:
+        id: vid_indicator
+        
+    Target: 
+        id: target_1
+        
+    Target: 
+        id: target_2
+
+    Target:
+        id: target_e1
+
+    Target:
+        id: target_e2
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 6/8
+        top: root.top - 70
+        text: str(root.trial_counter)
+
+    
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 170
+        text: root.percent_correct_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 170
+        text: root.percent_correct
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 270
+        text: root.tht_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 270
+        text: root.tht_param
+
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 470
+        text: root.targ_size_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 470
+        text: root.targ_size_param
+
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 570
+        text: root.big_rew_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 570
+        text: root.big_rew_time_param
+
+
+<Target>:
+    canvas:
+        Color:
+            rgba:self.color
+        Ellipse: 
+            pos:self.pos
+            size:self.size
