@@ -133,14 +133,13 @@ class R2Game(Widget):
         self.h5_table_row_cnt = 0
         self.idle = False
 
-
         cap = [True, False]
         for i, val in enumerate(use_cap['use_cap']):
             if val:
                 self.use_cap_not_button = cap[i]
 
         button_holdz = [0., 0.1, 0.2, 0.3, 0.4]
-        grasp_holdz = [0., .15, .2, .25, .35, .50]
+        grasp_holdz = [0., 0.05, 0.1, 0.15, .2, .25, .35, .50]
 
         for i, val in enumerate(hold['start_hold']):
             if val:
@@ -984,6 +983,8 @@ class Manager(ScreenManager):
         button_4 = BooleanProperty(data_params['start_hold'] == 0.4)
 
         grasp_0 = BooleanProperty(data_params['grasp_hold'] == 0.)
+        grasp_5 = BooleanProperty(data_params['grasp_hold'] == 0.05)
+        grasp_10 = BooleanProperty(data_params['grasp_hold'] == 0.10)
         grasp_15 = BooleanProperty(data_params['grasp_hold'] == 0.15)
         grasp_20 = BooleanProperty(data_params['grasp_hold'] == 0.20)
         grasp_25 = BooleanProperty(data_params['grasp_hold'] == 0.25)
