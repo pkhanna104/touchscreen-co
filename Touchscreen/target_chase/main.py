@@ -108,10 +108,10 @@ class COGame(Widget):
     exit_pos = np.array([exit_pos_x, exit_pos_y])
     
     
-    pd1_ind_pos_x = (fixed_window_size_cm[0]/2)-0.5
+    pd1_ind_pos_x = (fixed_window_size_cm[0]/2)-0.3
     pd1_ind_pos_y = (fixed_window_size_cm[1]/2)-0.5
     pd1_indicator_pos = np.array([pd1_ind_pos_x, pd1_ind_pos_y])
-    pd2_ind_pos_x = (fixed_window_size_cm[0]/2)-2
+    pd2_ind_pos_x = (fixed_window_size_cm[0]/2)-1.8
     pd2_ind_pos_y = (fixed_window_size_cm[1]/2)-0.5
     pd2_indicator_pos = np.array([pd2_ind_pos_x, pd2_ind_pos_y])
     
