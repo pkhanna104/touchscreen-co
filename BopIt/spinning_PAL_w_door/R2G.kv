@@ -678,6 +678,20 @@
                     active: root.grasp_to10
 
                 Label: 
+                    text: '20 sec'
+                CheckBox: 
+                    id: gto_twenty_sec
+                    group: 'gto'
+                    active: root.grasp_to20
+
+                Label: 
+                    text: '30 sec'
+                CheckBox: 
+                    id: gto_thirty_sec
+                    group: 'gto'
+                    active: root.grasp_to30
+
+                Label: 
                     text: 'Infinity'
                 CheckBox:
                     id: gto_inf
@@ -815,7 +829,7 @@
                     dict(start_hold=[zero_hold.active, hund_hold.active, two_hund_hold.active, three_hund_hold.active, four_hund_hold.active], grasp_hold = [g_zero_sec.active, 
                     g_50_msec.active, g_100_msec.active, g_eighteen_sec.active, g_twenty_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_half_sec.active]), 
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
-                    dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]),
+                    dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_twenty_sec.active, gto_thirty_sec.active, gto_inf.active]),
                     dict(use_cap=[False, True]), 
                     dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]), 
                     dict(trials=[giant_hole.active, tripod.active, pinch.active, tiny.active,

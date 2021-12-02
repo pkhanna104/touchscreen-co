@@ -227,7 +227,7 @@ class R2Game(Widget):
         self.use_start = True
         self.only_start = False
 
-        grasp_tos = [5., 10., 999999999.]
+        grasp_tos = [5., 10., 20., 30., 999999999.]
 
         for i, val in enumerate(grasp_to['gto']):
             if val:
@@ -1011,16 +1011,11 @@ class Manager(ScreenManager):
             elif trl == 'pinch_3': 
                 pinch3 = BooleanProperty(True)
 
-        grasp_to5 = BooleanProperty(False)
-        grasp_to10 = BooleanProperty(False)
-        grasp_toinf = BooleanProperty(False)
-
-        if data_params['grasp_timeout'] == 5.: 
-            grasp_to5 = BooleanProperty(True)
-        elif data_params['grasp_timeout'] == 10.: 
-            grasp_to10 = BooleanProperty(True)
-        else:
-            grasp_toinf = BooleanProperty(True)
+        grasp_to5 = BooleanProperty(data_params['grasp_timeout'] == 5.)
+        grasp_to10 = BooleanProperty(data_params['grasp_timeout'] == 10.)
+        grasp_to20 = BooleanProperty(data_params['grasp_timeout'] == 20.)
+        grasp_to30 = BooleanProperty(data_params['grasp_timeout'] == 30.)
+        grasp_toinf = BooleanProperty(data_params['grasp_timeout'] > 40)
 
         trls_25 = BooleanProperty(data_params['trls_25'])
         trls_50 = BooleanProperty(data_params['trls_50'])
