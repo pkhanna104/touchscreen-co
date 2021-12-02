@@ -139,7 +139,7 @@ class R2Game(Widget):
                 self.use_cap_not_button = cap[i]
 
         button_holdz = [0., 0.1, 0.2, 0.3, 0.4]
-        grasp_holdz = [0., 0.05, 0.1, 0.15, .2, .25, .35, .50]
+        grasp_holdz = [0., 0.05, 0.1, 0.15, .2, .25, .35, .50, '.09-.12', '.11-.15']
 
         for i, val in enumerate(hold['start_hold']):
             if val:
@@ -156,7 +156,7 @@ class R2Game(Widget):
                     self.grasp_hold_type = grasp_holdz[i]
                     self.grasp_hold = 0.
                 else:
-                    self.grasp_hold_type = 0
+                    self.grasp_hold_type = grasp_holdz[i]
                     self.grasp_hold = grasp_holdz[i]
 
         small_rew_opts = [.1, .3, .5]
@@ -368,7 +368,7 @@ class R2Game(Widget):
             ITI_mean=self.ITI_mean, ITI_std = self.ITI_std, start_timeout = self.start_timeout, rew_delay = self.reward_delay_time,
             reward_fcn=reward_fcn, use_cap=self.use_cap_not_button,
             start_hold=self.start_hold,
-            grasp_hold = self.grasp_hold, 
+            grasp_hold = self.grasp_hold_type, 
             grasp_timeout = self.grasp_timeout_time, 
             big_rew=big_rew, 
             small_rew = small_rew, 
@@ -990,7 +990,8 @@ class Manager(ScreenManager):
         grasp_25 = BooleanProperty(data_params['grasp_hold'] == 0.25)
         grasp_35 = BooleanProperty(data_params['grasp_hold'] == 0.35)
         grasp_50 = BooleanProperty(data_params['grasp_hold'] == 0.50)
-
+        grasp_r_90_120 = BooleanProperty(data_params['grasp_hold'] == '.09-.12')
+        grasp_r_110_150 = BooleanProperty(data_params['grasp_hold'] == '.11-.15')
 
         power = BooleanProperty(False)
         tripod = BooleanProperty(False)
