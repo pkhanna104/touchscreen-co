@@ -243,7 +243,7 @@ class COGame(Widget):
 
         # NUDGE X
         nudge_x_opts = [-6, -4, -2, 0, 2, 4, 6]    
-        for i, val in enumerate(nudge_x['nudge_x_t1']):
+y        for i, val in enumerate(nudge_x['nudge_x_t1']):
             if val:
                 self.nudge_x_t1 = nudge_x_opts[i]
                 
@@ -286,7 +286,7 @@ class COGame(Widget):
         
                 
         # TARGET POSITIONS
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'center out', 'button out']
+        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -2034,6 +2034,7 @@ class Manager(ScreenManager):
     is_seqF = BooleanProperty(False)
     is_seqG = BooleanProperty(False)
     is_seqH = BooleanProperty(False)
+    is_seqI = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     is_BO = BooleanProperty(False)
     try:
@@ -2053,6 +2054,8 @@ class Manager(ScreenManager):
             is_seqG = BooleanProperty(True) 
         elif data_params['seq'] == 'H':
             is_seqH = BooleanProperty(True) 
+        elif data_params['seq'] == 'I':
+            is_seqI = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
         elif data_params['seq'] == 'button out': 
