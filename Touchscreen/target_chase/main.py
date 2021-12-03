@@ -243,7 +243,7 @@ class COGame(Widget):
 
         # NUDGE X
         nudge_x_opts = [-6, -4, -2, 0, 2, 4, 6]    
-y        for i, val in enumerate(nudge_x['nudge_x_t1']):
+        for i, val in enumerate(nudge_x['nudge_x_t1']):
             if val:
                 self.nudge_x_t1 = nudge_x_opts[i]
                 
