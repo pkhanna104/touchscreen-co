@@ -351,6 +351,14 @@ class COGame(Widget):
             self.target3_pos_str = 'lower_middle'
             self.target4_pos_str = 'upper_middle'
             self.target5_pos_str = 'middle_left'
+            
+        elif self.seq == 'I':
+            seq_preselect = True
+            self.target1_pos_str = 'lower_left'
+            self.target2_pos_str = 'upper_middle'
+            self.target3_pos_str = 'lower_right'
+            self.target4_pos_str = 'upper_right'
+            self.target5_pos_str = 'center'
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -747,7 +755,7 @@ class COGame(Widget):
         self.exit_target2.set_size(2*self.exit_rad)
         self.pd1_indicator_targ.set_size(self.exit_rad)
         self.pd1_indicator_targ.move(self.pd1_indicator_pos)
-        self.pd1_indicator_targ.color = (0., 0., 0., 1.)
+        self.pd1_indicator_targ.color = (.75, .75, .75, 1.)
         self.pd2_indicator_targ.set_size(self.exit_rad)
         self.pd2_indicator_targ.move(self.pd2_indicator_pos)
         self.pd2_indicator_targ.color = (0., 0., 0., 1.)
@@ -1143,7 +1151,7 @@ class COGame(Widget):
         self.h5_table_row['cursor_ids'] = cursor_id
 
         self.h5_table_row['target_pos'] = self.active_target_position
-        if self.is_button_ard and self.button_pressed:
+        if self.is_button_ard and self.button_pressed():
             self.h5_table_row['button_state'] = 1
         else:
             self.h5_table_row['button_state'] = 0
@@ -1176,6 +1184,7 @@ class COGame(Widget):
         # If past number of max trials then auto-quit: 
         if np.logical_and(self.trial_counter >= self.max_trials, self.state == 'ITI'):
             self.idle = True
+            self.pd1_indicator_targ.color = (.75, .75, .75, 1.)
             return True
         else:
             e = [0, 0]
@@ -1192,6 +1201,7 @@ class COGame(Widget):
                     
             if t[0] > self.exit_hold and t[1] > self.exit_hold:
                 self.idle = False
+                self.pd1_indicator_targ.color = (.75, .75, .75, 1.)
                 return True
 
             else:
