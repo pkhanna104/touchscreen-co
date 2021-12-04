@@ -28,7 +28,7 @@ void loop() {
   if (t_now > t_last_trig + 1000){
     t_last_trig = t_now;
     digitalWrite(strobe, HIGH);
-    delay(500);
+    delay(10);
     digitalWrite(strobe, LOW);
   }
 }
