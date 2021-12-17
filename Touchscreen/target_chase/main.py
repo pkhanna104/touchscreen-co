@@ -386,11 +386,11 @@ class COGame(Widget):
             
         elif self.seq == 'M':
             seq_preselect = True
-            self.target1_pos_str = 'upper_right'
-            self.target2_pos_str = 'lower_middle'
-            self.target3_pos_str = 'middle_left'
-            self.target4_pos_str = 'middle_right'
-            self.target5_pos_str = 'upper_left'
+            self.target1_pos_str = 'center'
+            self.target2_pos_str = 'upper_left'
+            self.target3_pos_str = 'middle_right'
+            self.target4_pos_str = 'lower_middle'
+            self.target5_pos_str = 'upper_right'
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -1294,9 +1294,7 @@ class COGame(Widget):
         else:
             if self.trial_counter == self.next_breaktrl:
                 sound = SoundLoader.load('DoorBell.wav')
-                Sound.volume(0.5)
                 sound.play()
-                Sound.volume(1)
                 self.this_breakdur = self.break_dur
                 self.next_breaktrl = self.next_breaktrl + self.break_trl
             else:
@@ -1305,9 +1303,7 @@ class COGame(Widget):
     def end_taskbreak(self, **kwargs):
         if self.this_breakdur > 0 and kwargs['ts'] > self.this_breakdur:
             sound = SoundLoader.load('DoorBell.wav')
-            Sound.volume(0.5)
             sound.play()
-            Sound.volume(1)
         return kwargs['ts'] > self.this_breakdur
 
     def _start_vid_trig(self, **kwargs):
