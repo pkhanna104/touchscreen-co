@@ -745,7 +745,7 @@ class COGame(Widget):
 
         self.testing = False
 
-        autoquit_trls = [10, 25, 50, 100, 10**10]
+        autoquit_trls = [10, 25, 50, 90, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
@@ -1294,8 +1294,9 @@ class COGame(Widget):
         else:
             if self.trial_counter == self.next_breaktrl:
                 sound = SoundLoader.load('DoorBell.wav')
-                sound.volume(0.5)
+                Sound.volume(0.5)
                 sound.play()
+                Sound.volume(1)
                 self.this_breakdur = self.break_dur
                 self.next_breaktrl = self.next_breaktrl + self.break_trl
             else:
@@ -1304,8 +1305,9 @@ class COGame(Widget):
     def end_taskbreak(self, **kwargs):
         if self.this_breakdur > 0 and kwargs['ts'] > self.this_breakdur:
             sound = SoundLoader.load('DoorBell.wav')
-            sound.volume(0.5)
+            Sound.volume(0.5)
             sound.play()
+            Sound.volume(1)
         return kwargs['ts'] > self.this_breakdur
 
     def _start_vid_trig(self, **kwargs):
@@ -2510,6 +2512,7 @@ class Manager(ScreenManager):
     is_autoqt10 = BooleanProperty(False)
     is_autoqt25 = BooleanProperty(False)
     is_autoqt50 = BooleanProperty(False)
+    is_autoqt90 = BooleanProperty(False)
     is_autoqt100 = BooleanProperty(False)
     is_autoqtnever = BooleanProperty(False)
     try:
@@ -2519,6 +2522,8 @@ class Manager(ScreenManager):
             is_autoqt25 = BooleanProperty(True)
         elif data_params['max_trials'] == 50:
             is_autoqt50 = BooleanProperty(True)
+        elif data_params['max_trials'] == 90:
+            is_autoqt90 = BooleanProperty(True)
         elif data_params['max_trials'] == 100:
             is_autoqt100 = BooleanProperty(True)
         elif data_params['max_trials'] == 10**10:
