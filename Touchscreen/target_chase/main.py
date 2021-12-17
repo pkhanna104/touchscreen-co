@@ -1294,6 +1294,7 @@ class COGame(Widget):
         else:
             if self.trial_counter == self.next_breaktrl:
                 sound = SoundLoader.load('DoorBell.wav')
+                sound.volume(0.5)
                 sound.play()
                 self.this_breakdur = self.break_dur
                 self.next_breaktrl = self.next_breaktrl + self.break_trl
@@ -1303,6 +1304,7 @@ class COGame(Widget):
     def end_taskbreak(self, **kwargs):
         if self.this_breakdur > 0 and kwargs['ts'] > self.this_breakdur:
             sound = SoundLoader.load('DoorBell.wav')
+            sound.volume(0.5)
             sound.play()
         return kwargs['ts'] > self.this_breakdur
 
