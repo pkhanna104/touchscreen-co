@@ -216,7 +216,7 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         hold=None, autoquit=None, rew_var=None, targ_timeout = None, 
-        drag=None, nudge_x=None, screen_size=None, juicer=None):
+        drag=None, nudge_x=None, screen_size=None, juicer=None, taskbreak=None):
         
         self.rew_cnt = 0
 
@@ -286,7 +286,7 @@ class COGame(Widget):
         
                 
         # TARGET POSITIONS
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'center out', 'button out']
+        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -382,6 +382,14 @@ class COGame(Widget):
             self.target2_pos_str = 'upper_right'
             self.target3_pos_str = 'center'
             self.target4_pos_str = 'lower_right'
+            self.target5_pos_str = 'upper_left'
+            
+        elif self.seq == 'M':
+            seq_preselect = True
+            self.target1_pos_str = 'upper_right'
+            self.target2_pos_str = 'lower_middle'
+            self.target3_pos_str = 'middle_left'
+            self.target4_pos_str = 'middle_right'
             self.target5_pos_str = 'upper_left'
         
         elif self.seq == 'center out':
@@ -741,6 +749,19 @@ class COGame(Widget):
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
+                
+        # TASK BREAKS
+        break_trls = [0, 10, 15, 20, 25]
+        for i, val in enumerate(taskbreak['breaktrl']):
+            if val: 
+                self.break_trl = break_trls[i]
+                
+        self.next_breaktrl = self.break_trl
+                
+        break_durs = [30, 60, 90, 120, 150]
+        for i, val in enumerate(taskbreak['breakdur']):
+            if val: 
+                self.break_dur = break_durs[i]
         
         # OK to drag into the targets?
         self.drag_ok = False;
@@ -796,7 +817,8 @@ class COGame(Widget):
         self.repeat = False
 
         self.FSM = dict()
-        self.FSM['ITI'] = dict(end_ITI='vid_trig', stop=None)
+        self.FSM['ITI'] = dict(end_ITI='taskbreak', stop=None)
+        self.FSM['taskbreak'] = dict(end_taskbreak='vid_trig', stop=None)
         self.FSM['vid_trig'] = dict(end_vid_trig='button', stop=None)
         self.FSM['button'] = dict(button_pressed='button_hold', stop=None)
         self.FSM['button_hold'] = dict(finish_button_hold='target', early_leave_button_hold='button', stop=None)
@@ -927,6 +949,8 @@ class COGame(Widget):
         d = dict(animal_name=animal_name,
             juicer = self.juicer,
             user_id = user_id,
+            break_trl = self.break_trl,
+            break_dur = self.break_dur,
             max_trials = self.max_trials,
             target1_timeout_time = self.target1_timeout_time,
             target_timeout_time = self.target_timeout_time,
@@ -1263,6 +1287,28 @@ class COGame(Widget):
         
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
+    
+    def _start_taskbreak(self, **kwargs):
+        if self.break_trl == 0:
+            self.this_breakdur = 0
+        else:
+            if self.trial_counter == self.next_breaktrl:
+                sound = SoundLoader.load('B35.wav')
+                sound.play()
+                sound = SoundLoader.load('B35.wav')
+                sound.play()
+                self.this_breakdur = self.break_dur
+                self.next_breaktrl = self.next_breaktrl + self.break_trl
+            else:
+                self.this_breakdur = 0
+    
+    def end_taskbreak(self, **kwargs):
+        if kwargs['ts'] > self.this_breakdur:
+            sound = SoundLoader.load('B35.wav')
+            sound.play()
+            sound = SoundLoader.load('B35.wav')
+            sound.play()
+        return kwargs['ts'] > self.this_breakdur
 
     def _start_vid_trig(self, **kwargs):
         if self.trial_counter == 0:
@@ -2062,6 +2108,7 @@ class Manager(ScreenManager):
     is_seqJ = BooleanProperty(False)
     is_seqK = BooleanProperty(False)
     is_seqL = BooleanProperty(False)
+    is_seqM = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     is_BO = BooleanProperty(False)
     try:
@@ -2089,6 +2136,8 @@ class Manager(ScreenManager):
             is_seqK = BooleanProperty(True) 
         elif data_params['seq'] == 'L':
             is_seqL = BooleanProperty(True) 
+        elif data_params['seq'] == 'M':
+            is_seqM = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
         elif data_params['seq'] == 'button out': 
@@ -2416,6 +2465,46 @@ class Manager(ScreenManager):
             is_ttnt100 = BooleanProperty(True)
         elif data_params['time_to_next_targ'] == 1.5:
             is_ttnt150 = BooleanProperty(True)
+    except:
+        pass
+    
+    # break after x trials
+    is_nobreak = BooleanProperty(False)
+    is_break10 = BooleanProperty(False)
+    is_break15 = BooleanProperty(False)
+    is_break20 = BooleanProperty(False)
+    is_break25 = BooleanProperty(False)
+    try:
+        if data_params['break_trl'] == 0:
+            is_nobreak = BooleanProperty(True)
+        elif data_params['break_trl'] == 10:
+            is_break10 = BooleanProperty(True)
+        elif data_params['break_trl'] == 15:
+            is_break15 = BooleanProperty(True)
+        elif data_params['break_trl'] == 20:
+            is_break20 = BooleanProperty(True)
+        elif data_params['break_trl'] == 25:
+            is_break25 = BooleanProperty(True)
+    except:
+        pass
+    
+    # break duration
+    is_breakdur30 = BooleanProperty(False)
+    is_breakdur60 = BooleanProperty(False)
+    is_breakdur90 = BooleanProperty(False)
+    is_breakdur120 = BooleanProperty(False)
+    is_breakdur150 = BooleanProperty(False)
+    try:
+        if data_params['break_dur'] == 30:
+            is_breakdur30 = BooleanProperty(True)
+        elif data_params['break_dur'] == 60:
+            is_breakdur60 = BooleanProperty(True)
+        elif data_params['break_dur'] == 90:
+            is_breakdur90 = BooleanProperty(True)
+        elif data_params['break_dur'] == 120:
+            is_breakdur120 = BooleanProperty(True)
+        elif data_params['break_dur'] == 150:
+            is_breakdur150 = BooleanProperty(True)
     except:
         pass
     
