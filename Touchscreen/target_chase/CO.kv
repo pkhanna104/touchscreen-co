@@ -1097,6 +1097,13 @@
                     active: root.is_seqM
                     
                 Label: 
+                    text: 'N'
+                CheckBox:
+                    id: seqN
+                    group: 'seq'
+                    active: root.is_seqN
+                    
+                Label: 
                     text: 'Center Out'
                 CheckBox:
                     id: centerOut
@@ -2216,6 +2223,13 @@
                     active: root.is_autoqt50
                     
                 Label:
+                    text: '90 trials'
+                CheckBox:
+                    id: ninety_trials
+                    group: 'trials'
+                    active: root.is_autoqt90
+                    
+                Label:
                     text: '100 trials!'
                 CheckBox:
                     id: hundred_trials
@@ -2254,7 +2268,7 @@
                     big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active, big_rew_pt9_sec.active, big_rew_1pt1_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_18.active, targ_rad_22.active, targ_rad_30.active, targ_rad_40.active], 
                     eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active],
-                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, seqF.active, seqG.active, seqH.active, seqI.active, seqJ.active, seqK.active, seqL.active, seqM.active, centerOut.active, buttonOut.active],
+                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, seqF.active, seqG.active, seqH.active, seqI.active, seqJ.active, seqK.active, seqL.active, seqM.active, seqN.active, centerOut.active, buttonOut.active],
                     targ1_pos=[t1random.active, t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
                     targ2_pos=[t2none.active, t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
                     targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_mid.active, t3lower_mid.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
@@ -2262,7 +2276,7 @@
                     time_to_next_targ=[t2next_never.active, t2next_250.active, t2next_500.active, t2next_750.active, t2next_1000.active, t2next_1500.active]),
                     dict(button_hold=[bhtfalse.active, bht000.active, bht100.active, bht200.active, bht300.active, bht400.active, bht500.active, bht600.active, bht700.active, bht800.active, bht900.active, bht1000.active, bht200to400.active, bht600to800.active, bht800to1000.active],
                     hold=[tht000.active, tht100.active, tht200.active, tht300.active, tht400.active, tht500.active, tht600.active, tht100to300.active, tht400to600.active]), 
-                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
+                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, ninety_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
                     dict(t1tt=[t1tt_0pt8_sec.active, t1tt_1pt0_sec.active, t1tt_1pt5_sec.active, t1tt_2pt0_sec.active, t1tt_2pt5_sec.active, t1tt_3pt0_sec.active, t1tt_3pt5_sec.active, t1tt_4pt0_sec.active, t1tt_10pt0_sec.active],
                     tt=[tt_0pt7_sec.active, tt_0pt8_sec.active, tt_1pt0_sec.active, tt_1pt5_sec.active, tt_2pt0_sec.active, tt_2pt5_sec.active, tt_3pt0_sec.active, tt_3pt5_sec.active, tt_4pt0_sec.active]),
