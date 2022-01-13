@@ -1062,6 +1062,62 @@
                     active: root.is_seqH
                     
                 Label: 
+                    text: 'I'
+                CheckBox:
+                    id: seqI
+                    group: 'seq'
+                    active: root.is_seqI
+                    
+                Label: 
+                    text: 'J'
+                CheckBox:
+                    id: seqJ
+                    group: 'seq'
+                    active: root.is_seqJ
+                    
+                Label: 
+                    text: 'K'
+                CheckBox:
+                    id: seqK
+                    group: 'seq'
+                    active: root.is_seqK
+                    
+                Label: 
+                    text: 'L'
+                CheckBox:
+                    id: seqL
+                    group: 'seq'
+                    active: root.is_seqL
+                    
+                Label: 
+                    text: 'M'
+                CheckBox:
+                    id: seqM
+                    group: 'seq'
+                    active: root.is_seqM
+                    
+                Label: 
+                    text: 'N'
+                CheckBox:
+                    id: seqN
+                    group: 'seq'
+                    active: root.is_seqN
+                    
+                Label: 
+                    text: 'O'
+                CheckBox:
+                    id: seqO
+                    group: 'seq'
+                    active: root.is_seqO
+                    
+                Label: 
+                    text: 'P'
+                CheckBox:
+                    id: seqP
+                    group: 'seq'
+                    active: root.is_seqP
+                    
+                Label: 
                     text: 'Center Out'
                 CheckBox:
                     id: centerOut
@@ -1996,7 +2052,145 @@
                 Label:
                     text: ''
                     fontsize: 50
-                           
+            
+            
+            
+            BoxLayout:
+                id: break
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Break Every: '
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: 'NO Break'
+                CheckBox:
+                    id: break_none
+                    group: 'break'
+                    active: root.is_nobreak
+                
+                Label: 
+                    text: '10 trials'
+                CheckBox:
+                    id: break_10
+                    group: 'break'
+                    active: root.is_break10
+
+                Label: 
+                    text: '15 trials'
+                CheckBox:
+                    id: break_15
+                    group: 'break'
+                    active: root.is_break15
+
+                Label:
+                    text: '20 trials'
+                CheckBox:
+                    id: break_20
+                    group: 'break'
+                    active: root.is_break20
+                    
+                Label:
+                    text: '25 trials'
+                CheckBox:
+                    id: break_25
+                    group: 'break'
+                    active: root.is_break25
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50        
+            
+            
+            BoxLayout:
+                id: breakdur
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Break Length: '
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0.5 min'
+                CheckBox:
+                    id: breakdur30
+                    group: 'breakdur'
+                    active: root.is_breakdur30
+                
+                Label: 
+                    text: '1 min'
+                CheckBox:
+                    id: breakdur60
+                    group: 'breakdur'
+                    active: root.is_breakdur60
+
+                Label: 
+                    text: '1.5 min'
+                CheckBox:
+                    id: breakdur90
+                    group: 'breakdur'
+                    active: root.is_breakdur90
+
+                Label:
+                    text: '2 min'
+                CheckBox:
+                    id: breakdur120
+                    group: 'breakdur'
+                    active: root.is_breakdur120
+                    
+                Label:
+                    text: '2.5 min'
+                CheckBox:
+                    id: breakdur150
+                    group: 'breakdur'
+                    active: root.is_breakdur150
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50         
             
             BoxLayout:
                 id: test
@@ -2043,6 +2237,13 @@
                     active: root.is_autoqt50
                     
                 Label:
+                    text: '90 trials'
+                CheckBox:
+                    id: ninety_trials
+                    group: 'trials'
+                    active: root.is_autoqt90
+                    
+                Label:
                     text: '100 trials!'
                 CheckBox:
                     id: hundred_trials
@@ -2081,7 +2282,7 @@
                     big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active, big_rew_pt9_sec.active, big_rew_1pt1_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_18.active, targ_rad_22.active, targ_rad_30.active, targ_rad_40.active], 
                     eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active],
-                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, seqF.active, seqG.active, seqH.active, centerOut.active, buttonOut.active],
+                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, seqF.active, seqG.active, seqH.active, seqI.active, seqJ.active, seqK.active, seqL.active, seqM.active, seqN.active, seqO.active, seqP.active, centerOut.active, buttonOut.active],
                     targ1_pos=[t1random.active, t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
                     targ2_pos=[t2none.active, t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
                     targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_mid.active, t3lower_mid.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
@@ -2089,7 +2290,7 @@
                     time_to_next_targ=[t2next_never.active, t2next_250.active, t2next_500.active, t2next_750.active, t2next_1000.active, t2next_1500.active]),
                     dict(button_hold=[bhtfalse.active, bht000.active, bht100.active, bht200.active, bht300.active, bht400.active, bht500.active, bht600.active, bht700.active, bht800.active, bht900.active, bht1000.active, bht200to400.active, bht600to800.active, bht800to1000.active],
                     hold=[tht000.active, tht100.active, tht200.active, tht300.active, tht400.active, tht500.active, tht600.active, tht100to300.active, tht400to600.active]), 
-                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
+                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, ninety_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
                     dict(t1tt=[t1tt_0pt8_sec.active, t1tt_1pt0_sec.active, t1tt_1pt5_sec.active, t1tt_2pt0_sec.active, t1tt_2pt5_sec.active, t1tt_3pt0_sec.active, t1tt_3pt5_sec.active, t1tt_4pt0_sec.active, t1tt_10pt0_sec.active],
                     tt=[tt_0pt7_sec.active, tt_0pt8_sec.active, tt_1pt0_sec.active, tt_1pt5_sec.active, tt_2pt0_sec.active, tt_2pt5_sec.active, tt_3pt0_sec.active, tt_3pt5_sec.active, tt_4pt0_sec.active]),
@@ -2100,7 +2301,9 @@
                     nudge_x_t4=[nudge_x_t4_neg6.active, nudge_x_t4_neg4.active, nudge_x_t4_neg2.active, nudge_x_t4_zero.active, nudge_x_t4_pos2.active, nudge_x_t4_pos4.active, nudge_x_t4_pos6.active]),
                     dict(screen_top=[screen_top_neg6.active, screen_top_neg5.active, screen_top_neg4.active, screen_top_neg3.active, screen_top_neg2.active, screen_top_neg1.active, screen_top_zero.active], 
                     screen_bot=[screen_bot_0.active, screen_bot_2.active, screen_bot_4.active, screen_bot_6.active, screen_bot_8.active, screen_bot_10.active, screen_bot_12.active]),
-                    dict(juicer=[yellow.active, red.active]))
+                    dict(juicer=[yellow.active, red.active]),
+                    dict(breaktrl=[break_none.active, break_10.active, break_15.active, break_20.active, break_25.active],
+                    breakdur=[breakdur30.active, breakdur60.active, breakdur90.active, breakdur120.active, breakdur150.active]))
 
             Label:
                 text: ''
@@ -2219,8 +2422,8 @@
     Label:
         color: .5,.5,.5,1
         font_size: 50
-        center_x: root.width * 6/8
-        top: root.top - 70
+        center_x: root.width * 15/16
+        top: root.height * 1/16
         text: str(root.trial_counter)
 
     
