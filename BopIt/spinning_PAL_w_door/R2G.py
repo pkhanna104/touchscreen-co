@@ -139,9 +139,10 @@ class R2Game(Widget):
                 self.use_cap_not_button = cap[i]
 
         button_holdz = [0., 0.1, 0.2, 0.3, 0.4]
-        grasp_holdz = [0., 0.05, 0.1, 0.15, .2, .25, .35, .50, '.09-.12', '.11-.15']
+        grasp_holdz = [0., 0.05, 0.1, 0.15, .2, .25, .35, '.09-.12', '.11-.15']
 
         for i, val in enumerate(hold['start_hold']):
+            print(i, val, button_holdz[i])
             if val:
                 if type(button_holdz[i]) is str:
                     self.start_hold_type = button_holdz[i]
@@ -617,7 +618,7 @@ class R2Game(Widget):
         self.close_app()
 
     def update(self, ts):
-        print(self.state, self.going_to_targ, self.door_state, self.try_to_close, self.abortclose)
+        #print(self.state, self.going_to_targ, self.door_state, self.try_to_close, self.abortclose)
         self.state_length = time.time() - self.state_start
         
         # Read from task arduino: 
@@ -745,7 +746,7 @@ class R2Game(Widget):
         if type(self.grasp_hold_type) is str:
             tht_min, tht_max = self.grasp_hold_type.split('-')
             self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
-
+        print('grasp hold time %.2f'%(self.grasp_hold))
         #### flag to make sure that while reward is blocking loops, that 'drop' doesn't get triggered ###
         self.reward_started = False
 
@@ -831,7 +832,7 @@ class R2Game(Widget):
             return False
 
     def end_grasp_hold(self, **kwargs):
-        return kwargs['ts'] > self.grasp_hold
+        return kwargs['ts'] >= self.grasp_hold
 
     def drop(self, **kwargs):
         if self.reward_started:
