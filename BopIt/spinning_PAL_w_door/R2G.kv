@@ -320,6 +320,49 @@
                 Label:
                     text: ''
                     fontsize: 50
+
+            BoxLayout 
+                id: top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Trial start sound on?        '
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: 'Yes'
+
+                CheckBox:
+                    group: 'doorbell'
+                    id: doorbell_on
+                    active: root.doorbell_on
+            
+                Label: 
+                    text: 'No'
+
+                CheckBox:
+                    group: 'doorbell'
+                    id: doorbell_off
+                    active: root.doorbell_off
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
             
             BoxLayout 
                 id: top
@@ -537,7 +580,21 @@
                     id: g_eighteen_sec
                     group: 'ghold_time'
                     active: root.grasp_15
-                    
+                
+                Label: 
+                    text: '0.09-0.12 sec'
+                CheckBox: 
+                    id: g_rand_90_120msec
+                    group: 'ghold_time'
+                    active: root.grasp_r_90_120
+
+                Label: 
+                    text: '0.11-0.15sec'
+                CheckBox: 
+                    id: g_rand_110_150msec
+                    group: 'ghold_time'
+                    active: root.grasp_r_110_150
+
                 Label: 
                     text: '0.20 sec'
                 CheckBox: 
@@ -557,16 +614,16 @@
 
                 CheckBox:
                     id: g_thirty_five_sec
-                    group: 'hold_time'
+                    group: 'ghold_time'
                     active: root.grasp_35
 
-                Label: 
-                    text: '0.5 sec'
-                CheckBox:
-                    id: g_half_sec
-                    group: 'ghold_time'
-                    active: root.grasp_50
 
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
                 Label:
                     text: ''
                     fontsize: 50
@@ -676,6 +733,20 @@
                     id: gto_ten_sec
                     group: 'gto'
                     active: root.grasp_to10
+
+                Label: 
+                    text: '20 sec'
+                CheckBox: 
+                    id: gto_twenty_sec
+                    group: 'gto'
+                    active: root.grasp_to20
+
+                Label: 
+                    text: '30 sec'
+                CheckBox: 
+                    id: gto_thirty_sec
+                    group: 'gto'
+                    active: root.grasp_to30
 
                 Label: 
                     text: 'Infinity'
@@ -813,13 +884,14 @@
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]), 
                     dict(test=[testing.active, monk_time.active]), 
                     dict(start_hold=[zero_hold.active, hund_hold.active, two_hund_hold.active, three_hund_hold.active, four_hund_hold.active], grasp_hold = [g_zero_sec.active, 
-                    g_50_msec.active, g_100_msec.active, g_eighteen_sec.active, g_twenty_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_half_sec.active]), 
+                    g_50_msec.active, g_100_msec.active, g_eighteen_sec.active, g_twenty_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_rand_90_120msec.active, g_rand_110_150msec.active]), 
                     dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
-                    dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_inf.active]),
+                    dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_twenty_sec.active, gto_thirty_sec.active, gto_inf.active]),
                     dict(use_cap=[False, True]), 
                     dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]), 
                     dict(trials=[giant_hole.active, tripod.active, pinch.active, tiny.active,
-                    pinch3.active]), dict(juicer=[yellow.active, red.active]))
+                    pinch3.active]), dict(juicer=[yellow.active, red.active]), 
+                    dict(doorbell=[doorbell_on.active,doorbell_off.active]))
 
                     Clock.schedule_interval(game.update, 1.0 / 60.0)
             Label:

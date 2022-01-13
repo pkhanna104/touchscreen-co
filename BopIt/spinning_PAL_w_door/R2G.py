@@ -128,7 +128,7 @@ class R2Game(Widget):
     def init(self, animal_names_dict=None, rew_in=None, rew_var=None,
         test=None, hold=None, autoquit=None,
         grasp_to=None, use_cap=None, tsk_opt=None, trials_active=None,
-        juicer=None):
+        juicer=None, doorbell=None):
 
         self.h5_table_row_cnt = 0
         self.idle = False
@@ -139,9 +139,10 @@ class R2Game(Widget):
                 self.use_cap_not_button = cap[i]
 
         button_holdz = [0., 0.1, 0.2, 0.3, 0.4]
-        grasp_holdz = [0., 0.05, 0.1, 0.15, .2, .25, .35, .50]
+        grasp_holdz = [0., 0.05, 0.1, 0.15, .2, .25, .35, '.09-.12', '.11-.15']
 
         for i, val in enumerate(hold['start_hold']):
+            print(i, val, button_holdz[i])
             if val:
                 if type(button_holdz[i]) is str:
                     self.start_hold_type = button_holdz[i]
@@ -156,7 +157,7 @@ class R2Game(Widget):
                     self.grasp_hold_type = grasp_holdz[i]
                     self.grasp_hold = 0.
                 else:
-                    self.grasp_hold_type = 0
+                    self.grasp_hold_type = grasp_holdz[i]
                     self.grasp_hold = grasp_holdz[i]
 
         small_rew_opts = [.1, .3, .5]
@@ -227,7 +228,7 @@ class R2Game(Widget):
         self.use_start = True
         self.only_start = False
 
-        grasp_tos = [5., 10., 999999999.]
+        grasp_tos = [5., 10., 20., 30., 999999999.]
 
         for i, val in enumerate(grasp_to['gto']):
             if val:
@@ -236,6 +237,8 @@ class R2Game(Widget):
         # Preload reward buttons: 
         self.reward1 = SoundLoader.load('reward1.wav')
         self.reward2 = SoundLoader.load('reward2.wav')
+        self.doorbell = SoundLoader.load('DoorBell.wav')
+
         self.reward_started = False
 
         self.state = 'ITI'
@@ -262,6 +265,11 @@ class R2Game(Widget):
         for i, val in enumerate(juicer['juicer']): 
             if val: 
                 self.juicer = juicer_opts[i]
+
+        doorbell_opts = [True, False]
+        for i, val in enumerate(doorbell['doorbell']): 
+            if val: 
+                self.doorbell_indicator = doorbell_opts[i]
 
 
         self.trial_num = 0; 
@@ -368,7 +376,7 @@ class R2Game(Widget):
             ITI_mean=self.ITI_mean, ITI_std = self.ITI_std, start_timeout = self.start_timeout, rew_delay = self.reward_delay_time,
             reward_fcn=reward_fcn, use_cap=self.use_cap_not_button,
             start_hold=self.start_hold,
-            grasp_hold = self.grasp_hold, 
+            grasp_hold = self.grasp_hold_type, 
             grasp_timeout = self.grasp_timeout_time, 
             big_rew=big_rew, 
             small_rew = small_rew, 
@@ -391,7 +399,8 @@ class R2Game(Widget):
             reward_for_grasp = self.reward_for_grasp[0], 
             skip_juice=self.skip_juice, 
             use_start = self.use_start, 
-            only_start = self.only_start)
+            only_start = self.only_start, 
+            doorbell_indicator = self.doorbell_indicator)
 
         ### save now 
         import os
@@ -617,7 +626,7 @@ class R2Game(Widget):
         self.close_app()
 
     def update(self, ts):
-        print(self.state, self.going_to_targ, self.door_state, self.try_to_close, self.abortclose)
+        #print(self.state, self.going_to_targ, self.door_state, self.try_to_close, self.abortclose)
         self.state_length = time.time() - self.state_start
         
         # Read from task arduino: 
@@ -745,7 +754,7 @@ class R2Game(Widget):
         if type(self.grasp_hold_type) is str:
             tht_min, tht_max = self.grasp_hold_type.split('-')
             self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
-
+        print('grasp hold time %.2f'%(self.grasp_hold))
         #### flag to make sure that while reward is blocking loops, that 'drop' doesn't get triggered ###
         self.reward_started = False
 
@@ -793,6 +802,8 @@ class R2Game(Widget):
         return kwargs['ts'] > self.pre_start_vid_ts
 
     def _start_start_button(self, **kwargs):
+        if self.doorbell_indicator: 
+            self.doorbell.play()
         pass
 
     def pushed_start(self, **kwargs):
@@ -831,7 +842,7 @@ class R2Game(Widget):
             return False
 
     def end_grasp_hold(self, **kwargs):
-        return kwargs['ts'] > self.grasp_hold
+        return kwargs['ts'] >= self.grasp_hold
 
     def drop(self, **kwargs):
         if self.reward_started:
@@ -913,28 +924,9 @@ class Manager(ScreenManager):
         rew_start_and_grasp = BooleanProperty(data_params['rew_start_and_grasp'])
         rew_grasp = BooleanProperty(data_params['rew_grasp'])
         rew_snd = BooleanProperty(data_params['snd_only'])
-
-        # if data_params['rew_manual']: 
-        #     rew_manual = BooleanProperty(True)
-        # elif data_params['rew_start']: 
-        #     rew_start = BooleanProperty(True)
-        # elif data_params['rew_start_and_grasp']: 
-        #     rew_start_and_grasp = BooleanProperty(True)
-        # elif data_params['rew_grasp']: 
-        #     rew_grasp = BooleanProperty(True)
-        # elif data_params['snd_only']: 
-        #     rew_snd = BooleanProperty(True) 
-
         only_gripper = BooleanProperty(data_params['task_opt'] == 'grip')
         only_button = BooleanProperty(data_params['task_opt'] == 'button')
         button_grip = BooleanProperty(data_params['task_opt'] == 'both')
-
-        # if data_params['task_opt'] == 'grip': 
-        #     only_gripper = BooleanProperty(True)
-        # elif data_params['task_opt'] == 'button': 
-        #     only_button = BooleanProperty(True)
-        # elif data_params['task_opt'] == 'both': 
-        #     button_grip = BooleanProperty(True)
 
         monk_haribo = BooleanProperty(data_params['animal_name'] == 'haribo')
         monk_butters = BooleanProperty(data_params['animal_name'] == 'butters')
@@ -946,31 +938,12 @@ class Manager(ScreenManager):
         small_rew_3 = BooleanProperty(data_params['small_rew'] == 0.3)
         small_rew_5 = BooleanProperty(data_params['small_rew'] == 0.5)
 
-        # if data_params['small_rew'] == 0.1: 
-        #     small_rew_1 = BooleanProperty(True)
-        # elif data_params['small_rew'] == 0.3: 
-        #     small_rew_3 = BooleanProperty(True)
-        # elif data_params['small_rew'] == 0.5: 
-        #     small_rew_5 = BooleanProperty(True)
-
         big_rew_3 = BooleanProperty(data_params['big_rew'] == 0.3)
         big_rew_5 = BooleanProperty(data_params['big_rew'] == 0.5)
         big_rew_7 = BooleanProperty(data_params['big_rew'] == 0.7)
 
-        # if data_params['big_rew'] == 0.3: 
-        #     big_rew_3 = BooleanProperty(True)
-        # elif data_params['big_rew'] == 0.5: 
-        #     big_rew_5 = BooleanProperty(True)
-        # elif data_params['big_rew'] == 0.7: 
-        #     big_rew_7 = BooleanProperty(True)
-
         juicer_y = BooleanProperty(data_params['juicer'] ==  'yellow')
         juicer_r = BooleanProperty(data_params['juicer'] == 'red')
-
-        # if data_params['juicer'] ==  'yellow': 
-        #     juicer_y = BooleanProperty(True)
-        # elif data_params['juicer'] == 'red': 
-        #     juicer_r = BooleanProperty(True)
 
         rew_all = BooleanProperty(data_params['rew_all'])
         rew_50 = BooleanProperty(data_params['rew_50'])
@@ -990,7 +963,8 @@ class Manager(ScreenManager):
         grasp_25 = BooleanProperty(data_params['grasp_hold'] == 0.25)
         grasp_35 = BooleanProperty(data_params['grasp_hold'] == 0.35)
         grasp_50 = BooleanProperty(data_params['grasp_hold'] == 0.50)
-
+        grasp_r_90_120 = BooleanProperty(data_params['grasp_hold'] == '.09-.12')
+        grasp_r_110_150 = BooleanProperty(data_params['grasp_hold'] == '.11-.15')
 
         power = BooleanProperty(False)
         tripod = BooleanProperty(False)
@@ -1011,20 +985,22 @@ class Manager(ScreenManager):
             elif trl == 'pinch_3': 
                 pinch3 = BooleanProperty(True)
 
-        grasp_to5 = BooleanProperty(False)
-        grasp_to10 = BooleanProperty(False)
-        grasp_toinf = BooleanProperty(False)
-
-        if data_params['grasp_timeout'] == 5.: 
-            grasp_to5 = BooleanProperty(True)
-        elif data_params['grasp_timeout'] == 10.: 
-            grasp_to10 = BooleanProperty(True)
-        else:
-            grasp_toinf = BooleanProperty(True)
+        grasp_to5 = BooleanProperty(data_params['grasp_timeout'] == 5.)
+        grasp_to10 = BooleanProperty(data_params['grasp_timeout'] == 10.)
+        grasp_to20 = BooleanProperty(data_params['grasp_timeout'] == 20.)
+        grasp_to30 = BooleanProperty(data_params['grasp_timeout'] == 30.)
+        grasp_toinf = BooleanProperty(data_params['grasp_timeout'] > 40)
 
         trls_25 = BooleanProperty(data_params['trls_25'])
         trls_50 = BooleanProperty(data_params['trls_50'])
         trls_inf = BooleanProperty(data_params['trls_inf'])
+
+        try:
+            doorbell_on = BooleanProperty(data_params['doorbell_indicator'] == True)
+            doorbell_off = BooleanProperty(data_params['doorbell_indicator'] == False)
+        except: 
+            doorbell_on = BooleanProperty(True)
+            doorbell_off = BooleanProperty(False)            
     else: 
         rew_manual = BooleanProperty(False)
         rew_start = BooleanProperty(False)
@@ -1081,7 +1057,8 @@ class Manager(ScreenManager):
         trls_25 = BooleanProperty(False)
         trls_50 = BooleanProperty(True)
         trls_inf = BooleanProperty(False)
-
+        doorbell_on = BooleanProperty(True)
+        doorbell_off = BooleanProperty(False)
 
 class R2GApp(App):
     def build(self, **kwargs):
