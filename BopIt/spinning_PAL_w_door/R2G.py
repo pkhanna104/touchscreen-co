@@ -128,7 +128,7 @@ class R2Game(Widget):
     def init(self, animal_names_dict=None, rew_in=None, rew_var=None,
         test=None, hold=None, autoquit=None,
         grasp_to=None, use_cap=None, tsk_opt=None, trials_active=None,
-        juicer=None):
+        juicer=None, doorbell=None):
 
         self.h5_table_row_cnt = 0
         self.idle = False
@@ -237,6 +237,8 @@ class R2Game(Widget):
         # Preload reward buttons: 
         self.reward1 = SoundLoader.load('reward1.wav')
         self.reward2 = SoundLoader.load('reward2.wav')
+        self.doorbell = SoundLoader.load('DoorBell.wav')
+
         self.reward_started = False
 
         self.state = 'ITI'
@@ -263,6 +265,11 @@ class R2Game(Widget):
         for i, val in enumerate(juicer['juicer']): 
             if val: 
                 self.juicer = juicer_opts[i]
+
+        doorbell_opts = [True, False]
+        for i, val in enumerate(doorbell['doorbell']): 
+            if val: 
+                self.doorbell_indicator = doorbell_opts[i]
 
 
         self.trial_num = 0; 
@@ -392,7 +399,8 @@ class R2Game(Widget):
             reward_for_grasp = self.reward_for_grasp[0], 
             skip_juice=self.skip_juice, 
             use_start = self.use_start, 
-            only_start = self.only_start)
+            only_start = self.only_start, 
+            doorbell_indicator = self.doorbell_indicator)
 
         ### save now 
         import os
@@ -794,6 +802,8 @@ class R2Game(Widget):
         return kwargs['ts'] > self.pre_start_vid_ts
 
     def _start_start_button(self, **kwargs):
+        if self.doorbell_indicator: 
+            self.doorbell.play()
         pass
 
     def pushed_start(self, **kwargs):
@@ -914,28 +924,9 @@ class Manager(ScreenManager):
         rew_start_and_grasp = BooleanProperty(data_params['rew_start_and_grasp'])
         rew_grasp = BooleanProperty(data_params['rew_grasp'])
         rew_snd = BooleanProperty(data_params['snd_only'])
-
-        # if data_params['rew_manual']: 
-        #     rew_manual = BooleanProperty(True)
-        # elif data_params['rew_start']: 
-        #     rew_start = BooleanProperty(True)
-        # elif data_params['rew_start_and_grasp']: 
-        #     rew_start_and_grasp = BooleanProperty(True)
-        # elif data_params['rew_grasp']: 
-        #     rew_grasp = BooleanProperty(True)
-        # elif data_params['snd_only']: 
-        #     rew_snd = BooleanProperty(True) 
-
         only_gripper = BooleanProperty(data_params['task_opt'] == 'grip')
         only_button = BooleanProperty(data_params['task_opt'] == 'button')
         button_grip = BooleanProperty(data_params['task_opt'] == 'both')
-
-        # if data_params['task_opt'] == 'grip': 
-        #     only_gripper = BooleanProperty(True)
-        # elif data_params['task_opt'] == 'button': 
-        #     only_button = BooleanProperty(True)
-        # elif data_params['task_opt'] == 'both': 
-        #     button_grip = BooleanProperty(True)
 
         monk_haribo = BooleanProperty(data_params['animal_name'] == 'haribo')
         monk_butters = BooleanProperty(data_params['animal_name'] == 'butters')
@@ -947,31 +938,12 @@ class Manager(ScreenManager):
         small_rew_3 = BooleanProperty(data_params['small_rew'] == 0.3)
         small_rew_5 = BooleanProperty(data_params['small_rew'] == 0.5)
 
-        # if data_params['small_rew'] == 0.1: 
-        #     small_rew_1 = BooleanProperty(True)
-        # elif data_params['small_rew'] == 0.3: 
-        #     small_rew_3 = BooleanProperty(True)
-        # elif data_params['small_rew'] == 0.5: 
-        #     small_rew_5 = BooleanProperty(True)
-
         big_rew_3 = BooleanProperty(data_params['big_rew'] == 0.3)
         big_rew_5 = BooleanProperty(data_params['big_rew'] == 0.5)
         big_rew_7 = BooleanProperty(data_params['big_rew'] == 0.7)
 
-        # if data_params['big_rew'] == 0.3: 
-        #     big_rew_3 = BooleanProperty(True)
-        # elif data_params['big_rew'] == 0.5: 
-        #     big_rew_5 = BooleanProperty(True)
-        # elif data_params['big_rew'] == 0.7: 
-        #     big_rew_7 = BooleanProperty(True)
-
         juicer_y = BooleanProperty(data_params['juicer'] ==  'yellow')
         juicer_r = BooleanProperty(data_params['juicer'] == 'red')
-
-        # if data_params['juicer'] ==  'yellow': 
-        #     juicer_y = BooleanProperty(True)
-        # elif data_params['juicer'] == 'red': 
-        #     juicer_r = BooleanProperty(True)
 
         rew_all = BooleanProperty(data_params['rew_all'])
         rew_50 = BooleanProperty(data_params['rew_50'])
@@ -1022,6 +994,13 @@ class Manager(ScreenManager):
         trls_25 = BooleanProperty(data_params['trls_25'])
         trls_50 = BooleanProperty(data_params['trls_50'])
         trls_inf = BooleanProperty(data_params['trls_inf'])
+
+        try:
+            doorbell_on = BooleanProperty(data_params['doorbell_indicator'] == True)
+            doorbell_off = BooleanProperty(data_params['doorbell_indicator'] == False)
+        except: 
+            doorbell_on = BooleanProperty(True)
+            doorbell_off = BooleanProperty(False)            
     else: 
         rew_manual = BooleanProperty(False)
         rew_start = BooleanProperty(False)
@@ -1078,7 +1057,8 @@ class Manager(ScreenManager):
         trls_25 = BooleanProperty(False)
         trls_50 = BooleanProperty(True)
         trls_inf = BooleanProperty(False)
-
+        doorbell_on = BooleanProperty(True)
+        doorbell_off = BooleanProperty(False)
 
 class R2GApp(App):
     def build(self, **kwargs):

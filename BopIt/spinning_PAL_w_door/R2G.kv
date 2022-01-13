@@ -320,6 +320,49 @@
                 Label:
                     text: ''
                     fontsize: 50
+
+            BoxLayout 
+                id: top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Trial start sound on?        '
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: 'Yes'
+
+                CheckBox:
+                    group: 'doorbell'
+                    id: doorbell_on
+                    active: root.doorbell_on
+            
+                Label: 
+                    text: 'No'
+
+                CheckBox:
+                    group: 'doorbell'
+                    id: doorbell_off
+                    active: root.doorbell_off
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
             
             BoxLayout 
                 id: top
@@ -847,7 +890,8 @@
                     dict(use_cap=[False, True]), 
                     dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]), 
                     dict(trials=[giant_hole.active, tripod.active, pinch.active, tiny.active,
-                    pinch3.active]), dict(juicer=[yellow.active, red.active]))
+                    pinch3.active]), dict(juicer=[yellow.active, red.active]), 
+                    dict(doorbell=[doorbell_on.active,doorbell_off.active]))
 
                     Clock.schedule_interval(game.update, 1.0 / 60.0)
             Label:
