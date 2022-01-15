@@ -138,7 +138,7 @@ class R2Game(Widget):
             if val:
                 self.use_cap_not_button = cap[i]
 
-        button_holdz = [0., 0.1, 0.2, 0.3, 0.4]
+        button_holdz = [0., 0.1, 0.2, 0.3, 0.4, '.4-.6', '.6-.8', '.8-1.0']
         grasp_holdz = [0., 0.05, 0.1, 0.15, .2, .25, .35, '.09-.12', '.11-.15']
 
         for i, val in enumerate(hold['start_hold']):
@@ -146,7 +146,7 @@ class R2Game(Widget):
             if val:
                 if type(button_holdz[i]) is str:
                     self.start_hold_type = button_holdz[i]
-                    self.start_hold = 0.
+                    self.start_hold = button_holdz[i]
                 else:
                     self.start_hold_type = 0
                     self.start_hold = button_holdz[i]
@@ -220,7 +220,7 @@ class R2Game(Widget):
             if val:
                 self.testing = test_vals[i]
         
-        autoquit_trls = [25, 50, 10**10]
+        autoquit_trls = [10, 15, 25, 35, 40, 50, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
@@ -237,7 +237,7 @@ class R2Game(Widget):
         # Preload reward buttons: 
         self.reward1 = SoundLoader.load('reward1.wav')
         self.reward2 = SoundLoader.load('reward2.wav')
-        self.doorbell = SoundLoader.load('DoorBell.wav')
+        self.doorbell = SoundLoader.load('mixkit-small-hit-in-a-game-2072.wav')
 
         self.reward_started = False
 
@@ -389,9 +389,13 @@ class R2Game(Widget):
             rew_all = rew_var['rew_var'][0], 
             rew_50 = rew_var['rew_var'][1], 
             rew_30 = rew_var['rew_var'][2], 
-            trls_25 = autoquit['autoquit'][0], 
-            trls_50 = autoquit['autoquit'][1], 
-            trls_inf = autoquit['autoquit'][2], 
+            trls_10 = autoquit['autoquit'][0],
+            trls_15 = autoquit['autoquit'][1],
+            trls_25 = autoquit['autoquit'][2],
+            trls_35 = autoquit['autoquit'][3], 
+            trls_40 = autoquit['autoquit'][4],
+            trls_50 = autoquit['autoquit'][5], 
+            trls_inf = autoquit['autoquit'][6], 
             trials_active = self.trials_list_valid, 
             trials_labels = self.trial_labels_active,
             juicer = self.juicer,
@@ -954,6 +958,10 @@ class Manager(ScreenManager):
         button_2 = BooleanProperty(data_params['start_hold'] == 0.2)
         button_3 = BooleanProperty(data_params['start_hold'] == 0.3)
         button_4 = BooleanProperty(data_params['start_hold'] == 0.4)
+        button_4_to_6 = BooleanProperty(data_params['start_hold'] == '.4-.6')
+        button_6_to_8 = BooleanProperty(data_params['start_hold'] == '.6-.8')
+        button_8_to_10 = BooleanProperty(data_params['start_hold'] == '.8-1.0')
+
 
         grasp_0 = BooleanProperty(data_params['grasp_hold'] == 0.)
         grasp_5 = BooleanProperty(data_params['grasp_hold'] == 0.05)
@@ -991,7 +999,11 @@ class Manager(ScreenManager):
         grasp_to30 = BooleanProperty(data_params['grasp_timeout'] == 30.)
         grasp_toinf = BooleanProperty(data_params['grasp_timeout'] > 40)
 
+        trls_10 = BooleanProperty(data_params['trls_10'])
+        trls_15 = BooleanProperty(data_params['trls_15'])
         trls_25 = BooleanProperty(data_params['trls_25'])
+        trls_35 = BooleanProperty(data_params['trls_35'])
+        trls_40 = BooleanProperty(data_params['trls_40'])
         trls_50 = BooleanProperty(data_params['trls_50'])
         trls_inf = BooleanProperty(data_params['trls_inf'])
 
