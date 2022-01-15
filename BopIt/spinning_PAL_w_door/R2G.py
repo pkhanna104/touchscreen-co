@@ -114,6 +114,7 @@ class R2Game(Widget):
     grasp_rew_txt = StringProperty('')
     grasp_rew_param = StringProperty('')
 
+    start_hold_txt = StringProperty('')
     button_rew_txt = StringProperty('')
     button_rew_param = StringProperty('')
 
@@ -146,9 +147,10 @@ class R2Game(Widget):
             if val:
                 if type(button_holdz[i]) is str:
                     self.start_hold_type = button_holdz[i]
-                    self.start_hold = button_holdz[i]
+                    cht_min, cht_max = self.start_hold_type.split('-')
+                    self.start_hold = ((float(cht_max) - float(cht_min)) * np.random.random()) + float(cht_min)
                 else:
-                    self.start_hold_type = 0
+                    self.start_hold_type = button_holdz[i]
                     self.start_hold = button_holdz[i]
 
         for i, val in enumerate(hold['grasp_hold']):
@@ -375,7 +377,7 @@ class R2Game(Widget):
         d = dict(animal_name=animal_name,
             ITI_mean=self.ITI_mean, ITI_std = self.ITI_std, start_timeout = self.start_timeout, rew_delay = self.reward_delay_time,
             reward_fcn=reward_fcn, use_cap=self.use_cap_not_button,
-            start_hold=self.start_hold,
+            start_hold=self.start_hold_type,
             grasp_hold = self.grasp_hold_type, 
             grasp_timeout = self.grasp_timeout_time, 
             big_rew=big_rew, 
@@ -1000,13 +1002,22 @@ class Manager(ScreenManager):
         grasp_to30 = BooleanProperty(data_params['grasp_timeout'] == 30.)
         grasp_toinf = BooleanProperty(data_params['grasp_timeout'] > 40)
 
-        trls_10 = BooleanProperty(data_params['trls_10'])
-        trls_15 = BooleanProperty(data_params['trls_15'])
-        trls_25 = BooleanProperty(data_params['trls_25'])
-        trls_35 = BooleanProperty(data_params['trls_35'])
-        trls_40 = BooleanProperty(data_params['trls_40'])
-        trls_50 = BooleanProperty(data_params['trls_50'])
-        trls_inf = BooleanProperty(data_params['trls_inf'])
+        try:
+            trls_10 = BooleanProperty(data_params['trls_10'])
+            trls_15 = BooleanProperty(data_params['trls_15'])
+            trls_25 = BooleanProperty(data_params['trls_25'])
+            trls_35 = BooleanProperty(data_params['trls_35'])
+            trls_40 = BooleanProperty(data_params['trls_40'])
+            trls_50 = BooleanProperty(data_params['trls_50'])
+            trls_inf = BooleanProperty(data_params['trls_inf'])
+        except:
+            trls_10 = BooleanProperty(False)
+            trls_15 = BooleanProperty(False)
+            trls_25 = BooleanProperty(False)
+            trls_35 = BooleanProperty(False)
+            trls_40 = BooleanProperty(False)
+            trls_50 = BooleanProperty(False)
+            trls_inf = BooleanProperty(False)  
 
         try:
             doorbell_on = BooleanProperty(data_params['doorbell_indicator'] == True)
