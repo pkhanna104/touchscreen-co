@@ -518,6 +518,29 @@
                     group: 'hold_time'
                     active: root.button_4
 
+                Label: 
+                    text: '0.4-0.6 sec'
+                    
+                CheckBox:
+                    id: four_to_six_hund_hold
+                    group: 'hold_time'
+                    active: root.button_4_to_6
+                
+                Label: 
+                    text: '0.6-0.8 sec'
+                    
+                CheckBox:
+                    id: six_to_eight_hund_hold
+                    group: 'hold_time'
+                    active: root.button_6_to_8
+
+                Label: 
+                    text: '0.8-1.0 sec'
+                    
+                CheckBox:
+                    id: eight_to_thous_hold
+                    group: 'hold_time'
+                    active: root.button_8_to_10
 
                 Label:
                     text: ''
@@ -794,11 +817,39 @@
                     color: 1, 1, 0, 1
 
                 Label: 
+                    text: '10 trials'
+                CheckBox:
+                    id: ten_trials
+                    group: 'trials'
+                    active: root.trls_10
+
+                Label: 
+                    text: '15 trials'
+                CheckBox:
+                    id: fifteen_trials
+                    group: 'trials'
+                    active: root.trls_15
+
+                Label: 
                     text: '25 trials'
                 CheckBox:
                     id: twenty_five_trials
                     group: 'trials'
                     active: root.trls_25
+
+                Label: 
+                    text: '35 trials'
+                CheckBox:
+                    id: thirty_five_trials
+                    group: 'trials'
+                    active: root.trls_35
+
+                Label: 
+                    text: '40 trials'
+                CheckBox:
+                    id: fourty_trials
+                    group: 'trials'
+                    active: root.trls_40
 
                 Label:
                     text: '50 trials'
@@ -885,7 +936,8 @@
                     dict(test=[testing.active, monk_time.active]), 
                     dict(start_hold=[zero_hold.active, hund_hold.active, two_hund_hold.active, three_hund_hold.active, four_hund_hold.active], grasp_hold = [g_zero_sec.active, 
                     g_50_msec.active, g_100_msec.active, g_eighteen_sec.active, g_twenty_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_rand_90_120msec.active, g_rand_110_150msec.active]), 
-                    dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
+                    dict(autoquit=[ten_trials.active, fifteen_trials.active,
+                    twenty_five_trials.active, thirty_five_trials.active, fourty_trials.active, fifty_trials.active, no_trials.active]), 
                     dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_twenty_sec.active, gto_thirty_sec.active, gto_inf.active]),
                     dict(use_cap=[False, True]), 
                     dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]), 
