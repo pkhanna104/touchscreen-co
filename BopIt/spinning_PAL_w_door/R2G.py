@@ -797,13 +797,14 @@ class R2Game(Widget):
             self.cam_trig_port.write('1'.encode())
         except:
             pass
+
+        if self.doorbell_indicator: 
+            self.doorbell.play()
     
     def end_vid_trig(self, **kwargs):
         return kwargs['ts'] > self.pre_start_vid_ts
 
     def _start_start_button(self, **kwargs):
-        if self.doorbell_indicator: 
-            self.doorbell.play()
         pass
 
     def pushed_start(self, **kwargs):
