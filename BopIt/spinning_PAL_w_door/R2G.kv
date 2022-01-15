@@ -934,7 +934,8 @@
                     dict(rew_manual=rew_noauto_chk.active, rew_start=rew_anytouch_chk.active, rew_start_and_grasp=rew_anytouch_pls_targ_chk.active, rew_grasp=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]), 
                     dict(test=[testing.active, monk_time.active]), 
-                    dict(start_hold=[zero_hold.active, hund_hold.active, two_hund_hold.active, three_hund_hold.active, four_hund_hold.active], grasp_hold = [g_zero_sec.active, 
+                    dict(start_hold=[zero_hold.active, hund_hold.active, two_hund_hold.active, three_hund_hold.active, four_hund_hold.active, four_to_six_hund_hold.active,
+                    six_to_eight_hund_hold.active, eight_to_thous_hold.active], grasp_hold = [g_zero_sec.active, 
                     g_50_msec.active, g_100_msec.active, g_eighteen_sec.active, g_twenty_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_rand_90_120msec.active, g_rand_110_150msec.active]), 
                     dict(autoquit=[ten_trials.active, fifteen_trials.active,
                     twenty_five_trials.active, thirty_five_trials.active, fourty_trials.active, fifty_trials.active, no_trials.active]), 
@@ -1003,7 +1004,7 @@
                 font_size: 20
                 center_x: root.width * 2/8
                 top: root.top - 220
-                text: game.button_hold_txt
+                text: game.start_hold_txt
             Label:
                 color: .5,.5,.5,1
                 font_size: 20
