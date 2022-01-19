@@ -286,7 +286,7 @@ class COGame(Widget):
         
                 
         # TARGET POSITIONS
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'center out', 'button out']
+        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -423,6 +423,14 @@ class COGame(Widget):
             self.target3_pos_str = 'middle_right'
             self.target4_pos_str = 'center'
             self.target5_pos_str = 'lower_middle'
+        
+        elif self.seq == 'R':
+            seq_preselect = True
+            self.target1_pos_str = 'middle_right'
+            self.target2_pos_str = 'upper_middle'
+            self.target3_pos_str = 'middle_left'
+            self.target4_pos_str = 'lower_middle'
+            self.target5_pos_str = 'upper_left'
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -2141,6 +2149,7 @@ class Manager(ScreenManager):
     is_seqO = BooleanProperty(False)
     is_seqP = BooleanProperty(False)
     is_seqQ = BooleanProperty(False)
+    is_seqR = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     is_BO = BooleanProperty(False)
     try:
@@ -2178,6 +2187,8 @@ class Manager(ScreenManager):
             is_seqP = BooleanProperty(True) 
         elif data_params['seq'] == 'Q':
             is_seqQ = BooleanProperty(True) 
+        elif data_params['seq'] == 'R':
+            is_seqR = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
         elif data_params['seq'] == 'button out': 
