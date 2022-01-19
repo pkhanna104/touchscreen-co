@@ -677,11 +677,22 @@ class COGame(Widget):
         self.active_target_position = self.target1_position
         self.target_index = 1
         
+        # ANIMAL NAME
+        for i, (nm, val) in enumerate(animal_names_dict.items()):
+            if val:
+                animal_name = nm
+        
         # HOW MUCH TIME TO WAIT UNTIL THE NEXT TARGET APPEARS
         time_to_next_targ_opts = [False, 0.25, 0.5, 0.75, 1.0, 1.5]
         for i, val in enumerate(task_in['time_to_next_targ']):
             if val:
                 self.time_to_next_targ = time_to_next_targ_opts[i]
+                
+        # INTER TARGET DELAY TIME
+        intertarg_delay_opts = [0, 0.1, 0.15, 0.2, 0.25]
+        for i, val in enumerate(task_in['intertarg_delay']):
+            if val:
+                self.intertarg_delay = intertarg_delay_opts[i]
         
         # ANIMAL NAME
         for i, (nm, val) in enumerate(animal_names_dict.items()):
@@ -946,6 +957,8 @@ class COGame(Widget):
         except:
             pass
         
+        
+        
         # Send Eyetracker Start Recording Trigger
         try:
             ### write to arduino: 
@@ -1018,6 +1031,7 @@ class COGame(Widget):
             target4_position = self.target4_position, 
             target5_position = self.target5_position,
             time_to_next_targ = self.time_to_next_targ,
+            intertarg_delay = self.intertarg_delay,
             button_hold_time = self.button_hold_time,
             target_hold_time = self.tht,
             rew_delay = self.reward_delay_time,
@@ -1535,6 +1549,11 @@ class COGame(Widget):
         Window.clearcolor = (0., 0., 0., 1.)
         self.target1.color = (0., 0., 0., 0.)
         
+        if self.first_time_for_this_targ:
+            self.first_time_for_this_targ_t0 = time.time()
+            self.target2.color = (0., 0., 0., 0.)
+            self.first_time_for_this_targ = False
+        
         if self.target_index == 1:
             self.active_target_position = self.target1_position
             self.next_target_position = self.target2_position
@@ -1555,7 +1574,9 @@ class COGame(Widget):
             self.target1_on_time = time.time()
 
         self.target1.move(self.active_target_position)
-        self.target1.color = (1., 1., 0., 1.)
+        
+        if self.intertarg_delay == 0:
+            self.target1.color = (1., 1., 0., 1.)
         
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
@@ -1572,11 +1593,6 @@ class COGame(Widget):
         if self.first_target_attempt:
             self.first_target_attempt_t0 = time.time();
             self.first_target_attempt = False
-        
-        if self.first_time_for_this_targ:
-            self.first_time_for_this_targ_t0 = time.time()
-            self.target2.color = (0., 0., 0., 0.)
-            self.first_time_for_this_targ = False
             
         self.repeat = False
     
@@ -1587,6 +1603,9 @@ class COGame(Widget):
                 # illuminate the next target
                 self.target2.move(self.next_target_position)
                 self.target2.color = (1., 1., 0., 1.)
+                
+        if not self.intertarg_delay == 0 and time.time() - self.first_time_for_this_targ_t0 >= self.intertarg_delay:
+            self.target1.color = (1., 1., 0., 1.)
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
@@ -2516,6 +2535,26 @@ class Manager(ScreenManager):
             is_ttnt100 = BooleanProperty(True)
         elif data_params['time_to_next_targ'] == 1.5:
             is_ttnt150 = BooleanProperty(True)
+    except:
+        pass
+    
+    # intertarg delay
+    is_inttargdelay0 = BooleanProperty(False)
+    is_inttargdelay100 = BooleanProperty(False)
+    is_inttargdelay150 = BooleanProperty(False)
+    is_inttargdelay200 = BooleanProperty(False)
+    is_inttargdelay250 = BooleanProperty(False)
+    try:
+        if data_params['intertarg_delay'] == 0:
+            is_inttargdelay0 = BooleanProperty(True)
+        elif data_params['intertarg_delay'] == 0.1:
+            is_inttargdelay100 = BooleanProperty(True)
+        elif data_params['intertarg_delay'] == 0.15:
+            is_inttargdelay150 = BooleanProperty(True)
+        elif data_params['intertarg_delay'] == 0.2:
+            is_inttargdelay200 = BooleanProperty(True)
+        elif data_params['intertarg_delay'] == 0.25:
+            is_inttargdelay250 = BooleanProperty(True)
     except:
         pass
     
