@@ -139,11 +139,11 @@ class R2Game(Widget):
             if val:
                 self.use_cap_not_button = cap[i]
 
-        button_holdz = [0., 0.1, 0.2, 0.3, 0.4, '.4-.6', '.6-.8', '.8-1.0']
-        grasp_holdz = [0., 0.05, 0.1, 0.15, .2, .25, .35, '.09-.12', '.11-.15']
+        button_holdz = [0., 0.4, '.4-.6', '.6-.8', '.8-1.0', '.9-1.2', '1.1-1.4', 1.5]
+        grasp_holdz = [0., .2, .25, .35, 0.5, '.35-.40', '.38-.45', '.43-.50']
 
         for i, val in enumerate(hold['start_hold']):
-            print(i, val, button_holdz[i])
+            #print(i, val, button_holdz[i])
             if val:
                 if type(button_holdz[i]) is str:
                     self.start_hold_type = button_holdz[i]
@@ -939,7 +939,7 @@ class Manager(ScreenManager):
         monk_butters = BooleanProperty(data_params['animal_name'] == 'butters')
         monk_nike = BooleanProperty(data_params['animal_name'] == 'nike')
         monk_fifi = BooleanProperty(data_params['animal_name'] == 'fifi')
-        monk_test = BooleanProperty(data_params['animal_name'] == 'testing')
+        monk_test = BooleanProperty(data_params['animal_name'] == 'test')
 
         small_rew_1 = BooleanProperty(data_params['small_rew'] == 0.1)
         small_rew_3 = BooleanProperty(data_params['small_rew'] == 0.3)
@@ -957,25 +957,30 @@ class Manager(ScreenManager):
         rew_30 = BooleanProperty(data_params['rew_30'])
 
         button_0 = BooleanProperty(data_params['start_hold'] == 0.)
-        button_1 = BooleanProperty(data_params['start_hold'] == 0.1)
-        button_2 = BooleanProperty(data_params['start_hold'] == 0.2)
-        button_3 = BooleanProperty(data_params['start_hold'] == 0.3)
+        #button_1 = BooleanProperty(data_params['start_hold'] == 0.1)
+        #button_2 = BooleanProperty(data_params['start_hold'] == 0.2)
+        #button_3 = BooleanProperty(data_params['start_hold'] == 0.3)
         button_4 = BooleanProperty(data_params['start_hold'] == 0.4)
         button_4_to_6 = BooleanProperty(data_params['start_hold'] == '.4-.6')
         button_6_to_8 = BooleanProperty(data_params['start_hold'] == '.6-.8')
         button_8_to_10 = BooleanProperty(data_params['start_hold'] == '.8-1.0')
-
+        button_9_to_12 = BooleanProperty(data_params['start_hold'] == '.9-1.2')
+        button_11_to_14 = BooleanProperty(data_params['start_hold'] == '1.1-1.4')
+        button_15 = BooleanProperty(data_params['start_hold'] == 1.5)
 
         grasp_0 = BooleanProperty(data_params['grasp_hold'] == 0.)
-        grasp_5 = BooleanProperty(data_params['grasp_hold'] == 0.05)
-        grasp_10 = BooleanProperty(data_params['grasp_hold'] == 0.10)
-        grasp_15 = BooleanProperty(data_params['grasp_hold'] == 0.15)
+        #grasp_5 = BooleanProperty(data_params['grasp_hold'] == 0.05)
+        #grasp_10 = BooleanProperty(data_params['grasp_hold'] == 0.10)
+        #grasp_15 = BooleanProperty(data_params['grasp_hold'] == 0.15)
         grasp_20 = BooleanProperty(data_params['grasp_hold'] == 0.20)
         grasp_25 = BooleanProperty(data_params['grasp_hold'] == 0.25)
         grasp_35 = BooleanProperty(data_params['grasp_hold'] == 0.35)
         grasp_50 = BooleanProperty(data_params['grasp_hold'] == 0.50)
-        grasp_r_90_120 = BooleanProperty(data_params['grasp_hold'] == '.09-.12')
-        grasp_r_110_150 = BooleanProperty(data_params['grasp_hold'] == '.11-.15')
+        #grasp_r_90_120 = BooleanProperty(data_params['grasp_hold'] == '.09-.12')
+        #grasp_r_110_150 = BooleanProperty(data_params['grasp_hold'] == '.11-.15')
+        grasp_35_to_40 = BooleanProperty(data_params['grasp_hold'] == '.35-.40')
+        grasp_38_to_45 = BooleanProperty(data_params['grasp_hold'] == '.38-.45')
+        grasp_43_to_50 = BooleanProperty(data_params['grasp_hold'] == '.43-.50')
 
         power = BooleanProperty(False)
         tripod = BooleanProperty(False)
