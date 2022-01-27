@@ -286,7 +286,7 @@ class COGame(Widget):
         
                 
         # TARGET POSITIONS
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'center out', 'button out']
+        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -439,6 +439,14 @@ class COGame(Widget):
             self.target3_pos_str = 'upper_middle'
             self.target4_pos_str = 'middle_left'
             self.target5_pos_str = 'lower_left'
+        
+        elif self.seq == 'T':
+            seq_preselect = True
+            self.target1_pos_str = 'upper_left'
+            self.target2_pos_str = 'center'
+            self.target3_pos_str = 'lower_left'
+            self.target4_pos_str = 'middle_right'
+            self.target5_pos_str = 'upper_middle'
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -1355,10 +1363,7 @@ class COGame(Widget):
             self.this_breakdur = 0
         else:
             if self.trial_counter == self.next_breaktrl:
-                if user_id == 'Ganguly':
-                    sound = SoundLoader.load('Doorbellx3.wav')
-                else:
-                    sound = SoundLoader.load('DoorBell.wav')
+                sound = SoundLoader.load('DoorBell.wav')
                 sound.play()
                 self.this_breakdur = self.break_dur
                 self.next_breaktrl = self.next_breaktrl + self.break_trl
@@ -1367,10 +1372,7 @@ class COGame(Widget):
     
     def end_taskbreak(self, **kwargs):
         if self.this_breakdur > 0 and kwargs['ts'] > self.this_breakdur:
-            if user_id == 'Ganguly':
-                sound = SoundLoader.load('Doorbellx3.wav')
-            else:
-                sound = SoundLoader.load('DoorBell.wav')
+            sound = SoundLoader.load('DoorBell.wav')
             sound.play()
         return kwargs['ts'] > self.this_breakdur
 
@@ -2184,6 +2186,7 @@ class Manager(ScreenManager):
     is_seqQ = BooleanProperty(False)
     is_seqR = BooleanProperty(False)
     is_seqS = BooleanProperty(False)
+    is_seqT = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     is_BO = BooleanProperty(False)
     try:
@@ -2225,6 +2228,8 @@ class Manager(ScreenManager):
             is_seqR = BooleanProperty(True) 
         elif data_params['seq'] == 'S':
             is_seqS = BooleanProperty(True) 
+        elif data_params['seq'] == 'T':
+            is_seqT = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
         elif data_params['seq'] == 'button out': 
