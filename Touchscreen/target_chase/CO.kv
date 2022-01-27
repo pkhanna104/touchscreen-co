@@ -1118,14 +1118,35 @@
                     active: root.is_seqP
                     
                 Label: 
-                    text: 'Center Out'
+                    text: 'Q'
+                CheckBox:
+                    id: seqQ
+                    group: 'seq'
+                    active: root.is_seqQ
+                    
+                Label: 
+                    text: 'R'
+                CheckBox:
+                    id: seqR
+                    group: 'seq'
+                    active: root.is_seqR
+                    
+                Label: 
+                    text: 'S'
+                CheckBox:
+                    id: seqS
+                    group: 'seq'
+                    active: root.is_seqS
+                    
+                Label: 
+                    text: 'Cen Out'
                 CheckBox:
                     id: centerOut
                     group: 'seq'
                     active: root.is_CO
                     
                 Label: 
-                    text: 'Button Out'
+                    text: 'But Out'
                 CheckBox: 
                     id: buttonOut
                     group: 'seq'
@@ -2052,6 +2073,63 @@
                 Label:
                     text: ''
                     fontsize: 50
+                    
+            BoxLayout:
+                id: intertarg_delay
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Intertarget delay'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0 sec'
+                CheckBox:
+                    id: intertarg_delay0
+                    group: 'intertarg_delay'
+                    active: root.is_inttargdelay0
+                    
+                Label: 
+                    text: '0.1 sec'
+                CheckBox:
+                    id: intertarg_delay100
+                    group: 'intertarg_delay'
+                    active: root.is_inttargdelay100
+                
+                Label: 
+                    text: '0.15 sec'
+                CheckBox:
+                    id: intertarg_delay150
+                    group: 'intertarg_delay'
+                    active: root.is_inttargdelay150
+                    
+                Label: 
+                    text: '0.2 sec'
+                CheckBox:
+                    id: intertarg_delay200
+                    group: 'intertarg_delay'
+                    active: root.is_inttargdelay200
+                
+                Label: 
+                    text: '0.25 sec'
+                CheckBox:
+                    id: intertarg_delay250
+                    group: 'intertarg_delay'
+                    active: root.is_inttargdelay250
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
             
             
             
@@ -2282,12 +2360,13 @@
                     big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active, big_rew_pt9_sec.active, big_rew_1pt1_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_18.active, targ_rad_22.active, targ_rad_30.active, targ_rad_40.active], 
                     eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active],
-                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, seqF.active, seqG.active, seqH.active, seqI.active, seqJ.active, seqK.active, seqL.active, seqM.active, seqN.active, seqO.active, seqP.active, centerOut.active, buttonOut.active],
+                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, seqF.active, seqG.active, seqH.active, seqI.active, seqJ.active, seqK.active, seqL.active, seqM.active, seqN.active, seqO.active, seqP.active, seqQ.active, seqR.active, seqS.active, centerOut.active, buttonOut.active],
                     targ1_pos=[t1random.active, t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
                     targ2_pos=[t2none.active, t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
                     targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_mid.active, t3lower_mid.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
                     targ4_pos=[t4none.active, t4center.active, t4upper_left.active, t4mid_left.active, t4lower_left.active, t4upper_mid.active, t4lower_mid.active, t4upper_right.active, t4mid_right.active, t4lower_right.active],
-                    time_to_next_targ=[t2next_never.active, t2next_250.active, t2next_500.active, t2next_750.active, t2next_1000.active, t2next_1500.active]),
+                    time_to_next_targ=[t2next_never.active, t2next_250.active, t2next_500.active, t2next_750.active, t2next_1000.active, t2next_1500.active],
+                    intertarg_delay=[intertarg_delay0.active, intertarg_delay100.active, intertarg_delay150.active, intertarg_delay200.active, intertarg_delay250.active]),
                     dict(button_hold=[bhtfalse.active, bht000.active, bht100.active, bht200.active, bht300.active, bht400.active, bht500.active, bht600.active, bht700.active, bht800.active, bht900.active, bht1000.active, bht200to400.active, bht600to800.active, bht800to1000.active],
                     hold=[tht000.active, tht100.active, tht200.active, tht300.active, tht400.active, tht500.active, tht600.active, tht100to300.active, tht400to600.active]), 
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, ninety_trials.active, hundred_trials.active, no_trials.active]),

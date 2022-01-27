@@ -485,32 +485,6 @@
                     active: root.button_0
 
                 Label: 
-                    text: '0.1 sec'
-
-                CheckBox:
-                    id: hund_hold
-                    group: 'hold_time'
-                    active: root.button_1
-
-                Label: 
-                    text: '0.2 sec'
-
-                CheckBox:
-                    id: two_hund_hold
-                    group: 'hold_time'
-                    active: root.button_2
-
-
-                Label: 
-                    text: '0.3 sec'
-                
-                CheckBox:
-                    id: three_hund_hold
-                    group: 'hold_time'
-                    active: root.button_3
-
-
-                Label: 
                     text: '0.4 sec'
                     
                 CheckBox:
@@ -518,6 +492,53 @@
                     group: 'hold_time'
                     active: root.button_4
 
+                Label: 
+                    text: '0.4-0.6 sec'
+                    
+                CheckBox:
+                    id: four_to_six_hund_hold
+                    group: 'hold_time'
+                    active: root.button_4_to_6
+                
+                Label: 
+                    text: '0.6-0.8 sec'
+                    
+                CheckBox:
+                    id: six_to_eight_hund_hold
+                    group: 'hold_time'
+                    active: root.button_6_to_8
+
+                Label: 
+                    text: '0.8-1.0 sec'
+                    
+                CheckBox:
+                    id: eight_to_thous_hold
+                    group: 'hold_time'
+                    active: root.button_8_to_10
+                
+                Label: 
+                    text: '0.9-1.2 sec'
+                
+                CheckBox: 
+                    id: nine_to_twelve_hold
+                    group: 'hold_time'
+                    active: root.button_9_to_12
+                    
+                Label: 
+                    text: '1.1-1.4 sec'
+
+                CheckBox: 
+                    id: eleven_to_fourteen_hold
+                    group: 'hold_time'
+                    active: root.button_11_to_14
+
+                Label: 
+                    text: '1.5 sec'
+                
+                CheckBox: 
+                    id: fifteen_hold
+                    group: 'hold_time'
+                    active: root.button_15
 
                 Label:
                     text: ''
@@ -561,41 +582,6 @@
                     active: root.grasp_0
 
                 Label: 
-                    text: '0.05 sec'
-                CheckBox:
-                    id: g_50_msec
-                    group: 'ghold_time'
-                    active: root.grasp_5
-
-                Label: 
-                    text: '0.1 sec'
-                CheckBox:
-                    id: g_100_msec
-                    group: 'ghold_time'
-                    active: root.grasp_10
-
-                Label: 
-                    text: '0.15 sec'
-                CheckBox:
-                    id: g_eighteen_sec
-                    group: 'ghold_time'
-                    active: root.grasp_15
-                
-                Label: 
-                    text: '0.09-0.12 sec'
-                CheckBox: 
-                    id: g_rand_90_120msec
-                    group: 'ghold_time'
-                    active: root.grasp_r_90_120
-
-                Label: 
-                    text: '0.11-0.15sec'
-                CheckBox: 
-                    id: g_rand_110_150msec
-                    group: 'ghold_time'
-                    active: root.grasp_r_110_150
-
-                Label: 
                     text: '0.20 sec'
                 CheckBox: 
                     id: g_twenty_sec
@@ -617,6 +603,33 @@
                     group: 'ghold_time'
                     active: root.grasp_35
 
+                Label: 
+                    text: '0.50 sec'
+                CheckBox: 
+                    id: g_fifty_sec
+                    group: 'ghold_time'
+                    active: root.grasp_50
+
+                Label: 
+                    text: '.35 - .40 sec'
+                CheckBox: 
+                    id: g_rand_350_400msec
+                    group: 'ghold_time'
+                    active: root.grasp_35_to_40
+
+                Label: 
+                    text: '.38 - .45 sec'
+                CheckBox: 
+                    id: g_rand_380_450msec
+                    group: 'ghold_time'
+                    active: root.grasp_38_to_45
+
+                Label: 
+                    text: '.43 - .5 sec'
+                CheckBox: 
+                    id: g_rand_430_500msec
+                    group: 'ghold_time'
+                    active: root.grasp_43_to_50
 
                 Label:
                     text: ''
@@ -794,11 +807,39 @@
                     color: 1, 1, 0, 1
 
                 Label: 
+                    text: '10 trials'
+                CheckBox:
+                    id: ten_trials
+                    group: 'trials'
+                    active: root.trls_10
+
+                Label: 
+                    text: '15 trials'
+                CheckBox:
+                    id: fifteen_trials
+                    group: 'trials'
+                    active: root.trls_15
+
+                Label: 
                     text: '25 trials'
                 CheckBox:
                     id: twenty_five_trials
                     group: 'trials'
                     active: root.trls_25
+
+                Label: 
+                    text: '35 trials'
+                CheckBox:
+                    id: thirty_five_trials
+                    group: 'trials'
+                    active: root.trls_35
+
+                Label: 
+                    text: '40 trials'
+                CheckBox:
+                    id: fourty_trials
+                    group: 'trials'
+                    active: root.trls_40
 
                 Label:
                     text: '50 trials'
@@ -883,9 +924,16 @@
                     dict(rew_manual=rew_noauto_chk.active, rew_start=rew_anytouch_chk.active, rew_start_and_grasp=rew_anytouch_pls_targ_chk.active, rew_grasp=rew_targ_chk.active, snd_only=sound_only_chk.active, small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]), 
                     dict(test=[testing.active, monk_time.active]), 
-                    dict(start_hold=[zero_hold.active, hund_hold.active, two_hund_hold.active, three_hund_hold.active, four_hund_hold.active], grasp_hold = [g_zero_sec.active, 
-                    g_50_msec.active, g_100_msec.active, g_eighteen_sec.active, g_twenty_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_rand_90_120msec.active, g_rand_110_150msec.active]), 
-                    dict(autoquit=[twenty_five_trials.active, fifty_trials.active, no_trials.active]), 
+
+                    dict(start_hold=[zero_hold.active, four_hund_hold.active, four_to_six_hund_hold.active,
+                    six_to_eight_hund_hold.active, eight_to_thous_hold.active, nine_to_twelve_hold.active,
+                    eleven_to_fourteen_hold.active, fifteen_hold.active], 
+
+                    grasp_hold = [g_zero_sec.active, 
+                    g_twenty_sec.active, g_quarter_sec.active, g_thirty_five_sec.active, g_fifty_sec.active, g_rand_350_400msec.active, g_rand_380_450msec.active, g_rand_430_500msec.active]), 
+                    
+                    dict(autoquit=[ten_trials.active, fifteen_trials.active,
+                    twenty_five_trials.active, thirty_five_trials.active, fourty_trials.active, fifty_trials.active, no_trials.active]), 
                     dict(gto=[gto_five_sec.active, gto_ten_sec.active, gto_twenty_sec.active, gto_thirty_sec.active, gto_inf.active]),
                     dict(use_cap=[False, True]), 
                     dict(tsk_opt=[tsk_grip.active, tsk_button.active, tsk_both.active]), 
@@ -951,7 +999,7 @@
                 font_size: 20
                 center_x: root.width * 2/8
                 top: root.top - 220
-                text: game.button_hold_txt
+                text: game.start_hold_txt
             Label:
                 color: .5,.5,.5,1
                 font_size: 20
