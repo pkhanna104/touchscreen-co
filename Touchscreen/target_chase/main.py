@@ -820,7 +820,7 @@ class COGame(Widget):
 
         self.testing = False
 
-        autoquit_trls = [10, 25, 50, 90, 100, 10**10]
+        autoquit_trls = [10, 25, 50, 60, 90, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
@@ -2642,6 +2642,7 @@ class Manager(ScreenManager):
     is_autoqt10 = BooleanProperty(False)
     is_autoqt25 = BooleanProperty(False)
     is_autoqt50 = BooleanProperty(False)
+    is_autoqt60 = BooleanProperty(False)
     is_autoqt90 = BooleanProperty(False)
     is_autoqt100 = BooleanProperty(False)
     is_autoqtnever = BooleanProperty(False)
@@ -2652,6 +2653,8 @@ class Manager(ScreenManager):
             is_autoqt25 = BooleanProperty(True)
         elif data_params['max_trials'] == 50:
             is_autoqt50 = BooleanProperty(True)
+        elif data_params['max_trials'] == 60:
+            is_autoqt60 = BooleanProperty(True)
         elif data_params['max_trials'] == 90:
             is_autoqt90 = BooleanProperty(True)
         elif data_params['max_trials'] == 100:

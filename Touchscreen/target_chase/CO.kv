@@ -2329,6 +2329,13 @@
                     active: root.is_autoqt50
                     
                 Label:
+                    text: '60 trials'
+                CheckBox:
+                    id: sixty_trials
+                    group: 'trials'
+                    active: root.is_autoqt60
+                    
+                Label:
                     text: '90 trials'
                 CheckBox:
                     id: ninety_trials
@@ -2383,7 +2390,7 @@
                     intertarg_delay=[intertarg_delay0.active, intertarg_delay100.active, intertarg_delay150.active, intertarg_delay200.active, intertarg_delay250.active]),
                     dict(button_hold=[bhtfalse.active, bht000.active, bht100.active, bht200.active, bht300.active, bht400.active, bht500.active, bht600.active, bht700.active, bht800.active, bht900.active, bht1000.active, bht200to400.active, bht600to800.active, bht800to1000.active],
                     hold=[tht000.active, tht100.active, tht200.active, tht300.active, tht400.active, tht500.active, tht600.active, tht100to300.active, tht400to600.active]), 
-                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, ninety_trials.active, hundred_trials.active, no_trials.active]),
+                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, sixty_trials.active, ninety_trials.active, hundred_trials.active, no_trials.active]),
                     dict(rew_var=[rew_all.active, rew_50.active, rew_30.active]),
                     dict(t1tt=[t1tt_0pt8_sec.active, t1tt_1pt0_sec.active, t1tt_1pt5_sec.active, t1tt_2pt0_sec.active, t1tt_2pt5_sec.active, t1tt_3pt0_sec.active, t1tt_3pt5_sec.active, t1tt_4pt0_sec.active, t1tt_10pt0_sec.active],
                     tt=[tt_0pt7_sec.active, tt_0pt8_sec.active, tt_1pt0_sec.active, tt_1pt5_sec.active, tt_2pt0_sec.active, tt_2pt5_sec.active, tt_3pt0_sec.active, tt_3pt5_sec.active, tt_4pt0_sec.active]),
