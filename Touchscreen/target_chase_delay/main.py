@@ -286,7 +286,7 @@ class COGame(Widget):
         
                 
         # TARGET POSITIONS
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'center out', 'button out']
+        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -447,14 +447,6 @@ class COGame(Widget):
             self.target3_pos_str = 'lower_left'
             self.target4_pos_str = 'middle_right'
             self.target5_pos_str = 'upper_middle'
-            
-        elif self.seq == 'U':
-            seq_preselect = True
-            self.target1_pos_str = 'middle_left'
-            self.target2_pos_str = 'upper_right'
-            self.target3_pos_str = 'upper_left'
-            self.target4_pos_str = 'lower_middle'
-            self.target5_pos_str = 'center'
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -1540,6 +1532,8 @@ class COGame(Widget):
         self.target1.color = (0., 1., 0., 1.)
 
     def _end_targ_hold(self, **kwargs):
+        self.target1.color = (0., 0., 0., 0.)
+        
         # Need to reset this
         self.first_time_for_this_targ = True
 
@@ -1599,14 +1593,13 @@ class COGame(Widget):
         
         if self.intertarg_delay == 0:
             self.target1.color = (1., 1., 0., 1.)
-            if np.remainder(self.target_index, 2) == 1:
-                self.pd1_indicator_targ.color = (0., 0., 0., 0.)
-            elif np.remainder(self.target_index, 2) == 0:
-                self.pd1_indicator_targ.color = (1., 1., 1., 1.)
         
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-            
+        if np.remainder(self.target_index, 2) == 1:
+            self.pd1_indicator_targ.color = (0., 0., 0., 0.)
+        elif np.remainder(self.target_index, 2) == 0:
+            self.pd1_indicator_targ.color = (1., 1., 1., 1.)
         try:
             self.write_iscan_trig()
         except:
@@ -1627,11 +1620,8 @@ class COGame(Widget):
                 self.target2.move(self.next_target_position)
                 self.target2.color = (1., 1., 0., 1.)
                 
-        if not self.intertarg_delay == 0:
-            if self.target_index == 1 or time.time() - self.first_time_for_this_targ_t0 >= self.intertarg_delay:
-                self.target1.color = (1., 1., 0., 1.)
-                self.pd1_indicator_targ.color = (0., 0., 0., 0.)
-                
+        if not self.intertarg_delay == 0 and time.time() - self.first_time_for_this_targ_t0 >= self.intertarg_delay:
+            self.target1.color = (1., 1., 0., 1.)
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
@@ -1785,10 +1775,6 @@ class COGame(Widget):
     def finish_targ_hold(self, **kwargs):
         if not self.target_index == self.num_targets:
             if self.tht <= kwargs['ts']:
-                self.target1.color = (0., 0., 0., 0.)
-                if not self.intertarg_delay == 0:
-                    self.pd1_indicator_targ.color = (1., 1., 1., 1.)
-                
                 # Play a small reward tone
                 sound = SoundLoader.load('reward2.wav')
                 sound.play()
@@ -1802,7 +1788,6 @@ class COGame(Widget):
     def finish_last_targ_hold(self, **kwargs):
         if self.target_index == self.num_targets:
             if self.tht <= kwargs['ts']:
-                self.target1.color = (0., 0., 0., 0.)
                 self.trial_completion_time = time.time() - self.target1_on_time
                 return True
             else:
@@ -2202,7 +2187,6 @@ class Manager(ScreenManager):
     is_seqR = BooleanProperty(False)
     is_seqS = BooleanProperty(False)
     is_seqT = BooleanProperty(False)
-    is_seqU = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     is_BO = BooleanProperty(False)
     try:
@@ -2246,8 +2230,6 @@ class Manager(ScreenManager):
             is_seqS = BooleanProperty(True) 
         elif data_params['seq'] == 'T':
             is_seqT = BooleanProperty(True) 
-        elif data_params['seq'] == 'U':
-            is_seqU = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
         elif data_params['seq'] == 'button out': 
