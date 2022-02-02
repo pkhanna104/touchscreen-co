@@ -769,7 +769,7 @@ class COGame(Widget):
             self.use_button = True
         
         # TARGET HOLD TIME
-        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, '.1-.3', '.4-.6']
+        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.1-.3', '.4-.6']
         self.tht_type = None
         for i, val in enumerate(hold['hold']):
             if val:
@@ -817,8 +817,8 @@ class COGame(Widget):
         else:
             self.last_targ_reward = [False, 0]
             
-        self.time_thresh_for_max_rew = 2.75+self.intertarg_delay*self.num_targets
-        self.time_thresh_for_min_rew = 3.25+self.intertarg_delay*self.num_targets
+        self.time_thresh_for_max_rew = 2.5
+        self.time_thresh_for_min_rew = 3.5
         
         # reward_delay_opts = [0., .4, .8, 1.2]
         # for i, val in enumerate(rew_del['rew_del']):
@@ -1722,14 +1722,14 @@ class COGame(Widget):
                 if self.reward_generator[self.trial_counter] > 0:
                     #self.reward_port.open()
                     if self.min_targ_reward[0]:
-                        if self.trial_completion_time < self.time_thresh_for_max_rew:
+                        if self.trial_completion_time > self.time_thresh_for_min_rew:
+                            this_rew = self.min_targ_reward[1]
+                        elif self.trial_completion_time < self.time_thresh_for_max_rew:
                             this_rew = self.last_targ_reward[1]
                         else:
-                            this_rew = self.min_targ_reward[1]
-                        # else:
-                            # rel_time = (self.trial_completion_time - self.time_thresh_for_max_rew)/(self.time_thresh_for_min_rew - self.time_thresh_for_max_rew)
-                            # rel_time = 1 - rel_time
-                            # this_rew = round(self.min_targ_reward[1] + rel_time*(self.last_targ_reward[1]-self.min_targ_reward[1]), 1)
+                            rel_time = (self.trial_completion_time - self.time_thresh_for_max_rew)/(self.time_thresh_for_min_rew - self.time_thresh_for_max_rew)
+                            rel_time = 1 - rel_time
+                            this_rew = round(self.min_targ_reward[1] + rel_time*(self.last_targ_reward[1]-self.min_targ_reward[1]), 1)
                         rew_str = [ord(r) for r in 'inf 50 ml/min '+str(this_rew)+' sec\n']
                         print('Scaled reward: ' + str(this_rew) + 'sec')
                         rew_time = this_rew; 
