@@ -75,7 +75,7 @@ elif user_id == 'Ganguly':
 elif user_id == 'BasalGangulia':
     last_param_path = 'C:/Users/BasalGangulia/Documents/'
 
-last_param_path = last_param_path+'most_recent_target_chase_params.pkl'
+last_param_path = last_param_path+'most_recent_eyetrack_cal_params.pkl'
 if os.path.exists(last_param_path):
     with open(last_param_path, 'rb') as f:
         data_params = pickle.load(f)
@@ -94,8 +94,8 @@ class COGame(Widget):
     pre_start_vid_ts = 0.1
     
     # ITI LENGTH
-    ITI_mean = 1.0
-    ITI_std = .2
+    ITI_mean = 0.1
+    ITI_std = 0
     target_rad = 1.5
     eff_target_rad = 1.5
     
@@ -215,8 +215,8 @@ class COGame(Widget):
             print('removing touch from pre-game screen')
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
-        hold=None, autoquit=None, rew_var=None, targ_timeout = None, 
-        drag=None, nudge_x=None, screen_size=None, juicer=None, taskbreak=None):
+        hold=None, autoquit=None, 
+        drag=None, screen_size=None, juicer=None):
         
         self.rew_cnt = 0
 
@@ -229,35 +229,15 @@ class COGame(Widget):
 
 
         # TARGET TIMEOUT
-        targ1_timeout_opts = [0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 10.0]
-        self.target1_timeout_time = 10000
-        for i, val in enumerate(targ_timeout['t1tt']):
-            if val:
-                self.target1_timeout_time = targ1_timeout_opts[i]
+        self.target1_timeout_time = 100
         
-        targ_timeout_opts = [0.7, 0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
-        self.target_timeout_time = 10000
-        for i, val in enumerate(targ_timeout['tt']):
-            if val:
-                self.target_timeout_time = targ_timeout_opts[i]
+        self.target_timeout_time = 100
 
         # NUDGE X
-        nudge_x_opts = [-6, -4, -2, 0, 2, 4, 6]    
-        for i, val in enumerate(nudge_x['nudge_x_t1']):
-            if val:
-                self.nudge_x_t1 = nudge_x_opts[i]
-                
-        for i, val in enumerate(nudge_x['nudge_x_t2']):
-            if val:
-                self.nudge_x_t2 = nudge_x_opts[i]
-                
-        for i, val in enumerate(nudge_x['nudge_x_t3']):
-            if val:
-                self.nudge_x_t3 = nudge_x_opts[i]
-                
-        for i, val in enumerate(nudge_x['nudge_x_t4']):
-            if val:
-                self.nudge_x_t4 = nudge_x_opts[i]
+        self.nudge_x_t1 = 0
+        self.nudge_x_t2 = 0
+        self.nudge_x_t3 = 0
+        self.nudge_x_t4 = 0
         
         # WHERE TO CONSIDER THE TOP AND BOTTOM OF THE SCREEN (HOW MUCH TO SHRINK IT DOWN/UP BY)
         screen_top_opts = [-12, -10, -8, -6, -4, -2, 0]    
@@ -271,7 +251,7 @@ class COGame(Widget):
                 self.screen_bot = screen_bot_opts[i]
         
         # TARGET RADIUS
-        target_rad_opts = [.5, .75, .82, .91, 1.0, 1.5, 1.85, 2.25, 3.0, 4.0]
+        target_rad_opts = [.1, .25, .5, 0.75, 1]
         for i, val in enumerate(task_in['targ_rad']):
             if val:
                 self.target_rad = target_rad_opts[i]
@@ -286,225 +266,9 @@ class COGame(Widget):
         
                 
         # TARGET POSITIONS
-        # seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'center out', 'button out']
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'V', 'rand5', 'repeat', 'center out', 'button out']
-        self.seq = False
-        for i, val in enumerate(task_in['seq']):
-            if val:
-                self.seq = seq_opts[i]
         
-        if self.seq == 'A':
-            seq_preselect = True
-            self.target1_pos_str = 'lower_right'
-            self.target2_pos_str = 'upper_right'
-            self.target3_pos_str = 'upper_left'
-            self.target4_pos_str = 'lower_left'
-            self.target5_pos_str = 'none'
-        elif self.seq == 'B':
-            seq_preselect = True
-            self.target1_pos_str = 'center'
-            self.target2_pos_str = 'middle_left'
-            self.target3_pos_str = 'middle_right'
-            self.target4_pos_str = 'upper_left'
-            self.target5_pos_str = 'none'
-        elif self.seq == 'C':
-            seq_preselect = True
-            self.target1_pos_str = 'upper_middle'
-            self.target2_pos_str = 'lower_left'
-            self.target3_pos_str = 'middle_right'
-            self.target4_pos_str = 'upper_left'
-            self.target5_pos_str = 'none'
-        elif self.seq == 'D':
-            seq_preselect = True
-            self.target1_pos_str = 'middle_left'
-            self.target2_pos_str = 'upper_right'
-            self.target3_pos_str = 'lower_middle'
-            self.target4_pos_str = 'upper_left'
-            self.target5_pos_str = 'none'
-        elif self.seq == 'E':
-            seq_preselect = True
-            self.target1_pos_str = 'upper_middle'
-            self.target2_pos_str = 'middle_left'
-            self.target3_pos_str = 'middle_right'
-            self.target4_pos_str = 'lower_middle'
-            self.target5_pos_str = 'upper_middle'
-            
-        elif self.seq == 'F':
-            seq_preselect = True
-            self.target1_pos_str = 'lower_middle'
-            self.target2_pos_str = 'upper_middle'
-            self.target3_pos_str = 'middle_right'
-            self.target4_pos_str = 'middle_left'
-            self.target5_pos_str = 'lower_middle'
-        
-        elif self.seq == 'G':
-            seq_preselect = True
-            self.target1_pos_str = 'middle_left'
-            self.target2_pos_str = 'middle_right'
-            self.target3_pos_str = 'lower_middle'
-            self.target4_pos_str = 'upper_middle'
-            self.target5_pos_str = 'middle_right'
-            
-        elif self.seq == 'H':
-            seq_preselect = True
-            self.target1_pos_str = 'middle_right'
-            self.target2_pos_str = 'middle_left'
-            self.target3_pos_str = 'lower_middle'
-            self.target4_pos_str = 'upper_middle'
-            self.target5_pos_str = 'middle_left'
-            
-        elif self.seq == 'I':
-            seq_preselect = True
-            self.target1_pos_str = 'lower_left'
-            self.target2_pos_str = 'upper_middle'
-            self.target3_pos_str = 'lower_right'
-            self.target4_pos_str = 'upper_right'
-            self.target5_pos_str = 'center'
-            
-        elif self.seq == 'J':
-            seq_preselect = True
-            self.target1_pos_str = 'lower_middle'
-            self.target2_pos_str = 'upper_right'
-            self.target3_pos_str = 'lower_right'
-            self.target4_pos_str = 'lower_left'
-            self.target5_pos_str = 'upper_middle'
-            
-        elif self.seq == 'K':
-            seq_preselect = True
-            self.target1_pos_str = 'upper_middle'
-            self.target2_pos_str = 'middle_right'
-            self.target3_pos_str = 'lower_left'
-            self.target4_pos_str = 'upper_left'
-            self.target5_pos_str = 'upper_right'
-            
-        elif self.seq == 'L':
-            seq_preselect = True
-            self.target1_pos_str = 'middle_left'
-            self.target2_pos_str = 'upper_right'
-            self.target3_pos_str = 'center'
-            self.target4_pos_str = 'lower_right'
-            self.target5_pos_str = 'upper_left'
-            
-        elif self.seq == 'M':
-            seq_preselect = True
-            self.target1_pos_str = 'center'
-            self.target2_pos_str = 'upper_left'
-            self.target3_pos_str = 'middle_right'
-            self.target4_pos_str = 'lower_middle'
-            self.target5_pos_str = 'upper_right'
-            
-        elif self.seq == 'N':
-            seq_preselect = True
-            self.target1_pos_str = 'lower_left'
-            self.target2_pos_str = 'center'
-            self.target3_pos_str = 'upper_left'
-            self.target4_pos_str = 'upper_right'
-            self.target5_pos_str = 'lower_right'
-            
-        elif self.seq == 'O':
-            seq_preselect = True
-            self.target1_pos_str = 'middle_right'
-            self.target2_pos_str = 'upper_left'
-            self.target3_pos_str = 'lower_middle'
-            self.target4_pos_str = 'center'
-            self.target5_pos_str = 'upper_right'
-            
-        elif self.seq == 'P':
-            seq_preselect = True
-            self.target1_pos_str = 'upper_right'
-            self.target2_pos_str = 'center'
-            self.target3_pos_str = 'lower_left'
-            self.target4_pos_str = 'upper_middle'
-            self.target5_pos_str = 'middle_right'
-            
-        elif self.seq == 'Q':
-            seq_preselect = True
-            self.target1_pos_str = 'upper_left'
-            self.target2_pos_str = 'lower_left'
-            self.target3_pos_str = 'middle_right'
-            self.target4_pos_str = 'center'
-            self.target5_pos_str = 'lower_middle'
-        
-        elif self.seq == 'R':
-            seq_preselect = True
-            self.target1_pos_str = 'middle_right'
-            self.target2_pos_str = 'upper_middle'
-            self.target3_pos_str = 'middle_left'
-            self.target4_pos_str = 'lower_middle'
-            self.target5_pos_str = 'upper_left'
-            
-        elif self.seq == 'S':
-            seq_preselect = True
-            self.target1_pos_str = 'center'
-            self.target2_pos_str = 'lower_right'
-            self.target3_pos_str = 'upper_middle'
-            self.target4_pos_str = 'middle_left'
-            self.target5_pos_str = 'lower_left'
-        
-        elif self.seq == 'T':
-            seq_preselect = True
-            self.target1_pos_str = 'upper_left'
-            self.target2_pos_str = 'center'
-            self.target3_pos_str = 'lower_left'
-            self.target4_pos_str = 'middle_right'
-            self.target5_pos_str = 'upper_middle'
-            
-        elif self.seq == 'U':
-            seq_preselect = True
-            self.target1_pos_str = 'middle_left'
-            self.target2_pos_str = 'upper_right'
-            self.target3_pos_str = 'upper_left'
-            self.target4_pos_str = 'lower_middle'
-            self.target5_pos_str = 'center'
-            
-        elif self.seq == 'V':
-            seq_preselect = True
-            self.target1_pos_str = 'middle_right'
-            self.target2_pos_str = 'upper_middle'
-            self.target3_pos_str = 'lower_left'
-            self.target4_pos_str = 'center'
-            self.target5_pos_str = 'upper_left'
-            
-        elif self.seq == 'rand5':
-            seq_preselect = True
-            pos_str_opts = ['upper_left', 'upper_middle', 'upper_right', 'middle_left', 'center', 'middle_right', 'lower_left', 'lower_middle', 'lower_right']
-            pos_order = np.random.permutation(9)
-            self.target1_pos_str = pos_str_opts[pos_order[0]]
-            self.target2_pos_str = pos_str_opts[pos_order[1]]
-            self.target3_pos_str = pos_str_opts[pos_order[2]]
-            self.target4_pos_str = pos_str_opts[pos_order[3]]
-            self.target5_pos_str = pos_str_opts[pos_order[4]]
-            
-        elif self.seq == 'repeat':
-            seq_preselect = True
-            self.target1_pos_str = data_params['target1_pos_str']
-            self.target2_pos_str = data_params['target2_pos_str']
-            self.target3_pos_str = data_params['target3_pos_str']
-            self.target4_pos_str = data_params['target4_pos_str']
-            self.target5_pos_str = data_params['target5_pos_str']
-        
-        elif self.seq == 'center out':
-            seq_preselect = True
-            self.target1_pos_str = 'center'
-            self.target2_pos_str = 'random'
-            self.target3_pos_str = 'none'
-            self.target4_pos_str = 'none'
-            self.target5_pos_str = 'none'
-            self.trial_order = self.gen_trials(self.seq) 
-            self.num_targets = 1
-        
-        elif self.seq == 'button out':
-            seq_preselect = True
-            self.target1_pos_str = 'random'
-            self.target2_pos_str = 'none'
-            self.target3_pos_str = 'none'
-            self.target4_pos_str = 'none'
-            self.target5_pos_str = 'none'
-            self.trial_order = self.gen_trials(self.seq)
-            self.num_targets = 1
-        
-        else:
-            seq_preselect = False
+        self.num_targets = 5
+
         
         self.center_position = np.array([0., 0.])
         # lower the center position by half of the total amount the screen height has been shrunk by
@@ -514,236 +278,31 @@ class COGame(Widget):
         d_center2bot = (fixed_window_size_cm[1]/2)+((self.screen_top/2)+(self.screen_bot/2))
         self.max_y_from_center = (fixed_window_size_cm[1]+self.screen_top-self.screen_bot)/2-self.target_rad
         
-        # target 1
-        if not seq_preselect:
-            target_pos_opts = ['random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
-            for i, val in enumerate(task_in['targ1_pos']):
-                if val:
-                    self.target1_pos_str = target_pos_opts[i]
-        
-        if self.target1_pos_str == 'random': # set for now, will get overriden later
-            targ_x = self.center_position[0]+self.nudge_x_t1
-            targ_y = self.center_position[1]
-        elif self.target1_pos_str == 'center':
-            targ_x = self.center_position[0]+self.nudge_x_t1
-            targ_y = self.center_position[1]
-        elif self.target1_pos_str == 'upper_middle':
-            targ_x = self.center_position[0]+self.nudge_x_t1
-            targ_y = self.center_position[1] + self.max_y_from_center
-        elif self.target1_pos_str == 'lower_middle':
-            targ_x = self.center_position[0]+self.nudge_x_t1
-            targ_y = self.center_position[1] - self.max_y_from_center
-        elif self.target1_pos_str == 'upper_right':
-            targ_x = self.max_y_from_center+self.nudge_x_t1
-            targ_y = self.center_position[1] + self.max_y_from_center
-        elif self.target1_pos_str == 'middle_right':
-            targ_x = self.max_y_from_center+self.nudge_x_t1
-            targ_y = self.center_position[1]
-        elif self.target1_pos_str == 'lower_right':
-            targ_x = self.max_y_from_center+self.nudge_x_t1
-            targ_y = self.center_position[1] - self.max_y_from_center
-        elif self.target1_pos_str == 'lower_left':
-            targ_x = -self.max_y_from_center+self.nudge_x_t1
-            targ_y = self.center_position[1] - self.max_y_from_center
-        elif self.target1_pos_str == 'middle_left':
-            targ_x = -self.max_y_from_center+self.nudge_x_t1
-            targ_y = self.center_position[1]
-        elif self.target1_pos_str == 'upper_left':
-            targ_x = -self.max_y_from_center+self.nudge_x_t1
-            targ_y = self.center_position[1] + self.max_y_from_center
-            
-        self.target1_position = np.array([targ_x, targ_y])
-        
-        # target 2
-        if not seq_preselect:
-            target_pos_opts = ['none', 'random', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
-            for i, val in enumerate(task_in['targ2_pos']):
-                if val:
-                    self.target2_pos_str = target_pos_opts[i]
 
-        if not self.target2_pos_str == 'none': 
-            if self.target2_pos_str == 'center':
-                targ_x = self.center_position[0]+self.nudge_x_t2
-                targ_y = self.center_position[1]
-            elif self.target2_pos_str == 'upper_middle':
-                targ_x = self.center_position[0]+self.nudge_x_t2
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif self.target2_pos_str == 'lower_middle':
-                targ_x = self.center_position[0]+self.nudge_x_t2
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target2_pos_str == 'upper_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif self.target2_pos_str == 'middle_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1]
-            elif self.target2_pos_str == 'lower_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target2_pos_str == 'lower_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target2_pos_str == 'middle_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1]
-            elif self.target2_pos_str == 'upper_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] + self.max_y_from_center
-            
-        self.target2_position = np.array([targ_x, targ_y])
+        ur_x = self.max_y_from_center+self.nudge_x_t2
+        ur_y = self.center_position[1] + self.max_y_from_center
         
-        # target 3
-        if not seq_preselect:
-            target_pos_opts = ['none', 'center', 'upper_left', 'middle_left', 'lower_left', 'upper_middle', 'lower_middle', 'upper_right', 'middle_right', 'lower_right']
-            for i, val in enumerate(task_in['targ3_pos']):
-                if val:
-                    self.target3_pos_str = target_pos_opts[i]
+        lr_x = self.max_y_from_center+self.nudge_x_t2
+        lr_y = self.center_position[1] - self.max_y_from_center
         
-        if not self.target3_pos_str == 'none':
-            if self.target3_pos_str == 'center':
-                targ_x = self.center_position[0]+self.nudge_x_t3
-                targ_y = self.center_position[1]
-            elif self.target3_pos_str == 'upper_middle':
-                targ_x = self.center_position[0]+self.nudge_x_t3
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif self.target3_pos_str == 'lower_middle':
-                targ_x = self.center_position[0]+self.nudge_x_t3
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target3_pos_str == 'upper_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t3
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif self.target3_pos_str == 'middle_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t3
-                targ_y = self.center_position[1]
-            elif self.target3_pos_str == 'lower_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t3
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target3_pos_str == 'lower_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t3
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target3_pos_str == 'middle_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t3
-                targ_y = self.center_position[1]
-            elif self.target3_pos_str == 'upper_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t3
-                targ_y = self.center_position[1] + self.max_y_from_center
-                
-            self.target3_position = np.array([targ_x, targ_y])
-            
-        # target 4
-        if not seq_preselect:
-            for i, val in enumerate(task_in['targ4_pos']):
-                if val:
-                    self.target4_pos_str = target_pos_opts[i]
+        ll_x = -self.max_y_from_center+self.nudge_x_t2
+        ll_y = self.center_position[1] - self.max_y_from_center
         
-        if not self.target4_pos_str == 'none':
-            if self.target4_pos_str == 'center':
-                targ_x = self.center_position[0]+self.nudge_x_t4
-                targ_y = self.center_position[1]
-            elif self.target4_pos_str == 'upper_middle':
-                targ_x = self.center_position[0]+self.nudge_x_t4
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif self.target4_pos_str == 'lower_middle':
-                targ_x = self.center_position[0]+self.nudge_x_t4
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target4_pos_str == 'upper_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif self.target4_pos_str == 'middle_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1]
-            elif self.target4_pos_str == 'lower_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target4_pos_str == 'lower_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target4_pos_str == 'middle_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1]
-            elif self.target4_pos_str == 'upper_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] + self.max_y_from_center
-            
-            self.target4_position = np.array([targ_x, targ_y])
-            
-        # target 5
-        if not seq_preselect:
-            self.target5_pos_str = 'none'
-            #for i, val in enumerate(task_in['targ4_pos']):
-            #    if val:
-            #        self.target4_pos_str = target_pos_opts[i]
-        
-        if self.target2_pos_str == 'none': 
-            self.target2_position = False 
-            self.target3_position = False
-            self.target4_position = False
-            self.target5_position = False
-            self.num_targets = 1
-        elif self.target3_pos_str == 'none':
-            self.target3_position = False
-            self.target4_position = False
-            self.target5_position = False
-            self.num_targets = 2
-        elif self.target4_pos_str == 'none':
-            self.target4_position = False
-            self.target5_position = False
-            self.num_targets = 3
-        elif self.target5_pos_str == 'none':
-            self.target5_position = False
-            self.num_targets = 4
-        else:
-            self.num_targets = 5
-            if self.target5_pos_str == 'center':
-                targ_x = self.center_position[0]+self.nudge_x_t4
-                targ_y = self.center_position[1]
-            elif self.target5_pos_str == 'upper_middle':
-                targ_x = self.center_position[0]+self.nudge_x_t4
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif self.target5_pos_str == 'lower_middle':
-                targ_x = self.center_position[0]+self.nudge_x_t4
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target5_pos_str == 'upper_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif self.target5_pos_str == 'middle_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1]
-            elif self.target5_pos_str == 'lower_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target5_pos_str == 'lower_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif self.target5_pos_str == 'middle_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1]
-            elif self.target5_pos_str == 'upper_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t4
-                targ_y = self.center_position[1] + self.max_y_from_center
-            
-            self.target5_position = np.array([targ_x, targ_y])
+        ul_x = -self.max_y_from_center+self.nudge_x_t2
+        ul_y = self.center_position[1] + self.max_y_from_center
 
-
-        self.active_target_position = self.target1_position
+        cent_x = self.center_position[0]+self.nudge_x_t1
+        cent_y = self.center_position[1]
+        
+        self.target_position = np.array([[ur_x, lr_x, ll_x, ul_x, cent_x], [ur_y, lr_y, ll_y, ul_y, cent_y]])
+        
         self.target_index = 1
         
-        # ANIMAL NAME
-        for i, (nm, val) in enumerate(animal_names_dict.items()):
-            if val:
-                animal_name = nm
-        
         # HOW MUCH TIME TO WAIT UNTIL THE NEXT TARGET APPEARS
-        time_to_next_targ_opts = [False, 0.25, 0.5, 0.75, 1.0, 1.5]
-        for i, val in enumerate(task_in['time_to_next_targ']):
-            if val:
-                self.time_to_next_targ = time_to_next_targ_opts[i]
+        self.time_to_next_targ = False
                 
         # INTER TARGET DELAY TIME
-        intertarg_delay_opts = [0, 0.1, 0.15, 0.2, 0.25]
-        for i, val in enumerate(task_in['intertarg_delay']):
-            if val:
-                self.intertarg_delay = intertarg_delay_opts[i]
+        self.intertarg_delay = 0
         
         # ANIMAL NAME
         for i, (nm, val) in enumerate(animal_names_dict.items()):
@@ -752,16 +311,7 @@ class COGame(Widget):
 
 
         # BUTTON HOLD TIME
-        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0, '.2-.4', '.6-.8', '.8-1.0']
-        self.button_hold_time_type = None
-        for i, val in enumerate(hold['button_hold']):
-            if val:
-                if type(holdz[i]) is str:
-                    mx, mn = holdz[i].split('-')
-                    self.button_hold_time_type = holdz[i]
-                    self.button_hold_time =  (float(mn)+float(mx))*.5
-                else:
-                    self.button_hold_time = holdz[i]
+        self.button_hold_time = [False, 1.0]
                     
         if self.button_hold_time is False:
             self.use_button = False
@@ -769,16 +319,7 @@ class COGame(Widget):
             self.use_button = True
         
         # TARGET HOLD TIME
-        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.1-.3', '.4-.6']
-        self.tht_type = None
-        for i, val in enumerate(hold['hold']):
-            if val:
-                if type(holdz[i]) is str:
-                    mx, mn = holdz[i].split('-')
-                    self.tht_type = holdz[i]
-                    self.tht =  (float(mn)+float(mx))*.5
-                else:
-                    self.tht = holdz[i]
+        self.tht = 0.0
         
         try:
             pygame.mixer.init()    
@@ -787,52 +328,24 @@ class COGame(Widget):
         
         
         # JUICE REWARD SETTINGS
-        button_rew_opts = [0., .1, .3, .5]
-        for i, val in enumerate(rew_in['button_rew']):
-            if val:
-                button_rew = button_rew_opts[i]
-        
-        min_rew_opts = ['No Reward Scaling', 0., .1, .2, .3]
-        for i, val in enumerate(rew_in['min_rew']):
-            if val:
-                min_rew = min_rew_opts[i]
-        
         big_rew_opts = [.3, .5, .7, 0.9, 1.1]
         for i, val in enumerate(rew_in['big_rew']):
             if val:
                 big_rew = big_rew_opts[i]
         
-        if button_rew > 0.0:
-            self.button_rew = [True, button_rew]
-        else:
-            self.button_rew = [False, 0]
+        self.button_rew = [False, 0]
         
-        if min_rew == 'No Reward Scaling':
-            self.min_targ_reward = [False, False]
-        else:
-            self.min_targ_reward = [True, min_rew]
+        self.min_targ_reward = [False, False]
 
-        if big_rew > 0.0:
-            self.last_targ_reward = [True, big_rew]
-        else:
-            self.last_targ_reward = [False, 0]
-            
-        self.time_thresh_for_max_rew = 2.5
-        self.time_thresh_for_min_rew = 3.5
+        self.last_targ_reward = [True, big_rew]
         
         # reward_delay_opts = [0., .4, .8, 1.2]
         # for i, val in enumerate(rew_del['rew_del']):
         #     if val:
         self.reward_delay_time = 0.0
 
-        reward_var_opt = [1.0, .5, .33]
-        for i, val in enumerate(rew_var['rew_var']):
-            if val:
-                self.percent_of_trials_rewarded = reward_var_opt[i]
-                if self.percent_of_trials_rewarded == 0.33:
-                    self.percent_of_trials_doubled = 0.1
-                else:
-                    self.percent_of_trials_doubled = 0.0
+        self.percent_of_trials_rewarded = 1.0
+        self.percent_of_trials_doubled = 0.0
         
         self.reward_generator = self.gen_rewards(self.percent_of_trials_rewarded, self.percent_of_trials_doubled,
             self.last_targ_reward)
@@ -847,26 +360,19 @@ class COGame(Widget):
 
         self.testing = False
 
-        autoquit_trls = [10, 25, 50, 60, 90, 100, 10**10]
+        autoquit_trls = [3, 5]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
                 
         # TASK BREAKS
-        break_trls = [0, 10, 15, 20, 25]
-        for i, val in enumerate(taskbreak['breaktrl']):
-            if val: 
-                self.break_trl = break_trls[i]
+        self.break_trl = 0
                 
         self.next_breaktrl = self.break_trl
                 
-        break_durs = [30, 60, 90, 120, 150]
-        for i, val in enumerate(taskbreak['breakdur']):
-            if val: 
-                self.break_dur = break_durs[i]
+        self.break_dur = 30
         
         # OK to drag into the targets?
-        self.drag_ok = False;
         drag_opts = [True, False]
         for i, val in enumerate(drag['drag']):
             if val:
@@ -893,8 +399,9 @@ class COGame(Widget):
         self.ITI = self.ITI_std + self.ITI_mean
 
         # Initialize targets: 
+        self.active_target_position = self.target_position[:, 0]
         self.target1.set_size(2*self.target_rad)
-        self.target1.move(self.target1_position)
+        self.target1.move(self.target_position[:, 0])
         self.target1.set_size(2*self.target_rad)
         self.target2.set_size(2*self.target_rad)
 
@@ -1059,7 +566,7 @@ class COGame(Widget):
             max_trials = self.max_trials,
             target1_timeout_time = self.target1_timeout_time,
             target_timeout_time = self.target_timeout_time,
-            button_rew = button_rew,
+            button_rew = self.button_rew,
             min_targ_reward = self.min_targ_reward[1],
             last_targ_reward = self.last_targ_reward[1],
             nudge_x_t1 = self.nudge_x_t1,
@@ -1071,17 +578,7 @@ class COGame(Widget):
             target_rad=self.target_rad,
             effective_target_rad=self.eff_target_rad,
             center_position = self.center_position,
-            seq = self.seq,
-            target1_pos_str = self.target1_pos_str,
-            target2_pos_str = self.target2_pos_str,
-            target3_pos_str = self.target3_pos_str,
-            target4_pos_str = self.target4_pos_str,
-            target5_pos_str = self.target5_pos_str,
-            target1_position = self.target1_position, 
-            target2_position = self.target2_position, 
-            target3_position = self.target3_position, 
-            target4_position = self.target4_position, 
-            target5_position = self.target5_position,
+            target_position = self.target_position,
             time_to_next_targ = self.time_to_next_targ,
             intertarg_delay = self.intertarg_delay,
             button_hold_time = self.button_hold_time,
@@ -1105,13 +602,13 @@ class COGame(Widget):
         else:
             # Try saving to Box
             if user_id == 'Sandon':
-                box_path = '/Users/Sandon/Box/Data/NHP_BehavioralData/target_chase/'
+                box_path = '/Users/Sandon/Box/Data/NHP_BehavioralData/eyetrack_cal/'
                 last_param_path = '/Users/Sandon/Documents/'
             elif user_id == 'Ganguly':
-                box_path = 'C:/Users/Ganguly/Box/Data/NHP_BehavioralData/target_chase/'
+                box_path = 'C:/Users/Ganguly/Box/Data/NHP_BehavioralData/eyetrack_cal/'
                 last_param_path = 'C:/Users/Ganguly/Documents/'
             elif user_id == 'BasalGangulia':
-                box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/target_chase/'
+                box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/eyetrack_cal/'
                 last_param_path = 'C:/Users/BasalGangulia/Documents/'
             
             # Check if the Box directory exists
@@ -1142,7 +639,7 @@ class COGame(Widget):
             self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
         
             # save the params for this run in the _last_params
-            pickle.dump(d, open(last_param_path+'most_recent_target_chase_params.pkl', 'wb'))
+            pickle.dump(d, open(last_param_path+'most_recent_eyetrack_cal_params.pkl', 'wb'))
     
             # save the params for this run in the same place where we're saving the data
             pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
@@ -1217,10 +714,7 @@ class COGame(Widget):
             self.targ_size_text = 'Target Radius: '
             self.big_rew_text = 'Big Reward Time: '
 
-            if type(self.tht_type) is str:
-                self.tht_param = self.tht_type
-            else:
-                self.tht_param = 'Constant: ' + str(self.tht)
+            self.tht_param = 'Constant: ' + str(self.tht)
 
             self.targ_size_param = str(self.target_rad)
             self.big_rew_time_param = str(self.last_targ_reward[1])
@@ -1369,17 +863,9 @@ class COGame(Widget):
         Window.clearcolor = (0., 0., 0., 1.)
         self.exit_target1.color = (.15, .15, .15, 1.)
         self.exit_target2.color = (.15, .15, .15, 1.)
-
         # Set ITI, CHT, THT
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
-
-        if type(self.tht_type) is str:
-            tht_min, tht_max = self.tht_type.split('-')
-            self.tht = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min)      
-        
-        if type(self.button_hold_time_type) is str:
-            bht_min, bht_max = self.button_hold_time_type.split('-')
-            self.button_hold_time = ((float(bht_max) - float(bht_min)) * np.random.random()) + float(bht_min)     
+   
         
         self.target1.color = (0., 0., 0., 0.)
         self.target1.color = (0., 0., 0., 0.)
@@ -1413,6 +899,7 @@ class COGame(Widget):
         return kwargs['ts'] > self.this_breakdur
 
     def _start_vid_trig(self, **kwargs):
+        self.target_order = np.random.permutation(5)
         if self.trial_counter == 0:
             time.sleep(1.)
         try:    
@@ -1424,47 +911,6 @@ class COGame(Widget):
         
         # Reset target index back to 1
         self.target_index = 1
-
-        # Get the position of target2
-        if self.target2_pos_str == 'random': 
-            i_pos = self.trial_order[self.trials_started]
-        
-            if i_pos == 0: # 'upper_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif i_pos == 1:# 'lower_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif i_pos == 2: # 'lower_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif i_pos == 3: # 'upper_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif i_pos == 4: # center positon 
-                targ_x = self.center_position[0]
-                targ_y = self.center_position[1]
-
-            self.target2_position = np.array([targ_x, targ_y])
-
-        if self.target1_pos_str == 'random': 
-            i_pos = self.trial_order[self.trials_started]
-            if i_pos == 0: # 'upper_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t1
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif i_pos == 1:# 'lower_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t1
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif i_pos == 2: # 'lower_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t1
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif i_pos == 3: # 'upper_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t1
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif i_pos == 4: # center positon 
-                targ_x = self.center_position[0]
-                targ_y = self.center_position[1]
-            self.target1_position = np.array([targ_x, targ_y])
 
                 
 
@@ -1604,21 +1050,8 @@ class COGame(Widget):
             self.target2.color = (0., 0., 0., 0.)
             self.first_time_for_this_targ = False
         
-        if self.target_index == 1:
-            self.active_target_position = self.target1_position
-            self.next_target_position = self.target2_position
-        elif self.target_index == 2:
-            self.active_target_position = self.target2_position
-            self.next_target_position = self.target3_position
-        elif self.target_index == 3:
-            self.active_target_position = self.target3_position
-            self.next_target_position = self.target4_position
-        elif self.target_index == 4:
-            self.active_target_position = self.target4_position
-            self.next_target_position = self.target5_position
-        elif self.target_index == 5:
-            self.active_target_position = self.target5_position
-            self.next_target_position = False
+        self.active_target_position = self.target_position[:, self.target_order[self.target_index-1]]
+        self.next_target_position = False
             
         if self.target_index == 1:
             self.target1_on_time = time.time()
@@ -1918,69 +1351,6 @@ class Manager(ScreenManager):
     except:
         pass
     
-    # target 1 timeout
-    is_t1tt0pt8 = BooleanProperty(False)
-    is_t1tt1pt0 = BooleanProperty(False)
-    is_t1tt1pt5 = BooleanProperty(False)
-    is_t1tt2pt0 = BooleanProperty(False)
-    is_t1tt2pt5 = BooleanProperty(False)
-    is_t1tt3pt0 = BooleanProperty(False)
-    is_t1tt3pt5 = BooleanProperty(False)
-    is_t1tt4pt0 = BooleanProperty(False)
-    is_t1tt10pt0 = BooleanProperty(False)
-    try:
-        if data_params['target1_timeout_time'] == 0.8:
-            is_t1tt0pt8 = BooleanProperty(True)
-        elif data_params['target1_timeout_time'] == 1.0:
-            is_t1tt1pt0 = BooleanProperty(True)
-        elif data_params['target1_timeout_time'] == 1.5:
-            is_t1tt1pt5 = BooleanProperty(True)
-        elif data_params['target1_timeout_time'] == 2.0:
-            is_t1tt2pt0 = BooleanProperty(True)
-        elif data_params['target1_timeout_time'] == 2.5:
-            is_t1tt2pt5 = BooleanProperty(True)
-        elif data_params['target1_timeout_time'] == 3.0:
-            is_t1tt3pt0 = BooleanProperty(True)
-        elif data_params['target1_timeout_time'] == 3.5:
-            is_t1tt3pt5 = BooleanProperty(True)
-        elif data_params['target1_timeout_time'] == 4.0:
-            is_t1tt4pt0 = BooleanProperty(True)    
-        elif data_params['target1_timeout_time'] == 10.0: 
-            is_t1tt10pt0 = BooleanProperty(True)
-    except:
-        pass
-    
-    # target timeout
-    is_tt0pt7 = BooleanProperty(False)
-    is_tt0pt8 = BooleanProperty(False)
-    is_tt1pt0 = BooleanProperty(False)
-    is_tt1pt5 = BooleanProperty(False)
-    is_tt2pt0 = BooleanProperty(False)
-    is_tt2pt5 = BooleanProperty(False)
-    is_tt3pt0 = BooleanProperty(False)
-    is_tt3pt5 = BooleanProperty(False)
-    is_tt4pt0 = BooleanProperty(False)
-    try:
-        if data_params['target_timeout_time'] == 0.7:
-            is_tt0pt7 = BooleanProperty(True)
-        elif data_params['target_timeout_time'] == 0.8:
-            is_tt0pt8 = BooleanProperty(True)
-        elif data_params['target_timeout_time'] == 1.0:
-            is_tt1pt0 = BooleanProperty(True)
-        elif data_params['target_timeout_time'] == 1.5:
-            is_tt1pt5 = BooleanProperty(True)
-        elif data_params['target_timeout_time'] == 2.0:
-            is_tt2pt0 = BooleanProperty(True)
-        elif data_params['target_timeout_time'] == 2.5:
-            is_tt2pt5 = BooleanProperty(True)
-        elif data_params['target_timeout_time'] == 3.0:
-            is_tt3pt0 = BooleanProperty(True)
-        elif data_params['target_timeout_time'] == 3.5:
-            is_tt3pt5 = BooleanProperty(True)
-        elif data_params['target_timeout_time'] == 4.0:
-            is_tt4pt0 = BooleanProperty(True)
-    except:
-        pass
         
     # dragok
     is_dragok = BooleanProperty(False)
@@ -1995,125 +1365,15 @@ class Manager(ScreenManager):
     
     # crashbar hold time
     is_bhtfalse = BooleanProperty(False)
-    is_bht000 = BooleanProperty(False)
-    is_bht100 = BooleanProperty(False)
-    is_bht200 = BooleanProperty(False)
-    is_bht300 = BooleanProperty(False)
-    is_bht400 = BooleanProperty(False)
-    is_bht500 = BooleanProperty(False)
-    is_bht600 = BooleanProperty(False)
-    is_bht700 = BooleanProperty(False)
-    is_bht800 = BooleanProperty(False)
-    is_bht900 = BooleanProperty(False)
     is_bht1000 = BooleanProperty(False)
-    is_bht200to400 = BooleanProperty(False)
-    is_bht600to800 = BooleanProperty(False)
-    is_bht800to1000 = BooleanProperty(False)
-    # is_bhtbigrand = BooleanProperty(False)
     try:
         if data_params['button_hold_time'] == False:
             is_bhtfalse = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.0:
-            is_bht000 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.1:
-            is_bht100 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.2:
-            is_bht200 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.3:
-            is_bht300 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.4:
-            is_bht400 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.5:
-            is_bht500 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.6:
-            is_bht600 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.7:
-            is_bht700 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.8:
-            is_bht800 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.9:
-            is_bht900 = BooleanProperty(True)
         elif data_params['button_hold_time'] == 1.0:
             is_bht1000 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == '.2-.4': 
-            is_bht200to400 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == '.6-.8':
-            is_bht600to800 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == '.8-1.0':
-            is_bht800to1000 = BooleanProperty(True)
     except:
         pass
-        
-    # crashbar reward
-    is_bhrew000 = BooleanProperty(False)
-    is_bhrew100 = BooleanProperty(False)
-    is_bhrew300 = BooleanProperty(False)
-    is_bhrew500 = BooleanProperty(False)
-    try:
-        if data_params['button_rew'] == 0.0:
-            is_bhrew000 = BooleanProperty(True)
-        elif data_params['button_rew'] == 0.1:
-            is_bhrew100 = BooleanProperty(True)
-        elif data_params['button_rew'] == 0.3:
-            is_bhrew300 = BooleanProperty(True)
-        elif data_params['button_rew'] == 0.5:
-            is_bhrew500 = BooleanProperty(True)
-    except:
-        pass
-        
-    # target hold time
-    is_tht000 = BooleanProperty(False)
-    is_tht100 = BooleanProperty(False)
-    is_tht200 = BooleanProperty(False)
-    is_tht300 = BooleanProperty(False)
-    is_tht400 = BooleanProperty(False)
-    is_tht500 = BooleanProperty(False)
-    is_tht600 = BooleanProperty(False)
-    is_tht100to300 = BooleanProperty(False)
-    is_tht400to600 = BooleanProperty(False)
-    try:
-        if data_params['target_hold_time'] == 0.0:
-            is_tht000 = BooleanProperty(True)
-        elif data_params['target_hold_time'] == 0.1:
-            is_tht100 = BooleanProperty(True)
-        elif data_params['target_hold_time'] == 0.2:
-            is_tht200 = BooleanProperty(True)
-        elif data_params['target_hold_time'] == 0.3:
-            is_tht300 = BooleanProperty(True)
-        elif data_params['target_hold_time'] == 0.4:
-            is_tht400 = BooleanProperty(True)
-        elif data_params['target_hold_time'] == 0.5:
-            is_tht500 = BooleanProperty(True)
-        elif data_params['target_hold_time'] == 0.6:
-            is_tht600 = BooleanProperty(True)
-        elif data_params['target_hold_time'] == '.1-.3':
-            is_tht100to300 = BooleanProperty(True)
-        elif data_params['target_hold_time'] == '.4-.6':
-            is_tht400to600 = BooleanProperty(True)
-    except:
-        pass
-        
-        
-    # minimum final target reward
-    is_minthrewnone = BooleanProperty(False)
-    is_minthrew000 = BooleanProperty(False)
-    is_minthrew100 = BooleanProperty(False)
-    is_minthrew200 = BooleanProperty(False)
-    is_minthrew300 = BooleanProperty(False)
-    try:
-        if data_params['min_targ_reward'] == 'No Reward Scaling':
-            is_minthrewnone = BooleanProperty(True)
-        elif data_params['min_targ_reward'] == 0.0:
-            is_minthrew000 = BooleanProperty(True)
-        elif data_params['min_targ_reward'] == 0.1:
-            is_minthrew100 = BooleanProperty(True)
-        elif data_params['min_targ_reward'] == 0.2:
-            is_minthrew200 = BooleanProperty(True)
-        elif data_params['min_targ_reward'] == 0.3:
-            is_minthrew300 = BooleanProperty(True)
-    except:
-        pass
-        
+
         
     # max final target reward
     is_threw300 = BooleanProperty(False)
@@ -2135,53 +1395,24 @@ class Manager(ScreenManager):
     except:
         pass
         
-    # reward variability
-    is_rewvarall = BooleanProperty(False)
-    is_rewvar50 = BooleanProperty(False)
-    is_rewvar33 = BooleanProperty(False)
-    try:
-        if data_params['percent_of_trials_rewarded'] == 1.0:
-            is_rewvarall = BooleanProperty(True)
-        elif data_params['percent_of_trials_rewarded'] == 0.5:
-            is_rewvar50 = BooleanProperty(True)
-        elif data_params['percent_of_trials_rewarded'] == 0.33:
-            is_rewvar33 = BooleanProperty(True)
-    except:
-        pass
-        
-        
     # target radius
-    is_trad050 = BooleanProperty(False)
-    is_trad075 = BooleanProperty(False)
-    is_trad082 = BooleanProperty(False)
-    is_trad091 = BooleanProperty(False)
     is_trad100 = BooleanProperty(False)
-    is_trad150 = BooleanProperty(False)
-    is_trad185 = BooleanProperty(False)
-    is_trad225 = BooleanProperty(False)
-    is_trad300 = BooleanProperty(False)
-    is_trad400 = BooleanProperty(False)
+    is_trad250 = BooleanProperty(False)
+    is_trad500 = BooleanProperty(False)
+    is_trad750 = BooleanProperty(False)
+    is_trad1000 = BooleanProperty(False)
+
     try:
-        if data_params['target_rad'] == 0.5:
-            is_trad050 = BooleanProperty(True)
-        elif data_params['target_rad'] == 0.75:
-            is_trad075 = BooleanProperty(True)
-        elif data_params['target_rad'] == 0.82:
-            is_trad082 = BooleanProperty(True)
-        elif data_params['target_rad'] == 0.91:
-            is_trad091 = BooleanProperty(True)
-        elif data_params['target_rad'] == 1.0:
+        if data_params['target_rad'] == 0.1:
             is_trad100 = BooleanProperty(True)
-        elif data_params['target_rad'] == 1.5:
-            is_trad150 = BooleanProperty(True)
-        elif data_params['target_rad'] == 1.85:
-            is_trad185 = BooleanProperty(True)
-        elif data_params['target_rad'] == 2.25:
-            is_trad225 = BooleanProperty(True)
-        elif data_params['target_rad'] == 3.0:
-            is_trad300 = BooleanProperty(True)
-        elif data_params['target_rad'] == 4.0:
-            is_trad400 = BooleanProperty(True)
+        elif data_params['target_rad'] == 0.25:
+            is_trad250 = BooleanProperty(True)
+        elif data_params['target_rad'] == 0.500:
+            is_trad500 = BooleanProperty(True)
+        elif data_params['target_rad'] == 0.75:
+            is_trad750 = BooleanProperty(True)
+        elif data_params['target_rad'] == 1.0:
+            is_trad1000 = BooleanProperty(True)
     except:
         pass
         
@@ -2208,337 +1439,8 @@ class Manager(ScreenManager):
             is_efftrad50 = BooleanProperty(True)
     except: 
         pass
-        
-    # sequence preselect
-    is_seqA = BooleanProperty(False)
-    is_seqB = BooleanProperty(False)
-    is_seqC = BooleanProperty(False)
-    is_seqD = BooleanProperty(False)
-    is_seqE = BooleanProperty(False)
-    is_seqF = BooleanProperty(False)
-    is_seqG = BooleanProperty(False)
-    is_seqH = BooleanProperty(False)
-    is_seqI = BooleanProperty(False)
-    is_seqJ = BooleanProperty(False)
-    is_seqK = BooleanProperty(False)
-    is_seqL = BooleanProperty(False)
-    is_seqM = BooleanProperty(False)
-    is_seqN = BooleanProperty(False)
-    is_seqO = BooleanProperty(False)
-    is_seqP = BooleanProperty(False)
-    is_seqQ = BooleanProperty(False)
-    is_seqR = BooleanProperty(False)
-    is_seqS = BooleanProperty(False)
-    is_seqT = BooleanProperty(False)
-    is_seqU = BooleanProperty(False)
-    is_seqV = BooleanProperty(False)
-    is_seqRand5 = BooleanProperty(False)
-    is_seqRepeat = BooleanProperty(False)
-    is_CO = BooleanProperty(False)
-    is_BO = BooleanProperty(False)
-    try:
-        if data_params['seq'] == 'A':
-            is_seqA = BooleanProperty(True)
-        elif data_params['seq'] == 'B':
-            is_seqB = BooleanProperty(True)
-        elif data_params['seq'] == 'C':
-            is_seqC = BooleanProperty(True) 
-        elif data_params['seq'] == 'D':
-            is_seqD = BooleanProperty(True) 
-        elif data_params['seq'] == 'E':
-            is_seqE = BooleanProperty(True) 
-        elif data_params['seq'] == 'F':
-            is_seqF = BooleanProperty(True) 
-        elif data_params['seq'] == 'G':
-            is_seqG = BooleanProperty(True) 
-        elif data_params['seq'] == 'H':
-            is_seqH = BooleanProperty(True) 
-        elif data_params['seq'] == 'I':
-            is_seqI = BooleanProperty(True) 
-        elif data_params['seq'] == 'J':
-            is_seqJ = BooleanProperty(True) 
-        elif data_params['seq'] == 'K':
-            is_seqK = BooleanProperty(True) 
-        elif data_params['seq'] == 'L':
-            is_seqL = BooleanProperty(True) 
-        elif data_params['seq'] == 'M':
-            is_seqM = BooleanProperty(True) 
-        elif data_params['seq'] == 'N':
-            is_seqN = BooleanProperty(True) 
-        elif data_params['seq'] == 'O':
-            is_seqO = BooleanProperty(True) 
-        elif data_params['seq'] == 'P':
-            is_seqP = BooleanProperty(True) 
-        elif data_params['seq'] == 'Q':
-            is_seqQ = BooleanProperty(True) 
-        elif data_params['seq'] == 'R':
-            is_seqR = BooleanProperty(True) 
-        elif data_params['seq'] == 'S':
-            is_seqS = BooleanProperty(True) 
-        elif data_params['seq'] == 'T':
-            is_seqT = BooleanProperty(True) 
-        elif data_params['seq'] == 'U':
-            is_seqU = BooleanProperty(True) 
-        elif data_params['seq'] == 'V':
-            is_seqU = BooleanProperty(True) 
-        elif data_params['seq'] == 'rand5':
-            is_seqRand5 = BooleanProperty(True) 
-        elif data_params['seq'] == 'repeat':
-            is_seqRepeat = BooleanProperty(True) 
-        elif data_params['seq'] == 'center out':
-            is_CO = BooleanProperty(True) 
-        elif data_params['seq'] == 'button out': 
-            is_BO = BooleanProperty(True) 
-    except: 
-        pass
 
-    # target 1 position
-    is_t1cent = BooleanProperty(False)
-    is_t1um = BooleanProperty(False)
-    is_t1lm = BooleanProperty(False)
-    is_t1ul = BooleanProperty(False)
-    is_t1ml = BooleanProperty(False)
-    is_t1ll = BooleanProperty(False)
-    is_t1ur = BooleanProperty(False)
-    is_t1mr = BooleanProperty(False)
-    is_t1lr = BooleanProperty(False)
-    is_t1rand = BooleanProperty(False) 
-    try:
-        if data_params['target1_pos_str'] == 'center':
-            is_t1cent = BooleanProperty(True)
-        elif data_params['target1_pos_str'] == 'upper_middle':
-            is_t1um = BooleanProperty(True)
-        elif data_params['target1_pos_str'] == 'lower_middle':
-            is_t1lm = BooleanProperty(True) 
-        elif data_params['target1_pos_str'] == 'upper_left':
-            is_t1ul = BooleanProperty(True)
-        elif data_params['target1_pos_str'] == 'middle_left':
-            is_t1ml = BooleanProperty(True)
-        elif data_params['target1_pos_str'] == 'lower_left':
-            is_t1ll = BooleanProperty(True)
-        elif data_params['target1_pos_str'] == 'upper_right':
-            is_t1ur = BooleanProperty(True)
-        elif data_params['target1_pos_str'] == 'middle_right':
-            is_t1mr = BooleanProperty(True)
-        elif data_params['target1_pos_str'] == 'lower_right':
-            is_t1lr = BooleanProperty(True)
-        elif data_params['target1_pos_str'] == 'random': 
-            is_t1rand = BooleanProperty(True)
-    except:
-        pass
-        
-    # target 1 nudge
-    is_t1nudgeneg6 = BooleanProperty(False)
-    is_t1nudgeneg4 = BooleanProperty(False)
-    is_t1nudgeneg2 = BooleanProperty(False)
-    is_t1nudgezero = BooleanProperty(False)
-    is_t1nudgepos2 = BooleanProperty(False)
-    is_t1nudgepos4 = BooleanProperty(False)
-    is_t1nudgepos6 = BooleanProperty(False)
-    try:
-        if data_params['nudge_x_t1'] == -6:
-            is_t1nudgeneg6 = BooleanProperty(True)
-        elif data_params['nudge_x_t1'] == -4:
-            is_t1nudgeneg4 = BooleanProperty(True)
-        elif data_params['nudge_x_t1'] == -2:
-            is_t1nudgeneg2 = BooleanProperty(True)
-        elif data_params['nudge_x_t1'] == 0:
-            is_t1nudgezero = BooleanProperty(True)
-        elif data_params['nudge_x_t1'] == 2:
-            is_t1nudgepos2 = BooleanProperty(True)
-        elif data_params['nudge_x_t1'] == 4:
-            is_t1nudgepos4 = BooleanProperty(True)
-        elif data_params['nudge_x_t1'] == 6:
-            is_t1nudgepos6 = BooleanProperty(True)
-    except:
-        pass
-        
-    # target 2 position
-    is_t2cent = BooleanProperty(False)
-    is_t2um = BooleanProperty(False)
-    is_t2lm = BooleanProperty(False)
-    is_t2ul = BooleanProperty(False)
-    is_t2ml = BooleanProperty(False)
-    is_t2ll = BooleanProperty(False)
-    is_t2ur = BooleanProperty(False)
-    is_t2mr = BooleanProperty(False)
-    is_t2lr = BooleanProperty(False)
-    is_t2rand = BooleanProperty(False)
-    is_t2none = BooleanProperty(False)
-    try:
-        if data_params['target2_pos_str'] == 'center':
-            is_t2cent = BooleanProperty(True)
-        elif data_params['target2_pos_str'] == 'upper_middle':
-            is_t2um = BooleanProperty(True)
-        elif data_params['target2_pos_str'] == 'lower_middle':
-            is_t2lm = BooleanProperty(True) 
-        elif data_params['target2_pos_str'] == 'upper_left':
-            is_t2ul = BooleanProperty(True)
-        elif data_params['target2_pos_str'] == 'middle_left':
-            is_t2ml = BooleanProperty(True)
-        elif data_params['target2_pos_str'] == 'lower_left':
-            is_t2ll = BooleanProperty(True)
-        elif data_params['target2_pos_str'] == 'upper_right':
-            is_t2ur = BooleanProperty(True)
-        elif data_params['target2_pos_str'] == 'middle_right':
-            is_t2mr = BooleanProperty(True)
-        elif data_params['target2_pos_str'] == 'lower_right':
-            is_t2lr = BooleanProperty(True)
-        elif data_params['target2_pos_str'] == 'random':
-            is_t2rand = BooleanProperty(True)
-        elif data_params['target2_pos_str'] == 'none': 
-            is_t2none = BooleanProperty(True)
-    except:
-        pass
-        
-    # target 2 nudge
-    is_t2nudgeneg6 = BooleanProperty(False)
-    is_t2nudgeneg4 = BooleanProperty(False)
-    is_t2nudgeneg2 = BooleanProperty(False)
-    is_t2nudgezero = BooleanProperty(False)
-    is_t2nudgepos2 = BooleanProperty(False)
-    is_t2nudgepos4 = BooleanProperty(False)
-    is_t2nudgepos6 = BooleanProperty(False)
-    try:
-        if data_params['nudge_x_t2'] == -6:
-            is_t2nudgeneg6 = BooleanProperty(True)
-        elif data_params['nudge_x_t2'] == -4:
-            is_t2nudgeneg4 = BooleanProperty(True)
-        elif data_params['nudge_x_t2'] == -2:
-            is_t2nudgeneg2 = BooleanProperty(True)
-        elif data_params['nudge_x_t2'] == 0:
-            is_t2nudgezero = BooleanProperty(True)
-        elif data_params['nudge_x_t2'] == 2:
-            is_t2nudgepos2 = BooleanProperty(True)
-        elif data_params['nudge_x_t2'] == 4:
-            is_t2nudgepos4 = BooleanProperty(True)
-        elif data_params['nudge_x_t2'] == 6:
-            is_t2nudgepos6 = BooleanProperty(True)
-    except:
-        pass
-        
-    # target 3 position
-    is_t3cent = BooleanProperty(False)
-    is_t3um = BooleanProperty(False)
-    is_t3lm = BooleanProperty(False)
-    is_t3ul = BooleanProperty(False)
-    is_t3ml = BooleanProperty(False)
-    is_t3ll = BooleanProperty(False)
-    is_t3ur = BooleanProperty(False)
-    is_t3mr = BooleanProperty(False)
-    is_t3lr = BooleanProperty(False)
-    is_t3none = BooleanProperty(False)
-    try:
-        if data_params['target3_pos_str'] == 'center':
-            is_t3cent = BooleanProperty(True)
-        elif data_params['target3_pos_str'] == 'upper_middle':
-            is_t3um = BooleanProperty(True)
-        elif data_params['target3_pos_str'] == 'lower_middle':
-            is_t3lm = BooleanProperty(True) 
-        elif data_params['target3_pos_str'] == 'upper_left':
-            is_t3ul = BooleanProperty(True)
-        elif data_params['target3_pos_str'] == 'middle_left':
-            is_t3ml = BooleanProperty(True)
-        elif data_params['target3_pos_str'] == 'lower_left':
-            is_t3ll = BooleanProperty(True)
-        elif data_params['target3_pos_str'] == 'upper_right':
-            is_t3ur = BooleanProperty(True)
-        elif data_params['target3_pos_str'] == 'middle_right':
-            is_t3mr = BooleanProperty(True)
-        elif data_params['target3_pos_str'] == 'lower_right':
-            is_t3lr = BooleanProperty(True)
-        elif data_params['target3_pos_str'] == 'none':
-            is_t3none = BooleanProperty(True)
-    except:
-        pass
-        
-    # target 3 nudge
-    is_t3nudgeneg6 = BooleanProperty(False)
-    is_t3nudgeneg4 = BooleanProperty(False)
-    is_t3nudgeneg2 = BooleanProperty(False)
-    is_t3nudgezero = BooleanProperty(False)
-    is_t3nudgepos2 = BooleanProperty(False)
-    is_t3nudgepos4 = BooleanProperty(False)
-    is_t3nudgepos6 = BooleanProperty(False)
-    try:
-        if data_params['nudge_x_t3'] == -6:
-            is_t3nudgeneg6 = BooleanProperty(True)
-        elif data_params['nudge_x_t3'] == -4:
-            is_t3nudgeneg4 = BooleanProperty(True)
-        elif data_params['nudge_x_t3'] == -2:
-            is_t3nudgeneg2 = BooleanProperty(True)
-        elif data_params['nudge_x_t3'] == 0:
-            is_t3nudgezero = BooleanProperty(True)
-        elif data_params['nudge_x_t3'] == 2:
-            is_t3nudgepos2 = BooleanProperty(True)
-        elif data_params['nudge_x_t3'] == 4:
-            is_t3nudgepos4 = BooleanProperty(True)
-        elif data_params['nudge_x_t3'] == 6:
-            is_t3nudgepos6 = BooleanProperty(True)
-    except:
-        pass
-    
-    
-    # target 4 position
-    is_t4cent = BooleanProperty(False)
-    is_t4um = BooleanProperty(False)
-    is_t4lm = BooleanProperty(False)
-    is_t4ul = BooleanProperty(False)
-    is_t4ml = BooleanProperty(False)
-    is_t4ll = BooleanProperty(False)
-    is_t4ur = BooleanProperty(False)
-    is_t4mr = BooleanProperty(False)
-    is_t4lr = BooleanProperty(False)
-    is_t4none = BooleanProperty(False)
-    try:
-        if data_params['target4_pos_str'] == 'center':
-            is_t4cent = BooleanProperty(True)
-        elif data_params['target4_pos_str'] == 'upper_middle':
-            is_t4um = BooleanProperty(True)
-        elif data_params['target4_pos_str'] == 'lower_middle':
-            is_t4lm = BooleanProperty(True) 
-        elif data_params['target4_pos_str'] == 'upper_left':
-            is_t4ul = BooleanProperty(True)
-        elif data_params['target4_pos_str'] == 'middle_left':
-            is_t4ml = BooleanProperty(True)
-        elif data_params['target4_pos_str'] == 'lower_left':
-            is_t4ll = BooleanProperty(True)
-        elif data_params['target4_pos_str'] == 'upper_right':
-            is_t4ur = BooleanProperty(True)
-        elif data_params['target4_pos_str'] == 'middle_right':
-            is_t4mr = BooleanProperty(True)
-        elif data_params['target4_pos_str'] == 'lower_right':
-            is_t4lr = BooleanProperty(True)
-        elif data_params['target4_pos_str'] == 'none':
-            is_t4none = BooleanProperty(True)
-    except:
-        pass
-        
-    # target 4 nudge
-    is_t4nudgeneg6 = BooleanProperty(False)
-    is_t4nudgeneg4 = BooleanProperty(False)
-    is_t4nudgeneg2 = BooleanProperty(False)
-    is_t4nudgezero = BooleanProperty(False)
-    is_t4nudgepos2 = BooleanProperty(False)
-    is_t4nudgepos4 = BooleanProperty(False)
-    is_t4nudgepos6 = BooleanProperty(False)
-    try:
-        if data_params['nudge_x_t4'] == -6:
-            is_t4nudgeneg6 = BooleanProperty(True)
-        elif data_params['nudge_x_t4'] == -4:
-            is_t4nudgeneg4 = BooleanProperty(True)
-        elif data_params['nudge_x_t4'] == -2:
-            is_t4nudgeneg2 = BooleanProperty(True)
-        elif data_params['nudge_x_t4'] == 0:
-            is_t4nudgezero = BooleanProperty(True)
-        elif data_params['nudge_x_t4'] == 2:
-            is_t4nudgepos2 = BooleanProperty(True)
-        elif data_params['nudge_x_t4'] == 4:
-            is_t4nudgepos4 = BooleanProperty(True)
-        elif data_params['nudge_x_t4'] == 6:
-            is_t4nudgepos6 = BooleanProperty(True)
-    except:
-        pass
+
         
     # lower screen top by
     is_screentopzero = BooleanProperty(False)
@@ -2591,113 +1493,16 @@ class Manager(ScreenManager):
             is_screenbot12 = BooleanProperty(True)
     except:
         pass
-        
-    # time until next target appears
-    is_ttntnever = BooleanProperty(False)
-    is_ttnt025 = BooleanProperty(False)
-    is_ttnt050 = BooleanProperty(False)
-    is_ttnt075 = BooleanProperty(False)
-    is_ttnt100 = BooleanProperty(False)
-    is_ttnt150 = BooleanProperty(False)
-    try:
-        if data_params['time_to_next_targ'] == False:
-            is_ttntnever = BooleanProperty(True)
-        elif data_params['time_to_next_targ'] == 0.25:
-            is_ttnt025 = BooleanProperty(True)
-        elif data_params['time_to_next_targ'] == 0.5:
-            is_ttnt050 = BooleanProperty(True)
-        elif data_params['time_to_next_targ'] == 0.75:
-            is_ttnt075 = BooleanProperty(True)
-        elif data_params['time_to_next_targ'] == 1.0:
-            is_ttnt100 = BooleanProperty(True)
-        elif data_params['time_to_next_targ'] == 1.5:
-            is_ttnt150 = BooleanProperty(True)
-    except:
-        pass
-    
-    # intertarg delay
-    is_inttargdelay0 = BooleanProperty(False)
-    is_inttargdelay100 = BooleanProperty(False)
-    is_inttargdelay150 = BooleanProperty(False)
-    is_inttargdelay200 = BooleanProperty(False)
-    is_inttargdelay250 = BooleanProperty(False)
-    try:
-        if data_params['intertarg_delay'] == 0:
-            is_inttargdelay0 = BooleanProperty(True)
-        elif data_params['intertarg_delay'] == 0.1:
-            is_inttargdelay100 = BooleanProperty(True)
-        elif data_params['intertarg_delay'] == 0.15:
-            is_inttargdelay150 = BooleanProperty(True)
-        elif data_params['intertarg_delay'] == 0.2:
-            is_inttargdelay200 = BooleanProperty(True)
-        elif data_params['intertarg_delay'] == 0.25:
-            is_inttargdelay250 = BooleanProperty(True)
-    except:
-        pass
-    
-    # break after x trials
-    is_nobreak = BooleanProperty(False)
-    is_break10 = BooleanProperty(False)
-    is_break15 = BooleanProperty(False)
-    is_break20 = BooleanProperty(False)
-    is_break25 = BooleanProperty(False)
-    try:
-        if data_params['break_trl'] == 0:
-            is_nobreak = BooleanProperty(True)
-        elif data_params['break_trl'] == 10:
-            is_break10 = BooleanProperty(True)
-        elif data_params['break_trl'] == 15:
-            is_break15 = BooleanProperty(True)
-        elif data_params['break_trl'] == 20:
-            is_break20 = BooleanProperty(True)
-        elif data_params['break_trl'] == 25:
-            is_break25 = BooleanProperty(True)
-    except:
-        pass
-    
-    # break duration
-    is_breakdur30 = BooleanProperty(False)
-    is_breakdur60 = BooleanProperty(False)
-    is_breakdur90 = BooleanProperty(False)
-    is_breakdur120 = BooleanProperty(False)
-    is_breakdur150 = BooleanProperty(False)
-    try:
-        if data_params['break_dur'] == 30:
-            is_breakdur30 = BooleanProperty(True)
-        elif data_params['break_dur'] == 60:
-            is_breakdur60 = BooleanProperty(True)
-        elif data_params['break_dur'] == 90:
-            is_breakdur90 = BooleanProperty(True)
-        elif data_params['break_dur'] == 120:
-            is_breakdur120 = BooleanProperty(True)
-        elif data_params['break_dur'] == 150:
-            is_breakdur150 = BooleanProperty(True)
-    except:
-        pass
+
     
     # auto quit after
-    is_autoqt10 = BooleanProperty(False)
-    is_autoqt25 = BooleanProperty(False)
-    is_autoqt50 = BooleanProperty(False)
-    is_autoqt60 = BooleanProperty(False)
-    is_autoqt90 = BooleanProperty(False)
-    is_autoqt100 = BooleanProperty(False)
-    is_autoqtnever = BooleanProperty(False)
+    is_autoqt3 = BooleanProperty(False)
+    is_autoqt5 = BooleanProperty(False)
     try:
-        if data_params['max_trials'] == 10:
-            is_autoqt10 = BooleanProperty(True)
-        elif data_params['max_trials'] == 25:
-            is_autoqt25 = BooleanProperty(True)
-        elif data_params['max_trials'] == 50:
-            is_autoqt50 = BooleanProperty(True)
-        elif data_params['max_trials'] == 60:
-            is_autoqt60 = BooleanProperty(True)
-        elif data_params['max_trials'] == 90:
-            is_autoqt90 = BooleanProperty(True)
-        elif data_params['max_trials'] == 100:
-            is_autoqt100 = BooleanProperty(True)
-        elif data_params['max_trials'] == 10**10:
-            is_autoqtnever = BooleanProperty(True)
+        if data_params['max_trials'] == 3:
+            is_autoqt3 = BooleanProperty(True)
+        elif data_params['max_trials'] == 5:
+            is_autoqt5 = BooleanProperty(True)
     except:
         pass
 
