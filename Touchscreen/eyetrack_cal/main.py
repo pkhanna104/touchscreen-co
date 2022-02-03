@@ -267,7 +267,7 @@ class COGame(Widget):
                 
         # TARGET POSITIONS
         
-        self.num_targets = 5
+        self.num_targets = 1
 
         
         self.center_position = np.array([0., 0.])
@@ -298,6 +298,7 @@ class COGame(Widget):
         
         self.target_index = 1
         
+        
         # HOW MUCH TIME TO WAIT UNTIL THE NEXT TARGET APPEARS
         self.time_to_next_targ = False
                 
@@ -311,7 +312,10 @@ class COGame(Widget):
 
 
         # BUTTON HOLD TIME
-        self.button_hold_time = [False, 1.0]
+        button_hold_opts = [False, 1.0]
+        for i, val in enumerate(hold['button_hold']):
+            if val: 
+                self.button_hold_time = button_hold_opts[i]
                     
         if self.button_hold_time is False:
             self.use_button = False
@@ -363,8 +367,18 @@ class COGame(Widget):
         autoquit_trls = [3, 5]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
-                self.max_trials = autoquit_trls[i]
-                
+                self.n_repeats = autoquit_trls[i]
+        
+        self.max_trials = self.n_repeats*5
+        
+        # TARGET ORDER
+        targ_order = np.random.permutation(5)
+        for i in range(self.n_repeats):
+            targ_order2 = np.random.permutation(5)
+            targ_order = np.hstack((targ_order, targ_order2))
+            
+        self.targ_order = targ_order
+        
         # TASK BREAKS
         self.break_trl = 0
                 
@@ -563,6 +577,7 @@ class COGame(Widget):
             user_id = user_id,
             break_trl = self.break_trl,
             break_dur = self.break_dur,
+            n_repeats = self.n_repeats,
             max_trials = self.max_trials,
             target1_timeout_time = self.target1_timeout_time,
             target_timeout_time = self.target_timeout_time,
@@ -899,7 +914,6 @@ class COGame(Widget):
         return kwargs['ts'] > self.this_breakdur
 
     def _start_vid_trig(self, **kwargs):
-        self.target_order = np.random.permutation(5)
         if self.trial_counter == 0:
             time.sleep(1.)
         try:    
@@ -1050,7 +1064,7 @@ class COGame(Widget):
             self.target2.color = (0., 0., 0., 0.)
             self.first_time_for_this_targ = False
         
-        self.active_target_position = self.target_position[:, self.target_order[self.target_index-1]]
+        self.active_target_position = self.target_position[:, self.targ_order[self.trial_counter-1]]
         self.next_target_position = False
             
         if self.target_index == 1:
@@ -1499,9 +1513,9 @@ class Manager(ScreenManager):
     is_autoqt3 = BooleanProperty(False)
     is_autoqt5 = BooleanProperty(False)
     try:
-        if data_params['max_trials'] == 3:
+        if data_params['n_repeats'] == 3:
             is_autoqt3 = BooleanProperty(True)
-        elif data_params['max_trials'] == 5:
+        elif data_params['n_repeats'] == 5:
             is_autoqt5 = BooleanProperty(True)
     except:
         pass
