@@ -313,7 +313,6 @@ class COGame(Widget):
 
         # BUTTON HOLD TIME
         button_hold_opts = [False, 1.0]
-        import pdb; pdb.set_trace()
         for i, val in enumerate(hold['button_hold']):
             if val: 
                 self.button_hold_time = button_hold_opts[i]
