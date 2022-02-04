@@ -1073,7 +1073,7 @@ class COGame(Widget):
         self.target1.move(self.active_target_position)
         
         if self.intertarg_delay == 0:
-            self.target1.color = (1., 1., 0., 1.)
+            self.target1.color = (0., 0., 1., 1.)
             if np.remainder(self.target_index, 2) == 1:
                 self.pd1_indicator_targ.color = (0., 0., 0., 0.)
             elif np.remainder(self.target_index, 2) == 0:
@@ -1104,7 +1104,7 @@ class COGame(Widget):
                 
         if not self.intertarg_delay == 0:
             if self.target_index == 1 or time.time() - self.first_time_for_this_targ_t0 >= self.intertarg_delay:
-                self.target1.color = (1., 1., 0., 1.)
+                self.target1.color = (0., 0., 1., 1.)
                 self.pd1_indicator_targ.color = (0., 0., 0., 0.)
                 
 
