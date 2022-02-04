@@ -94,7 +94,7 @@ class COGame(Widget):
     pre_start_vid_ts = 0.1
     
     # ITI LENGTH
-    ITI_mean = 1.5
+    ITI_mean = 0.1
     ITI_std = 0
     target_rad = 1.5
     eff_target_rad = 1.5
@@ -471,8 +471,8 @@ class COGame(Widget):
             elif self.juicer == 'red': 
 
                 prolific_com = None
-                import serial.tools.list_ports
-                coms = serial.tools.list_ports.comports()
+                import serial.tools.list_ports as lp
+                coms = lp.comports()
                 for c in coms: 
                     if 'Prolific USB-to-Serial' in c.description:
                         prolific_com_end = c.description.split('(')
@@ -492,6 +492,8 @@ class COGame(Widget):
 
         except:
             pass
+        
+        import serial
         
         # DIO
         try:
