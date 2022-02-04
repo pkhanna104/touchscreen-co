@@ -1,0 +1,818 @@
+#:kivy 1.10.0
+#:import Clock kivy.clock.Clock
+
+<Manager>:
+    id: screen_manager
+
+    Screen:
+        name: 'home'
+
+        BoxLayout
+            id: starting
+            orientation: 'vertical'
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: 'Welcome! Make a Selection in Each Row:'
+                fontsize: 80
+                color: 0,0,1,1
+                canvas.before:
+                    Color: 
+                        rgb: 1,1,0
+                        
+            BoxLayout
+                id: starting2
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: 'Animal Names:'
+                    color: 1, 1, 0, 1
+                    fontsize: 50
+                    
+                Label: 
+                    text: 'Haribo'
+                    fontsize: 28
+                    halign: 'center'                        
+                CheckBox: 
+                    group: 'check'
+                    id: chk_har
+                    active: root.is_haribo  
+                     
+                Label: 
+                    text: 'Fifi'
+                    fontsize: 28
+                    halign: 'center'                      
+                CheckBox: 
+                    group: 'check'
+                    id: chk_fifi
+                    active: root.is_fifi    
+                
+                Label: 
+                    text: 'Nike'
+                    fontsize: 28
+                    halign: 'center'                 
+                CheckBox: 
+                    group: 'check'
+                    id: chk_nike
+                    active: root.is_nike    
+                    
+                Label: 
+                    text: 'Butters'
+                    fontsize: 28
+                    halign: 'center' 
+                CheckBox: 
+                    group: 'check'
+                    id: chk_but
+                    active: root.is_butters    
+                    
+                Label: 
+                    text: 'Testing'
+                    fontsize: 28
+                    halign: 'center' 
+                CheckBox: 
+                    group: 'check'
+                    id: chk_test
+                    active: root.is_testing
+                   
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            BoxLayout 
+                id: top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Which Juicer?        '
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: 'Old yellow'
+
+                CheckBox:
+                    group: 'juicer'
+                    id: yellow
+                    active: root.juicer_y
+            
+                Label: 
+                    text: 'New red'
+
+                CheckBox:
+                    group: 'juicer'
+                    id: red
+                    active: root.juicer_r
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                    
+            BoxLayout
+                id: drag
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: 'Drag OK:'
+                    color: 1, 1, 0, 1
+                    fontsize: 50
+                    
+                Label: 
+                    text: 'YES'                     
+                CheckBox: 
+                    group: 'drag'
+                    id: dragok
+                    active: root.is_dragok  
+                     
+                Label: 
+                    text: 'NO'                   
+                CheckBox: 
+                    group: 'drag'
+                    id: dragnotok
+                    active: root.is_dragnotok    
+                   
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+            
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+                        
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+                Label: 
+                    text: 'Crashbar Hold Time'
+                    color: 1, 1, 0, 1
+                    
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'NO Crashbar'
+                CheckBox: 
+                    id: bhtfalse
+                    group: 'button_hold_time'
+                    active: root.is_bhtfalse
+                    
+                Label:
+                    text: '1.0 sec'
+                CheckBox:
+                    id: bht1000
+                    group: 'button_hold_time'
+                    active: root.is_bht1000
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            BoxLayout 
+                id: big_rew
+                orientation: 'horizontal'
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label: 
+                    text: 'Maximum Reward'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0.3 sec'
+                CheckBox:
+                    id: big_rew_pt3_sec
+                    group: 'big_rew'
+                    active: root.is_threw300
+
+                Label: 
+                    text: '0.5 sec'
+                CheckBox:
+                    id: big_rew_pt5_sec
+                    group: 'big_rew'
+                    active: root.is_threw500
+
+                Label: 
+                    text: '0.7 sec'
+                CheckBox:
+                    id: big_rew_pt7_sec
+                    group: 'big_rew'
+                    active: root.is_threw700
+                    
+                Label: 
+                    text: '0.9 sec'
+                CheckBox:
+                    id: big_rew_pt9_sec
+                    group: 'big_rew'
+                    active: root.is_threw900
+                    
+                Label: 
+                    text: '1.1 sec'
+                CheckBox:
+                    id: big_rew_1pt1_sec
+                    group: 'big_rew'
+                    active: root.is_threw1100
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Appearing Target Radius'
+                    color: 1, 1, 0, 1
+                
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: '.1 cm'
+                CheckBox:
+                    id: targ_rad_pt1
+                    group: 'targ_cm'
+                    active: root.is_trad100
+                    
+                Label: 
+                    text: '.25 cm'
+                CheckBox:
+                    id: targ_rad_pt25
+                    group: 'targ_cm'
+                    active: root.is_trad250
+                    
+                Label: 
+                    text: '.5 cm'
+                CheckBox:
+                    id: targ_rad_pt5
+                    group: 'targ_cm'
+                    active: root.is_trad500
+                    
+                Label: 
+                    text: '.75 cm'
+                CheckBox:
+                    id: targ_rad_pt75
+                    group: 'targ_cm'
+                    active: root.is_trad750
+                    
+                Label: 
+                    text: '1.0 cm'
+                CheckBox:
+                    id: targ_rad_1
+                    group: 'targ_cm'
+                    active: root.is_trad1000
+                                        
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                    
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Effective Target Radius'
+                    color: 1, 1, 0, 1
+                
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Same as Appears'
+                CheckBox:
+                    id: eff_targ_rad_same
+                    group: 'eff_targ_cm'
+                    active: root.is_efftradsame
+
+                Label: 
+                    text: '1.0 cm'
+                CheckBox:
+                    id: eff_targ_rad_10
+                    group: 'eff_targ_cm'
+                    active: root.is_efftrad10
+                    
+                Label: 
+                    text: '2.0 cm'
+                CheckBox:
+                    id: eff_targ_rad_20
+                    group: 'eff_targ_cm'
+                    active: root.is_efftrad20
+                    
+                Label: 
+                    text: '3.0 cm'
+                CheckBox:
+                    id: eff_targ_rad_30
+                    group: 'eff_targ_cm'
+                    active: root.is_efftrad30
+                    
+                Label: 
+                    text: '4.0 cm'
+                CheckBox:
+                    id: eff_targ_rad_40
+                    group: 'eff_targ_cm'
+                    active: root.is_efftrad40
+                    
+                Label: 
+                    text: '5.0 cm'
+                CheckBox:
+                    id: eff_targ_rad_50
+                    group: 'eff_targ_cm'
+                    active: root.is_efftrad50
+                                        
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                    
+                    
+            BoxLayout:
+                id: screen_top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Lower Screen Top By'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0 cm'
+                CheckBox:
+                    id: screen_top_zero
+                    group: 'screen_top'
+                    active: root.is_screentopzero
+                    
+                Label: 
+                    text: '2 cm'
+                CheckBox:
+                    id: screen_top_neg1
+                    group: 'screen_top'
+                    active: root.is_screentop2
+                
+                Label: 
+                    text: '4 cm'
+                CheckBox:
+                    id: screen_top_neg2
+                    group: 'screen_top'
+                    active: root.is_screentop4
+                    
+                Label: 
+                    text: '6 cm'
+                CheckBox:
+                    id: screen_top_neg3
+                    group: 'screen_top'
+                    active: root.is_screentop6
+                
+                Label: 
+                    text: '8 cm'
+                CheckBox:
+                    id: screen_top_neg4
+                    group: 'screen_top'
+                    active: root.is_screentop8
+                  
+                Label: 
+                    text: '10 cm'
+                CheckBox:
+                    id: screen_top_neg5
+                    group: 'screen_top'
+                    active: root.is_screentop10
+                    
+                Label: 
+                    text: '12 cm'
+                CheckBox:
+                    id: screen_top_neg6
+                    group: 'screen_top'
+                    active: root.is_screentop12
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                    
+            BoxLayout:
+                id: screen_bot
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Raise Screen Bottom By'
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '0 cm'
+                CheckBox:
+                    id: screen_bot_0
+                    group: 'screen_bot'
+                    active: root.is_screenbot0
+                    
+                Label: 
+                    text: '2 cm'
+                CheckBox:
+                    id: screen_bot_2
+                    group: 'screen_bot'
+                    active: root.is_screenbot2
+                
+                Label: 
+                    text: '4 cm'
+                CheckBox:
+                    id: screen_bot_4
+                    group: 'screen_bot'
+                    active: root.is_screenbot4
+                    
+                Label: 
+                    text: '6 cm'
+                CheckBox:
+                    id: screen_bot_6
+                    group: 'screen_bot'
+                    active: root.is_screenbot6
+                
+                Label: 
+                    text: '8 cm'
+                CheckBox:
+                    id: screen_bot_8
+                    group: 'screen_bot'
+                    active: root.is_screenbot8
+                  
+                Label: 
+                    text: '10 cm'
+                CheckBox:
+                    id: screen_bot_10
+                    group: 'screen_bot'
+                    active: root.is_screenbot10
+                    
+                Label: 
+                    text: '12 cm'
+                CheckBox:
+                    id: screen_bot_12
+                    group: 'screen_bot'
+                    active: root.is_screenbot12
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+            BoxLayout:
+                id: test
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Repeat each point: '
+                    color: 1, 1, 0, 1
+
+                Label: 
+                    text: '3 times'
+                CheckBox:
+                    id: three_trials
+                    group: 'trials'
+                    active: root.is_autoqt3
+
+                Label: 
+                    text: '5 times'
+                CheckBox:
+                    id: five_trials
+                    group: 'trials'
+                    active: root.is_autoqt5
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+
+
+            Button:
+                text: 'Play Eyetracker Calibration Game'
+                halign: 'center'
+                valign: 'middle'
+                font_size: 50
+                text_size: self.size
+                on_release: 
+                    root.current = 'splash_start'
+                    splash.init(dict(haribo=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butters=chk_but.active, testing=chk_test.active), 
+                    dict(big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active, big_rew_pt9_sec.active, big_rew_1pt1_sec.active]), 
+                    dict(targ_rad=[targ_rad_pt1.active, targ_rad_pt25.active, targ_rad_pt5.active, targ_rad_pt75.active, targ_rad_1.active], 
+                    eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active]),
+                    dict(button_hold=[bhtfalse.active, bht1000.active]), 
+                    dict(autoquit=[three_trials.active, five_trials.active]),
+                    dict(drag=[dragok.active, dragnotok.active]),
+                    dict(screen_top=[screen_top_neg6.active, screen_top_neg5.active, screen_top_neg4.active, screen_top_neg3.active, screen_top_neg2.active, screen_top_neg1.active, screen_top_zero.active], 
+                    screen_bot=[screen_bot_0.active, screen_bot_2.active, screen_bot_4.active, screen_bot_6.active, screen_bot_8.active, screen_bot_10.active, screen_bot_12.active]),
+                    dict(juicer=[yellow.active, red.active]))
+
+            Label:
+                text: ''
+                fontsize: 50
+            Label:
+                text: ''
+                fontsize: 50
+
+    Screen: 
+        name: 'splash_start'
+        Splash:
+            id: splash
+
+        BoxLayout:
+            id: test
+            orientation: 'vertical'
+         
+            Label:
+                text: 'Parameters Cached!! \n \n Prepare the Monkey! \n \n Pausing Until Start Button Pressed. '
+                halign: 'center'
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+                
+            BoxLayout:
+                id: test2
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Button: 
+                    text: 'Start'
+                    color: .25, .25, .25, 1
+                    background_color: (.2, .2, .2, 1.0)
+
+                    on_release:
+                        root.current = 'game_screen'
+                        game.init(*splash.args)
+                        Clock.schedule_interval(game.update, 1.0 / 60.0)
+                
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+            Label:
+                text: ''
+                fontsize: 50
+                
+    Screen:
+        name: 'game_screen'
+        COGame:
+            id: game
+
+<COGame>:
+    target1: target_1
+    target2: target_2
+    exit_target1: target_e1
+    exit_target2: target_e2
+    pd1_indicator_targ: pd1_indicator
+    pd2_indicator_targ: pd2_indicator
+    vid_indicator_targ: vid_indicator
+
+    Target:
+        id: pd1_indicator
+        
+    Target:
+        id: pd2_indicator
+        
+    Target:
+        id: vid_indicator
+        
+    Target: 
+        id: target_1
+        
+    Target: 
+        id: target_2
+
+    Target:
+        id: target_e1
+
+    Target:
+        id: target_e2
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 15/16
+        top: root.height * 1/16
+        text: str(root.trial_counter)
+
+    
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 170
+        text: root.percent_correct_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 170
+        text: root.percent_correct
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 270
+        text: root.tht_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 270
+        text: root.tht_param
+
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 470
+        text: root.targ_size_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 470
+        text: root.targ_size_param
+
+
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 2/8
+        top: root.top - 570
+        text: root.big_rew_text
+    Label:
+        color: .5,.5,.5,1
+        font_size: 50
+        center_x: root.width * 5/8
+        top: root.top - 570
+        text: root.big_rew_time_param
+
+
+<Target>:
+    canvas:
+        Color:
+            rgba:self.color
+        Ellipse: 
+            pos:self.pos
+            size:self.size

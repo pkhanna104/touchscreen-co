@@ -235,7 +235,7 @@ class COGame(Widget):
             if val:
                 self.target1_timeout_time = targ1_timeout_opts[i]
         
-        targ_timeout_opts = [0.7, 0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+        targ_timeout_opts = [0.7, 0.8, 0.9, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
         self.target_timeout_time = 10000
         for i, val in enumerate(targ_timeout['tt']):
             if val:
@@ -286,7 +286,8 @@ class COGame(Widget):
         
                 
         # TARGET POSITIONS
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'center out', 'button out']
+        # seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'center out', 'button out']
+        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'V', 'W', 'rand5', 'repeat', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -439,6 +440,56 @@ class COGame(Widget):
             self.target3_pos_str = 'upper_middle'
             self.target4_pos_str = 'middle_left'
             self.target5_pos_str = 'lower_left'
+        
+        elif self.seq == 'T':
+            seq_preselect = True
+            self.target1_pos_str = 'upper_left'
+            self.target2_pos_str = 'center'
+            self.target3_pos_str = 'lower_left'
+            self.target4_pos_str = 'middle_right'
+            self.target5_pos_str = 'upper_middle'
+            
+        elif self.seq == 'U':
+            seq_preselect = True
+            self.target1_pos_str = 'middle_left'
+            self.target2_pos_str = 'upper_right'
+            self.target3_pos_str = 'upper_left'
+            self.target4_pos_str = 'lower_middle'
+            self.target5_pos_str = 'center'
+            
+        elif self.seq == 'V':
+            seq_preselect = True
+            self.target1_pos_str = 'middle_right'
+            self.target2_pos_str = 'upper_middle'
+            self.target3_pos_str = 'lower_left'
+            self.target4_pos_str = 'center'
+            self.target5_pos_str = 'upper_left'
+            
+        elif self.seq == 'W':
+            seq_preselect = True
+            self.target1_pos_str = 'upper_right'
+            self.target2_pos_str = 'middle_left'
+            self.target3_pos_str = 'upper_left'
+            self.target4_pos_str = 'lower_middle'
+            self.target5_pos_str = 'middle_right'
+            
+        elif self.seq == 'rand5':
+            seq_preselect = True
+            pos_str_opts = ['upper_left', 'upper_middle', 'upper_right', 'middle_left', 'center', 'middle_right', 'lower_left', 'lower_middle', 'lower_right']
+            pos_order = np.random.permutation(9)
+            self.target1_pos_str = pos_str_opts[pos_order[0]]
+            self.target2_pos_str = pos_str_opts[pos_order[1]]
+            self.target3_pos_str = pos_str_opts[pos_order[2]]
+            self.target4_pos_str = pos_str_opts[pos_order[3]]
+            self.target5_pos_str = pos_str_opts[pos_order[4]]
+            
+        elif self.seq == 'repeat':
+            seq_preselect = True
+            self.target1_pos_str = data_params['target1_pos_str']
+            self.target2_pos_str = data_params['target2_pos_str']
+            self.target3_pos_str = data_params['target3_pos_str']
+            self.target4_pos_str = data_params['target4_pos_str']
+            self.target5_pos_str = data_params['target5_pos_str']
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -726,7 +777,7 @@ class COGame(Widget):
             self.use_button = True
         
         # TARGET HOLD TIME
-        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, '.1-.3', '.4-.6']
+        holdz = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, '.1-.3', '.4-.6']
         self.tht_type = None
         for i, val in enumerate(hold['hold']):
             if val:
@@ -774,8 +825,8 @@ class COGame(Widget):
         else:
             self.last_targ_reward = [False, 0]
             
-        self.time_thresh_for_max_rew = 2.5
-        self.time_thresh_for_min_rew = 3.5
+        self.time_thresh_for_max_rew = 2.75+self.intertarg_delay*self.num_targets
+        self.time_thresh_for_min_rew = 3.25+self.intertarg_delay*self.num_targets
         
         # reward_delay_opts = [0., .4, .8, 1.2]
         # for i, val in enumerate(rew_del['rew_del']):
@@ -804,7 +855,7 @@ class COGame(Widget):
 
         self.testing = False
 
-        autoquit_trls = [10, 25, 50, 90, 100, 10**10]
+        autoquit_trls = [10, 25, 50, 60, 90, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
@@ -1001,7 +1052,8 @@ class COGame(Widget):
                 baseline_data.append([fsr1, fsr2])
                 time.sleep(.005)
             baseline_data = np.vstack((baseline_data))
-            self.fsr_baseline = 100+1.5*np.max(baseline_data, axis=0)
+            # self.fsr_baseline = 100+1.5*np.max(baseline_data, axis=0)
+            self.fsr_baseline = 20+np.max(baseline_data, axis=0)
         else: 
             self.fsr_baseline = np.array([200, 200])
             
@@ -1355,10 +1407,7 @@ class COGame(Widget):
             self.this_breakdur = 0
         else:
             if self.trial_counter == self.next_breaktrl:
-                if user_id == 'Ganguly':
-                    sound = SoundLoader.load('Doorbellx3.wav')
-                else:
-                    sound = SoundLoader.load('DoorBell.wav')
+                sound = SoundLoader.load('DoorBell.wav')
                 sound.play()
                 self.this_breakdur = self.break_dur
                 self.next_breaktrl = self.next_breaktrl + self.break_trl
@@ -1367,10 +1416,7 @@ class COGame(Widget):
     
     def end_taskbreak(self, **kwargs):
         if self.this_breakdur > 0 and kwargs['ts'] > self.this_breakdur:
-            if user_id == 'Ganguly':
-                sound = SoundLoader.load('Doorbellx3.wav')
-            else:
-                sound = SoundLoader.load('DoorBell.wav')
+            sound = SoundLoader.load('DoorBell.wav')
             sound.play()
         return kwargs['ts'] > self.this_breakdur
 
@@ -1530,8 +1576,6 @@ class COGame(Widget):
         self.target1.color = (0., 1., 0., 1.)
 
     def _end_targ_hold(self, **kwargs):
-        self.target1.color = (0., 0., 0., 0.)
-        
         # Need to reset this
         self.first_time_for_this_targ = True
 
@@ -1591,13 +1635,14 @@ class COGame(Widget):
         
         if self.intertarg_delay == 0:
             self.target1.color = (1., 1., 0., 1.)
+            if np.remainder(self.target_index, 2) == 1:
+                self.pd1_indicator_targ.color = (0., 0., 0., 0.)
+            elif np.remainder(self.target_index, 2) == 0:
+                self.pd1_indicator_targ.color = (1., 1., 1., 1.)
         
         self.exit_target1.color = (.15, .15, .15, 1)
         self.exit_target2.color = (.15, .15, .15, 1)
-        if np.remainder(self.target_index, 2) == 1:
-            self.pd1_indicator_targ.color = (0., 0., 0., 0.)
-        elif np.remainder(self.target_index, 2) == 0:
-            self.pd1_indicator_targ.color = (1., 1., 1., 1.)
+            
         try:
             self.write_iscan_trig()
         except:
@@ -1618,8 +1663,11 @@ class COGame(Widget):
                 self.target2.move(self.next_target_position)
                 self.target2.color = (1., 1., 0., 1.)
                 
-        if not self.intertarg_delay == 0 and time.time() - self.first_time_for_this_targ_t0 >= self.intertarg_delay:
-            self.target1.color = (1., 1., 0., 1.)
+        if not self.intertarg_delay == 0:
+            if self.target_index == 1 or time.time() - self.first_time_for_this_targ_t0 >= self.intertarg_delay:
+                self.target1.color = (1., 1., 0., 1.)
+                self.pd1_indicator_targ.color = (0., 0., 0., 0.)
+                
 
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
@@ -1630,7 +1678,7 @@ class COGame(Widget):
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
         self.cnts_in_rew = 0
-        if np.remainder(self.num_targets, 2) == 1:
+        if np.remainder(self.num_targets, 2) == 1 or not self.intertarg_delay == 0:
             self.pd1_indicator_targ.color = (1., 1., 1., 1.)
         elif np.remainder(self.num_targets, 2) == 0:
             self.pd1_indicator_targ.color = (0., 0., 0., 1.)
@@ -1682,14 +1730,14 @@ class COGame(Widget):
                 if self.reward_generator[self.trial_counter] > 0:
                     #self.reward_port.open()
                     if self.min_targ_reward[0]:
-                        if self.trial_completion_time > self.time_thresh_for_min_rew:
-                            this_rew = self.min_targ_reward[1]
-                        elif self.trial_completion_time < self.time_thresh_for_max_rew:
+                        if self.trial_completion_time < self.time_thresh_for_max_rew:
                             this_rew = self.last_targ_reward[1]
                         else:
-                            rel_time = (self.trial_completion_time - self.time_thresh_for_max_rew)/(self.time_thresh_for_min_rew - self.time_thresh_for_max_rew)
-                            rel_time = 1 - rel_time
-                            this_rew = round(self.min_targ_reward[1] + rel_time*(self.last_targ_reward[1]-self.min_targ_reward[1]), 1)
+                            this_rew = self.min_targ_reward[1]
+                        # else:
+                            # rel_time = (self.trial_completion_time - self.time_thresh_for_max_rew)/(self.time_thresh_for_min_rew - self.time_thresh_for_max_rew)
+                            # rel_time = 1 - rel_time
+                            # this_rew = round(self.min_targ_reward[1] + rel_time*(self.last_targ_reward[1]-self.min_targ_reward[1]), 1)
                         rew_str = [ord(r) for r in 'inf 50 ml/min '+str(this_rew)+' sec\n']
                         print('Scaled reward: ' + str(this_rew) + 'sec')
                         rew_time = this_rew; 
@@ -1773,6 +1821,10 @@ class COGame(Widget):
     def finish_targ_hold(self, **kwargs):
         if not self.target_index == self.num_targets:
             if self.tht <= kwargs['ts']:
+                self.target1.color = (0., 0., 0., 0.)
+                if not self.intertarg_delay == 0:
+                    self.pd1_indicator_targ.color = (1., 1., 1., 1.)
+                
                 # Play a small reward tone
                 sound = SoundLoader.load('reward2.wav')
                 sound.play()
@@ -1786,6 +1838,7 @@ class COGame(Widget):
     def finish_last_targ_hold(self, **kwargs):
         if self.target_index == self.num_targets:
             if self.tht <= kwargs['ts']:
+                self.target1.color = (0., 0., 0., 0.)
                 self.trial_completion_time = time.time() - self.target1_on_time
                 return True
             else:
@@ -1908,6 +1961,7 @@ class Manager(ScreenManager):
     # target timeout
     is_tt0pt7 = BooleanProperty(False)
     is_tt0pt8 = BooleanProperty(False)
+    is_tt0pt9 = BooleanProperty(False)
     is_tt1pt0 = BooleanProperty(False)
     is_tt1pt5 = BooleanProperty(False)
     is_tt2pt0 = BooleanProperty(False)
@@ -1920,6 +1974,8 @@ class Manager(ScreenManager):
             is_tt0pt7 = BooleanProperty(True)
         elif data_params['target_timeout_time'] == 0.8:
             is_tt0pt8 = BooleanProperty(True)
+        elif data_params['target_timeout_time'] == 0.9:
+            is_tt0pt9 = BooleanProperty(True)
         elif data_params['target_timeout_time'] == 1.0:
             is_tt1pt0 = BooleanProperty(True)
         elif data_params['target_timeout_time'] == 1.5:
@@ -2184,6 +2240,12 @@ class Manager(ScreenManager):
     is_seqQ = BooleanProperty(False)
     is_seqR = BooleanProperty(False)
     is_seqS = BooleanProperty(False)
+    is_seqT = BooleanProperty(False)
+    is_seqU = BooleanProperty(False)
+    is_seqV = BooleanProperty(False)
+    is_seqW = BooleanProperty(False)
+    is_seqRand5 = BooleanProperty(False)
+    is_seqRepeat = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     is_BO = BooleanProperty(False)
     try:
@@ -2225,6 +2287,18 @@ class Manager(ScreenManager):
             is_seqR = BooleanProperty(True) 
         elif data_params['seq'] == 'S':
             is_seqS = BooleanProperty(True) 
+        elif data_params['seq'] == 'T':
+            is_seqT = BooleanProperty(True) 
+        elif data_params['seq'] == 'U':
+            is_seqU = BooleanProperty(True) 
+        elif data_params['seq'] == 'V':
+            is_seqV = BooleanProperty(True) 
+        elif data_params['seq'] == 'W':
+            is_seqW = BooleanProperty(True) 
+        elif data_params['seq'] == 'rand5':
+            is_seqRand5 = BooleanProperty(True) 
+        elif data_params['seq'] == 'repeat':
+            is_seqRepeat = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
         elif data_params['seq'] == 'button out': 
@@ -2619,6 +2693,7 @@ class Manager(ScreenManager):
     is_autoqt10 = BooleanProperty(False)
     is_autoqt25 = BooleanProperty(False)
     is_autoqt50 = BooleanProperty(False)
+    is_autoqt60 = BooleanProperty(False)
     is_autoqt90 = BooleanProperty(False)
     is_autoqt100 = BooleanProperty(False)
     is_autoqtnever = BooleanProperty(False)
@@ -2629,6 +2704,8 @@ class Manager(ScreenManager):
             is_autoqt25 = BooleanProperty(True)
         elif data_params['max_trials'] == 50:
             is_autoqt50 = BooleanProperty(True)
+        elif data_params['max_trials'] == 60:
+            is_autoqt60 = BooleanProperty(True)
         elif data_params['max_trials'] == 90:
             is_autoqt90 = BooleanProperty(True)
         elif data_params['max_trials'] == 100:
