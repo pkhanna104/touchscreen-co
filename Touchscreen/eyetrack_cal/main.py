@@ -94,7 +94,7 @@ class COGame(Widget):
     pre_start_vid_ts = 0.1
     
     # ITI LENGTH
-    ITI_mean = 0.1
+    ITI_mean = 1.5
     ITI_std = 0
     target_rad = 1.5
     eff_target_rad = 1.5
@@ -313,6 +313,7 @@ class COGame(Widget):
 
         # BUTTON HOLD TIME
         button_hold_opts = [False, 1.0]
+        import pdb; pdb.set_trace()
         for i, val in enumerate(hold['button_hold']):
             if val: 
                 self.button_hold_time = button_hold_opts[i]
