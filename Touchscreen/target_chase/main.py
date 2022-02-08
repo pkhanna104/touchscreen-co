@@ -1124,7 +1124,7 @@ class COGame(Widget):
                 time.sleep(.005)
             baseline_data = np.vstack((baseline_data))
             # self.fsr_baseline = 100+1.5*np.max(baseline_data, axis=0)
-            self.fsr_baseline = 50+1.2*np.max(baseline_data, axis=0)
+            self.fsr_baseline = 20+1.15*np.max(baseline_data, axis=0)
         else: 
             self.fsr_baseline = np.array([200, 200])
             
