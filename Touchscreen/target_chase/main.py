@@ -142,6 +142,25 @@ class COGame(Widget):
 
     target1 = ObjectProperty(None)
     target2 = ObjectProperty(None)
+    
+    target1_out = ObjectProperty(None)
+    target1_in = ObjectProperty(None)
+    target2_out = ObjectProperty(None)
+    target2_in = ObjectProperty(None)
+    target3_out = ObjectProperty(None)
+    target3_in = ObjectProperty(None)
+    target4_out = ObjectProperty(None)
+    target4_in = ObjectProperty(None)
+    target5_out = ObjectProperty(None)
+    target5_in = ObjectProperty(None)
+    target6_out = ObjectProperty(None)
+    target6_in = ObjectProperty(None)
+    target7_out = ObjectProperty(None)
+    target7_in = ObjectProperty(None)
+    target8_out = ObjectProperty(None)
+    target8_in = ObjectProperty(None)
+    target9_out = ObjectProperty(None)
+    target9_in = ObjectProperty(None)
 
     done_init = False
     prev_exit_ts = np.array([0,0])
@@ -287,7 +306,7 @@ class COGame(Widget):
                 
         # TARGET POSITIONS
         # seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'center out', 'button out']
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'V', 'W', 'rand5', 'repeat', 'center out', 'button out']
+        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'V', 'W', 'X', 'rand5', 'repeat', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -471,6 +490,14 @@ class COGame(Widget):
             self.target2_pos_str = 'middle_left'
             self.target3_pos_str = 'upper_left'
             self.target4_pos_str = 'lower_middle'
+            self.target5_pos_str = 'middle_right'
+            
+        elif self.seq == 'X':
+            seq_preselect = True
+            self.target1_pos_str = 'center'
+            self.target2_pos_str = 'lower_right'
+            self.target3_pos_str = 'upper_right'
+            self.target4_pos_str = 'upper_left'
             self.target5_pos_str = 'middle_right'
             
         elif self.seq == 'rand5':
@@ -748,7 +775,7 @@ class COGame(Widget):
                 self.time_to_next_targ = time_to_next_targ_opts[i]
                 
         # INTER TARGET DELAY TIME
-        intertarg_delay_opts = [0, 0.1, 0.15, 0.2, 0.25]
+        intertarg_delay_opts = [0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5]
         for i, val in enumerate(task_in['intertarg_delay']):
             if val:
                 self.intertarg_delay = intertarg_delay_opts[i]
@@ -879,6 +906,13 @@ class COGame(Widget):
         for i, val in enumerate(drag['drag']):
             if val:
                 self.drag_ok = drag_opts[i]
+                
+        # display target outlines?
+        self.display_outlines = False
+        outline_opts = [True, False]
+        for i, val in enumerate(task_in['outlines']):
+            if val:
+                self.display_outlines = outline_opts[i]
         
 
         # nudge_9am_dist = [0., .5, 1.]
@@ -899,11 +933,48 @@ class COGame(Widget):
         self.state = 'ITI'
         self.state_start = time.time()
         self.ITI = self.ITI_std + self.ITI_mean
+        
+        # Initialize the background targets
+        self.target1_out.color = (1., 1., 0., 0.)
+        self.target1_out.set_size(2*self.target_rad)
+        self.target1_in.color = (0., 0., 0., 0.)
+        self.target1_in.set_size(2*self.target_rad-0.1)
+        self.target2_out.color = (1., 1., 0., 0.)
+        self.target2_out.set_size(2*self.target_rad)
+        self.target2_in.color = (0., 0., 0., 0.)
+        self.target2_in.set_size(2*self.target_rad-0.1)
+        self.target3_out.color = (1., 1., 0., 0.)
+        self.target3_out.set_size(2*self.target_rad)
+        self.target3_in.color = (0., 0., 0., 0.)
+        self.target3_in.set_size(2*self.target_rad-0.1)
+        self.target4_out.color = (1., 1., 0., 0.)
+        self.target4_out.set_size(2*self.target_rad)
+        self.target4_in.color = (0., 0., 0., 0.)
+        self.target4_in.set_size(2*self.target_rad-0.1)
+        self.target5_out.color = (1., 1., 0., 0.)
+        self.target5_out.set_size(2*self.target_rad)
+        self.target5_in.color = (0., 0., 0., 0.)
+        self.target5_in.set_size(2*self.target_rad-0.1)
+        self.target6_out.color = (1., 1., 0., 0.)
+        self.target6_out.set_size(2*self.target_rad)
+        self.target6_in.color = (0., 0., 0., 0.)
+        self.target6_in.set_size(2*self.target_rad-0.1)
+        self.target7_out.color = (1., 1., 0., 0.)
+        self.target7_out.set_size(2*self.target_rad)
+        self.target7_in.color = (0., 0., 0., 0.)
+        self.target7_in.set_size(2*self.target_rad-0.1)
+        self.target8_out.color = (1., 1., 0., 0.)
+        self.target8_out.set_size(2*self.target_rad)
+        self.target8_in.color = (0., 0., 0., 0.)
+        self.target8_in.set_size(2*self.target_rad-0.1)
+        self.target9_out.color = (1., 1., 0., 0.)
+        self.target9_out.set_size(2*self.target_rad)
+        self.target9_in.color = (0., 0., 0., 0.)
+        self.target9_in.set_size(2*self.target_rad-0.1)
 
         # Initialize targets: 
         self.target1.set_size(2*self.target_rad)
         self.target1.move(self.target1_position)
-        self.target1.set_size(2*self.target_rad)
         self.target2.set_size(2*self.target_rad)
 
         self.exit_target1.set_size(2*self.exit_rad)
@@ -1104,7 +1175,8 @@ class COGame(Widget):
             start_time = datetime.datetime.now().strftime('%Y%m%d_%H%M'),
             testing=self.testing,
             drag_ok = self.drag_ok, 
-            fsr_baseline = self.fsr_baseline
+            fsr_baseline = self.fsr_baseline,
+            display_outlines = self.display_outlines
             )
 
         if self.testing:
@@ -1399,6 +1471,9 @@ class COGame(Widget):
             pass
         self.trials_started += 1
         
+        if self.display_outlines:
+            self.set_alloutlinetargs_color(0., 0., 0., 0.)
+        
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
     
@@ -1491,6 +1566,9 @@ class COGame(Widget):
         except:
             pass
         self.button_pressed_prev = False
+        
+        if self.display_outlines:
+            self.set_targoutline_color(1., 1., 0., 1.)
         
     def button_pressed(self, **kwargs):
         if self.use_button is False or self.is_button_ard is False:
@@ -1672,6 +1750,8 @@ class COGame(Widget):
     def _start_reward(self, **kwargs):
         self.trial_counter += 1
         Window.clearcolor = (1., 1., 1., 1.)
+        if self.display_outlines:
+            self.set_alloutlinetargs_color(1., 1., 1., 1.)
         self.target1.color = (1., 1., 1., 1.)
         self.target2.color = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
@@ -1876,6 +1956,67 @@ class COGame(Widget):
             return inTarg
         else:
             return False
+        
+    def set_alloutlinetargs_color(self, r, g, b, a):
+        self.target1_out.color = (r, g, b, a)
+        self.target1_in.color = (r, g, b, a)
+        self.target2_out.color = (r, g, b, a)
+        self.target2_in.color = (r, g, b, a)
+        self.target3_out.color = (r, g, b, a)
+        self.target3_in.color = (r, g, b, a)
+        self.target4_out.color = (r, g, b, a)
+        self.target4_in.color = (r, g, b, a)
+        self.target5_out.color = (r, g, b, a)
+        self.target5_in.color = (r, g, b, a)
+        self.target6_out.color = (r, g, b, a)
+        self.target6_in.color = (r, g, b, a)
+        self.target7_out.color = (r, g, b, a)
+        self.target7_in.color = (r, g, b, a)
+        self.target8_out.color = (r, g, b, a)
+        self.target8_in.color = (r, g, b, a)
+        self.target9_out.color = (r, g, b, a)
+        self.target9_in.color = (r, g, b, a)
+        
+    def set_targoutline_color(self, r, g, b, a):
+        self.target1_out.move(np.array([self.center_position[0], self.center_position[1]]))
+        self.target1_in.move(np.array([self.center_position[0], self.center_position[1]]))
+        self.target2_out.move(np.array([self.center_position[0], self.center_position[1] + self.max_y_from_center]))
+        self.target2_in.move(np.array([self.center_position[0], self.center_position[1] + self.max_y_from_center]))
+        self.target3_out.move(np.array([self.center_position[0], self.center_position[1] - self.max_y_from_center]))
+        self.target3_in.move(np.array([self.center_position[0], self.center_position[1] - self.max_y_from_center]))
+        self.target4_out.move(np.array([self.max_y_from_center, self.center_position[1] + self.max_y_from_center]))
+        self.target4_in.move(np.array([self.max_y_from_center, self.center_position[1] + self.max_y_from_center]))
+        self.target5_out.move(np.array([self.max_y_from_center, self.center_position[1]]))
+        self.target5_in.move(np.array([self.max_y_from_center, self.center_position[1]]))
+        self.target6_out.move(np.array([self.max_y_from_center, self.center_position[1] - self.max_y_from_center]))
+        self.target6_in.move(np.array([self.max_y_from_center, self.center_position[1] - self.max_y_from_center]))
+        self.target7_out.move(np.array([-self.max_y_from_center, self.center_position[1] + self.max_y_from_center]))
+        self.target7_in.move(np.array([-self.max_y_from_center, self.center_position[1] + self.max_y_from_center]))
+        self.target8_out.move(np.array([-self.max_y_from_center, self.center_position[1]]))
+        self.target8_in.move(np.array([-self.max_y_from_center, self.center_position[1]]))
+        self.target9_out.move(np.array([-self.max_y_from_center, self.center_position[1] - self.max_y_from_center]))
+        self.target9_in.move(np.array([-self.max_y_from_center, self.center_position[1] - self.max_y_from_center]))
+        
+        
+        self.target1_out.color = (r, g, b, a)
+        self.target1_in.color = (0., 0., 0., a)
+        self.target2_out.color = (r, g, b, a)
+        self.target2_in.color = (0., 0., 0., a)
+        self.target3_out.color = (r, g, b, a)
+        self.target3_in.color = (0., 0., 0., a)
+        self.target4_out.color = (r, g, b, a)
+        self.target4_in.color = (0., 0., 0., a)
+        self.target5_out.color = (r, g, b, a)
+        self.target5_in.color = (0., 0., 0., a)
+        self.target6_out.color = (r, g, b, a)
+        self.target6_in.color = (0., 0., 0., a)
+        self.target7_out.color = (r, g, b, a)
+        self.target7_in.color = (0., 0., 0., a)
+        self.target8_out.color = (r, g, b, a)
+        self.target8_in.color = (0., 0., 0., a)
+        self.target9_out.color = (r, g, b, a)
+        self.target9_in.color = (0., 0., 0., a)
+    
 
 class Splash(Widget):
     def init(self, *args):
@@ -2219,6 +2360,18 @@ class Manager(ScreenManager):
             is_efftrad50 = BooleanProperty(True)
     except: 
         pass
+    
+    # display outlines
+    is_outlines = BooleanProperty(False)
+    is_no_outlines = BooleanProperty(False)
+
+    try:
+        if data_params['display_outlines'] == True:
+            is_outlines     = BooleanProperty(True)
+        elif data_params['display_outlines'] == False:
+            is_no_outlines  = BooleanProperty(True)
+    except: 
+        pass
         
     # sequence preselect
     is_seqA = BooleanProperty(False)
@@ -2244,6 +2397,7 @@ class Manager(ScreenManager):
     is_seqU = BooleanProperty(False)
     is_seqV = BooleanProperty(False)
     is_seqW = BooleanProperty(False)
+    is_seqX = BooleanProperty(False)
     is_seqRand5 = BooleanProperty(False)
     is_seqRepeat = BooleanProperty(False)
     is_CO = BooleanProperty(False)
@@ -2295,6 +2449,8 @@ class Manager(ScreenManager):
             is_seqV = BooleanProperty(True) 
         elif data_params['seq'] == 'W':
             is_seqW = BooleanProperty(True) 
+        elif data_params['seq'] == 'X':
+            is_seqX = BooleanProperty(True) 
         elif data_params['seq'] == 'rand5':
             is_seqRand5 = BooleanProperty(True) 
         elif data_params['seq'] == 'repeat':
@@ -2635,6 +2791,9 @@ class Manager(ScreenManager):
     is_inttargdelay150 = BooleanProperty(False)
     is_inttargdelay200 = BooleanProperty(False)
     is_inttargdelay250 = BooleanProperty(False)
+    is_inttargdelay300 = BooleanProperty(False)
+    is_inttargdelay400 = BooleanProperty(False)
+    is_inttargdelay500 = BooleanProperty(False)
     try:
         if data_params['intertarg_delay'] == 0:
             is_inttargdelay0 = BooleanProperty(True)
@@ -2646,6 +2805,12 @@ class Manager(ScreenManager):
             is_inttargdelay200 = BooleanProperty(True)
         elif data_params['intertarg_delay'] == 0.25:
             is_inttargdelay250 = BooleanProperty(True)
+        elif data_params['intertarg_delay'] == 0.3:
+            is_inttargdelay300 = BooleanProperty(True)
+        elif data_params['intertarg_delay'] == 0.4:
+            is_inttargdelay400 = BooleanProperty(True)
+        elif data_params['intertarg_delay'] == 0.5:
+            is_inttargdelay500 = BooleanProperty(True)
     except:
         pass
     
