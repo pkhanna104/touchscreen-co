@@ -254,7 +254,7 @@ class COGame(Widget):
             if val:
                 self.target1_timeout_time = targ1_timeout_opts[i]
         
-        targ_timeout_opts = [0.7, 0.8, 0.9, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+        targ_timeout_opts = [0.7, 0.8, 0.9, 1.0, 1.1, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
         self.target_timeout_time = 10000
         for i, val in enumerate(targ_timeout['tt']):
             if val:
@@ -2104,6 +2104,7 @@ class Manager(ScreenManager):
     is_tt0pt8 = BooleanProperty(False)
     is_tt0pt9 = BooleanProperty(False)
     is_tt1pt0 = BooleanProperty(False)
+    is_tt1pt1 = BooleanProperty(False)
     is_tt1pt5 = BooleanProperty(False)
     is_tt2pt0 = BooleanProperty(False)
     is_tt2pt5 = BooleanProperty(False)
@@ -2119,6 +2120,8 @@ class Manager(ScreenManager):
             is_tt0pt9 = BooleanProperty(True)
         elif data_params['target_timeout_time'] == 1.0:
             is_tt1pt0 = BooleanProperty(True)
+        elif data_params['target_timeout_time'] == 1.1:
+            is_tt1pt1 = BooleanProperty(True)
         elif data_params['target_timeout_time'] == 1.5:
             is_tt1pt5 = BooleanProperty(True)
         elif data_params['target_timeout_time'] == 2.0:
