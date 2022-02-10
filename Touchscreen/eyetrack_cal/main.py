@@ -373,7 +373,7 @@ class COGame(Widget):
         
         # TARGET ORDER
         targ_order = np.random.permutation(5)
-        for i in range(self.n_repeats):
+        for i in range(self.n_repeats-1):
             targ_order2 = np.random.permutation(5)
             targ_order = np.hstack((targ_order, targ_order2))
             

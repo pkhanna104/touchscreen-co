@@ -306,7 +306,7 @@ class COGame(Widget):
                 
         # TARGET POSITIONS
         # seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'center out', 'button out']
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'V', 'W', 'X', 'rand5', 'repeat', 'center out', 'button out']
+        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'V', 'W', 'X', 'Y', 'rand5', 'repeat', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -499,6 +499,14 @@ class COGame(Widget):
             self.target3_pos_str = 'upper_right'
             self.target4_pos_str = 'upper_left'
             self.target5_pos_str = 'middle_right'
+            
+        elif self.seq == 'Y':
+            seq_preselect = True
+            self.target1_pos_str = 'upper_middle'
+            self.target2_pos_str = 'lower_right'
+            self.target3_pos_str = 'middle_left'
+            self.target4_pos_str = 'upper_left'
+            self.target5_pos_str = 'center'
             
         elif self.seq == 'rand5':
             seq_preselect = True
@@ -2407,6 +2415,7 @@ class Manager(ScreenManager):
     is_seqV = BooleanProperty(False)
     is_seqW = BooleanProperty(False)
     is_seqX = BooleanProperty(False)
+    is_seqY = BooleanProperty(False)
     is_seqRand5 = BooleanProperty(False)
     is_seqRepeat = BooleanProperty(False)
     is_CO = BooleanProperty(False)
@@ -2460,6 +2469,8 @@ class Manager(ScreenManager):
             is_seqW = BooleanProperty(True) 
         elif data_params['seq'] == 'X':
             is_seqX = BooleanProperty(True) 
+        elif data_params['seq'] == 'Y':
+            is_seqY = BooleanProperty(True) 
         elif data_params['seq'] == 'rand5':
             is_seqRand5 = BooleanProperty(True) 
         elif data_params['seq'] == 'repeat':
