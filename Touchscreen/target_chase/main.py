@@ -861,17 +861,17 @@ class COGame(Widget):
             self.last_targ_reward = [False, 0]
         
         if animal_name is 'butters':
-            targ1on2touch_fast = 0.75
-            targon2touch_fast = 0.5
+            targ1on2touch_fast = 0.7
+            targon2touch_fast = 0.45
             targon2touch_slow = 0.6
         elif animal_name is 'fifi':
-            targ1on2touch_fast = 0.75
-            targon2touch_fast = 0.5
-            targon2touch_slow = 0.6
+            targ1on2touch_fast = 0.65
+            targon2touch_fast = 0.45
+            targon2touch_slow = 0.55
         else:
             targ1on2touch_fast = 0.7
             targon2touch_fast = 0.45
-            targon2touch_slow = 0.55
+            targon2touch_slow = 0.6
         self.time_thresh_for_max_rew = targ1on2touch_fast+targon2touch_fast*(self.num_targets-1)+self.intertarg_delay*self.num_targets
         self.time_thresh_for_min_rew = targ1on2touch_fast+targon2touch_slow*(self.num_targets-1)+self.intertarg_delay*self.num_targets
         
