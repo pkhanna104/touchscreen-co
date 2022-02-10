@@ -720,6 +720,34 @@
                     id: min_rew_pt3_sec
                     group: 'min_rew'
                     active: root.is_minthrew300
+                    
+                Label: 
+                    text: '0.4 sec'
+                CheckBox:
+                    id: min_rew_pt4_sec
+                    group: 'min_rew'
+                    active: root.is_minthrew400
+                    
+                Label: 
+                    text: '0.5 sec'
+                CheckBox:
+                    id: min_rew_pt5_sec
+                    group: 'min_rew'
+                    active: root.is_minthrew500
+                    
+                Label: 
+                    text: '0.6 sec'
+                CheckBox:
+                    id: min_rew_pt6_sec
+                    group: 'min_rew'
+                    active: root.is_minthrew600
+                    
+                Label: 
+                    text: '0.7 sec'
+                CheckBox:
+                    id: min_rew_pt7_sec
+                    group: 'min_rew'
+                    active: root.is_minthrew700
 
                 Label:
                     text: ''
@@ -2498,7 +2526,7 @@
                     root.current = 'splash_start'
                     splash.init(dict(haribo=chk_har.active, fifi=chk_fifi.active, nike=chk_nike.active, butters=chk_but.active, testing=chk_test.active), 
                     dict(button_rew=[button_rew_zero_sec.active, button_rew_pt1_sec.active, button_rew_pt3_sec.active, button_rew_pt5_sec.active], 
-                    min_rew=[min_rew_none.active, min_rew_zero_sec.active, min_rew_pt1_sec.active, min_rew_pt2_sec.active, min_rew_pt3_sec.active],
+                    min_rew=[min_rew_none.active, min_rew_zero_sec.active, min_rew_pt1_sec.active, min_rew_pt2_sec.active, min_rew_pt3_sec.active, min_rew_pt4_sec.active, min_rew_pt5_sec.active, min_rew_pt6_sec.active, min_rew_pt7_sec.active],
                     big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active, big_rew_pt9_sec.active, big_rew_1pt1_sec.active]), 
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_18.active, targ_rad_22.active, targ_rad_30.active, targ_rad_40.active], 
                     eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active],

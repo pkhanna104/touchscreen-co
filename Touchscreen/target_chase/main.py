@@ -835,7 +835,7 @@ class COGame(Widget):
             if val:
                 button_rew = button_rew_opts[i]
         
-        min_rew_opts = ['No Reward Scaling', 0., .1, .2, .3]
+        min_rew_opts = ['No Reward Scaling', 0., .1, .2, .3, 0.4, 0.5, 0.6, 0.7]
         for i, val in enumerate(rew_in['min_rew']):
             if val:
                 min_rew = min_rew_opts[i]
@@ -859,9 +859,21 @@ class COGame(Widget):
             self.last_targ_reward = [True, big_rew]
         else:
             self.last_targ_reward = [False, 0]
-            
-        self.time_thresh_for_max_rew = 2.75+self.intertarg_delay*self.num_targets
-        self.time_thresh_for_min_rew = 3.25+self.intertarg_delay*self.num_targets
+        
+        if animal_name is 'butters':
+            targ1on2touch_fast = 0.75
+            targon2touch_fast = 0.5
+            targon2touch_slow = 0.6
+        elif animal_name is 'fifi':
+            targ1on2touch_fast = 0.75
+            targon2touch_fast = 0.5
+            targon2touch_slow = 0.6
+        else:
+            targ1on2touch_fast = 0.7
+            targon2touch_fast = 0.45
+            targon2touch_slow = 0.55
+        self.time_thresh_for_max_rew = targ1on2touch_fast+targon2touch_fast*(self.num_targets-1)+self.intertarg_delay*self.num_targets
+        self.time_thresh_for_min_rew = targ1on2touch_fast+targon2touch_slow*(self.num_targets-1)+self.intertarg_delay*self.num_targets
         
         # reward_delay_opts = [0., .4, .8, 1.2]
         # for i, val in enumerate(rew_del['rew_del']):
@@ -2272,6 +2284,10 @@ class Manager(ScreenManager):
     is_minthrew100 = BooleanProperty(False)
     is_minthrew200 = BooleanProperty(False)
     is_minthrew300 = BooleanProperty(False)
+    is_minthrew400 = BooleanProperty(False)
+    is_minthrew500 = BooleanProperty(False)
+    is_minthrew600 = BooleanProperty(False)
+    is_minthrew700 = BooleanProperty(False)
     try:
         if data_params['min_targ_reward'] == 'No Reward Scaling':
             is_minthrewnone = BooleanProperty(True)
@@ -2283,6 +2299,14 @@ class Manager(ScreenManager):
             is_minthrew200 = BooleanProperty(True)
         elif data_params['min_targ_reward'] == 0.3:
             is_minthrew300 = BooleanProperty(True)
+        elif data_params['min_targ_reward'] == 0.4:
+            is_minthrew400 = BooleanProperty(True)
+        elif data_params['min_targ_reward'] == 0.5:
+            is_minthrew500 = BooleanProperty(True)
+        elif data_params['min_targ_reward'] == 0.6:
+            is_minthrew600 = BooleanProperty(True)
+        elif data_params['min_targ_reward'] == 0.7:
+            is_minthrew700 = BooleanProperty(True)
     except:
         pass
         
