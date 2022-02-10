@@ -1135,7 +1135,7 @@ class COGame(Widget):
             if user_id == 'Ganguly':
                 self.fsr_baseline = 20+1.15*np.max(baseline_data, axis=0)
             elif user_id == 'BasalGangulia':
-                self.fsr_baseline = 100+*np.max(baseline_data, axis=0)
+                self.fsr_baseline = 100+np.max(baseline_data, axis=0)
         else: 
             self.fsr_baseline = np.array([200, 200])
             
