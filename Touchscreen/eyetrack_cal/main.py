@@ -391,6 +391,8 @@ class COGame(Widget):
         for i, val in enumerate(drag['drag']):
             if val:
                 self.drag_ok = drag_opts[i]
+                
+        self.trial_counter = 1;
         
 
         # nudge_9am_dist = [0., .5, 1.]
@@ -413,7 +415,7 @@ class COGame(Widget):
         self.ITI = self.ITI_std + self.ITI_mean
 
         # Initialize targets: 
-        self.active_target_position = self.target_position[:, 0]
+        self.active_target_position = self.target_position[:, self.targ_order[0]]
         self.target1.set_size(2*self.target_rad)
         self.target1.move(self.target_position[:, 0])
         self.target1.set_size(2*self.target_rad)
@@ -568,7 +570,10 @@ class COGame(Widget):
                 time.sleep(.005)
             baseline_data = np.vstack((baseline_data))
             # self.fsr_baseline = 100+1.5*np.max(baseline_data, axis=0)
-            self.fsr_baseline = 20+1.15*np.max(baseline_data, axis=0)
+            if user_id == 'Ganguly':
+                self.fsr_baseline = 20+1.15*np.max(baseline_data, axis=0)
+            elif user_id == 'BasalGangulia':
+                self.fsr_baseline = 100+*np.max(baseline_data, axis=0)
         else: 
             self.fsr_baseline = np.array([200, 200])
             

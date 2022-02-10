@@ -506,7 +506,7 @@ class COGame(Widget):
             self.target2_pos_str = 'lower_right'
             self.target3_pos_str = 'middle_left'
             self.target4_pos_str = 'upper_left'
-            self.target5_pos_str = 'center'
+            self.target5_pos_str = 'lower_middle'
             
         elif self.seq == 'rand5':
             seq_preselect = True
@@ -1132,7 +1132,10 @@ class COGame(Widget):
                 time.sleep(.005)
             baseline_data = np.vstack((baseline_data))
             # self.fsr_baseline = 100+1.5*np.max(baseline_data, axis=0)
-            self.fsr_baseline = 20+1.15*np.max(baseline_data, axis=0)
+            if user_id == 'Ganguly':
+                self.fsr_baseline = 20+1.15*np.max(baseline_data, axis=0)
+            elif user_id == 'BasalGangulia':
+                self.fsr_baseline = 100+*np.max(baseline_data, axis=0)
         else: 
             self.fsr_baseline = np.array([200, 200])
             
