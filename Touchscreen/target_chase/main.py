@@ -1541,45 +1541,67 @@ class COGame(Widget):
         
         # Get the position of random targets
         i_pos_rand = np.random.permutation(9)
-
         if self.target1_pos_str == 'random': 
             if self.seq == 'center out' or self.seq == 'button out':
                 i_pos = self.trial_order[self.trials_started]
             else:
-                i_pos = i_pos_rand[0]
-            targ_pos = self.get_target_position(i_pos, self.nudge_x_t1)
+                ix = np.random.choice(range(len(i_pos_rand)))
+                i_pos = i_pos_rand[ix]
+                i_pos_rand = np.delete(i_pos_rand, ix)
+            targ1_pos = self.get_target_position(i_pos, self.nudge_x_t1)
     
-            self.target1_position = targ_pos 
+            self.target1_position = targ1_pos 
             
         if self.target2_pos_str == 'random': 
             if self.seq == 'center out' or self.seq == 'button out':
                 i_pos = self.trial_order[self.trials_started]
+                targ2_pos = self.get_target_position(i_pos, self.nudge_x_t2)
             else:
-                i_pos = i_pos_rand[1]
-            targ_pos = self.get_target_position(i_pos, self.nudge_x_t2)
-    
-            self.target2_position = targ_pos 
+                d_targ2targ = 0
+                while d_targ2targ <= self.max_y_from_center:
+                    ix = np.random.choice(range(len(i_pos_rand)))
+                    i_pos = i_pos_rand[ix]
+                    targ2_pos = self.get_target_position(i_pos, self.nudge_x_t2)
+                    d_targ2targ = np.sqrt(np.sum(np.square((targ1_pos-targ2_pos))))
+            
+            i_pos_rand = np.delete(i_pos_rand, ix)
+            self.target2_position = targ2_pos 
             
         if self.target3_pos_str == 'random': 
             if not self.seq == 'center out' and not self.seq == 'button out':
-                i_pos = i_pos_rand[2]
-                targ_pos = self.get_target_position(i_pos, self.nudge_x_t3)
-    
-                self.target3_position = targ_pos 
+                d_targ2targ = 0
+                while d_targ2targ <= self.max_y_from_center:
+                    ix = np.random.choice(range(len(i_pos_rand)))
+                    i_pos = i_pos_rand[ix]
+                    targ3_pos = self.get_target_position(i_pos, self.nudge_x_t3)
+                    d_targ2targ = np.sqrt(np.sum(np.square((targ2_pos-targ3_pos))))
+                    
+                i_pos_rand = np.delete(i_pos_rand, ix)
+                self.target3_position = targ3_pos 
             
         if self.target4_pos_str == 'random': 
             if not self.seq == 'center out' and not self.seq == 'button out':
-                i_pos = i_pos_rand[3]
-                targ_pos = self.get_target_position(i_pos, self.nudge_x_t4)
-    
-                self.target4_position = targ_pos 
+                d_targ2targ = 0
+                while d_targ2targ <= self.max_y_from_center:
+                    ix = np.random.choice(range(len(i_pos_rand)))
+                    i_pos = i_pos_rand[ix]
+                    targ4_pos = self.get_target_position(i_pos, self.nudge_x_t4)
+                    d_targ2targ = np.sqrt(np.sum(np.square((targ3_pos-targ4_pos))))
+                
+                i_pos_rand = np.delete(i_pos_rand, ix)
+                self.target4_position = targ4_pos 
             
         if self.target5_pos_str == 'random': 
             if not self.seq == 'center out' and not self.seq == 'button out':
-                i_pos = i_pos_rand[4]
-                targ_pos = self.get_target_position(i_pos, self.nudge_x_t4)
-    
-                self.target5_position = targ_pos 
+                d_targ2targ = 0
+                while d_targ2targ <= self.max_y_from_center:
+                    ix = np.random.choice(range(len(i_pos_rand)))
+                    i_pos = i_pos_rand[ix]
+                    targ5_pos = self.get_target_position(i_pos, self.nudge_x_t4)
+                    d_targ2targ = np.sqrt(np.sum(np.square((targ4_pos-targ5_pos))))
+                    
+                i_pos_rand = np.delete(i_pos_rand, ix)
+                self.target5_position = targ5_pos 
 
                 
 
