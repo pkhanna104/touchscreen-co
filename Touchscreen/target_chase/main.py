@@ -306,7 +306,7 @@ class COGame(Widget):
                 
         # TARGET POSITIONS
         # seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'center out', 'button out']
-        seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'V', 'W', 'X', 'Y', 'rand5', 'repeat', 'center out', 'button out']
+        seq_opts = ['Y', 'rand5', 'repeat', 'randevery', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -525,6 +525,14 @@ class COGame(Widget):
             self.target3_pos_str = data_params['target3_pos_str']
             self.target4_pos_str = data_params['target4_pos_str']
             self.target5_pos_str = data_params['target5_pos_str']
+            
+        elif self.seq == 'randevery':
+            seq_preselect = True
+            self.target1_pos_str = 'random'
+            self.target2_pos_str = 'random'
+            self.target3_pos_str = 'random'
+            self.target4_pos_str = 'random'
+            self.target5_pos_str = 'random'
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -1530,47 +1538,48 @@ class COGame(Widget):
         
         # Reset target index back to 1
         self.target_index = 1
-
-        # Get the position of target2
-        if self.target2_pos_str == 'random': 
-            i_pos = self.trial_order[self.trials_started]
         
-            if i_pos == 0: # 'upper_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif i_pos == 1:# 'lower_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif i_pos == 2: # 'lower_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif i_pos == 3: # 'upper_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t2
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif i_pos == 4: # center positon 
-                targ_x = self.center_position[0]
-                targ_y = self.center_position[1]
-
-            self.target2_position = np.array([targ_x, targ_y])
+        # Get the position of random targets
+        i_pos_rand = np.random.permutation(9)
 
         if self.target1_pos_str == 'random': 
-            i_pos = self.trial_order[self.trials_started]
-            if i_pos == 0: # 'upper_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t1
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif i_pos == 1:# 'lower_right':
-                targ_x = self.max_y_from_center+self.nudge_x_t1
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif i_pos == 2: # 'lower_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t1
-                targ_y = self.center_position[1] - self.max_y_from_center
-            elif i_pos == 3: # 'upper_left':
-                targ_x = -self.max_y_from_center+self.nudge_x_t1
-                targ_y = self.center_position[1] + self.max_y_from_center
-            elif i_pos == 4: # center positon 
-                targ_x = self.center_position[0]
-                targ_y = self.center_position[1]
-            self.target1_position = np.array([targ_x, targ_y])
+            if self.seq == 'center out' or self.seq == 'button out':
+                i_pos = self.trial_order[self.trials_started]
+            else:
+                i_pos = i_pos_rand[0]
+            targ_pos = self.get_target_position(i_pos, self.nudge_x_t1)
+    
+            self.target1_position = targ_pos 
+            
+        if self.target2_pos_str == 'random': 
+            if self.seq == 'center out' or self.seq == 'button out':
+                i_pos = self.trial_order[self.trials_started]
+            else:
+                i_pos = i_pos_rand[1]
+            targ_pos = self.get_target_position(i_pos, self.nudge_x_t2)
+    
+            self.target2_position = targ_pos 
+            
+        if self.target3_pos_str == 'random': 
+            if not self.seq == 'center out' and not self.seq == 'button out':
+                i_pos = i_pos_rand[2]
+                targ_pos = self.get_target_position(i_pos, self.nudge_x_t3)
+    
+                self.target3_position = targ_pos 
+            
+        if self.target4_pos_str == 'random': 
+            if not self.seq == 'center out' and not self.seq == 'button out':
+                i_pos = i_pos_rand[3]
+                targ_pos = self.get_target_position(i_pos, self.nudge_x_t4)
+    
+                self.target4_position = targ_pos 
+            
+        if self.target5_pos_str == 'random': 
+            if not self.seq == 'center out' and not self.seq == 'button out':
+                i_pos = i_pos_rand[4]
+                targ_pos = self.get_target_position(i_pos, self.nudge_x_t4)
+    
+                self.target5_position = targ_pos 
 
                 
 
@@ -2039,6 +2048,37 @@ class COGame(Widget):
         self.target8_in.color = (0., 0., 0., a)
         self.target9_out.color = (r, g, b, a)
         self.target9_in.color = (0., 0., 0., a)
+        
+    def get_target_position(self, i_pos, nudge):
+        if i_pos == 4: # center
+            targ_x = self.center_position[0]+nudge
+            targ_y = self.center_position[1]
+        elif i_pos == 5: # upper_middle
+            targ_x = self.center_position[0]+nudge
+            targ_y = self.center_position[1] + self.max_y_from_center
+        elif i_pos == 6: # lower middle
+            targ_x = self.center_position[0]+nudge
+            targ_y = self.center_position[1] - self.max_y_from_center
+        elif i_pos == 0: # upper right
+            targ_x = self.max_y_from_center+nudge
+            targ_y = self.center_position[1] + self.max_y_from_center
+        elif i_pos == 7: # middle right
+            targ_x = self.max_y_from_center+nudge
+            targ_y = self.center_position[1]
+        elif i_pos == 1: # lower right
+            targ_x = self.max_y_from_center+nudge
+            targ_y = self.center_position[1] - self.max_y_from_center
+        elif i_pos == 2: # lower left
+            targ_x = -self.max_y_from_center+nudge
+            targ_y = self.center_position[1] - self.max_y_from_center
+        elif i_pos == 8: # middle left
+            targ_x = -self.max_y_from_center+nudge
+            targ_y = self.center_position[1]
+        elif i_pos == 3: # upper left
+            targ_x = -self.max_y_from_center+nudge
+            targ_y = self.center_position[1] + self.max_y_from_center
+
+        return np.array([targ_x, targ_y])
     
 
 class Splash(Widget):
@@ -2445,6 +2485,7 @@ class Manager(ScreenManager):
     is_seqY = BooleanProperty(False)
     is_seqRand5 = BooleanProperty(False)
     is_seqRepeat = BooleanProperty(False)
+    is_seqRandomEvery = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     is_BO = BooleanProperty(False)
     try:
@@ -2502,6 +2543,8 @@ class Manager(ScreenManager):
             is_seqRand5 = BooleanProperty(True) 
         elif data_params['seq'] == 'repeat':
             is_seqRepeat = BooleanProperty(True) 
+        elif data_params['seq'] == 'randevery':
+            is_seqRandomEvery = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
         elif data_params['seq'] == 'button out': 

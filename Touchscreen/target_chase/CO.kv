@@ -1091,69 +1091,69 @@
                     text: 'Sequence'
                     color: 1, 1, 0, 1
                 
-                Label: 
-                    text: 'A'
-                CheckBox:
-                    id: seqA
-                    group: 'seq'
-                    active: root.is_seqA
-                
-                Label: 
-                    text: 'B'
-                CheckBox:
-                    id: seqB
-                    group: 'seq'
-                    active: root.is_seqB
-                    
-                Label: 
-                    text: 'C'
-                CheckBox:
-                    id: seqC
-                    group: 'seq'
-                    active: root.is_seqC
-                    
-                Label: 
-                    text: 'D'
-                CheckBox:
-                    id: seqD
-                    group: 'seq'
-                    active: root.is_seqD
-                    
-                Label: 
-                    text: 'E'
-                CheckBox:
-                    id: seqE
-                    group: 'seq'
-                    active: root.is_seqE
-                    
-                Label: 
-                    text: 'F'
-                CheckBox:
-                    id: seqF
-                    group: 'seq'
-                    active: root.is_seqF
-                    
-                Label: 
-                    text: 'G'
-                CheckBox:
-                    id: seqG
-                    group: 'seq'
-                    active: root.is_seqG
-                
-                Label: 
-                    text: 'H'
-                CheckBox:
-                    id: seqH
-                    group: 'seq'
-                    active: root.is_seqH
-                    
-                Label: 
-                    text: 'I'
-                CheckBox:
-                    id: seqI
-                    group: 'seq'
-                    active: root.is_seqI
-                    
+#                Label: 
+#                    text: 'A'
+#                CheckBox:
+#                    id: seqA
+#                    group: 'seq'
+#                    active: root.is_seqA
+#                
+#                Label: 
+#                    text: 'B'
+#                CheckBox:
+#                    id: seqB
+#                    group: 'seq'
+#                    active: root.is_seqB
+#                    
+#                Label: 
+#                    text: 'C'
+#                CheckBox:
+#                    id: seqC
+#                    group: 'seq'
+#                    active: root.is_seqC
+#                    
+#                Label: 
+#                    text: 'D'
+#                CheckBox:
+#                    id: seqD
+#                    group: 'seq'
+#                    active: root.is_seqD
+#                    
+#                Label: 
+#                    text: 'E'
+#                CheckBox:
+#                    id: seqE
+#                    group: 'seq'
+#                    active: root.is_seqE
+#                    
+#                Label: 
+#                    text: 'F'
+#                CheckBox:
+#                    id: seqF
+#                    group: 'seq'
+#                    active: root.is_seqF
+#                    
+#                Label: 
+#                    text: 'G'
+#                CheckBox:
+#                    id: seqG
+#                    group: 'seq'
+#                    active: root.is_seqG
+#                
+#                Label: 
+#                    text: 'H'
+#                CheckBox:
+#                    id: seqH
+#                    group: 'seq'
+#                    active: root.is_seqH
+#                    
+#                Label: 
+#                    text: 'I'
+#                CheckBox:
+#                    id: seqI
+#                    group: 'seq'
+#                    active: root.is_seqI
+#                    
 #                Label: 
 #                    text: 'J'
 #                CheckBox:
@@ -1237,27 +1237,27 @@
 #                    id: seqU
 #                    group: 'seq'
 #                    active: root.is_seqU
-                   
-                Label: 
-                    text: 'V'
-                CheckBox:
-                    id: seqV
-                    group: 'seq'
-                    active: root.is_seqV   
-                    
-                Label: 
-                    text: 'W'
-                CheckBox:
-                    id: seqW
-                    group: 'seq'
-                    active: root.is_seqW    
-                    
-                Label: 
-                    text: 'X'
-                CheckBox:
-                    id: seqX
-                    group: 'seq'
-                    active: root.is_seqX
+#                   
+#                Label: 
+#                    text: 'V'
+#                CheckBox:
+#                    id: seqV
+#                    group: 'seq'
+#                    active: root.is_seqV   
+#                    
+#                Label: 
+#                    text: 'W'
+#                CheckBox:
+#                    id: seqW
+#                    group: 'seq'
+#                    active: root.is_seqW    
+#                    
+#                Label: 
+#                    text: 'X'
+#                CheckBox:
+#                    id: seqX
+#                    group: 'seq'
+#                    active: root.is_seqX
                     
                 Label: 
                     text: 'Y'
@@ -1279,6 +1279,13 @@
                     id: seqRepeat
                     group: 'seq'
                     active: root.is_seqRepeat 
+                    
+                Label: 
+                    text: 'Random Every'
+                CheckBox:
+                    id: seqRandomEvery
+                    group: 'seq'
+                    active: root.is_seqRandomEvery
                     
                 Label: 
                     text: 'Cen Out'
@@ -2531,7 +2538,7 @@
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_18.active, targ_rad_22.active, targ_rad_30.active, targ_rad_40.active], 
                     eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active],
 #                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, seqF.active, seqG.active, seqH.active, seqI.active, seqJ.active, seqK.active, seqL.active, seqM.active, seqN.active, seqO.active, seqP.active, seqQ.active, seqR.active, seqS.active, seqT.active, seqU.active, seqV.active, seqW.active, centerOut.active, buttonOut.active],
-                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, seqF.active, seqG.active, seqH.active, seqI.active, seqV.active, seqW.active, seqX.active, seqY.active, seqRand5.active, seqRepeat.active, centerOut.active, buttonOut.active],
+                    seq=[seqY.active, seqRand5.active, seqRepeat.active, seqRandomEvery.active, centerOut.active, buttonOut.active],
                     targ1_pos=[t1random.active, t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
                     targ2_pos=[t2none.active, t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
                     targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_mid.active, t3lower_mid.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
