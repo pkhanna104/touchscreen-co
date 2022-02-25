@@ -234,8 +234,9 @@ class COGame(Widget):
             print('removing touch from pre-game screen')
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
-        hold=None, autoquit=None, rew_var=None, targ_timeout = None, 
-        drag=None, nudge_x=None, screen_size=None, juicer=None, taskbreak=None):
+        hold=None, autoquit=None, # rew_var=None, 
+        targ_timeout = None, drag=None, # nudge_x=None, 
+        screen_size=None, juicer=None, taskbreak=None):
         
         self.rew_cnt = 0
 
@@ -261,22 +262,26 @@ class COGame(Widget):
                 self.target_timeout_time = targ_timeout_opts[i]
 
         # NUDGE X
-        nudge_x_opts = [-6, -4, -2, 0, 2, 4, 6]    
-        for i, val in enumerate(nudge_x['nudge_x_t1']):
-            if val:
-                self.nudge_x_t1 = nudge_x_opts[i]
+        # nudge_x_opts = [-6, -4, -2, 0, 2, 4, 6]    
+        self.nudge_x_t1 = 0
+        # for i, val in enumerate(nudge_x['nudge_x_t1']):
+        #     if val:
+        #         self.nudge_x_t1 = nudge_x_opts[i]
                 
-        for i, val in enumerate(nudge_x['nudge_x_t2']):
-            if val:
-                self.nudge_x_t2 = nudge_x_opts[i]
+        self.nudge_x_t2 = 0
+        # for i, val in enumerate(nudge_x['nudge_x_t2']):
+        #     if val:
+        #         self.nudge_x_t2 = nudge_x_opts[i]
+        
+        self.nudge_x_t3 = 0
+        # for i, val in enumerate(nudge_x['nudge_x_t3']):
+        #     if val:
+        #         self.nudge_x_t3 = nudge_x_opts[i]
                 
-        for i, val in enumerate(nudge_x['nudge_x_t3']):
-            if val:
-                self.nudge_x_t3 = nudge_x_opts[i]
-                
-        for i, val in enumerate(nudge_x['nudge_x_t4']):
-            if val:
-                self.nudge_x_t4 = nudge_x_opts[i]
+        self.nudge_x_t4 = 0       
+        # for i, val in enumerate(nudge_x['nudge_x_t4']):
+        #     if val:
+        #         self.nudge_x_t4 = nudge_x_opts[i]
         
         # WHERE TO CONSIDER THE TOP AND BOTTOM OF THE SCREEN (HOW MUCH TO SHRINK IT DOWN/UP BY)
         screen_top_opts = [-12, -10, -8, -6, -4, -2, 0]    
@@ -510,13 +515,14 @@ class COGame(Widget):
             
         elif self.seq == 'rand5':
             seq_preselect = True
-            pos_str_opts = ['upper_left', 'upper_middle', 'upper_right', 'middle_left', 'center', 'middle_right', 'lower_left', 'lower_middle', 'lower_right']
-            pos_order = np.random.permutation(9)
-            self.target1_pos_str = pos_str_opts[pos_order[0]]
-            self.target2_pos_str = pos_str_opts[pos_order[1]]
-            self.target3_pos_str = pos_str_opts[pos_order[2]]
-            self.target4_pos_str = pos_str_opts[pos_order[3]]
-            self.target5_pos_str = pos_str_opts[pos_order[4]]
+            self.make_random_sequence(True)
+            # pos_str_opts = ['upper_left', 'upper_middle', 'upper_right', 'middle_left', 'center', 'middle_right', 'lower_left', 'lower_middle', 'lower_right']
+            # pos_order = np.random.permutation(9)
+            # self.target1_pos_str = pos_str_opts[pos_order[0]]
+            # self.target2_pos_str = pos_str_opts[pos_order[1]]
+            # self.target3_pos_str = pos_str_opts[pos_order[2]]
+            # self.target4_pos_str = pos_str_opts[pos_order[3]]
+            # self.target5_pos_str = pos_str_opts[pos_order[4]]
             
         elif self.seq == 'repeat':
             seq_preselect = True
@@ -720,10 +726,9 @@ class COGame(Widget):
             
         # target 5
         if not seq_preselect:
-            self.target5_pos_str = 'none'
-            #for i, val in enumerate(task_in['targ4_pos']):
-            #    if val:
-            #        self.target4_pos_str = target_pos_opts[i]
+            for i, val in enumerate(task_in['targ5_pos']):
+                if val:
+                    self.target5_pos_str = target_pos_opts[i]
         
         if self.target2_pos_str == 'none': 
             self.target2_position = False 
@@ -774,7 +779,6 @@ class COGame(Widget):
                 targ_y = self.center_position[1] + self.max_y_from_center
             
             self.target5_position = np.array([targ_x, targ_y])
-
 
         self.active_target_position = self.target1_position
         self.target_index = 1
@@ -888,14 +892,16 @@ class COGame(Widget):
         #     if val:
         self.reward_delay_time = 0.0
 
-        reward_var_opt = [1.0, .5, .33]
-        for i, val in enumerate(rew_var['rew_var']):
-            if val:
-                self.percent_of_trials_rewarded = reward_var_opt[i]
-                if self.percent_of_trials_rewarded == 0.33:
-                    self.percent_of_trials_doubled = 0.1
-                else:
-                    self.percent_of_trials_doubled = 0.0
+        self.percent_of_trials_rewarded = 1.0
+        self.percent_of_trials_doubled = 0.0
+        # reward_var_opt = [1.0, .5, .33]
+        # for i, val in enumerate(rew_var['rew_var']):
+        #     if val:
+        #         self.percent_of_trials_rewarded = reward_var_opt[i]
+        #         if self.percent_of_trials_rewarded == 0.33:
+        #             self.percent_of_trials_doubled = 0.1
+        #         else:
+        #             self.percent_of_trials_doubled = 0.0
         
         self.reward_generator = self.gen_rewards(self.percent_of_trials_rewarded, self.percent_of_trials_doubled,
             self.last_targ_reward)
@@ -1540,68 +1546,9 @@ class COGame(Widget):
         self.target_index = 1
         
         # Get the position of random targets
-        i_pos_rand = np.random.permutation(9)
-        if self.target1_pos_str == 'random': 
-            if self.seq == 'center out' or self.seq == 'button out':
-                i_pos = self.trial_order[self.trials_started]
-            else:
-                ix = np.random.choice(range(len(i_pos_rand)))
-                i_pos = i_pos_rand[ix]
-                i_pos_rand = np.delete(i_pos_rand, ix)
-            targ1_pos = self.get_target_position(i_pos, self.nudge_x_t1)
-    
-            self.target1_position = targ1_pos 
-            
-        if self.target2_pos_str == 'random': 
-            if self.seq == 'center out' or self.seq == 'button out':
-                i_pos = self.trial_order[self.trials_started]
-                targ2_pos = self.get_target_position(i_pos, self.nudge_x_t2)
-            else:
-                d_targ2targ = 0
-                while d_targ2targ <= self.max_y_from_center:
-                    ix = np.random.choice(range(len(i_pos_rand)))
-                    i_pos = i_pos_rand[ix]
-                    targ2_pos = self.get_target_position(i_pos, self.nudge_x_t2)
-                    d_targ2targ = np.sqrt(np.sum(np.square((targ1_pos-targ2_pos))))
-            
-            i_pos_rand = np.delete(i_pos_rand, ix)
-            self.target2_position = targ2_pos 
-            
-        if self.target3_pos_str == 'random': 
-            if not self.seq == 'center out' and not self.seq == 'button out':
-                d_targ2targ = 0
-                while d_targ2targ <= self.max_y_from_center:
-                    ix = np.random.choice(range(len(i_pos_rand)))
-                    i_pos = i_pos_rand[ix]
-                    targ3_pos = self.get_target_position(i_pos, self.nudge_x_t3)
-                    d_targ2targ = np.sqrt(np.sum(np.square((targ2_pos-targ3_pos))))
-                    
-                i_pos_rand = np.delete(i_pos_rand, ix)
-                self.target3_position = targ3_pos 
-            
-        if self.target4_pos_str == 'random': 
-            if not self.seq == 'center out' and not self.seq == 'button out':
-                d_targ2targ = 0
-                while d_targ2targ <= self.max_y_from_center:
-                    ix = np.random.choice(range(len(i_pos_rand)))
-                    i_pos = i_pos_rand[ix]
-                    targ4_pos = self.get_target_position(i_pos, self.nudge_x_t4)
-                    d_targ2targ = np.sqrt(np.sum(np.square((targ3_pos-targ4_pos))))
-                
-                i_pos_rand = np.delete(i_pos_rand, ix)
-                self.target4_position = targ4_pos 
-            
-        if self.target5_pos_str == 'random': 
-            if not self.seq == 'center out' and not self.seq == 'button out':
-                d_targ2targ = 0
-                while d_targ2targ <= self.max_y_from_center:
-                    ix = np.random.choice(range(len(i_pos_rand)))
-                    i_pos = i_pos_rand[ix]
-                    targ5_pos = self.get_target_position(i_pos, self.nudge_x_t4)
-                    d_targ2targ = np.sqrt(np.sum(np.square((targ4_pos-targ5_pos))))
-                    
-                i_pos_rand = np.delete(i_pos_rand, ix)
-                self.target5_position = targ5_pos 
+        # i_pos_rand = np.random.permutation(9)
+        if self.seq == 'randevery' or self.seq == 'center out' or self.seq == 'button out':
+            self.make_random_sequence(False)
 
                 
 
@@ -1644,33 +1591,6 @@ class COGame(Widget):
             else:
                 return False
                 # print('Button NOT Pressed')
-    
-    # def button_pressed(self, **kwargs):
-    #     if self.use_button is False:
-    #         return True
-    #     else:
-    #         button_pressed_prev = self.button_pressed_prev
-    #         self.button_pressed_prev = self.button_pressed
-    #         if self.button_pressed:
-    #             self.pd1_indicator_targ.color = (.75, .75, .75, 1.)
-    #             if button_pressed_prev:
-    #                 if time.time() - self.t_button_hold_start > self.button_hold_time:
-    #                     # Play the button reward sound
-    #                     sound = SoundLoader.load('C.wav')
-    #                     sound.play()
-    #                     # if the button has been held down long enough
-    #                     if self.button_rew[0]:
-    #                         self.run_button_rew()
-    #                     return True
-    #                 else:
-    #                     return False
-    #             else:
-    #                 # this is the first cycle that the button has been pressed for
-    #                 self.t_button_hold_start = time.time()
-    #                 return False
-    #         else:
-    #             self.pd1_indicator_targ.color = (.25, .25, .25, 1.)
-    #             return False
     
     def _start_button_hold(self, **kwargs):
         self.t_button_hold_start = time.time()
@@ -2101,6 +2021,73 @@ class COGame(Widget):
             targ_y = self.center_position[1] + self.max_y_from_center
 
         return np.array([targ_x, targ_y])
+    
+    def make_random_sequence(self, change_str):
+        # Get the position of random targets
+        i_pos_rand = np.random.permutation(9)
+        pos_str_opts = ['upper_right', 'lower_right', 'lower_left', 'upper_left', 'center', 'upper_middle', 'lower_middle', 'middle_right', 'middle_left']
+        if self.target1_pos_str == 'random': 
+            ix = np.random.choice(range(len(i_pos_rand)))
+            i_pos = i_pos_rand[ix]
+            i_pos_rand = np.delete(i_pos_rand, ix)
+            targ1_pos = self.get_target_position(i_pos, self.nudge_x_t1)
+    
+            self.target1_position = targ1_pos 
+            if change_str:
+                self.target1_pos_str = pos_str_opts[i_pos]
+            
+        if self.target2_pos_str == 'random': 
+            d_targ2targ = 0
+            while d_targ2targ <= self.max_y_from_center:
+                ix = np.random.choice(range(len(i_pos_rand)))
+                i_pos = i_pos_rand[ix]
+                targ2_pos = self.get_target_position(i_pos, self.nudge_x_t2)
+                d_targ2targ = np.sqrt(np.sum(np.square((self.target1_position-targ2_pos))))
+            
+            i_pos_rand = np.delete(i_pos_rand, ix)
+            self.target2_position = targ2_pos 
+            if change_str:
+                self.target2_pos_str = pos_str_opts[i_pos]
+            
+        if self.target3_pos_str == 'random': 
+            d_targ2targ = 0
+            while d_targ2targ <= self.max_y_from_center:
+                ix = np.random.choice(range(len(i_pos_rand)))
+                i_pos = i_pos_rand[ix]
+                targ3_pos = self.get_target_position(i_pos, self.nudge_x_t3)
+                d_targ2targ = np.sqrt(np.sum(np.square((self.target2_position-targ3_pos))))
+                
+            i_pos_rand = np.delete(i_pos_rand, ix)
+            self.target3_position = targ3_pos 
+            if change_str:
+                self.target3_pos_str = pos_str_opts[i_pos]
+            
+        if self.target4_pos_str == 'random': 
+            d_targ2targ = 0
+            while d_targ2targ <= self.max_y_from_center:
+                ix = np.random.choice(range(len(i_pos_rand)))
+                i_pos = i_pos_rand[ix]
+                targ4_pos = self.get_target_position(i_pos, self.nudge_x_t4)
+                d_targ2targ = np.sqrt(np.sum(np.square((self.target3_position-targ4_pos))))
+            
+            i_pos_rand = np.delete(i_pos_rand, ix)
+            self.target4_position = targ4_pos 
+            if change_str:
+                self.target4_pos_str = pos_str_opts[i_pos]
+            
+        if self.target5_pos_str == 'random': 
+            d_targ2targ = 0
+            while d_targ2targ <= self.max_y_from_center:
+                ix = np.random.choice(range(len(i_pos_rand)))
+                i_pos = i_pos_rand[ix]
+                targ5_pos = self.get_target_position(i_pos, self.nudge_x_t4)
+                d_targ2targ = np.sqrt(np.sum(np.square((self.target4_position-targ5_pos))))
+                
+            i_pos_rand = np.delete(i_pos_rand, ix)
+            self.target5_position = targ5_pos 
+            if change_str:
+                self.target5_pos_str = pos_str_opts[i_pos]
+        
     
 
 class Splash(Widget):
@@ -2819,6 +2806,41 @@ class Manager(ScreenManager):
             is_t4nudgepos4 = BooleanProperty(True)
         elif data_params['nudge_x_t4'] == 6:
             is_t4nudgepos6 = BooleanProperty(True)
+    except:
+        pass
+    
+    # target 5 position
+    is_t5cent = BooleanProperty(False)
+    is_t5um = BooleanProperty(False)
+    is_t5lm = BooleanProperty(False)
+    is_t5ul = BooleanProperty(False)
+    is_t5ml = BooleanProperty(False)
+    is_t5ll = BooleanProperty(False)
+    is_t5ur = BooleanProperty(False)
+    is_t5mr = BooleanProperty(False)
+    is_t5lr = BooleanProperty(False)
+    is_t5none = BooleanProperty(False)
+    try:
+        if data_params['target5_pos_str'] == 'center':
+            is_t5cent = BooleanProperty(True)
+        elif data_params['target5_pos_str'] == 'upper_middle':
+            is_t5um = BooleanProperty(True)
+        elif data_params['target5_pos_str'] == 'lower_middle':
+            is_t5lm = BooleanProperty(True) 
+        elif data_params['target5_pos_str'] == 'upper_left':
+            is_t5ul = BooleanProperty(True)
+        elif data_params['target5_pos_str'] == 'middle_left':
+            is_t5ml = BooleanProperty(True)
+        elif data_params['target5_pos_str'] == 'lower_left':
+            is_t5ll = BooleanProperty(True)
+        elif data_params['target5_pos_str'] == 'upper_right':
+            is_t5ur = BooleanProperty(True)
+        elif data_params['target5_pos_str'] == 'middle_right':
+            is_t5mr = BooleanProperty(True)
+        elif data_params['target5_pos_str'] == 'lower_right':
+            is_t5lr = BooleanProperty(True)
+        elif data_params['target5_pos_str'] == 'none':
+            is_t5none = BooleanProperty(True)
     except:
         pass
         
