@@ -310,6 +310,15 @@ class COGame(Widget):
         
                 
         # TARGET POSITIONS
+        self.center_position = np.array([0., 0.])
+        # lower the center position by half of the total amount the screen height has been shrunk by
+        self.center_position[1] = self.center_position[1] + self.screen_top/2 + self.screen_bot/2
+        
+        d_center2top = (fixed_window_size_cm[1]/2)-((self.screen_top/2)+(self.screen_bot/2))
+        d_center2bot = (fixed_window_size_cm[1]/2)+((self.screen_top/2)+(self.screen_bot/2))
+        self.max_y_from_center = (fixed_window_size_cm[1]+self.screen_top-self.screen_bot)/2-self.target_rad
+        
+        
         # seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'center out', 'button out']
         seq_opts = ['Y', 'rand5', 'repeat', 'randevery', 'center out', 'button out']
         self.seq = False
@@ -515,6 +524,11 @@ class COGame(Widget):
             
         elif self.seq == 'rand5':
             seq_preselect = True
+            self.target1_pos_str = 'random'
+            self.target2_pos_str = 'random'
+            self.target3_pos_str = 'random'
+            self.target4_pos_str = 'random'
+            self.target5_pos_str = 'random'
             self.make_random_sequence(True)
             # pos_str_opts = ['upper_left', 'upper_middle', 'upper_right', 'middle_left', 'center', 'middle_right', 'lower_left', 'lower_middle', 'lower_right']
             # pos_order = np.random.permutation(9)
@@ -562,14 +576,6 @@ class COGame(Widget):
         
         else:
             seq_preselect = False
-        
-        self.center_position = np.array([0., 0.])
-        # lower the center position by half of the total amount the screen height has been shrunk by
-        self.center_position[1] = self.center_position[1] + self.screen_top/2 + self.screen_bot/2
-        
-        d_center2top = (fixed_window_size_cm[1]/2)-((self.screen_top/2)+(self.screen_bot/2))
-        d_center2bot = (fixed_window_size_cm[1]/2)+((self.screen_top/2)+(self.screen_bot/2))
-        self.max_y_from_center = (fixed_window_size_cm[1]+self.screen_top-self.screen_bot)/2-self.target_rad
         
         # target 1
         if not seq_preselect:
