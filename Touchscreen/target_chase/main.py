@@ -572,11 +572,7 @@ class COGame(Widget):
             self.target3_pos_str_og = self.target3_pos_str
             self.target4_pos_str_og = self.target4_pos_str
             self.target5_pos_str_og = self.target5_pos_str
-            self.target1_position_og = self.target1_position
-            self.target2_position_og = self.target2_position
-            self.target3_position_og = self.target3_position
-            self.target4_position_og = self.target4_position
-            self.target5_position_og = self.target5_position
+            
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -809,6 +805,12 @@ class COGame(Widget):
                 targ_y = self.center_position[1] + self.max_y_from_center
             
             self.target5_position = np.array([targ_x, targ_y])
+            
+        self.target1_position_og = self.target1_position
+        self.target2_position_og = self.target2_position
+        self.target3_position_og = self.target3_position
+        self.target4_position_og = self.target4_position
+        self.target5_position_og = self.target5_position
 
         self.active_target_position = self.target1_position
         self.target_index = 1
