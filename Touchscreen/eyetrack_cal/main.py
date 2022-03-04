@@ -3,6 +3,7 @@ from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
 from kivy.core.text import Label as CoreLabel
 from kivy.uix.widget import Widget
+from kivy.uix.image import Image
 from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty, ListProperty, StringProperty, BooleanProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.vector import Vector
@@ -142,6 +143,8 @@ class COGame(Widget):
 
     target1 = ObjectProperty(None)
     target2 = ObjectProperty(None)
+    # wimg = Image(source='monkeyface.png')
+    # wimg.size = [20, 20]
 
     done_init = False
     prev_exit_ts = np.array([0,0])
@@ -279,22 +282,35 @@ class COGame(Widget):
         self.max_y_from_center = (fixed_window_size_cm[1]+self.screen_top-self.screen_bot)/2-self.target_rad
         
 
-        ur_x = self.max_y_from_center+self.nudge_x_t2
+        ur_x = self.max_y_from_center
         ur_y = self.center_position[1] + self.max_y_from_center
         
-        lr_x = self.max_y_from_center+self.nudge_x_t2
+        lr_x = self.max_y_from_center
         lr_y = self.center_position[1] - self.max_y_from_center
         
-        ll_x = -self.max_y_from_center+self.nudge_x_t2
+        ll_x = -self.max_y_from_center
         ll_y = self.center_position[1] - self.max_y_from_center
         
-        ul_x = -self.max_y_from_center+self.nudge_x_t2
+        ul_x = -self.max_y_from_center
         ul_y = self.center_position[1] + self.max_y_from_center
 
-        cent_x = self.center_position[0]+self.nudge_x_t1
+        cent_x = self.center_position[0]
         cent_y = self.center_position[1]
         
-        self.target_position = np.array([[ur_x, lr_x, ll_x, ul_x, cent_x], [ur_y, lr_y, ll_y, ul_y, cent_y]])
+        ml_x = -self.max_y_from_center
+        ml_y = self.center_position[1]
+        
+        mr_x = self.max_y_from_center
+        mr_y = self.center_position[1]
+        
+        um_x = self.center_position[0]
+        um_y = self.center_position[1] + self.max_y_from_center
+        
+        lm_x = self.center_position[0]
+        lm_y = self.center_position[1] - self.max_y_from_center
+        
+        self.target_position = np.array([[ur_x, lr_x, ll_x, ul_x, cent_x, ml_x, mr_x, um_x, lm_x], 
+                                         [ur_y, lr_y, ll_y, ul_y, cent_y, ml_y, mr_y, um_y, lm_y]])
         
         self.target_index = 1
         
@@ -369,12 +385,13 @@ class COGame(Widget):
             if val: 
                 self.n_repeats = autoquit_trls[i]
         
-        self.max_trials = self.n_repeats*5
+        self.n_targ_poss = self.target_position.shape[0]
+        self.max_trials = self.n_repeats*self.n_targ_poss
         
         # TARGET ORDER
-        targ_order = np.random.permutation(5)
+        targ_order = np.random.permutation(self.n_targ_poss)
         for i in range(self.n_repeats-1):
-            targ_order2 = np.random.permutation(5)
+            targ_order2 = np.random.permutation(self.n_targ_poss)
             targ_order = np.hstack((targ_order, targ_order2))
             
         self.targ_order = targ_order
@@ -392,7 +409,7 @@ class COGame(Widget):
             if val:
                 self.drag_ok = drag_opts[i]
                 
-        self.trial_counter = 1;
+        self.trial_counter = 0;
         
 
         # nudge_9am_dist = [0., .5, 1.]

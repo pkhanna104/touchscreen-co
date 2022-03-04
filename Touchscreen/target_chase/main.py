@@ -320,7 +320,7 @@ class COGame(Widget):
         
         
         # seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'center out', 'button out']
-        seq_opts = ['Y', 'rand5', 'repeat', 'randevery', 'center out', 'button out']
+        seq_opts = ['Y', 'rand5', 'repeat', 'randevery', 'rand5-randevery', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -553,6 +553,25 @@ class COGame(Widget):
             self.target3_pos_str = 'random'
             self.target4_pos_str = 'random'
             self.target5_pos_str = 'random'
+            
+        elif self.seq == 'rand5-randevery':
+            seq_preselect = True
+            self.target1_pos_str = 'random'
+            self.target2_pos_str = 'random'
+            self.target3_pos_str = 'random'
+            self.target4_pos_str = 'random'
+            self.target5_pos_str = 'random'
+            self.make_random_sequence(False)
+            self.target1_pos_str_og = self.target1_pos_str
+            self.target2_pos_str_og = self.target2_pos_str
+            self.target3_pos_str_og = self.target3_pos_str
+            self.target4_pos_str_og = self.target4_pos_str
+            self.target5_pos_str_og = self.target5_pos_str
+            self.target1_position_og = self.target1_position
+            self.target2_position_og = self.target2_position
+            self.target3_position_og = self.target3_position
+            self.target4_position_og = self.target4_position
+            self.target5_position_og = self.target5_position
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -934,6 +953,7 @@ class COGame(Widget):
                 self.break_trl = break_trls[i]
                 
         self.next_breaktrl = self.break_trl
+        self.block_ix = 1
                 
         break_durs = [30, 60, 90, 120, 150]
         for i, val in enumerate(taskbreak['breakdur']):
@@ -1529,6 +1549,7 @@ class COGame(Widget):
                 sound.play()
                 self.this_breakdur = self.break_dur
                 self.next_breaktrl = self.next_breaktrl + self.break_trl
+                self.block_ix += 1
             else:
                 self.this_breakdur = 0
     
@@ -1555,6 +1576,15 @@ class COGame(Widget):
         # i_pos_rand = np.random.permutation(9)
         if self.seq == 'randevery' or self.seq == 'center out' or self.seq == 'button out':
             self.make_random_sequence(False)
+        elif self.seq == 'rand5-randevery':
+            if np.remainder(self.block_ix, 2) == 1:
+                self.target1_position = self.target1_position_og
+                self.target2_position = self.target2_position_og
+                self.target3_position = self.target3_position_og
+                self.target4_position = self.target4_position_og
+                self.target5_position = self.target5_position_og
+            else:
+                self.make_random_sequence(False)
 
                 
 
@@ -2501,6 +2531,7 @@ class Manager(ScreenManager):
     is_seqRand5 = BooleanProperty(False)
     is_seqRepeat = BooleanProperty(False)
     is_seqRandomEvery = BooleanProperty(False)
+    is_seqRand5RandomEvery = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     is_BO = BooleanProperty(False)
     try:
@@ -2560,6 +2591,8 @@ class Manager(ScreenManager):
             is_seqRepeat = BooleanProperty(True) 
         elif data_params['seq'] == 'randevery':
             is_seqRandomEvery = BooleanProperty(True) 
+        elif data_params['seq'] == 'rand5-randevery':
+            is_seqRand5RandomEvery = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
         elif data_params['seq'] == 'button out': 
