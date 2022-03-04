@@ -2531,7 +2531,7 @@ class Manager(ScreenManager):
     is_seqRand5 = BooleanProperty(False)
     is_seqRepeat = BooleanProperty(False)
     is_seqRandomEvery = BooleanProperty(False)
-    is_seqRand5RandomEvery = BooleanProperty(False)
+    is_seqRand5RandEvery = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     is_BO = BooleanProperty(False)
     try:
@@ -2592,7 +2592,7 @@ class Manager(ScreenManager):
         elif data_params['seq'] == 'randevery':
             is_seqRandomEvery = BooleanProperty(True) 
         elif data_params['seq'] == 'rand5-randevery':
-            is_seqRand5RandomEvery = BooleanProperty(True) 
+            is_seqRand5RandEvery = BooleanProperty(True) 
         elif data_params['seq'] == 'center out':
             is_CO = BooleanProperty(True) 
         elif data_params['seq'] == 'button out': 
