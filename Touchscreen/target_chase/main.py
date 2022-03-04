@@ -811,6 +811,11 @@ class COGame(Widget):
         self.target3_position_og = self.target3_position
         self.target4_position_og = self.target4_position
         self.target5_position_og = self.target5_position
+        self.target1_pos_str = 'random'
+        self.target2_pos_str = 'random'
+        self.target3_pos_str = 'random'
+        self.target4_pos_str = 'random'
+        self.target5_pos_str = 'random'
 
         self.active_target_position = self.target1_position
         self.target_index = 1
