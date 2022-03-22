@@ -14,6 +14,7 @@ from numpy import binary_repr
 import struct
 from sys import platform
 import os
+import scipy.io as io
 
 
 Config.set('graphics', 'resizable', False)
@@ -177,6 +178,9 @@ class COGame(Widget):
     targ_size_param = StringProperty('')
     big_rew_time_param = StringProperty('')
     percent_correct_text = StringProperty('')
+    
+    # Load possible sequences
+    seq_poss = io.loadmat('seq_poss.mat')['seq_poss']
         
     
     def on_touch_down(self, touch):
@@ -235,13 +239,12 @@ class COGame(Widget):
             
     def init(self, animal_names_dict=None, rew_in=None, task_in=None,
         hold=None, autoquit=None, # rew_var=None, 
-        targ_timeout = None, drag=None, # nudge_x=None, 
+        targ_timeout = None, drag=None, button=None, # nudge_x=None, 
         screen_size=None, juicer=None, taskbreak=None):
         
         self.rew_cnt = 0
 
-        #Juicer options 
-        ###  juicer option ### 
+        # JUICER VERSION
         juicer_opts = ['yellow', 'red']
         for i, val in enumerate(juicer['juicer']): 
             if val: 
@@ -554,25 +557,6 @@ class COGame(Widget):
             self.target4_pos_str = 'random'
             self.target5_pos_str = 'random'
             
-        elif self.seq == 'rand5-randevery':
-            seq_preselect = True
-            self.target1_pos_str = 'random'
-            self.target2_pos_str = 'random'
-            self.target3_pos_str = 'random'
-            self.target4_pos_str = 'random'
-            self.target5_pos_str = 'random'
-            # self.make_random_sequence(False)
-            self.target1_pos_str = 'upper_middle'
-            self.target2_pos_str = 'middle_right'
-            self.target3_pos_str = 'lower_middle'
-            self.target4_pos_str = 'upper_right'
-            self.target5_pos_str = 'lower_right'
-            self.target1_pos_str_og = self.target1_pos_str
-            self.target2_pos_str_og = self.target2_pos_str
-            self.target3_pos_str_og = self.target3_pos_str
-            self.target4_pos_str_og = self.target4_pos_str
-            self.target5_pos_str_og = self.target5_pos_str
-            
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -596,6 +580,23 @@ class COGame(Widget):
         
         else:
             seq_preselect = False
+        
+        if self.seq == 'rand5-randevery' or (self.seq == 'repeat' and data_params['seq'] == 'rand5-randevery'):
+            seq_preselect = True
+            if self.seq == 'repeat' and data_params['seq'] == 'rand5-randevery':
+                self.seq = 'rand5-randevery'
+            else:
+                self.target1_pos_str = 'random'
+                self.target2_pos_str = 'random'
+                self.target3_pos_str = 'random'
+                self.target4_pos_str = 'random'
+                self.target5_pos_str = 'random'
+                self.make_random_sequence(True)
+            self.target1_pos_str_og = self.target1_pos_str
+            self.target2_pos_str_og = self.target2_pos_str
+            self.target3_pos_str_og = self.target3_pos_str
+            self.target4_pos_str_og = self.target4_pos_str
+            self.target5_pos_str_og = self.target5_pos_str
         
         # target 1
         if not seq_preselect:
@@ -805,17 +806,14 @@ class COGame(Widget):
                 targ_y = self.center_position[1] + self.max_y_from_center
             
             self.target5_position = np.array([targ_x, targ_y])
+        
+        if self.seq == 'rand5-randevery':
+            self.target1_position_og = self.target1_position
+            self.target2_position_og = self.target2_position
+            self.target3_position_og = self.target3_position
+            self.target4_position_og = self.target4_position
+            self.target5_position_og = self.target5_position
             
-        self.target1_position_og = self.target1_position
-        self.target2_position_og = self.target2_position
-        self.target3_position_og = self.target3_position
-        self.target4_position_og = self.target4_position
-        self.target5_position_og = self.target5_position
-        self.target1_pos_str = 'random'
-        self.target2_pos_str = 'random'
-        self.target3_pos_str = 'random'
-        self.target4_pos_str = 'random'
-        self.target5_pos_str = 'random'
 
         self.active_target_position = self.target1_position
         self.target_index = 1
@@ -836,11 +834,12 @@ class COGame(Widget):
         for i, val in enumerate(task_in['intertarg_delay']):
             if val:
                 self.intertarg_delay = intertarg_delay_opts[i]
-        
-        # ANIMAL NAME
-        for i, (nm, val) in enumerate(animal_names_dict.items()):
-            if val:
-                animal_name = nm
+               
+        # BUTTON VERSION        
+        button_opts = ['fsr', 'ir']
+        for i, val in enumerate(button['button']): 
+            if val: 
+                self.button_version = button_opts[i]
 
 
         # BUTTON HOLD TIME
@@ -1170,19 +1169,21 @@ class COGame(Widget):
             pass
         
         # External button
+        import serial
         try:
             self.is_button_ard = True
             if platform == 'darwin':
-                self.button_ard = serial.Serial(port='/dev/cu.usbmodem1421301', baudrate=9600)
+                self.button_ard = serial.Serial(port='/dev/cu.usbserial-141130', baudrate=9600)
             else:
                 if user_id == 'Ganguly':
                     self.button_ard = serial.Serial(port='COM3', baudrate=9600) 
                 elif user_id == 'BasalGangulia':
                     self.button_ard = serial.Serial(port='COM9', baudrate=9600)
+        
         except:
             self.is_button_ard = False
-
-        if self.is_button_ard: 
+        
+        if self.is_button_ard and self.button_version is 'fsr':
             baseline_data = []
             for _ in range(100): 
                 ser = self.button_ard.flushInput()
@@ -1202,6 +1203,8 @@ class COGame(Widget):
                 self.fsr_baseline = 100+np.max(baseline_data, axis=0)
         else: 
             self.fsr_baseline = np.array([200, 200])
+        
+        
             
 
         # save parameters: 
@@ -1251,6 +1254,7 @@ class COGame(Widget):
             testing=self.testing,
             drag_ok = self.drag_ok, 
             fsr_baseline = self.fsr_baseline,
+            button_version = self.button_version,
             display_outlines = self.display_outlines
             )
 
@@ -1587,16 +1591,27 @@ class COGame(Widget):
         # Get the position of random targets
         # i_pos_rand = np.random.permutation(9)
         if self.seq == 'randevery' or self.seq == 'center out' or self.seq == 'button out':
+            self.target1_pos_str = 'random'
+            self.target2_pos_str = 'random'
+            self.target3_pos_str = 'random'
+            self.target4_pos_str = 'random'
+            self.target5_pos_str = 'random'
             self.make_random_sequence(False)
         elif self.seq == 'rand5-randevery':
-            if np.remainder(self.block_ix, 2) == 1:
+            if np.remainder(self.block_ix, 2) == 1 and self.block_ix > 2:
+                self.target1_pos_str = 'random'
+                self.target2_pos_str = 'random'
+                self.target3_pos_str = 'random'
+                self.target4_pos_str = 'random'
+                self.target5_pos_str = 'random'
+                self.make_random_sequence(False)
+            else:
                 self.target1_position = self.target1_position_og
                 self.target2_position = self.target2_position_og
                 self.target3_position = self.target3_position_og
                 self.target4_position = self.target4_position_og
                 self.target5_position = self.target5_position_og
-            else:
-                self.make_random_sequence(False)
+                
 
                 
 
@@ -1620,7 +1635,7 @@ class COGame(Widget):
             self.set_targoutline_color(1., 1., 0., 1.)
         
     def button_pressed(self, **kwargs):
-        if self.use_button is False or self.is_button_ard is False:
+        if not self.use_button or not self.is_button_ard:
             return True
         else:
             # Get the button values
@@ -1628,17 +1643,24 @@ class COGame(Widget):
             _ = self.button_ard.readline()
             port_read = self.button_ard.readline()
             port_read = port_read.decode('ascii')
-            i_slash = port_read.find('/')
-            fsr1 = int(port_read[0:i_slash])
-            fsr2 = int(port_read[i_slash+1:])
-        
-            # Determine if the button was pressed or not
-            if fsr1 > self.fsr_baseline[0] or fsr2 > self.fsr_baseline[1]:
-                return True
-                # print('Button Pressed')
-            else:
-                return False
-                # print('Button NOT Pressed')
+            
+            if self.button_version is 'fsr':
+                i_slash = port_read.find('/')
+                fsr1 = int(port_read[0:i_slash])
+                fsr2 = int(port_read[i_slash+1:])
+            
+                # Determine if the button was pressed or not
+                if fsr1 > self.fsr_baseline[0] or fsr2 > self.fsr_baseline[1]:
+                    return True
+                    # print('Button Pressed')
+                else:
+                    return False
+                    # print('Button NOT Pressed')
+            elif self.button_version is 'ir':
+                if int(port_read) == 1:
+                    return True
+                else:
+                    return False
     
     def _start_button_hold(self, **kwargs):
         self.t_button_hold_start = time.time()
@@ -2043,41 +2065,46 @@ class COGame(Widget):
         if i_pos == 4: # center
             targ_x = self.center_position[0]+nudge
             targ_y = self.center_position[1]
-        elif i_pos == 5: # upper_middle
+        elif i_pos == 1: # upper_middle
             targ_x = self.center_position[0]+nudge
             targ_y = self.center_position[1] + self.max_y_from_center
-        elif i_pos == 6: # lower middle
+        elif i_pos == 7: # lower middle
             targ_x = self.center_position[0]+nudge
             targ_y = self.center_position[1] - self.max_y_from_center
-        elif i_pos == 0: # upper right
+        elif i_pos == 2: # upper right
             targ_x = self.max_y_from_center+nudge
             targ_y = self.center_position[1] + self.max_y_from_center
-        elif i_pos == 7: # middle right
+        elif i_pos == 5: # middle right
             targ_x = self.max_y_from_center+nudge
             targ_y = self.center_position[1]
-        elif i_pos == 1: # lower right
+        elif i_pos == 8: # lower right
             targ_x = self.max_y_from_center+nudge
             targ_y = self.center_position[1] - self.max_y_from_center
-        elif i_pos == 2: # lower left
+        elif i_pos == 6: # lower left
             targ_x = -self.max_y_from_center+nudge
             targ_y = self.center_position[1] - self.max_y_from_center
-        elif i_pos == 8: # middle left
+        elif i_pos == 3: # middle left
             targ_x = -self.max_y_from_center+nudge
             targ_y = self.center_position[1]
-        elif i_pos == 3: # upper left
+        elif i_pos == 0: # upper left
             targ_x = -self.max_y_from_center+nudge
             targ_y = self.center_position[1] + self.max_y_from_center
 
         return np.array([targ_x, targ_y])
     
+    def ind2sub(array_shape, ind):
+        rows = (ind / array_shape[1])
+        cols = (ind % array_shape[1]) # or numpy.mod(ind.astype('int'), array_shape[1])
+        return (rows, cols)
+    
     def make_random_sequence(self, change_str):
         # Get the position of random targets
-        i_pos_rand = np.random.permutation(9)
-        pos_str_opts = ['upper_right', 'lower_right', 'lower_left', 'upper_left', 'center', 'upper_middle', 'lower_middle', 'middle_right', 'middle_left']
+        pos_str_opts = ['upper_left', 'upper_middle', 'upper_right', 'middle_left', 'center', 'middle_right', 'lower_left', 'lower_middle', 'lower_right']
+        
+        seq_poss_ix = np.random.randint(0, np.shape(self.seq_poss)[0])
+        
         if self.target1_pos_str == 'random': 
-            ix = np.random.choice(range(len(i_pos_rand)))
-            i_pos = i_pos_rand[ix]
-            i_pos_rand = np.delete(i_pos_rand, ix)
+            i_pos = self.seq_poss[seq_poss_ix, 0]-1
             targ1_pos = self.get_target_position(i_pos, self.nudge_x_t1)
     
             self.target1_position = targ1_pos 
@@ -2085,53 +2112,33 @@ class COGame(Widget):
                 self.target1_pos_str = pos_str_opts[i_pos]
             
         if self.target2_pos_str == 'random': 
-            d_targ2targ = 0
-            while d_targ2targ <= self.max_y_from_center:
-                ix = np.random.choice(range(len(i_pos_rand)))
-                i_pos = i_pos_rand[ix]
-                targ2_pos = self.get_target_position(i_pos, self.nudge_x_t2)
-                d_targ2targ = np.sqrt(np.sum(np.square((self.target1_position-targ2_pos))))
-            
-            i_pos_rand = np.delete(i_pos_rand, ix)
+            i_pos = self.seq_poss[seq_poss_ix, 1]-1
+            targ2_pos = self.get_target_position(i_pos, self.nudge_x_t2)
+    
             self.target2_position = targ2_pos 
             if change_str:
                 self.target2_pos_str = pos_str_opts[i_pos]
             
         if self.target3_pos_str == 'random': 
-            d_targ2targ = 0
-            while d_targ2targ <= self.max_y_from_center:
-                ix = np.random.choice(range(len(i_pos_rand)))
-                i_pos = i_pos_rand[ix]
-                targ3_pos = self.get_target_position(i_pos, self.nudge_x_t3)
-                d_targ2targ = np.sqrt(np.sum(np.square((self.target2_position-targ3_pos))))
-                
-            i_pos_rand = np.delete(i_pos_rand, ix)
+            i_pos = self.seq_poss[seq_poss_ix, 2]-1
+            targ3_pos = self.get_target_position(i_pos, self.nudge_x_t3)
+    
             self.target3_position = targ3_pos 
             if change_str:
                 self.target3_pos_str = pos_str_opts[i_pos]
             
         if self.target4_pos_str == 'random': 
-            d_targ2targ = 0
-            while d_targ2targ <= self.max_y_from_center:
-                ix = np.random.choice(range(len(i_pos_rand)))
-                i_pos = i_pos_rand[ix]
-                targ4_pos = self.get_target_position(i_pos, self.nudge_x_t4)
-                d_targ2targ = np.sqrt(np.sum(np.square((self.target3_position-targ4_pos))))
-            
-            i_pos_rand = np.delete(i_pos_rand, ix)
+            i_pos = self.seq_poss[seq_poss_ix, 3]-1
+            targ4_pos = self.get_target_position(i_pos, self.nudge_x_t4)
+    
             self.target4_position = targ4_pos 
             if change_str:
                 self.target4_pos_str = pos_str_opts[i_pos]
             
         if self.target5_pos_str == 'random': 
-            d_targ2targ = 0
-            while d_targ2targ <= self.max_y_from_center:
-                ix = np.random.choice(range(len(i_pos_rand)))
-                i_pos = i_pos_rand[ix]
-                targ5_pos = self.get_target_position(i_pos, self.nudge_x_t4)
-                d_targ2targ = np.sqrt(np.sum(np.square((self.target4_position-targ5_pos))))
-                
-            i_pos_rand = np.delete(i_pos_rand, ix)
+            i_pos = self.seq_poss[seq_poss_ix, 4]-1
+            targ5_pos = self.get_target_position(i_pos, self.nudge_x_t4)
+    
             self.target5_position = targ5_pos 
             if change_str:
                 self.target5_pos_str = pos_str_opts[i_pos]
@@ -2160,14 +2167,23 @@ class Target(Widget):
 
 class Manager(ScreenManager):
     # DEFINE THE DEFAULTS AS WHATEVER THEY WERE LAST TIME
-    # animal name
+    # juicer version
     try:
         juicer_r = BooleanProperty(data_params['juicer'] == 'red')
         juicer_y = BooleanProperty(data_params['juicer'] == 'yellow')
     except: 
         juicer_r = BooleanProperty(False)
         juicer_y = BooleanProperty(False)
-
+        
+    # button version
+    try:
+        is_button_fsr = BooleanProperty(data_params['button_version'] == 'fsr')
+        is_button_ir = BooleanProperty(data_params['button_version'] == 'ir')
+    except: 
+        is_button_fsr = BooleanProperty(False)
+        is_button_ir = BooleanProperty(False)
+        
+    # animal name
     is_haribo = BooleanProperty(False)
     is_fifi = BooleanProperty(False)
     is_nike = BooleanProperty(False)

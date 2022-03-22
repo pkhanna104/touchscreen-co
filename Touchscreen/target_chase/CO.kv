@@ -132,6 +132,49 @@
                 Label:
                     text: ''
                     fontsize: 50
+                    
+                    
+            BoxLayout 
+                id: button_ver
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label: 
+                    text: 'Which Button?        '
+                    color: 1, 1, 0, 1
+           
+                Label: 
+                    text: 'Old FSR'
+
+                CheckBox:
+                    group: 'button_ver'
+                    id: button_fsr
+                    active: root.is_button_fsr
+            
+                Label: 
+                    text: 'New IR'
+
+                CheckBox:
+                    group: 'button_ver'
+                    id: button_ir
+                    active: root.is_button_ir
+
+                Label:
+                    text: ''
+                    fontsize: 50
+
+                Label:
+                    text: ''
+                    fontsize: 50
 
             BoxLayout 
                 id: top
@@ -2661,6 +2704,7 @@
                     dict(t1tt=[t1tt_0pt8_sec.active, t1tt_1pt0_sec.active, t1tt_1pt5_sec.active, t1tt_2pt0_sec.active, t1tt_2pt5_sec.active, t1tt_3pt0_sec.active, t1tt_3pt5_sec.active, t1tt_4pt0_sec.active, t1tt_10pt0_sec.active],
                     tt=[tt_0pt7_sec.active, tt_0pt8_sec.active, tt_0pt9_sec.active, tt_1pt0_sec.active, tt_1pt1_sec.active, tt_1pt2_sec.active, tt_1pt3_sec.active, tt_1pt5_sec.active, tt_2pt0_sec.active, tt_2pt5_sec.active, tt_3pt0_sec.active, tt_3pt5_sec.active, tt_4pt0_sec.active]),
                     dict(drag=[dragok.active, dragnotok.active]),
+                    dict(button=[button_fsr.active, button_ir.active]),
                     # dict(nudge_x_t1=[nudge_x_t1_neg6.active, nudge_x_t1_neg4.active, nudge_x_t1_neg2.active, nudge_x_t1_zero.active, nudge_x_t1_pos2.active, nudge_x_t1_pos4.active, nudge_x_t1_pos6.active],
                     # nudge_x_t2=[nudge_x_t2_neg6.active, nudge_x_t2_neg4.active, nudge_x_t2_neg2.active, nudge_x_t2_zero.active, nudge_x_t2_pos2.active, nudge_x_t2_pos4.active, nudge_x_t2_pos6.active],
                     # nudge_x_t3=[nudge_x_t3_neg6.active, nudge_x_t3_neg4.active, nudge_x_t3_neg2.active, nudge_x_t3_zero.active, nudge_x_t3_pos2.active, nudge_x_t3_pos4.active, nudge_x_t3_pos6.active],

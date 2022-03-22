@@ -385,7 +385,7 @@ class COGame(Widget):
             if val: 
                 self.n_repeats = autoquit_trls[i]
         
-        self.n_targ_poss = self.target_position.shape[0]
+        self.n_targ_poss = self.target_position.shape[1]
         self.max_trials = self.n_repeats*self.n_targ_poss
         
         # TARGET ORDER
