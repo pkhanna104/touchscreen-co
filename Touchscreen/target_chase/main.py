@@ -1181,7 +1181,7 @@ class COGame(Widget):
                     if self.button_version is 'fsr':
                         self.button_ard = serial.Serial(port='COM9', baudrate=9600)
                     elif self.button_version is 'ir':
-                        self.button_ard = serial.Serial(port='COM15', baudrate=9600)
+                        self.button_ard = serial.Serial(port='COM16', baudrate=9600)
         
         except:
             self.is_button_ard = False
