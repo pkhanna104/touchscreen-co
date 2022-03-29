@@ -586,17 +586,12 @@ class COGame(Widget):
             if self.seq == 'repeat' and data_params['seq'] == 'rand5-randevery':
                 self.seq = 'rand5-randevery'
             else:
-                # self.target1_pos_str = 'random'
-                # self.target2_pos_str = 'random'
-                # self.target3_pos_str = 'random'
-                # self.target4_pos_str = 'random'
-                # self.target5_pos_str = 'random'
-                # self.make_random_sequence(True)
-                self.target1_pos_str = 'center'
-                self.target2_pos_str = 'lower_right'
-                self.target3_pos_str = 'upper_middle'
-                self.target4_pos_str = 'lower_left'
-                self.target5_pos_str = 'middle_right'
+                self.target1_pos_str = 'random'
+                self.target2_pos_str = 'random'
+                self.target3_pos_str = 'random'
+                self.target4_pos_str = 'random'
+                self.target5_pos_str = 'random'
+                self.make_random_sequence(True)
             self.target1_pos_str_og = self.target1_pos_str
             self.target2_pos_str_og = self.target2_pos_str
             self.target3_pos_str_og = self.target3_pos_str
@@ -914,8 +909,8 @@ class COGame(Widget):
             self.last_targ_reward = [False, 0]
         
         if animal_name is 'butters':
-            targ1on2touch_fast = 0.7
-            targon2touch_fast = 0.45
+            targ1on2touch_fast = 0.9
+            targon2touch_fast = 0.5
             targon2touch_slow = 0.6
         elif animal_name is 'fifi':
             targ1on2touch_fast = 0.65
