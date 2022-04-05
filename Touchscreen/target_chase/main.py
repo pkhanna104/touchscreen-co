@@ -323,7 +323,7 @@ class COGame(Widget):
         
         
         # seq_opts = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'center out', 'button out']
-        seq_opts = ['Y', 'rand5', 'repeat', 'randevery', 'rand5-randevery', 'center out', 'button out']
+        seq_opts = ['Y', 'rand5', 'repeat', 'randevery', 'rand5-randevery', '2seq-repeat', 'center out', 'button out']
         self.seq = False
         for i, val in enumerate(task_in['seq']):
             if val:
@@ -541,7 +541,7 @@ class COGame(Widget):
             # self.target4_pos_str = pos_str_opts[pos_order[3]]
             # self.target5_pos_str = pos_str_opts[pos_order[4]]
             
-        elif self.seq == 'repeat':
+        elif self.seq == 'repeat' or self.seq == '2seq-repeat':
             seq_preselect = True
             self.target1_pos_str = data_params['target1_pos_str']
             self.target2_pos_str = data_params['target2_pos_str']
@@ -556,7 +556,6 @@ class COGame(Widget):
             self.target3_pos_str = 'random'
             self.target4_pos_str = 'random'
             self.target5_pos_str = 'random'
-            
         
         elif self.seq == 'center out':
             seq_preselect = True
@@ -581,10 +580,15 @@ class COGame(Widget):
         else:
             seq_preselect = False
         
-        if self.seq == 'rand5-randevery' or (self.seq == 'repeat' and data_params['seq'] == 'rand5-randevery'):
+        if self.seq == 'rand5-randevery' \
+        or (self.seq == 'repeat' and data_params['seq'] == 'rand5-randevery') \
+        or self.seq == '2seq-repeat':
             seq_preselect = True
             if self.seq == 'repeat' and data_params['seq'] == 'rand5-randevery':
                 self.seq = 'rand5-randevery'
+            elif self.seq == '2seq-repeat':
+                self.seq = '2seq-repeat'
+                self.seq2generated = False
             else:
                 self.target1_pos_str = 'random'
                 self.target2_pos_str = 'random'
@@ -807,7 +811,7 @@ class COGame(Widget):
             
             self.target5_position = np.array([targ_x, targ_y])
         
-        if self.seq == 'rand5-randevery':
+        if self.seq == 'rand5-randevery' or self.seq == '2seq-repeat':
             self.target1_position_og = self.target1_position
             self.target2_position_og = self.target2_position
             self.target3_position_og = self.target3_position
@@ -1608,6 +1612,34 @@ class COGame(Widget):
                 self.target4_pos_str = 'random'
                 self.target5_pos_str = 'random'
                 self.make_random_sequence(False)
+            else:
+                self.target1_position = self.target1_position_og
+                self.target2_position = self.target2_position_og
+                self.target3_position = self.target3_position_og
+                self.target4_position = self.target4_position_og
+                self.target5_position = self.target5_position_og
+        elif self.seq == '2seq-repeat':
+            if np.remainder(self.block_ix, 2) == 0:
+                if self.seq2generated:
+                    self.target1_position = self.seq2_target1_pos
+                    self.target2_position = self.seq2_target2_pos
+                    self.target3_position = self.seq2_target3_pos
+                    self.target4_position = self.seq2_target4_pos
+                    self.target5_position = self.seq2_target5_pos
+                else:
+                    self.target1_pos_str = 'random'
+                    self.target2_pos_str = 'random'
+                    self.target3_pos_str = 'random'
+                    self.target4_pos_str = 'random'
+                    self.target5_pos_str = 'random'
+                    self.make_random_sequence(False)
+                    
+                    self.seq2_target1_pos = self.target1_position
+                    self.seq2_target2_pos = self.target2_position
+                    self.seq2_target3_pos = self.target3_position
+                    self.seq2_target4_pos = self.target4_position
+                    self.seq2_target5_pos = self.target5_position
+                    self.seq2generated = True
             else:
                 self.target1_position = self.target1_position_og
                 self.target2_position = self.target2_position_og
@@ -2563,6 +2595,7 @@ class Manager(ScreenManager):
     is_seqRepeat = BooleanProperty(False)
     is_seqRandomEvery = BooleanProperty(False)
     is_seqRand5RandEvery = BooleanProperty(False)
+    is_seq2repeat = BooleanProperty(False)
     is_CO = BooleanProperty(False)
     is_BO = BooleanProperty(False)
     try:
@@ -2628,6 +2661,8 @@ class Manager(ScreenManager):
             is_CO = BooleanProperty(True) 
         elif data_params['seq'] == 'button out': 
             is_BO = BooleanProperty(True) 
+        elif data_params['seq'] == '2seq-repeat': 
+            is_seq2repeat = BooleanProperty(True) 
     except: 
         pass
 
