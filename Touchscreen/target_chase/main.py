@@ -2139,7 +2139,7 @@ class COGame(Widget):
         seq_poss_ix = np.random.randint(0, np.shape(self.seq_poss)[0])
         
         if self.target1_pos_str == 'random': 
-            i_pos = self.seq_poss[seq_poss_ix, 0]-1
+            i_pos = 5 #self.seq_poss[seq_poss_ix, 0]-1
             targ1_pos = self.get_target_position(i_pos, self.nudge_x_t1)
     
             self.target1_position = targ1_pos 
@@ -2147,7 +2147,7 @@ class COGame(Widget):
                 self.target1_pos_str = pos_str_opts[i_pos]
             
         if self.target2_pos_str == 'random': 
-            i_pos = self.seq_poss[seq_poss_ix, 1]-1
+            i_pos = 1 # self.seq_poss[seq_poss_ix, 1]-1
             targ2_pos = self.get_target_position(i_pos, self.nudge_x_t2)
     
             self.target2_position = targ2_pos 
@@ -2155,7 +2155,7 @@ class COGame(Widget):
                 self.target2_pos_str = pos_str_opts[i_pos]
             
         if self.target3_pos_str == 'random': 
-            i_pos = self.seq_poss[seq_poss_ix, 2]-1
+            i_pos = 7 # self.seq_poss[seq_poss_ix, 2]-1
             targ3_pos = self.get_target_position(i_pos, self.nudge_x_t3)
     
             self.target3_position = targ3_pos 
@@ -2163,7 +2163,7 @@ class COGame(Widget):
                 self.target3_pos_str = pos_str_opts[i_pos]
             
         if self.target4_pos_str == 'random': 
-            i_pos = self.seq_poss[seq_poss_ix, 3]-1
+            i_pos = 2 # self.seq_poss[seq_poss_ix, 3]-1
             targ4_pos = self.get_target_position(i_pos, self.nudge_x_t4)
     
             self.target4_position = targ4_pos 
@@ -2171,7 +2171,7 @@ class COGame(Widget):
                 self.target4_pos_str = pos_str_opts[i_pos]
             
         if self.target5_pos_str == 'random': 
-            i_pos = self.seq_poss[seq_poss_ix, 4]-1
+            i_pos = 3 # self.seq_poss[seq_poss_ix, 4]-1
             targ5_pos = self.get_target_position(i_pos, self.nudge_x_t4)
     
             self.target5_position = targ5_pos 
