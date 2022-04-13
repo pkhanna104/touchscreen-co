@@ -132,49 +132,6 @@
                 Label:
                     text: ''
                     fontsize: 50
-                    
-                    
-            BoxLayout 
-                id: button_ver
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Which Button?        '
-                    color: 1, 1, 0, 1
-           
-                Label: 
-                    text: 'Old FSR'
-
-                CheckBox:
-                    group: 'button_ver'
-                    id: button_fsr
-                    active: root.is_button_fsr
-            
-                Label: 
-                    text: 'New IR'
-
-                CheckBox:
-                    group: 'button_ver'
-                    id: button_ir
-                    active: root.is_button_ir
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
 
             BoxLayout 
                 id: top
@@ -1329,20 +1286,6 @@
                     id: seqRandomEvery
                     group: 'seq'
                     active: root.is_seqRandomEvery
-                    
-                Label: 
-                    text: 'Rand 5/Rand Every'
-                CheckBox:
-                    id: seqRand5RandEvery
-                    group: 'seq'
-                    active: root.is_seqRand5RandEvery
-                    
-                Label: 
-                    text: '2-Seq w/ Repeat'
-                CheckBox:
-                    id: seq2repeat
-                    group: 'seq'
-                    active: root.is_seq2repeat
                     
                 Label: 
                     text: 'Cen Out'
@@ -2695,7 +2638,7 @@
                     dict(targ_rad=[targ_rad_5.active, targ_rad_75.active, targ_rad_82.active, targ_rad_91.active, targ_rad_10.active, targ_rad_15.active, targ_rad_18.active, targ_rad_22.active, targ_rad_30.active, targ_rad_40.active], 
                     eff_targ_rad=[eff_targ_rad_same.active, eff_targ_rad_10.active, eff_targ_rad_20.active, eff_targ_rad_30.active, eff_targ_rad_40.active, eff_targ_rad_50.active],
 #                    seq=[seqA.active, seqB.active, seqC.active, seqD.active, seqE.active, seqF.active, seqG.active, seqH.active, seqI.active, seqJ.active, seqK.active, seqL.active, seqM.active, seqN.active, seqO.active, seqP.active, seqQ.active, seqR.active, seqS.active, seqT.active, seqU.active, seqV.active, seqW.active, centerOut.active, buttonOut.active],
-                    seq=[seqY.active, seqRand5.active, seqRepeat.active, seqRandomEvery.active, seqRand5RandEvery.active, seq2repeat.active, centerOut.active, buttonOut.active],
+                    seq=[seqY.active, seqRand5.active, seqRepeat.active, seqRandomEvery.active, centerOut.active, buttonOut.active],
                     targ1_pos=[t1random.active, t1center.active, t1upper_left.active, t1mid_left.active, t1lower_left.active, t1upper_mid.active, t1lower_mid.active, t1upper_right.active, t1mid_right.active, t1lower_right.active],
                     targ2_pos=[t2none.active, t2random.active, t2center.active, t2upper_left.active, t2mid_left.active, t2lower_left.active, t2upper_mid.active, t2lower_mid.active, t2upper_right.active, t2mid_right.active, t2lower_right.active],
                     targ3_pos=[t4none.active, t3center.active, t3upper_left.active, t3mid_left.active, t3lower_left.active, t3upper_mid.active, t3lower_mid.active, t3upper_right.active, t3mid_right.active, t3lower_right.active],
@@ -2711,7 +2654,6 @@
                     dict(t1tt=[t1tt_0pt8_sec.active, t1tt_1pt0_sec.active, t1tt_1pt5_sec.active, t1tt_2pt0_sec.active, t1tt_2pt5_sec.active, t1tt_3pt0_sec.active, t1tt_3pt5_sec.active, t1tt_4pt0_sec.active, t1tt_10pt0_sec.active],
                     tt=[tt_0pt7_sec.active, tt_0pt8_sec.active, tt_0pt9_sec.active, tt_1pt0_sec.active, tt_1pt1_sec.active, tt_1pt2_sec.active, tt_1pt3_sec.active, tt_1pt5_sec.active, tt_2pt0_sec.active, tt_2pt5_sec.active, tt_3pt0_sec.active, tt_3pt5_sec.active, tt_4pt0_sec.active]),
                     dict(drag=[dragok.active, dragnotok.active]),
-                    dict(button=[button_fsr.active, button_ir.active]),
                     # dict(nudge_x_t1=[nudge_x_t1_neg6.active, nudge_x_t1_neg4.active, nudge_x_t1_neg2.active, nudge_x_t1_zero.active, nudge_x_t1_pos2.active, nudge_x_t1_pos4.active, nudge_x_t1_pos6.active],
                     # nudge_x_t2=[nudge_x_t2_neg6.active, nudge_x_t2_neg4.active, nudge_x_t2_neg2.active, nudge_x_t2_zero.active, nudge_x_t2_pos2.active, nudge_x_t2_pos4.active, nudge_x_t2_pos6.active],
                     # nudge_x_t3=[nudge_x_t3_neg6.active, nudge_x_t3_neg4.active, nudge_x_t3_neg2.active, nudge_x_t3_zero.active, nudge_x_t3_pos2.active, nudge_x_t3_pos4.active, nudge_x_t3_pos6.active],
@@ -2809,9 +2751,6 @@
 <COGame>:
     target1: target_1
     target2: target_2
-    target3: target_3
-    target4: target_4
-    target5: target_5
     target1_in: target_one_in
     target1_out: target_one_out
     target2_in: target_two_in
@@ -2904,15 +2843,6 @@
         
     Target: 
         id: target_2
-        
-    Target: 
-        id: target_3
-        
-    Target: 
-        id: target_4
-        
-    Target: 
-        id: target_5
 
     Target:
         id: target_e1
