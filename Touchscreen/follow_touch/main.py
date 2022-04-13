@@ -84,7 +84,7 @@ elif user_id == 'Ganguly':
 elif user_id == 'BasalGangulia':
     last_param_path = 'C:/Users/BasalGangulia/Documents/'
 
-last_param_path = last_param_path+'most_recent_target_chase_params.pkl'
+last_param_path = last_param_path+'most_recent_follow_touch_params.pkl'
 if os.path.exists(last_param_path):
     with open(last_param_path, 'rb') as f:
         data_params = pickle.load(f)
@@ -1323,7 +1323,7 @@ class COGame(Widget):
             self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
         
             # save the params for this run in the _last_params
-            pickle.dump(d, open(last_param_path+'most_recent_target_chase_params.pkl', 'wb'))
+            pickle.dump(d, open(last_param_path+'most_recent_follow_touch_params.pkl', 'wb'))
     
             # save the params for this run in the same place where we're saving the data
             pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
