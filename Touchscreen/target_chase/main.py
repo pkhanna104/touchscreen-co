@@ -682,6 +682,12 @@ class COGame(Widget):
         for i, (nm, val) in enumerate(animal_names_dict.items()):
             if val:
                 animal_name = nm
+                
+        if animal_name == 'testing':
+            self.testing = True
+            self.tic_target = 0
+        else:
+            self.testing = False
         
         # HOW MUCH TIME TO WAIT UNTIL THE NEXT TARGET APPEARS
         time_to_next_targ_opts = [False, 0.25, 0.5, 0.75, 1.0, 1.5]
@@ -809,8 +815,6 @@ class COGame(Widget):
         # for i, val in enumerate(white_screen['white_screen']):
         #     if val:
         self.use_white_screen = False
-
-        self.testing = False
 
         autoquit_trls = [10, 25, 50, 60, 90, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
@@ -951,7 +955,7 @@ class COGame(Widget):
         self.FSM['button'] = dict(button_pressed='button_hold', stop=None)
         self.FSM['button_hold'] = dict(finish_button_hold='target', early_leave_button_hold='button', stop=None)
 
-        self.FSM['target'] = dict(touch_target = 'targ_hold', target_timeout='timeout_error', stop=None)
+        self.FSM['target'] = dict(touch_target_nohold = 'target', touch_target = 'targ_hold', target_timeout='timeout_error', stop=None)
         self.FSM['targ_hold'] = dict(finish_last_targ_hold='reward', finish_targ_hold='target', early_leave_target_hold = 'hold_error',
          targ_drag_out = 'drag_error', stop=None)
         self.FSM['reward'] = dict(end_reward = 'ITI', stop=None)
@@ -1136,61 +1140,61 @@ class COGame(Widget):
             display_outlines = self.display_outlines
             )
 
-        if self.testing:
-            pass
+        # if self.testing:
+        #     pass
 
-        else:
-            # Try saving to Box
-            if user_id == 'Sandon':
-                box_path = '/Users/Sandon/Box/Data/NHP_BehavioralData/target_chase/'
-                last_param_path = '/Users/Sandon/Documents/'
-            elif user_id == 'Ganguly':
-                box_path = 'C:/Users/Ganguly/Box/Data/NHP_BehavioralData/target_chase/'
-                last_param_path = 'C:/Users/Ganguly/Documents/'
-            elif user_id == 'BasalGangulia':
-                box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/target_chase/'
-                last_param_path = 'C:/Users/BasalGangulia/Documents/'
-            
-            # Check if the Box directory exists
-            if os.path.exists(box_path):
-                p = box_path
-            else:
-                # if there is no path to box, then save in a data_tmp folder within the CWD
-                path = os.getcwd()
-                path = path.split('\\')
-                path_data = [p for p in path]
-                path_root = ''
-                for ip in path_data:
-                    path_root += ip+'/'
-                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
-                if os.path.exists(p):
-                    pass
-                else:
-                    os.mkdir(p)
-                    print('Making temp directory: ', p)
-                last_param_path = p
-            print('Auto path : %s'%p)
-
-            print ('')
-            print ('')
-            print('Data saving PATH: ', p)
-            print ('')
-            print ('')
-            self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+        # else:
+        # Try saving to Box
+        if user_id == 'Sandon':
+            box_path = '/Users/Sandon/Box/Data/NHP_BehavioralData/target_chase/'
+            last_param_path = '/Users/Sandon/Documents/'
+        elif user_id == 'Ganguly':
+            box_path = 'C:/Users/Ganguly/Box/Data/NHP_BehavioralData/target_chase/'
+            last_param_path = 'C:/Users/Ganguly/Documents/'
+        elif user_id == 'BasalGangulia':
+            box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/target_chase/'
+            last_param_path = 'C:/Users/BasalGangulia/Documents/'
         
-            # save the params for this run in the _last_params
-            pickle.dump(d, open(last_param_path+'most_recent_target_chase_params.pkl', 'wb'))
-    
-            # save the params for this run in the same place where we're saving the data
-            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
-            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-            self.h5_table_row = self.h5_table.row
-            self.h5_table_row_cnt = 0
+        # Check if the Box directory exists
+        if os.path.exists(box_path):
+            p = box_path
+        else:
+            # if there is no path to box, then save in a data_tmp folder within the CWD
+            path = os.getcwd()
+            path = path.split('\\')
+            path_data = [p for p in path]
+            path_root = ''
+            for ip in path_data:
+                path_root += ip+'/'
+            p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
+            if os.path.exists(p):
+                pass
+            else:
+                os.mkdir(p)
+                print('Making temp directory: ', p)
+            last_param_path = p
+        print('Auto path : %s'%p)
 
-            # Note in python 3 to open pkl files: 
-            # with open('xxxx_params.pkl', 'rb') as f:
-            #    data_params = pickle.load(f)
+        print ('')
+        print ('')
+        print('Data saving PATH: ', p)
+        print ('')
+        print ('')
+        self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+    
+        # save the params for this run in the _last_params
+        pickle.dump(d, open(last_param_path+'most_recent_target_chase_params.pkl', 'wb'))
+
+        # save the params for this run in the same place where we're saving the data
+        pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+        self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+        self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+        self.h5_table_row = self.h5_table.row
+        self.h5_table_row_cnt = 0
+
+        # Note in python 3 to open pkl files: 
+        # with open('xxxx_params.pkl', 'rb') as f:
+        #    data_params = pickle.load(f)
         # except:
         #     pass
 
@@ -1319,13 +1323,13 @@ class COGame(Widget):
                 # else:
                 #     self.pd2_indicator_targ.color = (.75, .75, .75, 1.)
              
-        if self.testing:
+        # if self.testing:
+        #     pass
+        # else:
+        if self.state == 'idle_exit':
             pass
         else:
-            if self.state == 'idle_exit':
-                pass
-            else:
-                self.write_to_h5file()
+            self.write_to_h5file()
 
     def write_to_h5file(self):
         self.h5_table_row['state']= self.state; 
@@ -1615,20 +1619,17 @@ class COGame(Widget):
                 return True
     
     def _start_targ_hold(self, **kwargs):
-        if self.target_index == 1:
-            self.target1.color = (0., 1., 0., 1.)
-        elif self.target_index == 2:
-            self.target2.color = (0., 1., 0., 1.)
-        elif self.target_index == 3:
-            self.target3.color = (0., 1., 0., 1.)
-        elif self.target_index == 4:
-            self.target4.color = (0., 1., 0., 1.)
-        elif self.target_index == 5:
-            self.target5.color = (0., 1., 0., 1.)
-
-    def _end_targ_hold(self, **kwargs):
-        # Need to reset this
-        self.first_time_for_this_targ = True
+        if self.tht > 0:
+            if self.target_index == 1:
+                self.target1.color = (0., 1., 0., 1.)
+            elif self.target_index == 2:
+                self.target2.color = (0., 1., 0., 1.)
+            elif self.target_index == 3:
+                self.target3.color = (0., 1., 0., 1.)
+            elif self.target_index == 4:
+                self.target4.color = (0., 1., 0., 1.)
+            elif self.target_index == 5:
+                self.target5.color = (0., 1., 0., 1.)
 
     def _start_timeout_error(self, **kwargs):
         self.target1.color = (0., 0., 0., 0.)
@@ -1655,6 +1656,8 @@ class COGame(Widget):
         self.repeat = True
                 
     def _start_target(self, **kwargs):
+        if self.testing:
+            print('Time from last target touch to start of next target: ', np.round(1000*(time.time()-self.tic_target), 3), ' ms')
         Window.clearcolor = (0., 0., 0., 1.)
         
         if self.first_time_for_this_targ:
@@ -1880,10 +1883,64 @@ class COGame(Widget):
 
     def touch_target(self, **kwargs):
         if self.drag_ok:
-            return self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad)
+            if self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad):
+                if self.testing:
+                    self.tic_target = time.time()
+                return True
+            else:
+                return False
         else:
-            return np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad),
-                self.check_if_started_in_targ(self.active_target_position, self.eff_target_rad))
+            if np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad),
+                self.check_if_started_in_targ(self.active_target_position, self.eff_target_rad)):
+                if self.testing:
+                    self.tic_target = time.time()
+                return True
+            else:
+                return False
+            
+    def touch_target_nohold(self, **kwargs):
+        if self.tht == 0.0 and not self.target_index == self.num_targets:
+            if self.drag_ok:
+                if self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad):
+                    if self.testing:
+                        self.tic_target = time.time()
+                    istargtouch = True
+                else:
+                    istargtouch = False
+            else:
+                if np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad),
+                    self.check_if_started_in_targ(self.active_target_position, self.eff_target_rad)):
+                    if self.testing:
+                        self.tic_target = time.time()
+                    istargtouch = True
+                else:
+                    istargtouch = False
+            
+            if istargtouch:
+                # run the equivalent of finish_targ_hold without having to go through another loop
+                if self.target_index == 1:
+                    self.target1.color = (0., 0., 0., 0.)
+                elif self.target_index == 2:
+                    self.target2.color = (0., 0., 0., 0.)
+                elif self.target_index == 3:
+                    self.target3.color = (0., 0., 0., 0.)
+                elif self.target_index == 4:
+                    self.target4.color = (0., 0., 0., 0.)
+                elif self.target_index == 5:
+                    self.target5.color = (0., 0., 0., 0.)
+                if not self.intertarg_delay == 0:
+                    self.pd1_indicator_targ.color = (1., 1., 1., 1.)
+                
+                # Play a small reward tone
+                self.reward2.play()
+                self.target_index += 1
+                
+                # Need to reset this for the next target
+                self.first_time_for_this_targ = True
+                
+            return istargtouch
+        else:
+            return False
 
     def target_timeout(self, **kwargs):
         #return kwargs['ts'] > self.target_timeout_time
@@ -1921,6 +1978,9 @@ class COGame(Widget):
                 # sound.play()
                 self.reward2.play()
                 self.target_index += 1
+                
+                # Need to reset this for the next target
+                self.first_time_for_this_targ = True
                 return True
             else:
                 return False
