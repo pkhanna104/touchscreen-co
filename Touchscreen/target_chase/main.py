@@ -187,6 +187,9 @@ class COGame(Widget):
         
     
     def on_touch_down(self, touch):
+        if self.testing:
+            self.tic_on_touch_down_start = time.time()
+        
         #handle many touchs:
         ud = touch.ud
 
@@ -213,6 +216,11 @@ class COGame(Widget):
 
         # set self.touch to True
         self.touch = True
+        
+        if self.testing:
+            self.tic_on_touch_down_end = time.time()
+            
+        
 
     def on_touch_move(self, touch):
         curs = pix2cm(np.array([touch.x, touch.y]))
@@ -685,7 +693,14 @@ class COGame(Widget):
                 
         if animal_name == 'testing':
             self.testing = True
-            self.tic_target = 0
+            self.tic_touch_target = 0
+            self.tic_on_touch_down_start = 0
+            self.tic_on_touch_down_end = 0
+            self.tic_write_to_h5file_start = 0
+            self.tic_write_to_h5file_end = 0
+            self.tic_touch_targ_nohold_start = 0
+            self.tic_touch_targ_nohold_end = 0
+            self.tic_update_start = 0
         else:
             self.testing = False
         
@@ -1275,6 +1290,29 @@ class COGame(Widget):
         self.state_length = time.time() - self.state_start
         self.rew_cnt += 1
         
+        if self.testing:
+            self.tic_update_start = time.time()
+            
+        ## Change the luminance of the photodiode indicator
+        
+        if not np.any(self.cursor_ids):
+            self.vid_indicator_targ.color = (.25, .25, .25, 1.)
+            self.istouch = False
+        # cursor = np.zeros((10, 2))
+        # cursor[:] = np.nan
+        # for ic, curs_id in enumerate(self.cursor_ids):
+        #     cursor[ic, :] = self.cursor[curs_id]
+        # if np.isnan(cursor).all():
+        #     self.vid_indicator_targ.color = (.25, .25, .25, 1.)
+        #     # self.pd2_indicator_targ.color = (0., 0., 0., 1.)
+        else:
+            self.istouch = True
+            self.vid_indicator_targ.color = (.5, .5, .5, 1.)
+            # if self.state == 'target' and self.touch_target():
+            #     self.pd2_indicator_targ.color = (1., 1., 1., 1.)
+            # else:
+            #     self.pd2_indicator_targ.color = (.75, .75, .75, 1.)
+        
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
             kw = dict(ts=self.state_length)
@@ -1308,20 +1346,7 @@ class COGame(Widget):
                     while_state_fn = getattr(self, while_state_fn_name)
                     while_state_fn()
                     
-            ## Change the luminance of the photodiode indicator
-            cursor = np.zeros((10, 2))
-            cursor[:] = np.nan
-            for ic, curs_id in enumerate(self.cursor_ids):
-                cursor[ic, :] = self.cursor[curs_id]
-            if np.isnan(cursor).all():
-                self.vid_indicator_targ.color = (.25, .25, .25, 1.)
-                # self.pd2_indicator_targ.color = (0., 0., 0., 1.)
-            else:
-                self.vid_indicator_targ.color = (.5, .5, .5, 1.)
-                # if self.state == 'target' and self.touch_target():
-                #     self.pd2_indicator_targ.color = (1., 1., 1., 1.)
-                # else:
-                #     self.pd2_indicator_targ.color = (.75, .75, .75, 1.)
+        
              
         # if self.testing:
         #     pass
@@ -1329,7 +1354,11 @@ class COGame(Widget):
         if self.state == 'idle_exit':
             pass
         else:
+            if self.testing:
+                self.tic_write_to_h5file_start = time.time()
             self.write_to_h5file()
+            if self.testing:
+                self.tic_write_to_h5file_end = time.time()
 
     def write_to_h5file(self):
         self.h5_table_row['state']= self.state; 
@@ -1657,7 +1686,18 @@ class COGame(Widget):
                 
     def _start_target(self, **kwargs):
         if self.testing:
-            print('Time from last target touch to start of next target: ', np.round(1000*(time.time()-self.tic_target), 3), ' ms')
+            toc_start_target = time.time()
+            print('Time from touch_target touch to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_target), 3), ' ms')
+            print('Time from start of on_touch_down to start_target: ', np.round(1000*(toc_start_target-self.tic_on_touch_down_start), 3), ' ms')
+            print('Time from end of on_touch_down to start_target: ', np.round(1000*(toc_start_target-self.tic_on_touch_down_end), 3), ' ms')
+            print('Time from start of write_to_h5file to start_target: ', np.round(1000*(toc_start_target-self.tic_write_to_h5file_start), 3), ' ms')
+            print('Time from end of write_to_h5file to start_target: ', np.round(1000*(toc_start_target-self.tic_write_to_h5file_end), 3), ' ms')
+            print('Time from start of update to start_target: ', np.round(1000*(toc_start_target-self.tic_update_start), 3), ' ms')
+            print('Time from start of touch_target_nohold to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_targ_nohold_start), 3), ' ms')
+            print('Time from end of touch_target_nohold to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_targ_nohold_end), 3), ' ms')
+            
+            
+            
         Window.clearcolor = (0., 0., 0., 1.)
         
         if self.first_time_for_this_targ:
@@ -1882,28 +1922,33 @@ class COGame(Widget):
         return kwargs['ts'] >= self.drag_error_timeout
 
     def touch_target(self, **kwargs):
-        if self.drag_ok:
-            if self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad):
-                if self.testing:
-                    self.tic_target = time.time()
-                return True
-            else:
-                return False
-        else:
-            if np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad),
-                self.check_if_started_in_targ(self.active_target_position, self.eff_target_rad)):
-                if self.testing:
-                    self.tic_target = time.time()
-                return True
-            else:
-                return False
-            
-    def touch_target_nohold(self, **kwargs):
-        if self.tht == 0.0 and not self.target_index == self.num_targets:
+        if self.istouch:
             if self.drag_ok:
                 if self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad):
                     if self.testing:
-                        self.tic_target = time.time()
+                        self.tic_touch_target = time.time()
+                    return True
+                else:
+                    return False
+            else:
+                if np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad),
+                    self.check_if_started_in_targ(self.active_target_position, self.eff_target_rad)):
+                    if self.testing:
+                        self.tic_touch_target = time.time()
+                    return True
+                else:
+                    return False
+        else:
+            return False
+            
+    def touch_target_nohold(self, **kwargs):
+        if self.tht == 0.0 and not self.target_index == self.num_targets:
+            if self.testing:
+                self.tic_touch_targ_nohold_start = time.time()
+            if self.drag_ok:
+                if self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad):
+                    if self.testing:
+                        self.tic_touch_target = time.time()
                     istargtouch = True
                 else:
                     istargtouch = False
@@ -1911,7 +1956,7 @@ class COGame(Widget):
                 if np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad),
                     self.check_if_started_in_targ(self.active_target_position, self.eff_target_rad)):
                     if self.testing:
-                        self.tic_target = time.time()
+                        self.tic_touch_target = time.time()
                     istargtouch = True
                 else:
                     istargtouch = False
@@ -1937,6 +1982,9 @@ class COGame(Widget):
                 
                 # Need to reset this for the next target
                 self.first_time_for_this_targ = True
+                
+                if self.testing:
+                    self.tic_touch_targ_nohold_end = time.time()
                 
             return istargtouch
         else:
