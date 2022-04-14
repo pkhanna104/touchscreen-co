@@ -239,7 +239,7 @@ class R2Game(Widget):
         # Preload reward buttons: 
         self.reward1 = SoundLoader.load('reward1.wav')
         self.reward2 = SoundLoader.load('reward2.wav')
-        self.doorbell = SoundLoader.load('mixkit-small-hit-in-a-game-2072.wav')
+        self.doorbell = SoundLoader.load('C.wav')#-small-hit-in-a-game-2072.wav')
 
         self.reward_started = False
 

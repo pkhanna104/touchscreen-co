@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr 12 12:22:22 2022
+
+@author: Sandon
+"""
+
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
@@ -76,7 +84,7 @@ elif user_id == 'Ganguly':
 elif user_id == 'BasalGangulia':
     last_param_path = 'C:/Users/BasalGangulia/Documents/'
 
-last_param_path = last_param_path+'most_recent_target_chase_params.pkl'
+last_param_path = last_param_path+'most_recent_follow_touch_params.pkl'
 if os.path.exists(last_param_path):
     with open(last_param_path, 'rb') as f:
         data_params = pickle.load(f)
@@ -187,9 +195,6 @@ class COGame(Widget):
         
     
     def on_touch_down(self, touch):
-        if self.testing:
-            self.tic_on_touch_down_start = time.time()
-        
         #handle many touchs:
         ud = touch.ud
 
@@ -216,11 +221,6 @@ class COGame(Widget):
 
         # set self.touch to True
         self.touch = True
-        
-        if self.testing:
-            self.tic_on_touch_down_end = time.time()
-            
-        
 
     def on_touch_move(self, touch):
         curs = pix2cm(np.array([touch.x, touch.y]))
@@ -619,8 +619,39 @@ class COGame(Widget):
             for i, val in enumerate(task_in['targ1_pos']):
                 if val:
                     self.target1_pos_str = target_pos_opts[i]
+        
+        if self.target1_pos_str == 'random': # set for now, will get overriden later
+            targ_x = self.center_position[0]+self.nudge_x_t1
+            targ_y = self.center_position[1]
+        elif self.target1_pos_str == 'center':
+            targ_x = self.center_position[0]+self.nudge_x_t1
+            targ_y = self.center_position[1]
+        elif self.target1_pos_str == 'upper_middle':
+            targ_x = self.center_position[0]+self.nudge_x_t1
+            targ_y = self.center_position[1] + self.max_y_from_center
+        elif self.target1_pos_str == 'lower_middle':
+            targ_x = self.center_position[0]+self.nudge_x_t1
+            targ_y = self.center_position[1] - self.max_y_from_center
+        elif self.target1_pos_str == 'upper_right':
+            targ_x = self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] + self.max_y_from_center
+        elif self.target1_pos_str == 'middle_right':
+            targ_x = self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1]
+        elif self.target1_pos_str == 'lower_right':
+            targ_x = self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] - self.max_y_from_center
+        elif self.target1_pos_str == 'lower_left':
+            targ_x = -self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] - self.max_y_from_center
+        elif self.target1_pos_str == 'middle_left':
+            targ_x = -self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1]
+        elif self.target1_pos_str == 'upper_left':
+            targ_x = -self.max_y_from_center+self.nudge_x_t1
+            targ_y = self.center_position[1] + self.max_y_from_center
             
-        self.target1_position = self.get_targpos_from_str(self.target1_pos_str, self.nudge_x_t1)
+        self.target1_position = np.array([targ_x, targ_y])
         
         # target 2
         if not seq_preselect:
@@ -630,10 +661,35 @@ class COGame(Widget):
                     self.target2_pos_str = target_pos_opts[i]
 
         if not self.target2_pos_str == 'none': 
-            self.target2_position = self.get_targpos_from_str(self.target2_pos_str, self.nudge_x_t2)
-        else:
-            self.target2_position = False
-            self.num_targets = 1
+            if self.target2_pos_str == 'center':
+                targ_x = self.center_position[0]+self.nudge_x_t2
+                targ_y = self.center_position[1]
+            elif self.target2_pos_str == 'upper_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t2
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target2_pos_str == 'lower_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t2
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target2_pos_str == 'upper_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target2_pos_str == 'middle_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1]
+            elif self.target2_pos_str == 'lower_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target2_pos_str == 'lower_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target2_pos_str == 'middle_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1]
+            elif self.target2_pos_str == 'upper_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t2
+                targ_y = self.center_position[1] + self.max_y_from_center
+            
+        self.target2_position = np.array([targ_x, targ_y])
         
         # target 3
         if not seq_preselect:
@@ -642,12 +698,36 @@ class COGame(Widget):
                 if val:
                     self.target3_pos_str = target_pos_opts[i]
         
-        if not self.target3_pos_str == 'none': 
-            self.target3_position = self.get_targpos_from_str(self.target3_pos_str, self.nudge_x_t3)
-        else:
-            self.target3_position = False
-            if not self.target2_position is False:
-                 self.num_targets = 2
+        if not self.target3_pos_str == 'none':
+            if self.target3_pos_str == 'center':
+                targ_x = self.center_position[0]+self.nudge_x_t3
+                targ_y = self.center_position[1]
+            elif self.target3_pos_str == 'upper_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t3
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target3_pos_str == 'lower_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t3
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target3_pos_str == 'upper_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t3
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target3_pos_str == 'middle_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t3
+                targ_y = self.center_position[1]
+            elif self.target3_pos_str == 'lower_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t3
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target3_pos_str == 'lower_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t3
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target3_pos_str == 'middle_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t3
+                targ_y = self.center_position[1]
+            elif self.target3_pos_str == 'upper_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t3
+                targ_y = self.center_position[1] + self.max_y_from_center
+                
+            self.target3_position = np.array([targ_x, targ_y])
             
         # target 4
         if not seq_preselect:
@@ -655,12 +735,36 @@ class COGame(Widget):
                 if val:
                     self.target4_pos_str = target_pos_opts[i]
         
-        if not self.target4_pos_str == 'none': 
-            self.target4_position = self.get_targpos_from_str(self.target4_pos_str, self.nudge_x_t4)
-        else:
-            self.target4_position = False
-            if not self.target3_position is False:
-                 self.num_targets = 3
+        if not self.target4_pos_str == 'none':
+            if self.target4_pos_str == 'center':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1]
+            elif self.target4_pos_str == 'upper_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target4_pos_str == 'lower_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target4_pos_str == 'upper_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target4_pos_str == 'middle_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1]
+            elif self.target4_pos_str == 'lower_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target4_pos_str == 'lower_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target4_pos_str == 'middle_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1]
+            elif self.target4_pos_str == 'upper_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
+            
+            self.target4_position = np.array([targ_x, targ_y])
             
         # target 5
         if not seq_preselect:
@@ -668,13 +772,55 @@ class COGame(Widget):
                 if val:
                     self.target5_pos_str = target_pos_opts[i]
         
-        if not self.target5_pos_str == 'none': 
-            self.target5_position = self.get_targpos_from_str(self.target5_pos_str, self.nudge_x_t4)
-            self.num_targets = 5
-        else:
+        if self.target2_pos_str == 'none': 
+            self.target2_position = False 
+            self.target3_position = False
+            self.target4_position = False
             self.target5_position = False
-            if not self.target4_position is False:
-                 self.num_targets = 4
+            self.num_targets = 1
+        elif self.target3_pos_str == 'none':
+            self.target3_position = False
+            self.target4_position = False
+            self.target5_position = False
+            self.num_targets = 2
+        elif self.target4_pos_str == 'none':
+            self.target4_position = False
+            self.target5_position = False
+            self.num_targets = 3
+        elif self.target5_pos_str == 'none':
+            self.target5_position = False
+            self.num_targets = 4
+        else:
+            self.num_targets = 5
+            if self.target5_pos_str == 'center':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1]
+            elif self.target5_pos_str == 'upper_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target5_pos_str == 'lower_middle':
+                targ_x = self.center_position[0]+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target5_pos_str == 'upper_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
+            elif self.target5_pos_str == 'middle_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1]
+            elif self.target5_pos_str == 'lower_right':
+                targ_x = self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target5_pos_str == 'lower_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] - self.max_y_from_center
+            elif self.target5_pos_str == 'middle_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1]
+            elif self.target5_pos_str == 'upper_left':
+                targ_x = -self.max_y_from_center+self.nudge_x_t4
+                targ_y = self.center_position[1] + self.max_y_from_center
+            
+            self.target5_position = np.array([targ_x, targ_y])
         
         if self.seq == 'rand5-randevery' or self.seq == '2seq-repeat':
             self.target1_position_og = self.target1_position
@@ -682,6 +828,7 @@ class COGame(Widget):
             self.target3_position_og = self.target3_position
             self.target4_position_og = self.target4_position
             self.target5_position_og = self.target5_position
+            
 
         self.active_target_position = self.target1_position
         self.target_index = 1
@@ -690,19 +837,6 @@ class COGame(Widget):
         for i, (nm, val) in enumerate(animal_names_dict.items()):
             if val:
                 animal_name = nm
-                
-        if animal_name == 'testing':
-            self.testing = True
-            self.tic_touch_target = 0
-            self.tic_on_touch_down_start = 0
-            self.tic_on_touch_down_end = 0
-            self.tic_write_to_h5file_start = 0
-            self.tic_write_to_h5file_end = 0
-            self.tic_touch_targ_nohold_start = 0
-            self.tic_touch_targ_nohold_end = 0
-            self.tic_update_start = 0
-        else:
-            self.testing = False
         
         # HOW MUCH TIME TO WAIT UNTIL THE NEXT TARGET APPEARS
         time_to_next_targ_opts = [False, 0.25, 0.5, 0.75, 1.0, 1.5]
@@ -831,6 +965,8 @@ class COGame(Widget):
         #     if val:
         self.use_white_screen = False
 
+        self.testing = False
+
         autoquit_trls = [10, 25, 50, 60, 90, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
@@ -877,14 +1013,8 @@ class COGame(Widget):
 
 
         # Preload sounds: 
-        self.target1_start_sound = SoundLoader.load('C.wav')
-        tmp = time.time()
         self.reward1 = SoundLoader.load('reward1.wav')
-        print('Time for big reward sound to load: ', time.time()-tmp)
-        tmp = time.time()
         self.reward2 = SoundLoader.load('reward2.wav')
-        print('Time for small reward sound to load: ', time.time()-tmp)
-        
 
         self.state = 'ITI'
         self.state_start = time.time()
@@ -929,28 +1059,20 @@ class COGame(Widget):
         self.target9_in.set_size(2*self.target_rad-0.1)
 
         # Initialize targets: 
-        self.target1.set_size(2*self.target_rad)
-        self.target2.set_size(2*self.target_rad)
-        self.target3.set_size(2*self.target_rad)
-        self.target4.set_size(2*self.target_rad)
-        self.target5.set_size(2*self.target_rad)
-        self.target1.color = (0., 0., 0., 0.)
-        self.target2.color = (0., 0., 0., 0.)
-        self.target3.color = (0., 0., 0., 0.)
-        self.target4.color = (0., 0., 0., 0.)
-        self.target5.color = (0., 0., 0., 0.)
-       
+        self.target1.set_size(0.5)
+        self.target2.set_size(0.5)
+        self.target3.set_size(0.5)
+        self.target4.set_size(0.5)
+        self.target5.set_size(0.5)
 
         self.exit_target1.set_size(2*self.exit_rad)
         self.exit_target2.set_size(2*self.exit_rad)
-        self.exit_target1.color = (.15, .15, .15, 1)
-        self.exit_target2.color = (.15, .15, .15, 1)
         self.pd1_indicator_targ.set_size(self.exit_rad)
         self.pd1_indicator_targ.move(self.pd1_indicator_pos)
         self.pd1_indicator_targ.color = (.75, .75, .75, 1.)
-        # self.pd2_indicator_targ.set_size(self.exit_rad)
-        # self.pd2_indicator_targ.move(self.pd2_indicator_pos)
-        # self.pd2_indicator_targ.color = (0., 0., 0., 1.)
+        self.pd2_indicator_targ.set_size(self.exit_rad)
+        self.pd2_indicator_targ.move(self.pd2_indicator_pos)
+        self.pd2_indicator_targ.color = (0., 0., 0., 1.)
         self.vid_indicator_targ.set_size(self.exit_rad)
         self.vid_indicator_targ.move(self.vid_indicator_pos)
         self.vid_indicator_targ.color = (0., 0., 0., 1.)
@@ -970,21 +1092,23 @@ class COGame(Widget):
         self.FSM['button'] = dict(button_pressed='button_hold', stop=None)
         self.FSM['button_hold'] = dict(finish_button_hold='target', early_leave_button_hold='button', stop=None)
 
-        self.FSM['target'] = dict(touch_target_nohold = 'target', touch_target = 'targ_hold', target_timeout='timeout_error', stop=None)
+        self.FSM['target'] = dict(touch_target = 'targ_hold', target_timeout='timeout_error', stop=None)
         self.FSM['targ_hold'] = dict(finish_last_targ_hold='reward', finish_targ_hold='target', early_leave_target_hold = 'hold_error',
          targ_drag_out = 'drag_error', stop=None)
         self.FSM['reward'] = dict(end_reward = 'ITI', stop=None)
         
+        self.FSM['touch_error'] = dict(end_touch_error='target', stop=None)
         self.FSM['timeout_error'] = dict(end_timeout_error='ITI', stop=None)
         self.FSM['hold_error'] = dict(end_hold_error='target', stop=None)
         self.FSM['drag_error'] = dict(end_drag_error='target', stop=None)
         self.FSM['idle_exit'] = dict(stop=None)
         
+        
+        
         # OPEN PORTS
         try:
             if self.juicer == 'yellow':
                 if user_id == 'Ganguly':
-                    import serial
                     self.reward_port = serial.Serial(port='COM4',
                         baudrate=115200)
                 elif user_id == 'BasalGangulia':
@@ -1156,61 +1280,61 @@ class COGame(Widget):
             display_outlines = self.display_outlines
             )
 
-        # if self.testing:
-        #     pass
+        if self.testing:
+            pass
 
-        # else:
-        # Try saving to Box
-        if user_id == 'Sandon':
-            box_path = '/Users/Sandon/Box/Data/NHP_BehavioralData/target_chase/'
-            last_param_path = '/Users/Sandon/Documents/'
-        elif user_id == 'Ganguly':
-            box_path = 'C:/Users/Ganguly/Box/Data/NHP_BehavioralData/target_chase/'
-            last_param_path = 'C:/Users/Ganguly/Documents/'
-        elif user_id == 'BasalGangulia':
-            box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/target_chase/'
-            last_param_path = 'C:/Users/BasalGangulia/Documents/'
-        
-        # Check if the Box directory exists
-        if os.path.exists(box_path):
-            p = box_path
         else:
-            # if there is no path to box, then save in a data_tmp folder within the CWD
-            path = os.getcwd()
-            path = path.split('\\')
-            path_data = [p for p in path]
-            path_root = ''
-            for ip in path_data:
-                path_root += ip+'/'
-            p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
-            if os.path.exists(p):
-                pass
+            # Try saving to Box
+            if user_id == 'Sandon':
+                box_path = '/Users/Sandon/Box/Data/NHP_BehavioralData/target_chase/'
+                last_param_path = '/Users/Sandon/Documents/'
+            elif user_id == 'Ganguly':
+                box_path = 'C:/Users/Ganguly/Box/Data/NHP_BehavioralData/target_chase/'
+                last_param_path = 'C:/Users/Ganguly/Documents/'
+            elif user_id == 'BasalGangulia':
+                box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/target_chase/'
+                last_param_path = 'C:/Users/BasalGangulia/Documents/'
+            
+            # Check if the Box directory exists
+            if os.path.exists(box_path):
+                p = box_path
             else:
-                os.mkdir(p)
-                print('Making temp directory: ', p)
-            last_param_path = p
-        print('Auto path : %s'%p)
+                # if there is no path to box, then save in a data_tmp folder within the CWD
+                path = os.getcwd()
+                path = path.split('\\')
+                path_data = [p for p in path]
+                path_root = ''
+                for ip in path_data:
+                    path_root += ip+'/'
+                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d')+'/'
+                if os.path.exists(p):
+                    pass
+                else:
+                    os.mkdir(p)
+                    print('Making temp directory: ', p)
+                last_param_path = p
+            print('Auto path : %s'%p)
 
-        print ('')
-        print ('')
-        print('Data saving PATH: ', p)
-        print ('')
-        print ('')
-        self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+            print ('')
+            print ('')
+            print('Data saving PATH: ', p)
+            print ('')
+            print ('')
+            self.filename = p+ animal_name+'_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+        
+            # save the params for this run in the _last_params
+            pickle.dump(d, open(last_param_path+'most_recent_follow_touch_params.pkl', 'wb'))
     
-        # save the params for this run in the _last_params
-        pickle.dump(d, open(last_param_path+'most_recent_target_chase_params.pkl', 'wb'))
+            # save the params for this run in the same place where we're saving the data
+            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+            self.h5_table_row = self.h5_table.row
+            self.h5_table_row_cnt = 0
 
-        # save the params for this run in the same place where we're saving the data
-        pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
-        self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-        self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-        self.h5_table_row = self.h5_table.row
-        self.h5_table_row_cnt = 0
-
-        # Note in python 3 to open pkl files: 
-        # with open('xxxx_params.pkl', 'rb') as f:
-        #    data_params = pickle.load(f)
+            # Note in python 3 to open pkl files: 
+            # with open('xxxx_params.pkl', 'rb') as f:
+            #    data_params = pickle.load(f)
         # except:
         #     pass
 
@@ -1291,29 +1415,6 @@ class COGame(Widget):
         self.state_length = time.time() - self.state_start
         self.rew_cnt += 1
         
-        if self.testing:
-            self.tic_update_start = time.time()
-            
-        ## Change the luminance of the photodiode indicator
-        
-        if not np.any(self.cursor_ids):
-            self.vid_indicator_targ.color = (.25, .25, .25, 1.)
-            self.istouch = False
-        # cursor = np.zeros((10, 2))
-        # cursor[:] = np.nan
-        # for ic, curs_id in enumerate(self.cursor_ids):
-        #     cursor[ic, :] = self.cursor[curs_id]
-        # if np.isnan(cursor).all():
-        #     self.vid_indicator_targ.color = (.25, .25, .25, 1.)
-        #     # self.pd2_indicator_targ.color = (0., 0., 0., 1.)
-        else:
-            self.istouch = True
-            self.vid_indicator_targ.color = (.5, .5, .5, 1.)
-            # if self.state == 'target' and self.touch_target():
-            #     self.pd2_indicator_targ.color = (1., 1., 1., 1.)
-            # else:
-            #     self.pd2_indicator_targ.color = (.75, .75, .75, 1.)
-        
         # Run task update functions: 
         for f, (fcn_test_name, next_state) in enumerate(self.FSM[self.state].items()):
             kw = dict(ts=self.state_length)
@@ -1347,19 +1448,28 @@ class COGame(Widget):
                     while_state_fn = getattr(self, while_state_fn_name)
                     while_state_fn()
                     
-        
+            ## Change the luminance of the photodiode indicator
+            cursor = np.zeros((10, 2))
+            cursor[:] = np.nan
+            for ic, curs_id in enumerate(self.cursor_ids):
+                cursor[ic, :] = self.cursor[curs_id]
+            if np.isnan(cursor).all():
+                self.vid_indicator_targ.color = (.25, .25, .25, 1.)
+                self.pd2_indicator_targ.color = (0., 0., 0., 1.)
+            else:
+                self.vid_indicator_targ.color = (.5, .5, .5, 1.)
+                if self.state == 'target' and self.touch_target():
+                    self.pd2_indicator_targ.color = (1., 1., 1., 1.)
+                else:
+                    self.pd2_indicator_targ.color = (.75, .75, .75, 1.)
              
-        # if self.testing:
-        #     pass
-        # else:
-        if self.state == 'idle_exit':
+        if self.testing:
             pass
         else:
-            if self.testing:
-                self.tic_write_to_h5file_start = time.time()
-            self.write_to_h5file()
-            if self.testing:
-                self.tic_write_to_h5file_end = time.time()
+            if self.state == 'idle_exit':
+                pass
+            else:
+                self.write_to_h5file()
 
     def write_to_h5file(self):
         self.h5_table_row['state']= self.state; 
@@ -1376,8 +1486,7 @@ class COGame(Widget):
         self.h5_table_row['cursor_ids'] = cursor_id
 
         self.h5_table_row['target_pos'] = self.active_target_position
-        if self.is_button_ard and self.button_pressed() \
-            and not self.state == 'target' and not self.state == 'targ_hold':
+        if self.is_button_ard and self.button_pressed():
             self.h5_table_row['button_state'] = 1
         else:
             self.h5_table_row['button_state'] = 0
@@ -1401,10 +1510,10 @@ class COGame(Widget):
         word_str = b'd' + struct.pack('<H', int(row_to_write))
         self.dio_port.write(word_str)
         
-    # def write_iscan_trig(self):
-    #     ### write to arduino: 
-    #     word_str = b't'
-    #     self.iscan_trig_port.write(word_str)
+    def write_iscan_trig(self):
+        ### write to arduino: 
+        word_str = b't'
+        self.iscan_trig_port.write(word_str)
 
     def stop(self, **kwargs):
         # If past number of max trials then auto-quit: 
@@ -1439,9 +1548,8 @@ class COGame(Widget):
         except:
             pass
         Window.clearcolor = (0., 0., 0., 1.)
-        
-        if self.display_outlines:
-            self.set_alloutlinetargs_color(0., 0., 0., 0.)
+        self.exit_target1.color = (.15, .15, .15, 1.)
+        self.exit_target2.color = (.15, .15, .15, 1.)
 
         # Set ITI, CHT, THT
         self.ITI = np.random.random()*self.ITI_std + self.ITI_mean
@@ -1453,18 +1561,21 @@ class COGame(Widget):
         if type(self.button_hold_time_type) is str:
             bht_min, bht_max = self.button_hold_time_type.split('-')
             self.button_hold_time = ((float(bht_max) - float(bht_min)) * np.random.random()) + float(bht_min)     
-            
-        # Reset the target colors
+        
         self.target1.color = (0., 0., 0., 0.)
         self.target2.color = (0., 0., 0., 0.)
         self.target3.color = (0., 0., 0., 0.)
         self.target4.color = (0., 0., 0., 0.)
         self.target5.color = (0., 0., 0., 0.)
-        self.exit_target1.color = (.15, .15, .15, 1)
-        self.exit_target2.color = (.15, .15, .15, 1)
         self.pd1_indicator_targ.color = (.75, .75, .75, 1.)
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
+        self.trials_started += 1
         
-        
+        if self.display_outlines:
+            self.set_alloutlinetargs_color(0., 0., 0., 0.)
         
     def end_ITI(self, **kwargs):
         return kwargs['ts'] > self.ITI
@@ -1481,16 +1592,20 @@ class COGame(Widget):
                 self.block_ix += 1
             else:
                 self.this_breakdur = 0
-                
-        # do stuff that should be done during the ITI but we put it here because _start_ITI does not run for the first trial
-        
-        # try:
-        #     self.write_iscan_trig()
-        # except:
-        #     pass
-        self.trials_started += 1
-        
+    
+    def end_taskbreak(self, **kwargs):
+        if self.this_breakdur > 0 and kwargs['ts'] > self.this_breakdur:
+            sound = SoundLoader.load('DoorBell.wav')
+            sound.play()
+        return kwargs['ts'] > self.this_breakdur
 
+    def _start_vid_trig(self, **kwargs):
+        if self.trial_counter == 0:
+            time.sleep(1.)
+        try:    
+            self.cam_trig_port.write('1'.encode())
+        except:
+            pass
         self.first_target_attempt = True
         self.first_time_for_this_targ = True
         
@@ -1549,41 +1664,26 @@ class COGame(Widget):
                 self.target4_position = self.target4_position_og
                 self.target5_position = self.target5_position_og
                 
-        # move the targets to their respective positions
-        self.target1.move(self.target1_position)
-        self.target2.move(self.target2_position)
-        self.target3.move(self.target3_position)
-        self.target4.move(self.target4_position)
-        self.target5.move(self.target5_position)
-    
-    def end_taskbreak(self, **kwargs):
-        if self.this_breakdur > 0 and kwargs['ts'] > self.this_breakdur:
-            sound = SoundLoader.load('DoorBell.wav')
-            sound.play()
-        return kwargs['ts'] > self.this_breakdur
 
-    def _start_vid_trig(self, **kwargs):
-        if self.trial_counter == 0:
-            time.sleep(1.)
-        try:    
-            self.cam_trig_port.write('1'.encode())
-        except:
-            pass
+                
 
     def end_vid_trig(self, **kwargs):
         return kwargs['ts'] > self.pre_start_vid_ts
     
     def _start_button(self, **kwargs):
         Window.clearcolor = (0., 0., 0., 1.)
-        # self.target1.color = (0., 0., 0., 0.)
-        # self.target2.color = (0., 0., 0., 0.)
-        # self.exit_target1.color = (.15, .15, .15, 1)
-        # self.exit_target2.color = (.15, .15, .15, 1)
+        self.target1.color = (0., 0., 0., 0.)
+        self.target2.color = (0., 0., 0., 0.)
+        self.target3.color = (0., 0., 0., 0.)
+        self.target4.color = (0., 0., 0., 0.)
+        self.target5.color = (0., 0., 0., 0.)
+        self.exit_target1.color = (.15, .15, .15, 1)
+        self.exit_target2.color = (.15, .15, .15, 1)
         self.pd1_indicator_targ.color = (0., 0., 0., 0.)
-        # try:
-        #     self.write_iscan_trig()
-        # except:
-        #     pass
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
         self.button_pressed_prev = False
         
         if self.display_outlines:
@@ -1620,10 +1720,10 @@ class COGame(Widget):
     def _start_button_hold(self, **kwargs):
         self.t_button_hold_start = time.time()
         self.pd1_indicator_targ.color = (1., 1., 1., 1.)
-        # try:
-        #     self.write_iscan_trig()
-        # except:
-        #     pass
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
         
     def finish_button_hold(self, **kwargs):
         if self.use_button is False or self.is_button_ard is False:
@@ -1631,7 +1731,8 @@ class COGame(Widget):
         else:
             if time.time() - self.t_button_hold_start > self.button_hold_time:
                 # Play the button reward sound
-                self.target1_start_sound.play()
+                sound = SoundLoader.load('C.wav')
+                sound.play()
                 # if the button has been held down long enough
                 if self.button_rew[0]:
                     self.run_button_rew()
@@ -1649,112 +1750,78 @@ class COGame(Widget):
                 return True
     
     def _start_targ_hold(self, **kwargs):
-        if self.tht > 0:
-            if self.target_index == 1:
-                self.target1.color = (0., 1., 0., 1.)
-            elif self.target_index == 2:
-                self.target2.color = (0., 1., 0., 1.)
-            elif self.target_index == 3:
-                self.target3.color = (0., 1., 0., 1.)
-            elif self.target_index == 4:
-                self.target4.color = (0., 1., 0., 1.)
-            elif self.target_index == 5:
-                self.target5.color = (0., 1., 0., 1.)
+        self.target1.color = (0., 1., 0., 1.)
+
+    def _end_targ_hold(self, **kwargs):
+        # Need to reset this
+        self.first_time_for_this_targ = True
+
+    def _start_touch_error(self, **kwargs):
+        self.target1.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
+        self.repeat = True
 
     def _start_timeout_error(self, **kwargs):
-        self.target1.color = (0., 0., 0., 0.)
-        self.target2.color = (0., 0., 0., 0.)
-        self.target3.color = (0., 0., 0., 0.)
-        self.target4.color = (0., 0., 0., 0.)
-        self.target5.color = (0., 0., 0., 0.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
         #self.repeat = True
 
     def _start_hold_error(self, **kwargs):
-        self.target1.color = (0., 0., 0., 0.)
-        self.target2.color = (0., 0., 0., 0.)
-        self.target3.color = (0., 0., 0., 0.)
-        self.target4.color = (0., 0., 0., 0.)
-        self.target5.color = (0., 0., 0., 0.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
         self.repeat = True
 
     def _start_drag_error(self, **kwargs):
-        self.target1.color = (0., 0., 0., 0.)
-        self.target2.color = (0., 0., 0., 0.)
-        self.target3.color = (0., 0., 0., 0.)
-        self.target4.color = (0., 0., 0., 0.)
-        self.target5.color = (0., 0., 0., 0.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 1.)
+        self.target2.color = (0., 0., 0., 1.)
         self.repeat = True
                 
     def _start_target(self, **kwargs):
-        if self.testing:
-            toc_start_target = time.time()
-            print('Time from touch_target touch to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_target), 3), ' ms')
-            print('Time from start of on_touch_down to start_target: ', np.round(1000*(toc_start_target-self.tic_on_touch_down_start), 3), ' ms')
-            print('Time from end of on_touch_down to start_target: ', np.round(1000*(toc_start_target-self.tic_on_touch_down_end), 3), ' ms')
-            print('Time from start of write_to_h5file to start_target: ', np.round(1000*(toc_start_target-self.tic_write_to_h5file_start), 3), ' ms')
-            print('Time from end of write_to_h5file to start_target: ', np.round(1000*(toc_start_target-self.tic_write_to_h5file_end), 3), ' ms')
-            print('Time from start of update to start_target: ', np.round(1000*(toc_start_target-self.tic_update_start), 3), ' ms')
-            print('Time from start of touch_target_nohold to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_targ_nohold_start), 3), ' ms')
-            print('Time from end of touch_target_nohold to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_targ_nohold_end), 3), ' ms')
-            
-            
-            
         Window.clearcolor = (0., 0., 0., 1.)
+        self.target1.color = (0., 0., 0., 0.)
         
         if self.first_time_for_this_targ:
             self.first_time_for_this_targ_t0 = time.time()
+            self.target2.color = (0., 0., 0., 0.)
             self.first_time_for_this_targ = False
         
         if self.target_index == 1:
             self.active_target_position = self.target1_position
             self.next_target_position = self.target2_position
-            if self.intertarg_delay == 0:
-                self.target1.color = (1., 1., 0., 1.)
-                self.pd1_indicator_targ.color = (0., 0., 0., 0.)
         elif self.target_index == 2:
             self.active_target_position = self.target2_position
             self.next_target_position = self.target3_position
-            if self.intertarg_delay == 0:
-                self.target2.color = (1., 1., 0., 1.)
-                self.pd1_indicator_targ.color = (1., 1., 1., 1.)
         elif self.target_index == 3:
             self.active_target_position = self.target3_position
             self.next_target_position = self.target4_position
-            if self.intertarg_delay == 0:
-                self.target3.color = (1., 1., 0., 1.)
-                self.pd1_indicator_targ.color = (0., 0., 0., 0.)
         elif self.target_index == 4:
             self.active_target_position = self.target4_position
             self.next_target_position = self.target5_position
-            if self.intertarg_delay == 0:
-                self.target4.color = (1., 1., 0., 1.)
-                self.pd1_indicator_targ.color = (1., 1., 1., 1.)
         elif self.target_index == 5:
             self.active_target_position = self.target5_position
             self.next_target_position = False
-            if self.intertarg_delay == 0:
-                self.target5.color = (1., 1., 0., 1.)
-                self.pd1_indicator_targ.color = (0., 0., 0., 0.)
             
         if self.target_index == 1:
             self.target1_on_time = time.time()
 
-        # self.target1.move(self.active_target_position)
+        if self.intertarg_delay == 0:
+            self.target1.color = (1., 1., 0., 1.)
+            if np.remainder(self.target_index, 2) == 1:
+                self.pd1_indicator_targ.color = (0., 0., 0., 0.)
+            elif np.remainder(self.target_index, 2) == 0:
+                self.pd1_indicator_targ.color = (1., 1., 1., 1.)
         
-        # if self.intertarg_delay == 0:
-        #     self.target1.color = (1., 1., 0., 1.)
-        #     if np.remainder(self.target_index, 2) == 1:
-        #         self.pd1_indicator_targ.color = (0., 0., 0., 0.)
-        #     elif np.remainder(self.target_index, 2) == 0:
-        #         self.pd1_indicator_targ.color = (1., 1., 1., 1.)
-        
-        # self.exit_target1.color = (.15, .15, .15, 1)
-        # self.exit_target2.color = (.15, .15, .15, 1)
+        self.exit_target1.color = (.15, .15, .15, 1)
+        self.exit_target2.color = (.15, .15, .15, 1)
             
-        # try:
-        #     self.write_iscan_trig()
-        # except:
-        #     pass
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
             
             
         if self.first_target_attempt:
@@ -1764,33 +1831,47 @@ class COGame(Widget):
         self.repeat = False
     
     def _while_target(self, **kwargs):
+        if len(self.cursor_ids) > 0:
+            self.target1.move(np.array(self.cursor[self.cursor_ids[0]]))
+            self.target1.color = (1., 1., 0., 1.)
+        else:
+            self.target1.color = (0., 0., 0., 0.)
+        
+        if len(self.cursor_ids) > 1:
+            self.target2.move(np.array(self.cursor[self.cursor_ids[1]]))
+            self.target2.color = (1., 1., 0., 1.)
+        else:
+            self.target2.color = (0., 0., 0., 0.)
+            
+        if len(self.cursor_ids) > 2:
+            self.target3.move(np.array(self.cursor[self.cursor_ids[2]]))
+            self.target3.color = (1., 1., 0., 1.)
+        else:
+            self.target3.color = (0., 0., 0., 0.)
+            
+        if len(self.cursor_ids) > 3:
+            self.target4.move(np.array(self.cursor[self.cursor_ids[3]]))
+            self.target4.color = (1., 1., 0., 1.)
+        else:
+            self.target4.color = (0., 0., 0., 0.)
+            
+        if len(self.cursor_ids) > 4:
+            self.target5.move(np.array(self.cursor[self.cursor_ids[4]]))
+            self.target5.color = (1., 1., 0., 1.)
+        else:
+            self.target5.color = (0., 0., 0., 0.)
+        
+        
         # check and see if it is time for the next target to appear
         if self.time_to_next_targ is not False:
             if time.time() - self.first_time_for_this_targ_t0 > self.time_to_next_targ and self.target_index < self.num_targets:
                 # illuminate the next target
-                if self.target_index == 1:
-                    self.target2.color = (1., 1., 0., 1.)
-                elif self.target_index == 2:
-                    self.target3.color = (1., 1., 0., 1.)
-                elif self.target_index == 3:
-                    self.target4.color = (1., 1., 0., 1.)
-                elif self.target_index == 4:
-                    self.target5.color = (1., 1., 0., 1.)
-                # self.target2.move(self.next_target_position)
-                # self.target2.color = (1., 1., 0., 1.)
+                self.target2.move(self.next_target_position)
+                self.target2.color = (1., 1., 0., 1.)
                 
         if not self.intertarg_delay == 0:
             if self.target_index == 1 or time.time() - self.first_time_for_this_targ_t0 >= self.intertarg_delay:
-                if self.target_index == 1:
-                    self.target1.color = (1., 1., 0., 1.)
-                elif self.target_index == 2:
-                    self.target2.color = (1., 1., 0., 1.)
-                elif self.target_index == 3:
-                    self.target3.color = (1., 1., 0., 1.)
-                elif self.target_index == 4:
-                    self.target4.color = (1., 1., 0., 1.)
-                elif self.target_index == 5:
-                    self.target4.color = (1., 1., 0., 1.)
+                self.target1.color = (1., 1., 0., 1.)
                 self.pd1_indicator_targ.color = (0., 0., 0., 0.)
                 
 
@@ -1801,9 +1882,6 @@ class COGame(Widget):
             self.set_alloutlinetargs_color(1., 1., 1., 1.)
         self.target1.color = (1., 1., 1., 1.)
         self.target2.color = (1., 1., 1., 1.)
-        self.target3.color = (1., 1., 1., 1.)
-        self.target4.color = (1., 1., 1., 1.)
-        self.target5.color = (1., 1., 1., 1.)
         self.exit_target1.color = (1., 1., 1., 1.)
         self.exit_target2.color = (1., 1., 1., 1.)
         self.rew_cnt = 0
@@ -1812,10 +1890,10 @@ class COGame(Widget):
             self.pd1_indicator_targ.color = (1., 1., 1., 1.)
         elif np.remainder(self.num_targets, 2) == 0:
             self.pd1_indicator_targ.color = (0., 0., 0., 1.)
-        # try:
-        #     self.write_iscan_trig()
-        # except:
-        #     pass
+        try:
+            self.write_iscan_trig()
+        except:
+            pass
         self.repeat = False
 
     def _while_reward(self, **kwargs):
@@ -1855,6 +1933,7 @@ class COGame(Widget):
                 #print(str(self.reward_generator[self.trial_counter]))
                 #print(self.trial_counter)
                 #print(self.reward_generator[:100])
+                self.reward1 = SoundLoader.load('reward1.wav')
                 self.reward1.play()
                 if self.reward_generator[self.trial_counter] > 0:
                     #self.reward_port.open()
@@ -1913,6 +1992,9 @@ class COGame(Widget):
                 self.cnts_in_rew += 1
                 return False
 
+    def end_touch_error(self, **kwargs):
+        return kwargs['ts'] >= self.touch_error_timeout
+
     def end_timeout_error(self, **kwargs):
         return kwargs['ts'] >= self.timeout_error_timeout
 
@@ -1923,73 +2005,11 @@ class COGame(Widget):
         return kwargs['ts'] >= self.drag_error_timeout
 
     def touch_target(self, **kwargs):
-        if self.istouch:
-            if self.drag_ok:
-                if self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad):
-                    if self.testing:
-                        self.tic_touch_target = time.time()
-                    return True
-                else:
-                    return False
-            else:
-                if np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad),
-                    self.check_if_started_in_targ(self.active_target_position, self.eff_target_rad)):
-                    if self.testing:
-                        self.tic_touch_target = time.time()
-                    return True
-                else:
-                    return False
+        if self.drag_ok:
+            return self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad)
         else:
-            return False
-            
-    def touch_target_nohold(self, **kwargs):
-        if self.tht == 0.0 and not self.target_index == self.num_targets:
-            if self.testing:
-                self.tic_touch_targ_nohold_start = time.time()
-            if self.drag_ok:
-                if self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad):
-                    if self.testing:
-                        self.tic_touch_target = time.time()
-                    istargtouch = True
-                else:
-                    istargtouch = False
-            else:
-                if np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad),
-                    self.check_if_started_in_targ(self.active_target_position, self.eff_target_rad)):
-                    if self.testing:
-                        self.tic_touch_target = time.time()
-                    istargtouch = True
-                else:
-                    istargtouch = False
-            
-            if istargtouch:
-                # run the equivalent of finish_targ_hold without having to go through another loop
-                if self.target_index == 1:
-                    self.target1.color = (0., 0., 0., 0.)
-                elif self.target_index == 2:
-                    self.target2.color = (0., 0., 0., 0.)
-                elif self.target_index == 3:
-                    self.target3.color = (0., 0., 0., 0.)
-                elif self.target_index == 4:
-                    self.target4.color = (0., 0., 0., 0.)
-                elif self.target_index == 5:
-                    self.target5.color = (0., 0., 0., 0.)
-                if not self.intertarg_delay == 0:
-                    self.pd1_indicator_targ.color = (1., 1., 1., 1.)
-                
-                # Play a small reward tone
-                self.reward2.play()
-                self.target_index += 1
-                
-                # Need to reset this for the next target
-                self.first_time_for_this_targ = True
-                
-                if self.testing:
-                    self.tic_touch_targ_nohold_end = time.time()
-                
-            return istargtouch
-        else:
-            return False
+            return np.logical_and(self.check_if_cursors_in_targ(self.active_target_position, self.eff_target_rad),
+                self.check_if_started_in_targ(self.active_target_position, self.eff_target_rad))
 
     def target_timeout(self, **kwargs):
         #return kwargs['ts'] > self.target_timeout_time
@@ -2009,27 +2029,14 @@ class COGame(Widget):
     def finish_targ_hold(self, **kwargs):
         if not self.target_index == self.num_targets:
             if self.tht <= kwargs['ts']:
-                if self.target_index == 1:
-                    self.target1.color = (0., 0., 0., 0.)
-                elif self.target_index == 2:
-                    self.target2.color = (0., 0., 0., 0.)
-                elif self.target_index == 3:
-                    self.target3.color = (0., 0., 0., 0.)
-                elif self.target_index == 4:
-                    self.target4.color = (0., 0., 0., 0.)
-                elif self.target_index == 5:
-                    self.target5.color = (0., 0., 0., 0.)
+                self.target1.color = (0., 0., 0., 0.)
                 if not self.intertarg_delay == 0:
                     self.pd1_indicator_targ.color = (1., 1., 1., 1.)
                 
                 # Play a small reward tone
-                # sound = SoundLoader.load('reward2.wav')
-                # sound.play()
-                self.reward2.play()
+                sound = SoundLoader.load('reward2.wav')
+                sound.play()
                 self.target_index += 1
-                
-                # Need to reset this for the next target
-                self.first_time_for_this_targ = True
                 return True
             else:
                 return False
@@ -2039,16 +2046,7 @@ class COGame(Widget):
     def finish_last_targ_hold(self, **kwargs):
         if self.target_index == self.num_targets:
             if self.tht <= kwargs['ts']:
-                if self.target_index == 1:
-                    self.target1.color = (0., 0., 0., 0.)
-                elif self.target_index == 2:
-                    self.target2.color = (0., 0., 0., 0.)
-                elif self.target_index == 3:
-                    self.target3.color = (0., 0., 0., 0.)
-                elif self.target_index == 4:
-                    self.target4.color = (0., 0., 0., 0.)
-                elif self.target_index == 5:
-                    self.target5.color = (0., 0., 0., 0.)
+                self.target1.color = (0., 0., 0., 0.)
                 self.trial_completion_time = time.time() - self.target1_on_time
                 return True
             else:
@@ -2146,46 +2144,43 @@ class COGame(Widget):
         self.target8_in.color = (0., 0., 0., a)
         self.target9_out.color = (r, g, b, a)
         self.target9_in.color = (0., 0., 0., a)
+        
+    def get_target_position(self, i_pos, nudge):
+        if i_pos == 4: # center
+            targ_x = self.center_position[0]+nudge
+            targ_y = self.center_position[1]
+        elif i_pos == 1: # upper_middle
+            targ_x = self.center_position[0]+nudge
+            targ_y = self.center_position[1] + self.max_y_from_center
+        elif i_pos == 7: # lower middle
+            targ_x = self.center_position[0]+nudge
+            targ_y = self.center_position[1] - self.max_y_from_center
+        elif i_pos == 2: # upper right
+            targ_x = self.max_y_from_center+nudge
+            targ_y = self.center_position[1] + self.max_y_from_center
+        elif i_pos == 5: # middle right
+            targ_x = self.max_y_from_center+nudge
+            targ_y = self.center_position[1]
+        elif i_pos == 8: # lower right
+            targ_x = self.max_y_from_center+nudge
+            targ_y = self.center_position[1] - self.max_y_from_center
+        elif i_pos == 6: # lower left
+            targ_x = -self.max_y_from_center+nudge
+            targ_y = self.center_position[1] - self.max_y_from_center
+        elif i_pos == 3: # middle left
+            targ_x = -self.max_y_from_center+nudge
+            targ_y = self.center_position[1]
+        elif i_pos == 0: # upper left
+            targ_x = -self.max_y_from_center+nudge
+            targ_y = self.center_position[1] + self.max_y_from_center
+
+        return np.array([targ_x, targ_y])
     
     def ind2sub(array_shape, ind):
         rows = (ind / array_shape[1])
         cols = (ind % array_shape[1]) # or numpy.mod(ind.astype('int'), array_shape[1])
         return (rows, cols)
     
-    def get_targpos_from_str(self, pos_str, nudge_x):
-        if pos_str == 'random': # set for now, will get overriden later
-            targ_x = self.center_position[0]
-            targ_y = self.center_position[1]
-        elif pos_str == 'center':
-            targ_x = self.center_position[0]+nudge_x
-            targ_y = self.center_position[1]
-        elif pos_str == 'upper_middle':
-            targ_x = self.center_position[0]+nudge_x
-            targ_y = self.center_position[1] + self.max_y_from_center
-        elif pos_str == 'lower_middle':
-            targ_x = self.center_position[0]+nudge_x
-            targ_y = self.center_position[1] - self.max_y_from_center
-        elif pos_str == 'upper_right':
-            targ_x = self.max_y_from_center+nudge_x
-            targ_y = self.center_position[1] + self.max_y_from_center
-        elif pos_str == 'middle_right':
-            targ_x = self.max_y_from_center+nudge_x
-            targ_y = self.center_position[1]
-        elif pos_str == 'lower_right':
-            targ_x = self.max_y_from_center+nudge_x
-            targ_y = self.center_position[1] - self.max_y_from_center
-        elif pos_str == 'lower_left':
-            targ_x = -self.max_y_from_center+nudge_x
-            targ_y = self.center_position[1] - self.max_y_from_center
-        elif pos_str == 'middle_left':
-            targ_x = -self.max_y_from_center+nudge_x
-            targ_y = self.center_position[1]
-        elif pos_str == 'upper_left':
-            targ_x = -self.max_y_from_center+nudge_x
-            targ_y = self.center_position[1] + self.max_y_from_center
-            
-        return np.array([targ_x, targ_y])
-        
     def make_random_sequence(self, change_str):
         # Get the position of random targets
         pos_str_opts = ['upper_left', 'upper_middle', 'upper_right', 'middle_left', 'center', 'middle_right', 'lower_left', 'lower_middle', 'lower_right']
@@ -2193,40 +2188,40 @@ class COGame(Widget):
         seq_poss_ix = np.random.randint(0, np.shape(self.seq_poss)[0])
         
         if self.target1_pos_str == 'random': 
-            i_pos = self.seq_poss[seq_poss_ix, 0]-1
-            targ1_pos = self.get_targpos_from_str(pos_str_opts[i_pos], self.nudge_x_t1)
+            i_pos = 5 #self.seq_poss[seq_poss_ix, 0]-1
+            targ1_pos = self.get_target_position(i_pos, self.nudge_x_t1)
     
             self.target1_position = targ1_pos 
             if change_str:
                 self.target1_pos_str = pos_str_opts[i_pos]
             
         if self.target2_pos_str == 'random': 
-            i_pos = self.seq_poss[seq_poss_ix, 1]-1
-            targ2_pos = self.get_targpos_from_str(pos_str_opts[i_pos], self.nudge_x_t2)
+            i_pos = 1 # self.seq_poss[seq_poss_ix, 1]-1
+            targ2_pos = self.get_target_position(i_pos, self.nudge_x_t2)
     
             self.target2_position = targ2_pos 
             if change_str:
                 self.target2_pos_str = pos_str_opts[i_pos]
             
         if self.target3_pos_str == 'random': 
-            i_pos = self.seq_poss[seq_poss_ix, 2]-1
-            targ3_pos = self.get_targpos_from_str(pos_str_opts[i_pos], self.nudge_x_t3)
+            i_pos = 7 # self.seq_poss[seq_poss_ix, 2]-1
+            targ3_pos = self.get_target_position(i_pos, self.nudge_x_t3)
     
             self.target3_position = targ3_pos 
             if change_str:
                 self.target3_pos_str = pos_str_opts[i_pos]
             
         if self.target4_pos_str == 'random': 
-            i_pos = self.seq_poss[seq_poss_ix, 3]-1
-            targ4_pos = self.get_targpos_from_str(pos_str_opts[i_pos], self.nudge_x_t4)
+            i_pos = 2 # self.seq_poss[seq_poss_ix, 3]-1
+            targ4_pos = self.get_target_position(i_pos, self.nudge_x_t4)
     
             self.target4_position = targ4_pos 
             if change_str:
                 self.target4_pos_str = pos_str_opts[i_pos]
             
         if self.target5_pos_str == 'random': 
-            i_pos = self.seq_poss[seq_poss_ix, 4]-1
-            targ5_pos = self.get_targpos_from_str(pos_str_opts[i_pos], self.nudge_x_t4)
+            i_pos = 3 # self.seq_poss[seq_poss_ix, 4]-1
+            targ5_pos = self.get_target_position(i_pos, self.nudge_x_t4)
     
             self.target5_position = targ5_pos 
             if change_str:
