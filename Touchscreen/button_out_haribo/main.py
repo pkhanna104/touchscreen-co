@@ -762,10 +762,15 @@ class COGame(Widget):
         # OPEN PORTS
         try:
             if self.juicer == 'yellow':
+                print('opening reward port')
+                print('user id %s'%user_id)
                 if user_id == 'Ganguly':
-                    self.reward_port = serial.Serial(port='COM4',
+                    import serial
+                    self.reward_port = serial.Serial(port='COM25',
                         baudrate=115200)
+
                 elif user_id == 'BasalGangulia':
+                    import serial
                     self.reward_port = serial.Serial(port='COM3',
                         baudrate=115200)
                 self.reward_port.close()
@@ -818,12 +823,15 @@ class COGame(Widget):
             if platform == 'darwin':
                 self.button_ard = serial.Serial(port='/dev/cu.usbmodem1421301', baudrate=9600)
             else:
+                print('trying button')
                 if user_id == 'Ganguly':
-                    self.button_ard = serial.Serial(port='COM3', baudrate=9600) 
+                    self.button_ard = serial.Serial(port='COM3', baudrate=9600)
+                    print('button added') 
                 elif user_id == 'BasalGangulia':
                     self.button_ard = serial.Serial(port='COM9', baudrate=9600)
         except:
             self.is_button_ard = False
+        print('is button ard %s'%str(self.is_button_ard))
 
         if self.is_button_ard: 
             baseline_data = []
@@ -1016,7 +1024,7 @@ class COGame(Widget):
     def update(self, ts):
         self.state_length = time.time() - self.state_start
         self.rew_cnt += 1
-        
+        #print(self.state)
         if self.is_button_ard:
             # Get the button values
             ser = self.button_ard.flushInput()
@@ -1030,10 +1038,10 @@ class COGame(Widget):
             # Determine if the button was pressed or not
             if fsr1 > self.fsr_baseline[0] or fsr2 > self.fsr_baseline[1]:
                 self.button_pressed = True
-                # print('Button Pressed')
+                #print('Button Pressed')
             else:
                 self.button_pressed = False
-                # print('Button NOT Pressed')
+                #print('Button NOT Pressed')
         else:
             self.button_pressed = False
         

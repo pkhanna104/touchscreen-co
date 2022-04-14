@@ -47,7 +47,14 @@
                     group: 'check'
                     id: chk_har
                     active: root.is_haribo  
-                     
+                Label: 
+                    text: 'Nike'
+                    fontsize: 28
+                    halign: 'center'
+                CheckBox: 
+                    group: 'check'
+                    id: chk_nike
+                    active: root.is_nike
                 Label: 
                     text: 'Testing'
                     fontsize: 28
@@ -317,7 +324,7 @@
                 on_release: 
                     root.current = 'splash_start'
                     splash.init(
-                    dict(haribo=chk_har.active, fifi=False, nike=False, butters=False, testing=chk_test.active), 
+                    dict(haribo=chk_har.active, fifi=False, nike=chk_nike.active, butters=False, testing=chk_test.active), 
                     
                     dict(button_rew=[True, False, False, False], 
                     min_rew=[True, False, False, False, False],
