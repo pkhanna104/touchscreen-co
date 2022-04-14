@@ -592,7 +592,7 @@ class COGame(Widget):
 
 
         # BUTTON HOLD TIME
-        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0, '.2-.4', '.6-.8', '.8-1.0']
+        holdz = [0.1, 0.3, .5, 0.7, 0.9, '.2-.4', '.6-.8', '.8-1.0', '.9-1.2', '1.1-1.4']
         self.button_hold_time_type = None
         for i, val in enumerate(hold['button_hold']):
             if val:
@@ -1683,56 +1683,23 @@ class Manager(ScreenManager):
     except:
         pass
     
+
+
+
     # crashbar hold time
-    is_bhtfalse = BooleanProperty(False)
-    is_bht000 = BooleanProperty(False)
-    is_bht100 = BooleanProperty(False)
-    is_bht200 = BooleanProperty(False)
-    is_bht300 = BooleanProperty(False)
-    is_bht400 = BooleanProperty(False)
-    is_bht500 = BooleanProperty(False)
-    is_bht600 = BooleanProperty(False)
-    is_bht700 = BooleanProperty(False)
-    is_bht800 = BooleanProperty(False)
-    is_bht900 = BooleanProperty(False)
-    is_bht1000 = BooleanProperty(False)
-    is_bht200to400 = BooleanProperty(False)
-    is_bht600to800 = BooleanProperty(False)
-    is_bht800to1000 = BooleanProperty(False)
-    # is_bhtbigrand = BooleanProperty(False)
-    try:
-        if data_params['button_hold_time'] == False:
-            is_bhtfalse = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.0:
-            is_bht000 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.1:
-            is_bht100 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.2:
-            is_bht200 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.3:
-            is_bht300 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.4:
-            is_bht400 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.5:
-            is_bht500 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.6:
-            is_bht600 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.7:
-            is_bht700 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.8:
-            is_bht800 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.9:
-            is_bht900 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 1.0:
-            is_bht1000 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == '.2-.4': 
-            is_bht200to400 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == '.6-.8':
-            is_bht600to800 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == '.8-1.0':
-            is_bht800to1000 = BooleanProperty(True)
-    except:
-        pass
+    is_bht100 = BooleanProperty(data_params['button_hold_time'] == 0.1)
+    is_bht300 = BooleanProperty(data_params['button_hold_time'] == 0.3)
+    is_bht500 = BooleanProperty(data_params['button_hold_time'] == 0.5)
+    is_bht700 = BooleanProperty(data_params['button_hold_time'] == 0.7)
+    is_bht900 = BooleanProperty(data_params['button_hold_time'] == 0.9)
+    is_bht200_to_400 = BooleanProperty(data_params['button_hold_time'] == '0.2-0.4')
+    is_bht600_to_800 = BooleanProperty(data_params['button_hold_time'] ==  '0.6-0.8')
+    is_bht800_to_1000 = BooleanProperty(data_params['button_hold_time'] == '0.8-1.0')
+    is_bht900_to_1200 = BooleanProperty(data_params['button_hold_time'] == '0.9-1.2')
+    is_bht1100_to_1400 = BooleanProperty(data_params['button_hold_time'] == '1.1-1.4')
+
+
+
         
     # crashbar reward
     is_bhrew000 = BooleanProperty(False)
