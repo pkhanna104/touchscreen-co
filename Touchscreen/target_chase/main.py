@@ -15,6 +15,7 @@ import struct
 from sys import platform
 import os
 import scipy.io as io
+import numpy as np
 
 
 Config.set('graphics', 'resizable', False)
@@ -53,16 +54,24 @@ elif platform == 'win32':
         pix_per_cm = 95. # we get this automatically now but here it is anyway
     else:
         from screeninfo import get_monitors
-            mon = get_monitors()
-        #    if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
-        #        # must be an external monitor plugged in
-        #        # assume that it is the ViewSonic TD2230
-        #        fixed_window_size = (1920, 1080) # we get this automatically now but here it is anyway
-        #        fixed_window_size_cm = (47.6, 26.8) # this is the important part
-        #        pix_per_cm = 40. # we get this automatically now but here it is anyway
-        #    else:
-                # must just be the Surface Pro
-                # These are surface pro settings
+        mon = get_monitors()
+        if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
+            # must be an external monitor plugged in
+            i_td2230 = False
+            for i in range(len(mon)):
+                if mon[i].height_mm == 268 and mon[i].width_mm == 477:
+                    # assume it is viewsonic TD2230
+                    i_td2230 = i
+            if not i_td2230:
+                i_mon = i
+            else:
+                i_mon = i_td2230
+        else:
+            # must just be the surface pro
+            i_mon = 0
+        fixed_window_size = (mon[i_mon].width, mon[i_mon].height) # we get this automatically now but here it is anyway
+        fixed_window_size_cm = (mon[i_mon].width_mm/10, mon[i_mon].height_mm/10) # this is the important part
+        pix_per_cm = np.round(10*np.min([mon[i_mon].width/mon[i_mon].width_mm, mon[i_mon].height/mon[i_mon].height_mm]))
     
     import winsound
 
@@ -1178,6 +1187,12 @@ class COGame(Widget):
         elif user_id == 'BasalGangulia':
             box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/target_chase/'
             last_param_path = 'C:/Users/BasalGangulia/Documents/'
+        elif user_id == 'stim':
+            box_path = 'C:/Users/stim/Box/Data/NHP_BehavioralData/target_chase/'
+            last_param_path = 'C:/Users/stim/Documents/'
+        elif user_id == 'sando':
+            box_path = 'C:/Users/sando/Box/Data/NHP_BehavioralData/target_chase/'
+            last_param_path = 'C:/Users/sando/Documents/'
         
         # Check if the Box directory exists
         if os.path.exists(box_path):
