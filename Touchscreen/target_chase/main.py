@@ -67,6 +67,8 @@ for p in path:
         user_id = 'stim'
     elif p == 'Sandon':
         user_id = 'Sandon'
+    elif p == 'sando':
+        user_id = 'sando'
 
 # LOAD THE MOST RECENT PARMS TO USE AS DEFAULTS
 if user_id == 'Sandon':
@@ -75,6 +77,10 @@ elif user_id == 'Ganguly':
     last_param_path = 'C:/Users/Ganguly/Documents/'
 elif user_id == 'BasalGangulia':
     last_param_path = 'C:/Users/BasalGangulia/Documents/'
+elif user_id == 'sando':
+    last_param_path = 'C:/Users/sando/Documents/'
+elif user_id == 'stim':
+    last_param_path = 'C:/Users/stim/Documents/'
 
 last_param_path = last_param_path+'most_recent_target_chase_params.pkl'
 if os.path.exists(last_param_path):
