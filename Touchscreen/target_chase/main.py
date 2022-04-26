@@ -47,32 +47,18 @@ if platform == 'darwin': # we are on a Mac
     fixed_window_size_cm = (34.5, 21.5) # this is the important part
     pix_per_cm = 104. # we get this automatically now but here it is anyway
 elif platform == 'win32':
-        # see if there is an external monitor plugged in
-    if user_id == 'BasalGangulia':
-        fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
-        fixed_window_size_cm = (47.6, 26.8)
-#        fixed_window_size_cm = (22.8, 15.2) # this is the important part
-        pix_per_cm = 95. # we get this automatically now but here it is anyway
-    else:
-        from screeninfo import get_monitors
-        mon = get_monitors()
-        if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
-            # must be a1n external monitor plugged in
-            i_td2230 = False
-            for i in range(len(mon)):
-                if mon[i].height_mm == 268 and mon[i].width_mm == 477:
-                    # assume it is viewsonic TD2230
-                    i_td2230 = i
-            if not i_td2230:
-                i_mon = i
-            else:
-                i_mon = i_td2230
-        else:
-            # must just be the surface pro
-            i_mon = 0
-        fixed_window_size = (mon[i_mon].width, mon[i_mon].height) # we get this automatically now but here it is anyway
-        fixed_window_size_cm = (mon[i_mon].width_mm/10, mon[i_mon].height_mm/10) # this is the important part
-        pix_per_cm = np.round(10*np.min([mon[i_mon].width/mon[i_mon].width_mm, mon[i_mon].height/mon[i_mon].height_mm]))
+    # see if there is an external monitor plugged in
+    from screeninfo import get_monitors
+    mon = get_monitors()
+#    if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
+#        # must be an external monitor plugged in
+#        # assume that it is the ViewSonic TD2230
+#        fixed_window_size = (1920, 1080) # we get this automatically now but here it is anyway
+#        fixed_window_size_cm = (47.6, 26.8) # this is the important part
+#        pix_per_cm = 40. # we get this automatically now but here it is anyway
+#    else:
+        # must just be the Surface Pro
+        # These are surface pro settings
     fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
     fixed_window_size_cm = (47.6, 26.8)
 #        fixed_window_size_cm = (22.8, 15.2) # this is the important part
