@@ -27,22 +27,32 @@ if platform == 'darwin': # we are on a Mac
     fixed_window_size_cm = (34.5, 21.5) # this is the important part
     pix_per_cm = 104. # we get this automatically now but here it is anyway
 elif platform == 'win32':
-    # see if there is an external monitor plugged in
-    from screeninfo import get_monitors
-    mon = get_monitors()
-#    if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
-#        # must be an external monitor plugged in
-#        # assume that it is the ViewSonic TD2230
-#        fixed_window_size = (1920, 1080) # we get this automatically now but here it is anyway
-#        fixed_window_size_cm = (47.6, 26.8) # this is the important part
-#        pix_per_cm = 40. # we get this automatically now but here it is anyway
-#    else:
-        # must just be the Surface Pro
-        # These are surface pro settings
-    fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
-    fixed_window_size_cm = (47.6, 26.8)
+        # see if there is an external monitor plugged in
+    if user_id == 'BasalGangulia':
+        fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
+        fixed_window_size_cm = (47.6, 26.8)
 #        fixed_window_size_cm = (22.8, 15.2) # this is the important part
-    pix_per_cm = 95. # we get this automatically now but here it is anyway
+        pix_per_cm = 95. # we get this automatically now but here it is anyway
+    else:
+        from screeninfo import get_monitors
+        mon = get_monitors()
+        if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
+            # must be a1n external monitor plugged in
+            i_td2230 = False
+            for i in range(len(mon)):
+                if mon[i].height_mm == 268 and mon[i].width_mm == 477:
+                    # assume it is viewsonic TD2230
+                    i_td2230 = i
+            if not i_td2230:
+                i_mon = i
+            else:
+                i_mon = i_td2230
+        else:
+            # must just be the surface pro
+            i_mon = 0
+        fixed_window_size = (mon[i_mon].width, mon[i_mon].height) # we get this automatically now but here it is anyway
+        fixed_window_size_cm = (mon[i_mon].width_mm/10, mon[i_mon].height_mm/10) # this is the important part
+        pix_per_cm = np.round(10*np.min([mon[i_mon].width/mon[i_mon].width_mm, mon[i_mon].height/mon[i_mon].height_mm]))
     import winsound
 
 Config.set('graphics', 'width', str(fixed_window_size[0]))
@@ -2192,7 +2202,7 @@ class COGame(Widget):
         seq_poss_ix = np.random.randint(0, np.shape(self.seq_poss)[0])
         
         if self.target1_pos_str == 'random': 
-            i_pos = 1#self.seq_poss[seq_poss_ix, 0]-1
+            i_pos = self.seq_poss[seq_poss_ix, 0]-1
             targ1_pos = self.get_targpos_from_str(pos_str_opts[i_pos], self.nudge_x_t1)
     
             self.target1_position = targ1_pos 
@@ -2200,7 +2210,7 @@ class COGame(Widget):
                 self.target1_pos_str = pos_str_opts[i_pos]
             
         if self.target2_pos_str == 'random': 
-            i_pos = 5#self.seq_poss[seq_poss_ix, 1]-1
+            i_pos = self.seq_poss[seq_poss_ix, 1]-1
             targ2_pos = self.get_targpos_from_str(pos_str_opts[i_pos], self.nudge_x_t2)
     
             self.target2_position = targ2_pos 
@@ -2208,7 +2218,7 @@ class COGame(Widget):
                 self.target2_pos_str = pos_str_opts[i_pos]
             
         if self.target3_pos_str == 'random': 
-            i_pos = 0#self.seq_poss[seq_poss_ix, 2]-1
+            i_pos = self.seq_poss[seq_poss_ix, 2]-1
             targ3_pos = self.get_targpos_from_str(pos_str_opts[i_pos], self.nudge_x_t3)
     
             self.target3_position = targ3_pos 
@@ -2216,7 +2226,7 @@ class COGame(Widget):
                 self.target3_pos_str = pos_str_opts[i_pos]
             
         if self.target4_pos_str == 'random': 
-            i_pos = 2#self.seq_poss[seq_poss_ix, 3]-1
+            i_pos = self.seq_poss[seq_poss_ix, 3]-1
             targ4_pos = self.get_targpos_from_str(pos_str_opts[i_pos], self.nudge_x_t4)
     
             self.target4_position = targ4_pos 
@@ -2224,7 +2234,7 @@ class COGame(Widget):
                 self.target4_pos_str = pos_str_opts[i_pos]
             
         if self.target5_pos_str == 'random': 
-            i_pos = 6#self.seq_poss[seq_poss_ix, 4]-1
+            i_pos = self.seq_poss[seq_poss_ix, 4]-1
             targ5_pos = self.get_targpos_from_str(pos_str_opts[i_pos], self.nudge_x_t4)
     
             self.target5_position = targ5_pos 
