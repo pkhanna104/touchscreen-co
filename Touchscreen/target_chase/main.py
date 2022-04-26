@@ -48,15 +48,15 @@ if platform == 'darwin': # we are on a Mac
     pix_per_cm = 104. # we get this automatically now but here it is anyway
 elif platform == 'win32':
         # see if there is an external monitor plugged in
+    from screeninfo import get_monitors
+    mon = get_monitors()
     if user_id == 'BasalGangulia':
-        error
         fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
         fixed_window_size_cm = (47.6, 26.8)
 #        fixed_window_size_cm = (22.8, 15.2) # this is the important part
         pix_per_cm = 95. # we get this automatically now but here it is anyway
     else:
-        from screeninfo import get_monitors
-        mon = get_monitors()
+        
         if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
             # must be a1n external monitor plugged in
             i_td2230 = False
@@ -74,10 +74,6 @@ elif platform == 'win32':
         fixed_window_size = (mon[i_mon].width, mon[i_mon].height) # we get this automatically now but here it is anyway
         fixed_window_size_cm = (mon[i_mon].width_mm/10, mon[i_mon].height_mm/10) # this is the important part
         pix_per_cm = np.round(10*np.min([mon[i_mon].width/mon[i_mon].width_mm, mon[i_mon].height/mon[i_mon].height_mm]))
-    fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
-    fixed_window_size_cm = (47.6, 26.8)
-#        fixed_window_size_cm = (22.8, 15.2) # this is the important part
-    pix_per_cm = 95. # we get this automatically now but here it is anyway
     import winsound
 
 Config.set('graphics', 'width', str(fixed_window_size[0]))
