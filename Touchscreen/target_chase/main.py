@@ -15,10 +15,42 @@ import struct
 from sys import platform
 import os
 import scipy.io as io
-import numpy as np
 
 
 Config.set('graphics', 'resizable', False)
+
+if platform == 'darwin': # we are on a Mac
+    # This probably means that we are testing on a personal laptop
+    
+    # settings for MBP 16" 2021
+    fixed_window_size = (3072, 1920) # we get this automatically now but here it is anyway
+    fixed_window_size_cm = (34.5, 21.5) # this is the important part
+    pix_per_cm = 104. # we get this automatically now but here it is anyway
+elif platform == 'win32':
+    # see if there is an external monitor plugged in
+    from screeninfo import get_monitors
+    mon = get_monitors()
+#    if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
+#        # must be an external monitor plugged in
+#        # assume that it is the ViewSonic TD2230
+#        fixed_window_size = (1920, 1080) # we get this automatically now but here it is anyway
+#        fixed_window_size_cm = (47.6, 26.8) # this is the important part
+#        pix_per_cm = 40. # we get this automatically now but here it is anyway
+#    else:
+        # must just be the Surface Pro
+        # These are surface pro settings
+    fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
+    fixed_window_size_cm = (47.6, 26.8)
+#        fixed_window_size_cm = (22.8, 15.2) # this is the important part
+    pix_per_cm = 95. # we get this automatically now but here it is anyway
+    import winsound
+
+Config.set('graphics', 'width', str(fixed_window_size[0]))
+Config.set('graphics', 'height', str(fixed_window_size[1]))
+
+import time
+import numpy as np
+import tables
 
 # DETERMINE WHAT COMPUTER WE ARE ON
 path = os.getcwd()
@@ -35,55 +67,6 @@ for p in path:
         user_id = 'stim'
     elif p == 'Sandon':
         user_id = 'Sandon'
-    elif p == 'sando':
-        user_id = 'sando'
-
-if platform == 'darwin': # we are on a Mac
-    # This probably means that we are testing on a personal laptop
-    
-    # settings for MBP 16" 2021
-    fixed_window_size = (3072, 1920) # we get this automatically now but here it is anyway
-    fixed_window_size_cm = (34.5, 21.5) # this is the important part
-    pix_per_cm = 104. # we get this automatically now but here it is anyway
-elif platform == 'win32':
-    fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
-    fixed_window_size_cm = (47.6, 26.8)
-    pix_per_cm = 95. # we get this automatically now but here it is anyway
-#     # see if there is an external monitor plugged in
-#     if user_id == 'BasalGangulia':
-#         fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
-#         fixed_window_size_cm = (47.6, 26.8)
-# #        fixed_window_size_cm = (22.8, 15.2) # this is the important part
-#         pix_per_cm = 95. # we get this automatically now but here it is anyway
-#     else:
-#         from screeninfo import get_monitors
-#         mon = get_monitors()
-#         if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
-#             # must be a1n external monitor plugged in
-#             i_td2230 = False
-#             for i in range(len(mon)):
-#                 if mon[i].height_mm == 268 and mon[i].width_mm == 477:
-#                     # assume it is viewsonic TD2230
-#                     i_td2230 = i
-#             if not i_td2230:
-#                 i_mon = i
-#             else:
-#                 i_mon = i_td2230
-#         else:
-#             # must just be the surface pro
-#             i_mon = 0
-#         fixed_window_size = (mon[i_mon].width, mon[i_mon].height) # we get this automatically now but here it is anyway
-#         fixed_window_size_cm = (mon[i_mon].width_mm/10, mon[i_mon].height_mm/10) # this is the important part
-#         pix_per_cm = np.round(10*np.min([mon[i_mon].width/mon[i_mon].width_mm, mon[i_mon].height/mon[i_mon].height_mm]))
-    
-    import winsound
-
-Config.set('graphics', 'width', str(fixed_window_size[0]))
-Config.set('graphics', 'height', str(fixed_window_size[1]))
-
-import time
-import numpy as np
-import tables
 
 # LOAD THE MOST RECENT PARMS TO USE AS DEFAULTS
 if user_id == 'Sandon':
@@ -92,10 +75,6 @@ elif user_id == 'Ganguly':
     last_param_path = 'C:/Users/Ganguly/Documents/'
 elif user_id == 'BasalGangulia':
     last_param_path = 'C:/Users/BasalGangulia/Documents/'
-elif user_id == 'sando':
-    last_param_path = 'C:/Users/sando/Documents/'
-elif user_id == 'stim':
-    last_param_path = 'C:/Users/stim/Documents/'
 
 last_param_path = last_param_path+'most_recent_target_chase_params.pkl'
 if os.path.exists(last_param_path):
@@ -349,8 +328,8 @@ class COGame(Widget):
         # lower the center position by half of the total amount the screen height has been shrunk by
         self.center_position[1] = self.center_position[1] + self.screen_top/2 + self.screen_bot/2
         
-        # d_center2top = (fixed_window_size_cm[1]/2)-((self.screen_top/2)+(self.screen_bot/2))
-        # d_center2bot = (fixed_window_size_cm[1]/2)+((self.screen_top/2)+(self.screen_bot/2))
+        d_center2top = (fixed_window_size_cm[1]/2)-((self.screen_top/2)+(self.screen_bot/2))
+        d_center2bot = (fixed_window_size_cm[1]/2)+((self.screen_top/2)+(self.screen_bot/2))
         self.max_y_from_center = (fixed_window_size_cm[1]+self.screen_top-self.screen_bot)/2-self.target_rad
         
         
@@ -596,7 +575,8 @@ class COGame(Widget):
             self.target3_pos_str = 'none'
             self.target4_pos_str = 'none'
             self.target5_pos_str = 'none'
-            self.num_targets = 2
+            self.trial_order = self.gen_trials(self.seq) 
+            self.num_targets = 1
         
         elif self.seq == 'button out':
             seq_preselect = True
@@ -605,6 +585,7 @@ class COGame(Widget):
             self.target3_pos_str = 'none'
             self.target4_pos_str = 'none'
             self.target5_pos_str = 'none'
+            self.trial_order = self.gen_trials(self.seq)
             self.num_targets = 1
         
         else:
@@ -617,6 +598,7 @@ class COGame(Widget):
             if self.seq == 'repeat' and data_params['seq'] == 'rand5-randevery':
                 self.seq = 'rand5-randevery'
             elif self.seq == '2seq-repeat':
+                self.seq = '2seq-repeat'
                 self.seq2generated = False
             else:
                 self.target1_pos_str = 'random'
@@ -881,6 +863,18 @@ class COGame(Widget):
         for i, val in enumerate(task_in['outlines']):
             if val:
                 self.display_outlines = outline_opts[i]
+        
+
+        # nudge_9am_dist = [0., .5, 1.]
+        # for i, val in enumerate(nudge['nudge']):
+        #     if val:
+        self.nudge_dist = 0.
+
+        # targ_pos = ['corners', None]
+        # for i, val in enumerate(targ_pos['targ_pos']):
+        #     if val:
+        self.generator_kwarg = 'corners'
+
 
         # Preload sounds: 
         self.target1_start_sound = SoundLoader.load('C.wav')
@@ -1175,12 +1169,6 @@ class COGame(Widget):
         elif user_id == 'BasalGangulia':
             box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/target_chase/'
             last_param_path = 'C:/Users/BasalGangulia/Documents/'
-        elif user_id == 'stim':
-            box_path = 'C:/Users/stim/Box/Data/NHP_BehavioralData/target_chase/'
-            last_param_path = 'C:/Users/stim/Documents/'
-        elif user_id == 'sando':
-            box_path = 'C:/Users/sando/Box/Data/NHP_BehavioralData/target_chase/'
-            last_param_path = 'C:/Users/sando/Documents/'
         
         # Check if the Box directory exists
         if os.path.exists(box_path):
@@ -1699,14 +1687,14 @@ class COGame(Widget):
     def _start_target(self, **kwargs):
         if self.testing:
             toc_start_target = time.time()
-            # print('Time from touch_target touch to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_target), 3), ' ms')
-            # print('Time from start of on_touch_down to start_target: ', np.round(1000*(toc_start_target-self.tic_on_touch_down_start), 3), ' ms')
-            # print('Time from end of on_touch_down to start_target: ', np.round(1000*(toc_start_target-self.tic_on_touch_down_end), 3), ' ms')
-            # print('Time from start of write_to_h5file to start_target: ', np.round(1000*(toc_start_target-self.tic_write_to_h5file_start), 3), ' ms')
-            # print('Time from end of write_to_h5file to start_target: ', np.round(1000*(toc_start_target-self.tic_write_to_h5file_end), 3), ' ms')
-            # print('Time from start of update to start_target: ', np.round(1000*(toc_start_target-self.tic_update_start), 3), ' ms')
-            # print('Time from start of touch_target_nohold to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_targ_nohold_start), 3), ' ms')
-            # print('Time from end of touch_target_nohold to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_targ_nohold_end), 3), ' ms')
+            print('Time from touch_target touch to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_target), 3), ' ms')
+            print('Time from start of on_touch_down to start_target: ', np.round(1000*(toc_start_target-self.tic_on_touch_down_start), 3), ' ms')
+            print('Time from end of on_touch_down to start_target: ', np.round(1000*(toc_start_target-self.tic_on_touch_down_end), 3), ' ms')
+            print('Time from start of write_to_h5file to start_target: ', np.round(1000*(toc_start_target-self.tic_write_to_h5file_start), 3), ' ms')
+            print('Time from end of write_to_h5file to start_target: ', np.round(1000*(toc_start_target-self.tic_write_to_h5file_end), 3), ' ms')
+            print('Time from start of update to start_target: ', np.round(1000*(toc_start_target-self.tic_update_start), 3), ' ms')
+            print('Time from start of touch_target_nohold to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_targ_nohold_start), 3), ' ms')
+            print('Time from end of touch_target_nohold to start_target: ', np.round(1000*(toc_start_target-self.tic_touch_targ_nohold_end), 3), ' ms')
             
             
             
@@ -2250,7 +2238,7 @@ class Splash(Widget):
         self.args = args
         if platform =='win32':
             from sound import Sound
-            # Sound.volume_max()
+            Sound.volume_max()
 
 class Target(Widget):
     
