@@ -73,6 +73,10 @@ elif platform == 'win32':
         fixed_window_size = (mon[i_mon].width, mon[i_mon].height) # we get this automatically now but here it is anyway
         fixed_window_size_cm = (mon[i_mon].width_mm/10, mon[i_mon].height_mm/10) # this is the important part
         pix_per_cm = np.round(10*np.min([mon[i_mon].width/mon[i_mon].width_mm, mon[i_mon].height/mon[i_mon].height_mm]))
+    fixed_window_size = (2160, 1440) # we get this automatically now but here it is anyway
+    fixed_window_size_cm = (47.6, 26.8)
+#        fixed_window_size_cm = (22.8, 15.2) # this is the important part
+    pix_per_cm = 95. # we get this automatically now but here it is anyway
     import winsound
 
 Config.set('graphics', 'width', str(fixed_window_size[0]))
