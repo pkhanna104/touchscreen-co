@@ -19,6 +19,26 @@ import scipy.io as io
 
 Config.set('graphics', 'resizable', False)
 
+import time
+import numpy as np
+import tables
+
+# DETERMINE WHAT COMPUTER WE ARE ON
+path = os.getcwd()
+if platform == 'darwin': # we are on a Mac
+    path = path.split('/')
+elif platform == 'win32': # we are on windows
+    path = path.split('\\')
+for p in path:
+    if p == 'BasalGangulia':
+        user_id = 'BasalGangulia'
+    elif p == 'Ganguly':
+        user_id = 'Ganguly'
+    elif p == 'stim':
+        user_id = 'stim'
+    elif p == 'Sandon':
+        user_id = 'Sandon'
+
 if platform == 'darwin': # we are on a Mac
     # This probably means that we are testing on a personal laptop
     
@@ -57,26 +77,6 @@ elif platform == 'win32':
 
 Config.set('graphics', 'width', str(fixed_window_size[0]))
 Config.set('graphics', 'height', str(fixed_window_size[1]))
-
-import time
-import numpy as np
-import tables
-
-# DETERMINE WHAT COMPUTER WE ARE ON
-path = os.getcwd()
-if platform == 'darwin': # we are on a Mac
-    path = path.split('/')
-elif platform == 'win32': # we are on windows
-    path = path.split('\\')
-for p in path:
-    if p == 'BasalGangulia':
-        user_id = 'BasalGangulia'
-    elif p == 'Ganguly':
-        user_id = 'Ganguly'
-    elif p == 'stim':
-        user_id = 'stim'
-    elif p == 'Sandon':
-        user_id = 'Sandon'
 
 # LOAD THE MOST RECENT PARMS TO USE AS DEFAULTS
 if user_id == 'Sandon':
