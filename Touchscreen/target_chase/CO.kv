@@ -2787,7 +2787,7 @@
                     on_release:
                         root.current = 'game_screen'
                         game.init(*splash.args)
-                        Clock.schedule_interval(game.update, 1.0 / 60.0)
+                        Clock.schedule_interval(game.update, 1.0 / 200.0)
                 
                 Label:
                     text: ''
