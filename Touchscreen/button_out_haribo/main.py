@@ -214,6 +214,11 @@ class COGame(Widget):
         for i, val in enumerate(juicer['juicer']): 
             if val: 
                 self.juicer = juicer_opts[i]
+        
+        # ANIMAL NAME
+        for i, (nm, val) in enumerate(animal_names_dict.items()):
+            if val:
+                animal_name = nm
 
 
         # TARGET TIMEOUT
@@ -246,6 +251,14 @@ class COGame(Widget):
         for i, val in enumerate(nudge_x['nudge_x_t4']):
             if val:
                 self.nudge_x_t4 = nudge_x_opts[i]
+
+        if animal_name == 'nike': 
+            self.nudge_x_t1 = self.nudge_x_t1 + 0
+            self.nudge_x_t2 = self.nudge_x_t2 + 0
+            self.nudge_x_t3 = self.nudge_x_t3 + 0
+            self.nudge_x_t4 = self.nudge_x_t4 + 0
+            
+
         
         # WHERE TO CONSIDER THE TOP AND BOTTOM OF THE SCREEN (HOW MUCH TO SHRINK IT DOWN/UP BY)
         screen_top_opts = [-12, -10, -8, -6, -4, -2, 0]    
@@ -801,13 +814,21 @@ class COGame(Widget):
             pass
 
         try:
-            self.dio_port = serial.Serial(port='COM5', baudrate=115200)
+            print(animal_name)
+            if animal_name == 'haribo':
+                self.dio_port = serial.Serial(port='COM5', baudrate=115200)
+            elif animal_name == 'nike':
+                self.dio_port = serial.Serial(port='COM30', baudrate=115200)
             time.sleep(4.)
         except:
             pass
 
         try:
-            self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
+            print(animal_name)
+            if animal_name == 'haribo': 
+                self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
+            elif animal_name == 'nike':
+                self.cam_trig_port = serial.Serial(port='COM31', baudrate=9600)
             time.sleep(3.)
             # Say hello: 
             self.cam_trig_port.write('a'.encode())
