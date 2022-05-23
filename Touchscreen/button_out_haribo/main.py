@@ -253,10 +253,10 @@ class COGame(Widget):
                 self.nudge_x_t4 = nudge_x_opts[i]
 
         if animal_name == 'nike': 
-            self.nudge_x_t1 = self.nudge_x_t1 + 0
-            self.nudge_x_t2 = self.nudge_x_t2 + 0
-            self.nudge_x_t3 = self.nudge_x_t3 + 0
-            self.nudge_x_t4 = self.nudge_x_t4 + 0
+            self.nudge_x_t1 = self.nudge_x_t1 + 6
+            self.nudge_x_t2 = self.nudge_x_t2 + 6
+            self.nudge_x_t3 = self.nudge_x_t3 + 6
+            self.nudge_x_t4 = self.nudge_x_t4 + 6
             
 
         
