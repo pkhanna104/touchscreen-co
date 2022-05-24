@@ -109,6 +109,7 @@ class R2Game(Widget):
     speed = NumericProperty(0)
     hall_cnt = NumericProperty(0)
     end_cnt = NumericProperty(0)
+    print_state = StringProperty('')
 
     # Set relevant params text: 
     grasp_rew_txt = StringProperty('')
@@ -362,13 +363,14 @@ class R2Game(Widget):
             pass
 
         try:
-            self.dio_port = serial.Serial(port='COM6', baudrate=115200)
+            self.dio_port = serial.Serial(port='COM30', baudrate=115200)
             time.sleep(4.)
+            print('connected to dio port')
         except:
             pass
 
         try:
-            self.cam_trig_port = serial.Serial(port='COM11', baudrate=9600)
+            self.cam_trig_port = serial.Serial(port='COM29', baudrate=9600)
             time.sleep(3.)
             # Say hello: 
             self.cam_trig_port.write('a'.encode())
@@ -461,8 +463,8 @@ class R2Game(Widget):
 
         ### FSR threshold 
         self.fsr_threshold = 1.5*np.max(np.hstack((baseline_values)))
-        if self.fsr_threshold < 30: 
-            self.fsr_threshold += 25
+        #if self.fsr_threshold < 30: 
+        #    self.fsr_threshold += 25
 
         ### Close door 
         self.task_ard.write('c'.encode())
@@ -716,6 +718,9 @@ class R2Game(Widget):
                 pass
             else:
                 self.write_to_h5file()
+
+        ### update print state
+        self.print_state = self.state
 
     def write_to_h5file(self):
         self.h5_table_row['state']= self.state

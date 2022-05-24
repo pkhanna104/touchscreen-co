@@ -1127,6 +1127,15 @@
                     font_size: 30
                     on_release: game.quit_from_app()
                     background_color: (.1, 0.1, 0.8, 1.0)
+            BoxLayout:
+                id: test5
+                orientation: 'horizontal'
+                Label: 
+                    text: 'State: '
+                    fontsize: 50
+                Label: 
+                    text: game.print_state
+                    font_size: 50
 
             BoxLayout: 
                 id: test4
