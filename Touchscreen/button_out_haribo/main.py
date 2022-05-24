@@ -218,6 +218,11 @@ class COGame(Widget):
         for i, val in enumerate(juicer['juicer']): 
             if val: 
                 self.juicer = juicer_opts[i]
+        
+        # ANIMAL NAME
+        for i, (nm, val) in enumerate(animal_names_dict.items()):
+            if val:
+                animal_name = nm
 
 
         # TARGET TIMEOUT
@@ -250,6 +255,14 @@ class COGame(Widget):
         for i, val in enumerate(nudge_x['nudge_x_t4']):
             if val:
                 self.nudge_x_t4 = nudge_x_opts[i]
+
+        if animal_name == 'nike': 
+            self.nudge_x_t1 = self.nudge_x_t1 + 6
+            self.nudge_x_t2 = self.nudge_x_t2 + 6
+            self.nudge_x_t3 = self.nudge_x_t3 + 6
+            self.nudge_x_t4 = self.nudge_x_t4 + 6
+            
+
         
         # WHERE TO CONSIDER THE TOP AND BOTTOM OF THE SCREEN (HOW MUCH TO SHRINK IT DOWN/UP BY)
         screen_top_opts = [-12, -10, -8, -6, -4, -2, 0]    
@@ -596,7 +609,7 @@ class COGame(Widget):
 
 
         # BUTTON HOLD TIME
-        holdz = [False, 0.0, 0.1, 0.2, 0.3, 0.4, .5, .6, 0.7, 0.8, 0.9, 1.0, '.2-.4', '.6-.8', '.8-1.0']
+        holdz = [0.1, 0.3, .5, 0.7, 0.9, '.2-.4', '.6-.8', '.8-1.0', '.9-1.2', '1.1-1.4']
         self.button_hold_time_type = None
         for i, val in enumerate(hold['button_hold']):
             if val:
@@ -766,10 +779,15 @@ class COGame(Widget):
         # OPEN PORTS
         try:
             if self.juicer == 'yellow':
+                print('opening reward port')
+                print('user id %s'%user_id)
                 if user_id == 'Ganguly':
-                    self.reward_port = serial.Serial(port='COM4',
+                    import serial
+                    self.reward_port = serial.Serial(port='COM25',
                         baudrate=115200)
+
                 elif user_id == 'BasalGangulia':
+                    import serial
                     self.reward_port = serial.Serial(port='COM3',
                         baudrate=115200)
                 self.reward_port.close()
@@ -800,13 +818,21 @@ class COGame(Widget):
             pass
 
         try:
-            self.dio_port = serial.Serial(port='COM5', baudrate=115200)
+            print(animal_name)
+            if animal_name == 'haribo':
+                self.dio_port = serial.Serial(port='COM5', baudrate=115200)
+            elif animal_name == 'nike':
+                self.dio_port = serial.Serial(port='COM30', baudrate=115200)
             time.sleep(4.)
         except:
             pass
 
         try:
-            self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
+            print(animal_name)
+            if animal_name == 'haribo': 
+                self.cam_trig_port = serial.Serial(port='COM6', baudrate=9600)
+            elif animal_name == 'nike':
+                self.cam_trig_port = serial.Serial(port='COM31', baudrate=9600)
             time.sleep(3.)
             # Say hello: 
             self.cam_trig_port.write('a'.encode())
@@ -822,14 +848,17 @@ class COGame(Widget):
             if platform == 'darwin':
                 self.button_ard = serial.Serial(port='/dev/cu.usbmodem1421301', baudrate=9600)
             else:
+                print('trying button')
                 if user_id == 'Ganguly':
-                    self.button_ard = serial.Serial(port='COM3', baudrate=9600) 
+                    self.button_ard = serial.Serial(port='COM3', baudrate=9600)
+                    print('button added') 
                 elif user_id == 'BasalGangulia':
                     self.button_ard = serial.Serial(port='COM9', baudrate=9600)
                 elif user_id == 'cortex':
                     self.button_ard = serial.Serial(port = 'COM9', baudrate=9600)
         except:
             self.is_button_ard = False
+        print('is button ard %s'%str(self.is_button_ard))
 
         if self.is_button_ard: 
             baseline_data = []
@@ -1025,7 +1054,7 @@ class COGame(Widget):
     def update(self, ts):
         self.state_length = time.time() - self.state_start
         self.rew_cnt += 1
-        
+        #print(self.state)
         if self.is_button_ard:
             # Get the button values
             ser = self.button_ard.flushInput()
@@ -1039,10 +1068,10 @@ class COGame(Widget):
             # Determine if the button was pressed or not
             if fsr1 > self.fsr_baseline[0] or fsr2 > self.fsr_baseline[1]:
                 self.button_pressed = True
-                # print('Button Pressed')
+                #print('Button Pressed')
             else:
                 self.button_pressed = False
-                # print('Button NOT Pressed')
+                #print('Button NOT Pressed')
         else:
             self.button_pressed = False
         
@@ -1684,56 +1713,23 @@ class Manager(ScreenManager):
     except:
         pass
     
+
+
+
     # crashbar hold time
-    is_bhtfalse = BooleanProperty(False)
-    is_bht000 = BooleanProperty(False)
-    is_bht100 = BooleanProperty(False)
-    is_bht200 = BooleanProperty(False)
-    is_bht300 = BooleanProperty(False)
-    is_bht400 = BooleanProperty(False)
-    is_bht500 = BooleanProperty(False)
-    is_bht600 = BooleanProperty(False)
-    is_bht700 = BooleanProperty(False)
-    is_bht800 = BooleanProperty(False)
-    is_bht900 = BooleanProperty(False)
-    is_bht1000 = BooleanProperty(False)
-    is_bht200to400 = BooleanProperty(False)
-    is_bht600to800 = BooleanProperty(False)
-    is_bht800to1000 = BooleanProperty(False)
-    # is_bhtbigrand = BooleanProperty(False)
-    try:
-        if data_params['button_hold_time'] == False:
-            is_bhtfalse = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.0:
-            is_bht000 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.1:
-            is_bht100 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.2:
-            is_bht200 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.3:
-            is_bht300 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.4:
-            is_bht400 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.5:
-            is_bht500 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.6:
-            is_bht600 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.7:
-            is_bht700 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.8:
-            is_bht800 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 0.9:
-            is_bht900 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == 1.0:
-            is_bht1000 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == '.2-.4': 
-            is_bht200to400 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == '.6-.8':
-            is_bht600to800 = BooleanProperty(True)
-        elif data_params['button_hold_time'] == '.8-1.0':
-            is_bht800to1000 = BooleanProperty(True)
-    except:
-        pass
+    is_bht100 = BooleanProperty(data_params['button_hold_time'] == 0.1)
+    is_bht300 = BooleanProperty(data_params['button_hold_time'] == 0.3)
+    is_bht500 = BooleanProperty(data_params['button_hold_time'] == 0.5)
+    is_bht700 = BooleanProperty(data_params['button_hold_time'] == 0.7)
+    is_bht900 = BooleanProperty(data_params['button_hold_time'] == 0.9)
+    is_bht200_to_400 = BooleanProperty(data_params['button_hold_time'] == '0.2-0.4')
+    is_bht600_to_800 = BooleanProperty(data_params['button_hold_time'] ==  '0.6-0.8')
+    is_bht800_to_1000 = BooleanProperty(data_params['button_hold_time'] == '0.8-1.0')
+    is_bht900_to_1200 = BooleanProperty(data_params['button_hold_time'] == '0.9-1.2')
+    is_bht1100_to_1400 = BooleanProperty(data_params['button_hold_time'] == '1.1-1.4')
+
+
+
         
     # crashbar reward
     is_bhrew000 = BooleanProperty(False)

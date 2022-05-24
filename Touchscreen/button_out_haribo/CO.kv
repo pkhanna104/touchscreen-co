@@ -47,7 +47,14 @@
                     group: 'check'
                     id: chk_har
                     active: root.is_haribo  
-                     
+                Label: 
+                    text: 'Nike'
+                    fontsize: 28
+                    halign: 'center'
+                CheckBox: 
+                    group: 'check'
+                    id: chk_nike
+                    active: root.is_nike
                 Label: 
                     text: 'Testing'
                     fontsize: 28
@@ -162,6 +169,95 @@
                     text: ''
                     fontsize: 50
             
+            BoxLayout:
+                id: screen_top
+                orientation: 'horizontal'
+                canvas:
+                    Color:
+                        rgba: 0.1, 0.1, 0.7, 0.5
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label: 
+                    text: 'Button hold time (sec): '
+                    color: 1, 1, 0, 1
+                
+                Label: 
+                    text: '0.1 sec'
+                CheckBox:
+                    id: bht100
+                    group: 'button_hold'
+                    active: root.is_bht100
+
+                Label: 
+                    text: '0.3 sec'
+                CheckBox:
+                    id: bht300
+                    group: 'button_hold'
+                    active: root.is_bht300
+
+                Label: 
+                    text: '0.5 sec'
+                CheckBox:
+                    id: bht500
+                    group: 'button_hold'
+                    active: root.is_bht500
+
+                Label: 
+                    text: '0.7 sec'
+                CheckBox:
+                    id: bht700
+                    group: 'button_hold'
+                    active: root.is_bht700
+
+                Label: 
+                    text: '0.9 sec'
+                CheckBox:
+                    id: bht900
+                    group: 'button_hold'
+                    active: root.is_bht900
+
+                Label: 
+                    text: '0.2-0.4 sec'
+                CheckBox:
+                    id: bht200_to_400
+                    group: 'button_hold'
+                    active: root.is_bht200_to_400
+
+                Label: 
+                    text: '0.6-0.8 sec'
+                CheckBox:
+                    id: bht600_to_800
+                    group: 'button_hold'
+                    active: root.is_bht600_to_800
+
+                Label: 
+                    text: '0.8-1.0 sec'
+                CheckBox:
+                    id: bht800_to_1000
+                    group: 'button_hold'
+                    active: root.is_bht800_to_1000
+
+                Label: 
+                    text: '0.9-1.2 sec'
+                CheckBox:
+                    id: bht900_to_1200
+                    group: 'button_hold'
+                    active: root.is_bht900_to_1200
+
+                Label: 
+                    text: '1.1-1.4 sec'
+                CheckBox:
+                    id: bht1100_to_1400
+                    group: 'button_hold'
+                    active: root.is_bht1100_to_1400
+
             BoxLayout:
                 id: screen_top
                 orientation: 'horizontal'
@@ -317,7 +413,7 @@
                 on_release: 
                     root.current = 'splash_start'
                     splash.init(
-                    dict(haribo=chk_har.active, fifi=False, nike=False, butters=False, testing=chk_test.active), 
+                    dict(haribo=chk_har.active, fifi=False, nike=chk_nike.active, butters=False, testing=chk_test.active), 
                     
                     dict(button_rew=[True, False, False, False], 
                     min_rew=[True, False, False, False, False],
@@ -331,8 +427,10 @@
                     targ3_pos=[True, False,False, False, False, False, False, False ,False, False],
                     targ4_pos=[True, False,False, False, False, False, False, False ,False, False,],
                     time_to_next_targ=[True, False, False, False, False, False]),
-                    
-                    dict(button_hold=[False, False, False, False, False, False, False, False, False, False, False, False, True, False, False],
+
+                    dict(button_hold=[bht300.active, bht500.active, bht700.active, bht900.active, 
+                    bht200_to_400.active, bht600_to_800.active, bht800_to_1000.active, 
+                    bht900_to_1200.active, bht1100_to_1400.active],
                     hold=[True, False, False, False, False, False, False, False, False]), 
                     
                     dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),

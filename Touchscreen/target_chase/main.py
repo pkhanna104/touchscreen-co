@@ -995,6 +995,7 @@ class COGame(Widget):
         try:
             if self.juicer == 'yellow':
                 if user_id == 'Ganguly':
+                    import serial
                     self.reward_port = serial.Serial(port='COM4',
                         baudrate=115200)
                 elif user_id == 'BasalGangulia':
