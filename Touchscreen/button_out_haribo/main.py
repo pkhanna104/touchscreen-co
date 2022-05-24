@@ -66,6 +66,8 @@ for p in path:
         user_id = 'stim'
     elif p == 'Sandon':
         user_id = 'Sandon'
+    elif p == 'cortex': 
+        user_id = 'cortex'
 
 # LOAD THE MOST RECENT PARMS TO USE AS DEFAULTS
 if user_id == 'Sandon':
@@ -74,6 +76,8 @@ elif user_id == 'Ganguly':
     last_param_path = 'C:/Users/Ganguly/Documents/'
 elif user_id == 'BasalGangulia':
     last_param_path = 'C:/Users/BasalGangulia/Documents/'
+elif user_id == 'cortex':
+    last_param_path = 'C:/Users/cortex/Documents/'
 
 last_param_path = last_param_path+'most_recent_target_chase_params.pkl'
 if os.path.exists(last_param_path):
@@ -822,6 +826,8 @@ class COGame(Widget):
                     self.button_ard = serial.Serial(port='COM3', baudrate=9600) 
                 elif user_id == 'BasalGangulia':
                     self.button_ard = serial.Serial(port='COM9', baudrate=9600)
+                elif user_id == 'cortex':
+                    self.button_ard = serial.Serial(port = 'COM9', baudrate=9600)
         except:
             self.is_button_ard = False
 
@@ -902,6 +908,9 @@ class COGame(Widget):
             elif user_id == 'BasalGangulia':
                 box_path = 'C:/Users/BasalGangulia/Box/Data/NHP_BehavioralData/target_chase/'
                 last_param_path = 'C:/Users/BasalGangulia/Documents/'
+            elif user_id == 'cortex':
+                box_path = 'C:/Users/cortex/Box/Data/NHP_BehavioralData/target_chase/'
+                last_param_path = 'C:/Users/cortex/Documents/'
             
             # Check if the Box directory exists
             print('CWD: ')
