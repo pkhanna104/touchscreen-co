@@ -1,0 +1,63 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=PCB2
+*Date=14:41:11
+*CreatedBy=Fritzing 0.9.6b.2021-02-21.CD-178-0-8a1e0682
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;;;82.578;-47.9565;0;Bottom;TXT5
+2;220;THT;58.5891;-28.0598;90;Bottom; 
+3;;;9.40905;-19.0557;0;Bottom;TXT1
+4;;;7.07888;-6.94593;0;Bottom;TXT1
+5;;THT;56.0682;-41.8497;-90;Bottom; 
+6;;THT;78.9091;-47.8154;0;Bottom; 
+7;;THT;72.379;-35.6798;0;Bottom; 
+8;;;35.4631;-17.9266;0;Bottom;TXT2
+9;;;79.5005;-38.2671;0;Bottom;TXT5
+10;;THT;61.1291;-11.7298;90;Bottom;J5
+11;;;79.7532;-27.4013;0;Bottom;TXT2
+12;;;79.565;-28.7182;0;Bottom;TXT2
+13;;THT;28.1091;-11.7298;90;Bottom;J4
+14;;;46.8138;-18.0325;0;Bottom;TXT5
+15;;;14.1391;-33.1398;-90;Bottom; 
+16;;;64.8644;-27.8632;0;Bottom;TXT5
+17;;;25.7019;-17.8798;0;Bottom;TXT2
+18;;;68.2159;-17.8911;0;Bottom;TXT5
+19;;;79.6811;-23.0068;0;Bottom;TXT4
+20;;;53.6091;-35.3914;0;Bottom;TXT3
+21;;;73.4846;-17.5951;0;Bottom;TXT2
+22;;;15.3561;-17.979;0;Bottom;TXT2
+23;;;79.988;-33.2812;0;Bottom;TXT5
+24;;;79.5899;-17.7907;0;Bottom;TXT5
+25;;;58.3688;-17.6546;0;Bottom;TXT5
+26;;;51.9455;-18.0325;0;Bottom;TXT5
+27;;;65.1099;-38.3139;0;Bottom;TXT5
+28;;;64.981;-32.8576;0;Bottom;TXT5
+29;;;79.2559;-12.8197;0;Bottom;TXT7
+30;;;3.45642;-19.0934;0;Bottom;TXT1
+31;;;79.1913;-42.0298;0;Bottom;TXT5
+32;;;73.3368;-18.5414;0;Bottom;TXT2
+33;;;58.7012;-35.5382;0;Bottom;TXT3
+34;;;30.2191;-17.9503;0;Bottom;TXT2
+35;;THT;86.3466;-25.5196;0;Bottom;J3
+36;;;20.5626;-17.8652;0;Bottom;TXT2
+37;220;THT;53.5091;-28.0598;-90;Bottom; 
+38;;;78.9336;-43.2057;0;Bottom;TXT5
+39;;;82.2958;-46.8276;0;Bottom;TXT5
+40;;THT;6.69923;-12.8388;180;Bottom; 
+41;;;63.6234;-17.8415;0;Bottom;TXT5
+42;;;4.30152;-25.0792;0;Bottom;TXT1
+43;;;36.9991;-33.1398;-90;Bottom;
+44;;;40.5434;-17.8564;0;Bottom;TXT2
+45;;;79.3653;-7.98085;0;Bottom;TXT7
+46;;;51.0113;-26.7898;0;Bottom;Part1
+47;;;64.6099;-43.488;0;Bottom;TXT5
+48;;;78.721;-50.8257;0;Bottom;TXT5
