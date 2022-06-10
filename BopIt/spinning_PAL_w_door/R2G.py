@@ -109,11 +109,13 @@ class R2Game(Widget):
     speed = NumericProperty(0)
     hall_cnt = NumericProperty(0)
     end_cnt = NumericProperty(0)
+    print_state = StringProperty('')
 
     # Set relevant params text: 
     grasp_rew_txt = StringProperty('')
     grasp_rew_param = StringProperty('')
 
+    start_hold_txt = StringProperty('')
     button_rew_txt = StringProperty('')
     button_rew_param = StringProperty('')
 
@@ -138,17 +140,19 @@ class R2Game(Widget):
             if val:
                 self.use_cap_not_button = cap[i]
 
-        button_holdz = [0., 0.1, 0.2, 0.3, 0.4, '.4-.6', '.6-.8', '.8-1.0']
-        grasp_holdz = [0., 0.05, 0.1, 0.15, .2, .25, .35, '.09-.12', '.11-.15']
+        button_holdz = [0., 0.4, '.4-.6', '.6-.8', '.8-1.0', '.9-1.2', '1.1-1.4', 1.5]
+        grasp_holdz = [0., .2, .25, .35, 0.5, '.35-.40', '.38-.45', '.43-.50']
+        tgrasp_holdz = [0., .2, .25, .35, 0.5, '.35-.40', '.38-.45', '.43-.50']
 
         for i, val in enumerate(hold['start_hold']):
-            print(i, val, button_holdz[i])
+            #print(i, val, button_holdz[i])
             if val:
                 if type(button_holdz[i]) is str:
                     self.start_hold_type = button_holdz[i]
-                    self.start_hold = button_holdz[i]
+                    cht_min, cht_max = self.start_hold_type.split('-')
+                    self.start_hold = ((float(cht_max) - float(cht_min)) * np.random.random()) + float(cht_min)
                 else:
-                    self.start_hold_type = 0
+                    self.start_hold_type = button_holdz[i]
                     self.start_hold = button_holdz[i]
 
         for i, val in enumerate(hold['grasp_hold']):
@@ -159,6 +163,15 @@ class R2Game(Widget):
                 else:
                     self.grasp_hold_type = grasp_holdz[i]
                     self.grasp_hold = grasp_holdz[i]
+
+        for i, val in enumerate(hold['tgrasp_hold']):
+            if val:
+                if type(tgrasp_holdz[i]) is str:
+                    self.tgrasp_hold_type = tgrasp_holdz[i]
+                    self.tgrasp_hold = 0.
+                else:
+                    self.tgrasp_hold_type = tgrasp_holdz[i]
+                    self.tgrasp_hold = tgrasp_holdz[i]
 
         small_rew_opts = [.1, .3, .5]
         for i, val in enumerate(rew_in['small_rew']):
@@ -237,7 +250,7 @@ class R2Game(Widget):
         # Preload reward buttons: 
         self.reward1 = SoundLoader.load('reward1.wav')
         self.reward2 = SoundLoader.load('reward2.wav')
-        self.doorbell = SoundLoader.load('mixkit-small-hit-in-a-game-2072.wav')
+        self.doorbell = SoundLoader.load('C.wav')#-small-hit-in-a-game-2072.wav')
 
         self.reward_started = False
 
@@ -317,7 +330,8 @@ class R2Game(Widget):
 
         try:
             if self.juicer == 'yellow':
-                self.reward_port = serial.Serial(port='COM5',
+                import serial
+                self.reward_port = serial.Serial(port='COM24',
                     baudrate=115200)
                 reward_fcn = True
                 self.reward_port.close()
@@ -349,13 +363,14 @@ class R2Game(Widget):
             pass
 
         try:
-            self.dio_port = serial.Serial(port='COM6', baudrate=115200)
+            self.dio_port = serial.Serial(port='COM30', baudrate=115200)
             time.sleep(4.)
+            print('connected to dio port')
         except:
             pass
 
         try:
-            self.cam_trig_port = serial.Serial(port='COM11', baudrate=9600)
+            self.cam_trig_port = serial.Serial(port='COM29', baudrate=9600)
             time.sleep(3.)
             # Say hello: 
             self.cam_trig_port.write('a'.encode())
@@ -375,8 +390,9 @@ class R2Game(Widget):
         d = dict(animal_name=animal_name,
             ITI_mean=self.ITI_mean, ITI_std = self.ITI_std, start_timeout = self.start_timeout, rew_delay = self.reward_delay_time,
             reward_fcn=reward_fcn, use_cap=self.use_cap_not_button,
-            start_hold=self.start_hold,
+            start_hold=self.start_hold_type,
             grasp_hold = self.grasp_hold_type, 
+            tgrasp_hold = self.tgrasp_hold_type,
             grasp_timeout = self.grasp_timeout_time, 
             big_rew=big_rew, 
             small_rew = small_rew, 
@@ -415,6 +431,7 @@ class R2Game(Widget):
         pickle.dump(d, open(path_ + 'last_params.pkl', 'wb'))
 
         ## Open task arduino - IR sensor, button, wheel position ### 
+        import serial
         self.task_ard = serial.Serial('COM10', baudrate=115200)
         self.going_to_targ = 0; 
         self.abortclose = 0; 
@@ -702,6 +719,9 @@ class R2Game(Widget):
             else:
                 self.write_to_h5file()
 
+        ### update print state
+        self.print_state = self.state
+
     def write_to_h5file(self):
         self.h5_table_row['state']= self.state
         self.h5_table_row['time'] = time.time() - self.t0
@@ -755,16 +775,33 @@ class R2Game(Widget):
             cht_min, cht_max = self.start_hold_type.split('-')
             self.start_hold = ((float(cht_max) - float(cht_min)) * np.random.random()) + float(cht_min)
 
-        if type(self.grasp_hold_type) is str:
-            tht_min, tht_max = self.grasp_hold_type.split('-')
-            self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
-        print('grasp hold time %.2f'%(self.grasp_hold))
+
         #### flag to make sure that while reward is blocking loops, that 'drop' doesn't get triggered ###
         self.reward_started = False
 
         #### Get the current trial 
         self.trial_num += 1
         self.current_trial = self.generated_trials[self.trial_num]
+
+        if self.current_trial[0] == b'tiny':
+
+            if type(self.tgrasp_hold_type) is str: 
+                tht_min, tht_max = self.tgrasp_hold_type.split('-')
+                self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
+            else: 
+                self.grasp_hold = self.tgrasp_hold_type
+
+        else: 
+            if type(self.grasp_hold_type) is str:
+                tht_min, tht_max = self.grasp_hold_type.split('-')
+                self.grasp_hold = ((float(tht_max) - float(tht_min)) * np.random.random()) + float(tht_min) 
+            else: 
+                self.grasp_hold = self.grasp_hold_type
+
+        print('grasp hold time %.2f'%(self.grasp_hold))
+
+
+        ### if current-trial is tiny: 
 
     def opened_door(self, **kwargs): 
         if self.door_pos < 950: 
@@ -801,13 +838,14 @@ class R2Game(Widget):
             self.cam_trig_port.write('1'.encode())
         except:
             pass
+
+        if self.doorbell_indicator: 
+            self.doorbell.play()
     
     def end_vid_trig(self, **kwargs):
         return kwargs['ts'] > self.pre_start_vid_ts
 
     def _start_start_button(self, **kwargs):
-        if self.doorbell_indicator: 
-            self.doorbell.play()
         pass
 
     def pushed_start(self, **kwargs):
@@ -936,7 +974,7 @@ class Manager(ScreenManager):
         monk_butters = BooleanProperty(data_params['animal_name'] == 'butters')
         monk_nike = BooleanProperty(data_params['animal_name'] == 'nike')
         monk_fifi = BooleanProperty(data_params['animal_name'] == 'fifi')
-        monk_test = BooleanProperty(data_params['animal_name'] == 'testing')
+        monk_test = BooleanProperty(data_params['animal_name'] == 'test')
 
         small_rew_1 = BooleanProperty(data_params['small_rew'] == 0.1)
         small_rew_3 = BooleanProperty(data_params['small_rew'] == 0.3)
@@ -954,25 +992,41 @@ class Manager(ScreenManager):
         rew_30 = BooleanProperty(data_params['rew_30'])
 
         button_0 = BooleanProperty(data_params['start_hold'] == 0.)
-        button_1 = BooleanProperty(data_params['start_hold'] == 0.1)
-        button_2 = BooleanProperty(data_params['start_hold'] == 0.2)
-        button_3 = BooleanProperty(data_params['start_hold'] == 0.3)
+        #button_1 = BooleanProperty(data_params['start_hold'] == 0.1)
+        #button_2 = BooleanProperty(data_params['start_hold'] == 0.2)
+        #button_3 = BooleanProperty(data_params['start_hold'] == 0.3)
         button_4 = BooleanProperty(data_params['start_hold'] == 0.4)
         button_4_to_6 = BooleanProperty(data_params['start_hold'] == '.4-.6')
         button_6_to_8 = BooleanProperty(data_params['start_hold'] == '.6-.8')
         button_8_to_10 = BooleanProperty(data_params['start_hold'] == '.8-1.0')
-
+        button_9_to_12 = BooleanProperty(data_params['start_hold'] == '.9-1.2')
+        button_11_to_14 = BooleanProperty(data_params['start_hold'] == '1.1-1.4')
+        button_15 = BooleanProperty(data_params['start_hold'] == 1.5)
 
         grasp_0 = BooleanProperty(data_params['grasp_hold'] == 0.)
-        grasp_5 = BooleanProperty(data_params['grasp_hold'] == 0.05)
-        grasp_10 = BooleanProperty(data_params['grasp_hold'] == 0.10)
-        grasp_15 = BooleanProperty(data_params['grasp_hold'] == 0.15)
+        #grasp_5 = BooleanProperty(data_params['grasp_hold'] == 0.05)
+        #grasp_10 = BooleanProperty(data_params['grasp_hold'] == 0.10)
+        #grasp_15 = BooleanProperty(data_params['grasp_hold'] == 0.15)
         grasp_20 = BooleanProperty(data_params['grasp_hold'] == 0.20)
         grasp_25 = BooleanProperty(data_params['grasp_hold'] == 0.25)
         grasp_35 = BooleanProperty(data_params['grasp_hold'] == 0.35)
         grasp_50 = BooleanProperty(data_params['grasp_hold'] == 0.50)
-        grasp_r_90_120 = BooleanProperty(data_params['grasp_hold'] == '.09-.12')
-        grasp_r_110_150 = BooleanProperty(data_params['grasp_hold'] == '.11-.15')
+        #grasp_r_90_120 = BooleanProperty(data_params['grasp_hold'] == '.09-.12')
+        #grasp_r_110_150 = BooleanProperty(data_params['grasp_hold'] == '.11-.15')
+        grasp_35_to_40 = BooleanProperty(data_params['grasp_hold'] == '.35-.40')
+        grasp_38_to_45 = BooleanProperty(data_params['grasp_hold'] == '.38-.45')
+        grasp_43_to_50 = BooleanProperty(data_params['grasp_hold'] == '.43-.50')
+
+        tg_zero_sec = BooleanProperty(data_params['tgrasp_hold'] == 0.)
+        tg_twenty_sec = BooleanProperty(data_params['tgrasp_hold'] == 0.2)
+        tg_quarter_sec = BooleanProperty(data_params['tgrasp_hold'] == 0.25)
+        tg_thirty_five_sec = BooleanProperty(data_params['tgrasp_hold'] == 0.35)
+        tg_fifty_sec = BooleanProperty(data_params['tgrasp_hold'] == 0.5)
+        tg_rand_350_400msec = BooleanProperty(data_params['tgrasp_hold'] == '.35-.40')
+        tg_rand_380_450msec = BooleanProperty(data_params['tgrasp_hold'] == '.38-.45')
+        tg_rand_430_500msec = BooleanProperty(data_params['tgrasp_hold'] == '.43-.50')
+        
+        
 
         power = BooleanProperty(False)
         tripod = BooleanProperty(False)
@@ -999,13 +1053,22 @@ class Manager(ScreenManager):
         grasp_to30 = BooleanProperty(data_params['grasp_timeout'] == 30.)
         grasp_toinf = BooleanProperty(data_params['grasp_timeout'] > 40)
 
-        trls_10 = BooleanProperty(data_params['trls_10'])
-        trls_15 = BooleanProperty(data_params['trls_15'])
-        trls_25 = BooleanProperty(data_params['trls_25'])
-        trls_35 = BooleanProperty(data_params['trls_35'])
-        trls_40 = BooleanProperty(data_params['trls_40'])
-        trls_50 = BooleanProperty(data_params['trls_50'])
-        trls_inf = BooleanProperty(data_params['trls_inf'])
+        try:
+            trls_10 = BooleanProperty(data_params['trls_10'])
+            trls_15 = BooleanProperty(data_params['trls_15'])
+            trls_25 = BooleanProperty(data_params['trls_25'])
+            trls_35 = BooleanProperty(data_params['trls_35'])
+            trls_40 = BooleanProperty(data_params['trls_40'])
+            trls_50 = BooleanProperty(data_params['trls_50'])
+            trls_inf = BooleanProperty(data_params['trls_inf'])
+        except:
+            trls_10 = BooleanProperty(False)
+            trls_15 = BooleanProperty(False)
+            trls_25 = BooleanProperty(False)
+            trls_35 = BooleanProperty(False)
+            trls_40 = BooleanProperty(False)
+            trls_50 = BooleanProperty(False)
+            trls_inf = BooleanProperty(False)  
 
         try:
             doorbell_on = BooleanProperty(data_params['doorbell_indicator'] == True)
