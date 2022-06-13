@@ -485,69 +485,67 @@ class R2Game(Widget):
         d['fsr_threshold'] = self.fsr_threshold
         d['trials'] = self.generated_trials
 
-        if self.testing:
-            pass
+        
+        # import os
+        # path = os.getcwd()
+        # path = path.split('\\')
+        # path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
+        # path_root = ''
+        # for ip in path_data:
+        #     path_root += ip+'/'
+        # p = path_root+'data/'
+
+        path = os.getcwd()
+        path = path.split('\\')
+        print(path)
+        for p in path:
+            if p == 'BasalGangulia':
+                laptop_name = 'BasalGangulia'
+            elif p == 'Ganguly':
+                laptop_name = 'Ganguly'
+            elif p == 'stim':
+                laptop_name = 'stim'
+            elif p == 'cortex':
+                laptop_name = 'cortex'
+
+        p = "C:/Users/%s/Box/Data/NHP_BehavioralData/"%laptop_name
+
+        # Check if this directory exists: 
+        if os.path.exists(p):
+            p = p + "spal/"
+            print('path: %s'%p)
         else:
-            # import os
-            # path = os.getcwd()
-            # path = path.split('\\')
-            # path_data = [p for p in path if np.logical_and('Touchscreen' not in p, 'Targ' not in p)]
-            # path_root = ''
-            # for ip in path_data:
-            #     path_root += ip+'/'
-            # p = path_root+'data/'
-
-            path = os.getcwd()
-            path = path.split('\\')
-            print(path)
-            for p in path:
-                if p == 'BasalGangulia':
-                    laptop_name = 'BasalGangulia'
-                elif p == 'Ganguly':
-                    laptop_name = 'Ganguly'
-                elif p == 'stim':
-                    laptop_name = 'stim'
-                elif p == 'cortex':
-                    laptop_name = 'cortex'
-
-            p = "C:/Users/%s/Box/Data/NHP_BehavioralData/"%laptop_name
-
-            # Check if this directory exists: 
+            p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')+'/'
             if os.path.exists(p):
-                p = p + "spal/"
-                print('path: %s'%p)
+                pass
             else:
-                p = path_root+ 'data_tmp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')+'/'
-                if os.path.exists(p):
-                    pass
-                else:
-                    os.mkdir(p)
-                    print('Making temp directory: ', p)
-                    
-            print ('')
-            print ('')
-            print('Data saving PATH: ', p)
-            print ('')
-            print ('')
+                os.mkdir(p)
+                print('Making temp directory: ', p)
+                
+        print ('')
+        print ('')
+        print('Data saving PATH: ', p)
+        print ('')
+        print ('')
 
-            self.filename = p+ animal_name+'_Grasp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
-            pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
+        self.filename = p+ animal_name+'_Grasp_'+datetime.datetime.now().strftime('%Y%m%d_%H%M')
+        pickle.dump(d, open(self.filename+'_params.pkl', 'wb'))
 
-            ## Save as 'last params'
-            path_root = os.getcwd()
-            pickle.dump(d, open(os.path.join(path_root, 'last_params.pkl'), 'wb'))
+        ## Save as 'last params'
+        path_root = os.getcwd()
+        pickle.dump(d, open(os.path.join(path_root, 'last_params.pkl'), 'wb'))
 
-            self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
-            self.h5_table = self.h5file.create_table('/', 'task', Data, '')
-            self.h5_table_row = self.h5_table.row
+        self.h5file = tables.open_file(self.filename + '_data.hdf', mode='w', title = 'NHP data')
+        self.h5_table = self.h5file.create_table('/', 'task', Data, '')
+        self.h5_table_row = self.h5_table.row
 
-            # Get the task to start the accelerometer process
-            # Start the accelerometer: 
-            #self.acc_process = subprocess.Popen(['python run_acc.py', p + animal_name + '_Grasp'])
+        # Get the task to start the accelerometer process
+        # Start the accelerometer: 
+        #self.acc_process = subprocess.Popen(['python run_acc.py', p + animal_name + '_Grasp'])
 
-            # Note in python 3 to open pkl files: 
-            #with open('xxxx_params.pkl', 'rb') as f:
-            #    data_params = pickle.load(f)
+        # Note in python 3 to open pkl files: 
+        #with open('xxxx_params.pkl', 'rb') as f:
+        #    data_params = pickle.load(f)
 
     def get_trials_order(self): 
         self.generated_trials = []
@@ -717,13 +715,10 @@ class R2Game(Widget):
                         start_state_fn = getattr(self, start_state_fn_name)
                         start_state_fn()
             
-        if self.testing:
+        if self.state == 'idle_exit':
             pass
         else:
-            if self.state == 'idle_exit':
-                pass
-            else:
-                self.write_to_h5file()
+            self.write_to_h5file()
 
         ### update print state
         self.print_state = self.state
@@ -1105,7 +1100,8 @@ class Manager(ScreenManager):
             trls_35 = BooleanProperty(False)
             trls_40 = BooleanProperty(False)
             trls_50 = BooleanProperty(False)
-            trls_inf = BooleanProperty(False)  
+            trls_inf = BooleanProperty(False)
+        trls_40 = BooleanProperty(False)
 
         try:
             doorbell_on = BooleanProperty(data_params['doorbell_indicator'] == True)
@@ -1127,6 +1123,7 @@ class Manager(ScreenManager):
         monk_haribo = BooleanProperty(True)
         monk_butters = BooleanProperty(False)
         monk_nike = BooleanProperty(False)
+        monk_test = BooleanProperty(False)
 
         small_rew_1 = BooleanProperty(True)
         small_rew_3 = BooleanProperty(False)
@@ -1181,6 +1178,8 @@ class Manager(ScreenManager):
         trls_15 = BooleanProperty(False)
         trls_20 = BooleanProperty(False)
         trls_25 = BooleanProperty(False)
+        trls_35 = BooleanProperty(False)
+        trls_40 = BooleanProperty(False)
         trls_50 = BooleanProperty(True)
         trls_inf = BooleanProperty(False)
         doorbell_on = BooleanProperty(True)

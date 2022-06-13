@@ -178,6 +178,15 @@
                 Label:
                     text: ''
                     fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
                 Label: 
                     text: 'Trials: '
                     color: 1, 1, 0, 1                    
@@ -208,7 +217,36 @@
                 CheckBox: 
                     id: tiny
                     active: root.tiny
-                
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
+
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label: 
+                    text: 'Trials: '
+                    color: 1, 1, 0, 1                    
+
                 Label: 
                     text: 'Power 2'
 
@@ -233,9 +271,36 @@
                 Label: 
                     text: 'Tiny 2'
                 CheckBox: 
-                    id: tiny
+                    id: tiny2
                     active: root.tiny2
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+            BoxLayout:
+                id: params:
+                orientation: 'horizontal'
 
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label: 
+                    text: 'Trials: '
+                    color: 1, 1, 0, 1                    
 
                 Label: 
                     text: 'Power 3'
@@ -261,9 +326,15 @@
                 Label: 
                     text: 'Tiny 3'
                 CheckBox: 
-                    id: tiny
+                    id: tiny3
                     active: root.tiny3
                 
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
                 Label:
                     text: ''
                     fontsize: 50
@@ -336,20 +407,6 @@
                     id: thirty_five_trials
                     group: 'trials'
                     active: root.trls_35
-
-                Label: 
-                    text: '40 trials'
-                CheckBox:
-                    id: fourty_trials
-                    group: 'trials'
-                    active: root.trls_40
-
-                Label:
-                    text: '50 trials'
-                CheckBox:
-                    id: fifty_trials
-                    group: 'trials'
-                    active: root.trls_50
                     
 
                 Label:
@@ -372,48 +429,6 @@
                     text: ''
                     fontsize: 50
 
-            BoxLayout:
-                id: test
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.2, 0.2, 0.5, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Testing or Monkey Time?'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: 'Testing'
-                CheckBox:
-                    id: testing
-                    group: 'testing'
-
-                Label:
-                    text: 'Monkey Time'
-                CheckBox:
-                    id: monk_time
-                    group: 'testing'
-                    active: True
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-            
             Button:
                 text: 'Line Up Motor to the Rest position: Play R2G'
                 halign: 'center'
@@ -432,7 +447,7 @@
                     
                     dict(rew_var=[True, False, False]), 
                     
-                    dict(test=[testing.active, monk_time.active]), 
+                    dict(test=[False, True]), 
 
                     dict(start_hold=[False, False, False,
                     False, False, False,
@@ -445,7 +460,7 @@
                     False, False, False, True, False, False, False]),
 
                     dict(autoquit=[five_trials.active, ten_trials.active, fifteen_trials.active, twenty_trials.active,
-                    twenty_five_trials.active, thirty_five_trials.active, fourty_trials.active, fifty_trials.active, no_trials.active]), 
+                    twenty_five_trials.active, thirty_five_trials.active, False, False, no_trials.active]), 
                     dict(gto=[False, True, False, False, False]),
                     dict(use_cap=[False, True]), 
                     
