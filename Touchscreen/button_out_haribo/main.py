@@ -28,8 +28,7 @@ if platform == 'darwin': # we are on a Mac
 elif platform == 'win32':
     # see if there is an external monitor plugged in
     from screeninfo import get_monitors
-    mon = get_monitors()
-#    if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
+    mon = get_monitors() #    if len(get_monitors()) > 1 or get_monitors()[0].height == 1080:
 #        # must be an external monitor plugged in
 #        # assume that it is the ViewSonic TD2230
 #        fixed_window_size = (1920, 1080) # we get this automatically now but here it is anyway
@@ -705,7 +704,7 @@ class COGame(Widget):
 
         self.testing = False
 
-        autoquit_trls = [10, 25, 50, 100, 10**10]
+        autoquit_trls = [5, 10, 15, 20, 25, 50, 100, 10**10]
         for i, val in enumerate(autoquit['autoquit']):
             if val: 
                 self.max_trials = autoquit_trls[i]
@@ -2252,14 +2251,24 @@ class Manager(ScreenManager):
         pass
     
     # auto quit after
+    is_autoqt5 = BooleanProperty(False)
     is_autoqt10 = BooleanProperty(False)
+    is_autoqt15 = BooleanProperty(False)
+    is_autoqt20 = BooleanProperty(False)
     is_autoqt25 = BooleanProperty(False)
     is_autoqt50 = BooleanProperty(False)
     is_autoqt100 = BooleanProperty(False)
     is_autoqtnever = BooleanProperty(False)
     try:
-        if data_params['max_trials'] == 10:
+        
+        if data_params['max_trials'] == 5:
+            is_autoqt5 = BooleanProperty(True)
+        elif data_params['max_trials'] == 10:
             is_autoqt10 = BooleanProperty(True)
+        elif data_params['max_trials'] == 15:
+            is_autoqt15 = BooleanProperty(True)
+        elif data_params['max_trials'] == 20:
+            is_autoqt20 = BooleanProperty(True)
         elif data_params['max_trials'] == 25:
             is_autoqt25 = BooleanProperty(True)
         elif data_params['max_trials'] == 50:

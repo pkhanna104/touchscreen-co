@@ -71,47 +71,6 @@
                     text: ''
                     fontsize: 50
 
-            BoxLayout 
-                id: top
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Which Juicer?        '
-                    color: 1, 1, 0, 1
-           
-                Label: 
-                    text: 'Old yellow'
-
-                CheckBox:
-                    group: 'juicer'
-                    id: yellow
-                    active: root.juicer_y
-            
-                Label: 
-                    text: 'New red'
-
-                CheckBox:
-                    group: 'juicer'
-                    id: red
-                    active: root.juicer_r
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
 
             
             BoxLayout 
@@ -258,82 +217,7 @@
                     group: 'button_hold'
                     active: root.is_bht1100_to_1400
 
-            BoxLayout:
-                id: screen_top
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.1, 0.1, 0.7, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'Lower Screen Top By'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '0 cm'
-                CheckBox:
-                    id: screen_top_zero
-                    group: 'screen_top'
-                    active: root.is_screentopzero
-                    
-                Label: 
-                    text: '2 cm'
-                CheckBox:
-                    id: screen_top_neg1
-                    group: 'screen_top'
-                    active: root.is_screentop2
-                
-                Label: 
-                    text: '4 cm'
-                CheckBox:
-                    id: screen_top_neg2
-                    group: 'screen_top'
-                    active: root.is_screentop4
-                    
-                Label: 
-                    text: '6 cm'
-                CheckBox:
-                    id: screen_top_neg3
-                    group: 'screen_top'
-                    active: root.is_screentop6
-                
-                Label: 
-                    text: '8 cm'
-                CheckBox:
-                    id: screen_top_neg4
-                    group: 'screen_top'
-                    active: root.is_screentop8
-                  
-                Label: 
-                    text: '10 cm'
-                CheckBox:
-                    id: screen_top_neg5
-                    group: 'screen_top'
-                    active: root.is_screentop10
-                    
-                Label: 
-                    text: '12 cm'
-                CheckBox:
-                    id: screen_top_neg6
-                    group: 'screen_top'
-                    active: root.is_screentop12
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
+            
             
             BoxLayout:
                 id: test
@@ -359,11 +243,32 @@
                     color: 1, 1, 0, 1
 
                 Label: 
+                    text: '5 trials'
+                CheckBox:
+                    id: five_trials
+                    group: 'trials'
+                    active: root.is_autoqt5
+
+                Label: 
                     text: '10 trials'
                 CheckBox:
                     id: ten_trials
                     group: 'trials'
                     active: root.is_autoqt10
+
+                Label: 
+                    text: '15 trials'
+                CheckBox:
+                    id: fifteen_trials
+                    group: 'trials'
+                    active: root.is_autoqt15
+
+                Label: 
+                    text: '20 trials'
+                CheckBox:
+                    id: twenty_trials
+                    group: 'trials'
+                    active: root.is_autoqt20
 
                 Label: 
                     text: '25 trials'
@@ -433,7 +338,9 @@
                     bht900_to_1200.active, bht1100_to_1400.active],
                     hold=[True, False, False, False, False, False, False, False, False]), 
                     
-                    dict(autoquit=[ten_trials.active, twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
+                    dict(autoquit=[five_trials.active, 
+                    ten_trials.active, fifteen_trials.active, twenty_trials.active,
+                    twenty_five_trials.active, fifty_trials.active, hundred_trials.active, no_trials.active]),
                     
                     dict(rew_var=[True, False, False]),
                     
@@ -447,11 +354,12 @@
                     nudge_x_t3=[False, True, False, False, False, False, False],
                     nudge_x_t4=[False, False, False, True, False, False, False]),
                     
-                    dict(screen_top=[screen_top_neg6.active, screen_top_neg5.active, screen_top_neg4.active, screen_top_neg3.active, screen_top_neg2.active, screen_top_neg1.active, screen_top_zero.active], 
+                    dict(screen_top=[False, False, False, False, 
+                    False, True, False], 
                     
                     screen_bot=[True, False, False, False, False, False, False]),
                     
-                    dict(juicer=[yellow.active, red.active]))
+                    dict(juicer=[False, True]))
 
             Label:
                 text: ''
