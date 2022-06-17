@@ -178,7 +178,7 @@ class R2Game(Widget):
             if val:
                 small_rew = small_rew_opts[i]
 
-        big_rew_opts = [.3, .5, .7]
+        big_rew_opts = [0., .5, .7]
         for i, val in enumerate(rew_in['big_rew']):
             if val:
                 big_rew = big_rew_opts[i]
@@ -973,15 +973,17 @@ class Manager(ScreenManager):
 
         monk_haribo = BooleanProperty(data_params['animal_name'] == 'haribo')
         monk_butters = BooleanProperty(data_params['animal_name'] == 'butters')
-        monk_nike = BooleanProperty(data_params['animal_name'] == 'nike')
+        #monk_nike = BooleanProperty(data_params['animal_name'] == 'nike')
+        monk_nike = BooleanProperty(True)
         monk_fifi = BooleanProperty(data_params['animal_name'] == 'fifi')
-        monk_test = BooleanProperty(data_params['animal_name'] == 'test')
-
+        #monk_test = BooleanProperty(data_params['animal_name'] == 'test')
+        monk_test = BooleanProperty(False)
+        
         small_rew_1 = BooleanProperty(data_params['small_rew'] == 0.1)
         small_rew_3 = BooleanProperty(data_params['small_rew'] == 0.3)
         small_rew_5 = BooleanProperty(data_params['small_rew'] == 0.5)
 
-        big_rew_3 = BooleanProperty(data_params['big_rew'] == 0.3)
+        big_rew_0 = BooleanProperty(data_params['big_rew'] == 0.0)
         big_rew_5 = BooleanProperty(data_params['big_rew'] == 0.5)
         big_rew_7 = BooleanProperty(data_params['big_rew'] == 0.7)
 
@@ -1120,9 +1122,9 @@ class Manager(ScreenManager):
         only_button = BooleanProperty(False)
         button_grip = BooleanProperty(True)
 
-        monk_haribo = BooleanProperty(True)
+        monk_haribo = BooleanProperty(False)
         monk_butters = BooleanProperty(False)
-        monk_nike = BooleanProperty(False)
+        monk_nike = BooleanProperty(True)
         monk_test = BooleanProperty(False)
 
         small_rew_1 = BooleanProperty(True)

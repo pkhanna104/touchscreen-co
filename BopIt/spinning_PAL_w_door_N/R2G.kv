@@ -23,105 +23,7 @@
                     Color: 
                         rgb: 1,1,0
 
-
-
-            BoxLayout
-                id: starting2
-                orientation: 'horizontal'
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: 'Animal Names:'
-                    color: 1, 1, 0, 1
-                    fontsize: 50
-                    
-
-                Label: 
-                    text: 'Nike'
-                    fontsize: 28
-                    halign: 'center' 
-                    active: root.monk_nike                       
-                
-                CheckBox: 
-                    group: 'check'
-                    id: chk_n
-                
-
-                Label: 
-                    text: 'Test'
-                    fontsize: 28
-                    halign: 'center' 
-                    active: root.monk_test                     
-                
-                CheckBox: 
-                    group: 'check'
-                    id: chk_t
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
-
-            BoxLayout 
-                id: small_rew
-                orientation: 'horizontal'
-                canvas:
-                    Color:
-                        rgba: 0.2, 0.2, 0.5, 0.5
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label:
-                    text: ''
-                    fontsize: 50
-
-                Label: 
-                    text: 'SMALL reward'
-                    color: 1, 1, 0, 1
-
-                Label: 
-                    text: '0.1 sec'
-
-                CheckBox:
-                    id: small_rew_pt1_sec
-                    group: 'small_rew'
-                    active: root.small_rew_1
-
-                Label: 
-                    text: '0.3 sec'
-
-                CheckBox:
-                    id: small_rew_pt3_sec
-                    group: 'small_rew'
-                    active: root.small_rew_3
-
-                Label: 
-                    text: '0.5 sec'
-
-                CheckBox:
-                    id: small_rew_pt5_sec
-                    group: 'small_rew'
-                    active: root.small_rew_5
-
-                Label:
-                    text: ''
-                    fontsize: 50
-                Label:
-                    text: ''
-                    fontsize: 50
+            
 
             BoxLayout 
                 id: big_rew
@@ -137,12 +39,12 @@
                     color: 1, 1, 0, 1
 
                 Label: 
-                    text: '0.3 sec'
+                    text: '0.0 sec'
 
                 CheckBox:
-                    id: big_rew_pt3_sec
+                    id: big_rew_pt0_sec
                     group: 'big_rew'
-                    active: root.big_rew_3
+                    active: root.big_rew_0
 
                 Label: 
                     text: '0.5 sec'
@@ -437,11 +339,11 @@
                 text_size: self.size
                 on_release: 
                     root.current = 'game_screen'
-                    game.init(dict(haribo=False, butters=False, nike=chk_n.active,
-                    fifi=False, test=chk_t.active), 
+                    game.init(dict(haribo=False, butters=False, nike=True,
+                    fifi=False, test=False), 
                     dict(rew_manual=False, rew_start=False, rew_start_and_grasp=False, rew_grasp=True, snd_only=False, 
 
-                    small_rew=[small_rew_pt1_sec.active, small_rew_pt3_sec.active, small_rew_pt5_sec.active], 
+                    small_rew=[True, False, False], 
 
                     big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     
