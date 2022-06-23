@@ -70,8 +70,44 @@
                     fontsize: 50
 
 
+            BoxLayout: 
+                id: params
+                orientation: 'horizontal'
 
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label: 
+                    text: 'Grasp hold time: '
+                    color: 1, 1, 0, 1
+                Label: 
+                    text: '0.25 sec'
+                CheckBox: 
+                    id: grasp_hold_25
+                    group: 'grasp_hold'
+                    active: root.grasp_25
 
+                Label: 
+                    text: '0.50 sec'
+                CheckBox: 
+                    id: grasp_hold_50
+                    group: 'grasp_hold'
+                    active: root.grasp_50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
+                Label:
+                    text: ''
+                    fontsize: 50
 
             BoxLayout:
                 id: params:
@@ -345,7 +381,7 @@
 
                     small_rew=[True, False, False], 
 
-                    big_rew=[big_rew_pt3_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
+                    big_rew=[big_rew_pt0_sec.active, big_rew_pt5_sec.active, big_rew_pt7_sec.active]), 
                     
                     dict(rew_var=[True, False, False]), 
                     
@@ -356,10 +392,10 @@
                     False, True], 
 
                     grasp_hold = [False, 
-                    False, False, False, True, False, False, False], 
+                    False, grasp_hold_25.active, False, grasp_hold_50.active, False, False, False], 
                     
                     tgrasp_hold = [False,
-                    False, False, False, True, False, False, False]),
+                    False, grasp_hold_25.active, False, grasp_hold_50.active, False, False, False]),
 
                     dict(autoquit=[five_trials.active, ten_trials.active, fifteen_trials.active, twenty_trials.active,
                     twenty_five_trials.active, thirty_five_trials.active, False, False, no_trials.active]), 
@@ -467,15 +503,26 @@
                     font_size: 30
                     on_release: game.quit_from_app()
                     background_color: (.1, 0.1, 0.8, 1.0)
+            
             BoxLayout:
                 id: test5
                 orientation: 'horizontal'
                 Label: 
                     text: 'State: '
-                    fontsize: 50
+                    fontsize: 100
                 Label: 
                     text: game.print_state
                     font_size: 50
+
+            BoxLayout: 
+                id: test6
+                orientation: 'horizontal'
+                Label: 
+                    text: 'Task iteration: '
+                    fontsize: 100
+                Label: 
+                    text: game.print_iter
+                    fontsize: 200
 
             BoxLayout: 
                 id: test4

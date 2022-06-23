@@ -110,6 +110,8 @@ class R2Game(Widget):
     hall_cnt = NumericProperty(0)
     end_cnt = NumericProperty(0)
     print_state = StringProperty('')
+    print_iter = StringProperty('')
+    cnt = 0 
 
     # Set relevant params text: 
     grasp_rew_txt = StringProperty('')
@@ -721,9 +723,11 @@ class R2Game(Widget):
             self.write_to_h5file()
 
         ### update print state
-        self.print_state = self.state
+        self.print_state = self.current_trial[0] + ': ' +self.state
+        self.print_iter = str(self.cnt)
 
     def write_to_h5file(self):
+        self.cnt += 1
         self.h5_table_row['state']= self.state
         self.h5_table_row['time'] = time.time() - self.t0
         self.h5_table_row['time_abs'] = time.time()
